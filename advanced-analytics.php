@@ -5,7 +5,7 @@
  * Do WP Advanced Analysis
  *
  * @package   advanced-analysis
- * @author    quotecites
+ * @author    sdobreff
  * @copyright Copyright (C) 2023-%%YEAR%%, Advanced analysis
  * @license   GPL v3
  * @link      https://wordpress.org/plugins/advanced-analysis/
@@ -20,6 +20,10 @@
  * License URI:     http://www.gnu.org/licenses/gpl-3.0.txt
  * Requires PHP:    7.4
  */
+
+use ADVAN\Controllers\Error_Log;
+use ADVAN\Helpers\Context_Helper;
+use ADVAN\Controllers\Reverse_Line_Reader;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -99,7 +103,21 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 
 $plugin_name_libraries = require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
+Reverse_Line_Reader::read_file_from_end(
+	Error_Log::autodetect(),
+	function( $line ) {
+		echo $line;
+
+		// if ( ! str_contains( $address, 'stop_word' ) ) {
+		// 	echo "\nFound 'stop_word'!";
+
+		// 	return false; // returning false here "breaks" the loop
+		// }
+	},
+	30
+);
+
 if ( ! Context_Helper::is_installing() ) {
-	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
-	\add_action( 'plugins_loaded', array( '\ADVAN\Advanced_Analytics', 'init' ) );
+	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
+	// \add_action( 'plugins_loaded', array( '\ADVAN\Advanced_Analytics', 'init' ) );
 }
