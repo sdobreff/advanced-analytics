@@ -21,8 +21,10 @@
  * Requires PHP:    7.4
  */
 
+use ADVAN\Advanced_Analytics;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Controllers\Reverse_Line_Reader;
 
 // If this file is called directly, abort.
@@ -102,22 +104,27 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 }
 
 $plugin_name_libraries = require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
-
+/*
 Reverse_Line_Reader::read_file_from_end(
 	Error_Log::autodetect(),
 	function( $line ) {
-		echo $line;
+		// echo $line;
+
+		// Check if this is the last line, and if not try to parse the line.
+		if ( null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
+			print_r( Log_Line_Parser::parse_php_error_log_stack_line( $line ) );
+		}
 
 		// if ( ! str_contains( $address, 'stop_word' ) ) {
-		// 	echo "\nFound 'stop_word'!";
+		// echo "\nFound 'stop_word'!";
 
-		// 	return false; // returning false here "breaks" the loop
+		// return false; // returning false here "breaks" the loop
 		// }
 	},
 	30
 );
-
+*/
 if ( ! Context_Helper::is_installing() ) {
 	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
-	// \add_action( 'plugins_loaded', array( '\ADVAN\Advanced_Analytics', 'init' ) );
+	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }
