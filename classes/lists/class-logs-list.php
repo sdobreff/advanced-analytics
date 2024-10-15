@@ -14,14 +14,11 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
-use WSAL\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
-use WSAL\Helpers\Settings_Helper;
 use ADVAN\Helpers\Log_Line_Parser;
-use WSAL\Extensions\Views\Reports;
 use ADVAN\Controllers\Reverse_Line_Reader;
-use WSAL\Entities\Generated_Reports_Entity;
-use WSAL\Helpers\DateTime_Formatter_Helper;
+use ADVAN\Helpers\File_Helper;
+use ADVAN\Helpers\Settings;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -40,8 +37,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 	 * @since 5.0.0
 	 */
 	class Logs_List extends \WP_List_Table {
-		public const SCREEN_OPTIONS_SLUG = 'wsal_generated_reports_view';
-		public const SEARCH_INPUT        = 'sgp';
+
+		public const SCREEN_OPTIONS_SLUG = 'advanced-analytics-logs-list';
+
+		public const SEARCH_INPUT = 'sgp';
 
 		/**
 		 * Current screen.
@@ -207,10 +206,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
-				//'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
-				'timestamp'               => __( 'Time', 'advanced-analytics' ),
-				'severity'                => __( 'Severity', 'advanced-analytics' ),
-				'message' => __( 'Message', 'advanced-analytics' ),
+				// 'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
+				'timestamp' => __( 'Time', 'advanced-analytics' ),
+				'severity'  => __( 'Severity', 'advanced-analytics' ),
+				'message'   => __( 'Message', 'advanced-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -248,9 +247,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 5.0.0
 		 */
 		public function prepare_items() {
-			$columns               = $this->get_columns();
-			$hidden                = array();
-			$sortable              = $this->get_sortable_columns();
+			$columns = $this->get_columns();
+			$hidden  = array();
+			// $sortable              = $this->get_sortable_columns();
+			$sortable              = array();
 			$this->_column_headers = array( $columns, $hidden, $sortable );
 
 			$this->handle_table_actions();
@@ -285,7 +285,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function get_hidden_columns() {
 			return array_filter(
-				(array) get_user_option( 'managetoplevel_page_wsal-auditlogcolumnshidden', false )
+				(array) get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
 			);
 		}
 
@@ -353,36 +353,50 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
-			$collected_items = [];
-			$errors = [];
+			$collected_items = array();
+			$errors          = array();
+			$position        = null;
 
-			Reverse_Line_Reader::read_file_from_end(
-				Error_Log::autodetect(),
-				function( $line ) use (&$collected_items, &$errors ) {
-			
-					// Check if this is the last line, and if not try to parse the line.
-					if ( null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
-						$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+			if ( function_exists( 'set_time_limit' ) ) {
+				set_time_limit( 0 );
+			}
 
-						if (\is_array($parsed_data) && isset($parsed_data['message'])) {
-							if (!empty($collected_items)) {
-								$parsed_data['sub_items'] = $collected_items;
-								$collected_items = [];
+			while ( empty( $errors ) ) {
+				$result = Reverse_Line_Reader::read_file_from_end(
+					Error_Log::autodetect(),
+					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
+
+						$position = $pos;
+
+						// Check if this is the last line, and if not try to parse the line.
+						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
+							$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+
+							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
+								if ( ! empty( $collected_items ) ) {
+									$parsed_data['sub_items'] = $collected_items;
+									$collected_items          = array();
+								}
+								$errors[] = $parsed_data;
+							} elseif ( \is_array( $parsed_data ) ) {
+								$collected_items[] = $parsed_data;
 							}
-							$errors[] = $parsed_data;
-						} elseif (\is_array($parsed_data)) {
-							$collected_items[] = $parsed_data;
 						}
-					}
-			
-					// if ( ! str_contains( $address, 'stop_word' ) ) {
-					// echo "\nFound 'stop_word'!";
-			
-					// return false; // returning false here "breaks" the loop
-					// }
-				},
-				30
-			);
+
+						// if ( ! str_contains( $address, 'stop_word' ) ) {
+						// echo "\nFound 'stop_word'!";
+
+						// return false; // returning false here "breaks" the loop
+						// }
+					},
+					300,
+					$position
+				);
+
+				if ( false === $result ) {
+					break;
+				}
+			}
 
 			$this->items = $errors;
 
@@ -430,145 +444,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
-				case 'generated_report_name':
-					// row actions to edit record.
-					$query_args_view_data = array(
-						'page'                   => ( isset( $_REQUEST['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : Reports::get_safe_view_name(),
-						'action'                 => 'delete',
-						'_wpnonce'               => \wp_create_nonce( 'bulk-generated-reports' ),
-						self::$table_name . '[]' => absint( $item['id'] ),
-					);
-					$admin_page_url       = \network_admin_url( 'admin.php' );
-					$delete_data_link     = esc_url( add_query_arg( $query_args_view_data, $admin_page_url ) );
-					$actions['delete']    = '<a href="' . $delete_data_link . '#wsal-options-tab-saved-reports">' . \esc_html__( 'Delete report', 'advanced-analytics' ) . '</a>';
-
-					if ( \file_exists( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.csv' ) ) {
-
-						$url                 = add_query_arg(
-							array(
-								'action' => 'wsal_file_download',
-								'f'      => base64_encode( \basename( $item['generated_report_file'] ) . '.csv' ),
-								'ctype'  => 1,
-								'nonce'  => wp_create_nonce( 'wpsal_reporting_nonce_action' ),
-							),
-							admin_url( 'admin-ajax.php' )
-						);
-						$actions['download'] = '<a target="_blank" href="' . $url . '#wsal-options-tab-saved-reports">' . \esc_html__( 'Download CSV report', 'advanced-analytics' ) . '</a> (' . File_Helper::format_file_size( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.csv' ) . ')';
-					}
-
-					if ( \file_exists( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.html' ) ) {
-						$url                      = add_query_arg(
-							array(
-								'action' => 'wsal_file_download',
-								'f'      => base64_encode( \basename( $item['generated_report_file'] ) . '.html' ),
-								'ctype'  => 'html',
-								'nonce'  => wp_create_nonce( 'wpsal_reporting_nonce_action' ),
-							),
-							admin_url( 'admin-ajax.php' )
-						);
-						$actions['download_html'] = '<a target="_blank" href="' . $url . '#wsal-options-tab-saved-reports">' . \esc_html__( 'Download HTML report', 'advanced-analytics' ) . '</a> (' . File_Helper::format_file_size( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.html' ) . ')';
-					}
-
-					if ( -1 === (int) $item['generated_report_number_of_records'] ) {
-						if ( \file_exists( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.json' ) ) {
-							$url                      = add_query_arg(
-								array(
-									'action' => 'wsal_file_download',
-									'f'      => base64_encode( \basename( $item['generated_report_file'] ) . '.json' ),
-									'ctype'  => 'json',
-									'nonce'  => wp_create_nonce( 'wpsal_reporting_nonce_action' ),
-								),
-								admin_url( 'admin-ajax.php' )
-							);
-							$actions['download_html'] = '<a target="_blank" href="' . $url . '#wsal-options-tab-saved-reports">' . \esc_html__( 'Download JSON report', 'advanced-analytics' ) . '</a> (' . File_Helper::format_file_size( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.json' ) . ')';
-						}
-						if ( \file_exists( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.pdf' ) ) {
-							$url                      = add_query_arg(
-								array(
-									'action' => 'wsal_file_download',
-									'f'      => base64_encode( \basename( $item['generated_report_file'] ) . '.pdf' ),
-									'ctype'  => 'pdf',
-									'nonce'  => wp_create_nonce( 'wpsal_reporting_nonce_action' ),
-								),
-								admin_url( 'admin-ajax.php' )
-							);
-							$actions['download_html'] = '<a target="_blank" href="' . $url . '#wsal-options-tab-saved-reports">' . \esc_html__( 'Download PDF report', 'advanced-analytics' ) . '</a> (' . File_Helper::format_file_size( Settings_Helper::get_working_dir_path_static( 'reports', true ) . $item['generated_report_file'] . '.pdf' ) . ')';
-						}
-					}
-
-					return '<b>' . $item['generated_report_name'] . '</b>' . ( new \WP_List_Table() )->row_actions( $actions );
-				case 'generated_report_tag':
-					return $item['generated_report_tag'];
-				case 'generated_report_filters_normalized':
-					$item['generated_report_filters_normalized'] = \json_decode( $item['generated_report_filters_normalized'], true );
-					if ( isset( $item['generated_report_filters_normalized']['custom_title'] ) ) {
-						unset( $item['generated_report_filters_normalized']['custom_title'] );
-					}
-					if ( isset( $item['generated_report_filters_normalized']['comment'] ) ) {
-						unset( $item['generated_report_filters_normalized']['comment'] );
-					}
-					if ( isset( $item['generated_report_filters_normalized']['no_meta'] ) ) {
-						unset( $item['generated_report_filters_normalized']['no_meta'] );
-					}
-					if ( isset( $item['generated_report_filters_normalized']['sql'] ) ) {
-						unset( $item['generated_report_filters_normalized']['sql'] );
-					}
-					if ( isset( $item['generated_report_filters_normalized']['statistic_type'] ) ) {
-						unset( $item['generated_report_filters_normalized']['statistic_type'] );
-					}
-
-					$body = '';
-
-					$item['generated_report_filters'] = \json_decode( $item['generated_report_filters'], true );
-
-					if ( isset( $item['generated_report_filters']['statistic_report_only_archive'] ) || isset( $item['generated_report_filters']['archive_db_only'] ) ) {
-
-						if ( ( isset( $item['generated_report_filters']['statistic_report_only_archive'] ) && (bool) $item['generated_report_filters']['statistic_report_only_archive'] ) ||
-						( isset( $item['generated_report_filters']['use_archive_db'] ) &&
-						(bool) $item['generated_report_filters']['use_archive_db'] ) ||
-						( isset( $item['generated_report_filters']['archive_db_only'] ) &&
-						(bool) $item['generated_report_filters']['archive_db_only'] ) ) {
-							if ( ( isset( $item['generated_report_filters']['statistic_report_only_archive'] ) && (bool) $item['generated_report_filters']['statistic_report_only_archive'] ) || ( isset( $item['generated_report_filters']['archive_db_only'] ) && (bool) $item['generated_report_filters']['archive_db_only'] ) ) {
-								$body .= '<div><b>' . \esc_html__( 'Archive data only', 'advanced-analytics' ) . '</b></div>';
-							} else {
-								$body .= '<div><b>' . \esc_html__( 'Archive data included', 'advanced-analytics' ) . '</b></div>';
-							}
-						}
-					} elseif ( Settings_Helper::is_archiving_enabled() ) {
-						$body .= '<div><b>' . \esc_html__( 'Archive data is included', 'advanced-analytics' ) . '</b></div>';
-					}
-
-					foreach ( $item['generated_report_filters_normalized'] as $criteria_label => $criteria_values ) {
-
-						$body .= '<em>' . $criteria_label . ': </em>';
-						$body .= \implode( '<br>', (array) $criteria_values );
-						$body .= '<hr />';
-					}
-
-					return $body;
-
-				case 'generated_report_finished':
-					$finished = '';
-					$finished = \esc_html__( 'Report is ready', 'advanced-analytics' );
-					if ( 0 === (int) $item['generated_report_finished'] ) {
-						$finished = '<span style="color:#b32d2e">' . \esc_html__( 'Still generates', 'advanced-analytics' ) . '</span>';
-					}
-
-					return $finished;
-				case 'generated_report_number_of_records':
-					return ( -1 === (int) $item['generated_report_number_of_records'] ) ? \esc_html__( 'N/A', 'advanced-analytics' ) : $item['generated_report_number_of_records'];
-				case 'generated_report_type':
-					$type = \esc_html__( 'Statistic', 'advanced-analytics' );
-					if ( 999 !== (int) $item['generated_report_format'] ) {
-						$type = \esc_html__( 'Generic', 'advanced-analytics' );
-					}
-					return $type;
-				case 'generated_report_username':
-					return $item['generated_report_username'];
-				case 'created_on':
-					return $item['created_on']
-						? DateTime_Formatter_Helper::get_formatted_date_time( $item['created_on'], 'datetime', true, true )
-						: '<i>' . __( 'Unknown', 'advanced-analytics' ) . '</i>';
+				case 'timestamp':
+					return \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $item['timestamp'] );
 				default:
 					return isset( $item[ $column_name ] )
 						? esc_html( $item[ $column_name ] )
@@ -608,17 +485,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function get_bulk_actions() {
 			$actions = array();
-			if ( Settings_Helper::current_user_can( 'view' ) ) {
-				/**
-				 * On hitting apply in bulk actions the url paramas are set as
-				 * ?action=bulk-download&paged=1&action2=-1.
-				 *
-				 * Action and action2 are set based on the triggers above or below the table
-				 */
-				$actions = array(
-					'delete' => __( 'Delete Records', 'advanced-analytics' ),
-				);
-			}
 
 			return $actions;
 		}
@@ -768,16 +634,16 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$screen_options = $result;
 
 			foreach ( $screen_options as $key => $value ) {
-				add_action(
+				\add_action(
 					"load-$hook",
 					function () use ( $key, $value ) {
 						$option = 'per_page';
 						$args   = array(
 							'label'   => $value,
-							'default' => (int) Settings_Helper::get_option_value( 'items-per-page', 10 ),
+							'default' => 10,
 							'option'  => $key,
 						);
-						add_screen_option( $option, $args );
+						\add_screen_option( $option, $args );
 					}
 				);
 			}
@@ -812,153 +678,37 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			// Show site alerts widget.
 			// NOTE: this is shown when the filter IS NOT true.
-		}
 
-		/**
-		 * Prints column headers, accounting for hidden and sortable columns.
-		 *
-		 * @since 3.1.0
-		 *
-		 * @param bool $with_id Whether to set the ID attribute or not.
-		 */
-		public function print_column_headers( $with_id = true ) {
-			list( $columns, $hidden, $sortable, $primary ) = $this->get_column_info();
+			echo '<div><b>' . __( 'File size: ', 'advanced-analytics' ) . '</b> ' . File_Helper::format_file_size( Error_Log::autodetect() ) . '</div>';
+			echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), Error_Log::get_modification_time( Error_Log::autodetect() ) ) . '</div>';
 
-			$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ); //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotValidated, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$current_url = remove_query_arg( 'paged', $current_url );
+			if ( 'top' === $which ) {
+				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security' );
 
-			// When users click on a column header to sort by other columns.
-			if ( isset( $_GET['orderby'] ) ) {
-				$current_orderby = \sanitize_text_field( \wp_unslash( $_GET['orderby'] ) );
-				// In the initial view there's no orderby parameter.
-			} else {
-				$current_orderby = '';
+				?>
+				<script>
+					jQuery( document ).on( 'click', '#top-truncate, #bottom-truncate', function ( e ) {
+						var data = {
+							'action': 'advanced_analytics_truncate_log_file',
+							'post_type': 'GET',
+							'_wpnonce': jQuery('#advanced-analytics-security').val(),
+						};
+
+						jQuery.post(ajaxurl, data, function(response) {
+							if( 2 === response['data'] ) {
+								window.location.reload();
+							}
+						}, 'json');
+					});
+				</script>
+				<?php
 			}
 
-			// Not in the initial view and descending order.
-			if ( isset( $_GET['order'] ) && 'desc' === $_GET['order'] ) {
-				$current_order = 'desc';
-			} else {
-				// The initial view is not always 'asc', we'll take care of this below.
-				$current_order = 'asc';
-			}
-
-			if ( ! empty( $columns['cb'] ) ) {
-				static $cb_counter = 1;
-				$columns['cb']     = '<label class="label-covers-full-cell" for="cb-select-all-' . $cb_counter . '">' .
-				'<span class="screen-reader-text">' .
-					/* translators: Hidden accessibility text. */
-					__( 'Select All' ) .
-				'</span>' .
-				'</label>' .
-				'<input id="cb-select-all-' . $cb_counter . '" type="checkbox" />';
-				++$cb_counter;
-			}
-
-			foreach ( $columns as $column_key => $column_display_name ) {
-				$class          = array( 'manage-column', "column-$column_key" );
-				$aria_sort_attr = '';
-				$abbr_attr      = '';
-				$order_text     = '';
-
-				if ( in_array( $column_key, $hidden, true ) ) {
-					$class[] = 'hidden';
-				}
-
-				if ( 'cb' === $column_key ) {
-					$class[] = 'check-column';
-				} elseif ( in_array( $column_key, array( 'posts', 'comments', 'links' ), true ) ) {
-					$class[] = 'num';
-				}
-
-				if ( $column_key === $primary ) {
-					$class[] = 'column-primary';
-				}
-
-				if ( isset( $sortable[ $column_key ] ) ) {
-					$orderby       = isset( $sortable[ $column_key ][0] ) ? $sortable[ $column_key ][0] : '';
-					$desc_first    = isset( $sortable[ $column_key ][1] ) ? $sortable[ $column_key ][1] : false;
-					$abbr          = isset( $sortable[ $column_key ][2] ) ? $sortable[ $column_key ][2] : '';
-					$orderby_text  = isset( $sortable[ $column_key ][3] ) ? $sortable[ $column_key ][3] : '';
-					$initial_order = isset( $sortable[ $column_key ][4] ) ? $sortable[ $column_key ][4] : '';
-
-					/*
-					 * We're in the initial view and there's no $_GET['orderby'] then check if the
-					 * initial sorting information is set in the sortable columns and use that.
-					 */
-					if ( '' === $current_orderby && $initial_order ) {
-						// Use the initially sorted column $orderby as current orderby.
-						$current_orderby = $orderby;
-						// Use the initially sorted column asc/desc order as initial order.
-						$current_order = $initial_order;
-					}
-
-					/*
-					 * True in the initial view when an initial orderby is set via get_sortable_columns()
-					 * and true in the sorted views when the actual $_GET['orderby'] is equal to $orderby.
-					 */
-					if ( $current_orderby === $orderby ) {
-						// The sorted column. The `aria-sort` attribute must be set only on the sorted column.
-						if ( 'asc' === $current_order ) {
-							$order          = 'desc';
-							$aria_sort_attr = ' aria-sort="ascending"';
-						} else {
-							$order          = 'asc';
-							$aria_sort_attr = ' aria-sort="descending"';
-						}
-
-						$class[] = 'sorted';
-						$class[] = $current_order;
-					} else {
-						// The other sortable columns.
-						$order = strtolower( (string) $desc_first );
-
-						if ( ! in_array( $order, array( 'desc', 'asc' ), true ) ) {
-							$order = $desc_first ? 'desc' : 'asc';
-						}
-
-						$class[] = 'sortable';
-						$class[] = 'desc' === $order ? 'asc' : 'desc';
-
-						/* translators: Hidden accessibility text. */
-						$asc_text = __( 'Sort ascending.' );
-						/* translators: Hidden accessibility text. */
-						$desc_text  = __( 'Sort descending.' );
-						$order_text = 'asc' === $order ? $asc_text : $desc_text;
-					}
-
-					if ( '' !== $order_text ) {
-						$order_text = ' <span class="screen-reader-text">' . $order_text . '</span>';
-					}
-
-					// Print an 'abbr' attribute if a value is provided via get_sortable_columns().
-					$abbr_attr = $abbr ? ' abbr="' . esc_attr( $abbr ) . '"' : '';
-
-					$column_display_name = sprintf(
-						'<a href="%1$s#wsal-options-tab-saved-reports">' .
-						'<span>%2$s</span>' .
-						'<span class="sorting-indicators">' .
-							'<span class="sorting-indicator asc" aria-hidden="true"></span>' .
-							'<span class="sorting-indicator desc" aria-hidden="true"></span>' .
-						'</span>' .
-						'%3$s' .
-						'</a>',
-						esc_url( add_query_arg( compact( 'orderby', 'order' ), $current_url ) ),
-						$column_display_name,
-						$order_text
-					);
-				}
-
-				$tag   = ( 'cb' === $column_key ) ? 'td' : 'th';
-				$scope = ( 'th' === $tag ) ? 'scope="col"' : '';
-				$id    = $with_id ? "id='$column_key'" : '';
-
-				if ( ! empty( $class ) ) {
-					$class = "class='" . implode( ' ', $class ) . "'";
-				}
-
-				echo "<$tag $scope $id $class $aria_sort_attr $abbr_attr>$column_display_name</$tag>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
+			?>
+			<div>
+				<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', 'advanced-analytics' ); ?>" />
+			</div>
+			<?php
 		}
 
 		/**
@@ -981,12 +731,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				</div>
 						<?php
 					endif;
-					$this->extra_tablenav( $which );
 					?>
 
 				<br class="clear" />
 			</div>
 			<?php
+				$this->extra_tablenav( $which );
 		}
 	}
 }
