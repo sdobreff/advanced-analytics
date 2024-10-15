@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
-use ADVAN\Helpers\Log_Line_Parser;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,6 +48,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 2.0.0
 		 */
 		private static $current_options = array();
+
+		/**
+		 * The name of the hook for the menu.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $hook = null;
 
 		/**
 		 * Array with the default options
@@ -236,10 +244,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'no_editor_header_footer'  => false,
 					'no_display_post'          => false,
 					'position_before_footnote' => false,
+					'no_posts_footnotes'       => false,
 				);
 			}
 
 			return self::$default_options;
+		}
+
+		public static function get_main_menu_page_hook() {
+			return self::$hook;
 		}
 
 		/**
@@ -257,7 +270,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$base .= 'code';
 
-			\add_menu_page(
+			self::$hook = \add_menu_page(
 				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
 				\esc_html__( 'Analytics', 'advanced-analytics' ),
 				'manage_options',
@@ -266,6 +279,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				'', // 'data:image/svg+xml;base64,' . $base( file_get_contents( \AWEF_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 				30
 			);
+
+			\add_filter( 'manage_' . self::$hook . '_columns', array( Logs_List::class, 'manage_columns' ) );
+
+			Logs_List::add_screen_options( self::$hook );
 
 			\register_setting(
 				\ADVAN_SETTINGS_NAME,
@@ -364,7 +381,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function render() {
 
-			$events_list = new Logs_List( []);
+			$events_list = new Logs_List( array() );
 			$events_list->prepare_items();
 
 			$events_list->display();

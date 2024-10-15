@@ -128,3 +128,5 @@ if ( ! Context_Helper::is_installing() ) {
 	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }
+
+register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );

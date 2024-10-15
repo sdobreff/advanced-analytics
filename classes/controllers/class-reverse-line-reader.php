@@ -60,6 +60,16 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			} else {
 				return false;
 			}
+			// Lets check the size and act aproperly.
+			if ( null === $pos ) {
+				fseek( $handle, 0, SEEK_END );
+				$size = ftell( $handle );
+				if ( 0 === (int) $size ) {
+					fclose( $handle );
+					return false;
+				}
+			}
+
 			while ( true ) {
 				fseek( $handle, self::$pos, SEEK_END );
 				--self::$pos;
@@ -73,7 +83,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				}
 			}
 			$line   = fgets( $handle );
-			$result = $callback( $line );
+			$result = $callback( $line, $pos );
 
 			if ( false === $result ) {
 				fclose( $handle );

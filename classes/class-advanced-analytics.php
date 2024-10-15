@@ -21,6 +21,7 @@ use ADVAN\Controllers\Integrations;
 use ADVAN\Controllers\Footnotes_Formatter;
 use ADVAN\Controllers\Pointers;
 use ADVAN\Helpers\Ajax;
+use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Helpers\Context_Helper;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
@@ -63,7 +64,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Footnotes_Formatter::init();
 			}
 
-			// Ajax::init();
+			Ajax_Helper::init();
 		}
 
 		/**
@@ -79,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 * @since 2.0.0
 		 */
 		public static function add_settings_link( $links, $file ) {
-			if ( AWEF_PLUGIN_BASENAME === $file ) {
+			if ( ADVAN_PLUGIN_BASENAME === $file ) {
 				$settings_link = '<a href="' . Settings::get_settings_page_link() . '">' . __( 'Settings', 'advanced-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
 			}
@@ -221,5 +222,25 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				}
 			}
 		}
+
+		
+public static function shutdown() {
+    $errfile = "unknown file";
+    $errstr  = "shutdown";
+    $errno   = E_CORE_ERROR;
+    $errline = 0;
+
+    $error = error_get_last();
+
+    if($error !== NULL) {
+        $errno   = $error["type"];
+        $errfile = $error["file"];
+        $errline = $error["line"];
+        $errstr  = $error["message"];
+
+        //error_mail(format_error( $errno, $errstr, $errfile, $errline));
+    }
+}
+
 	}
 }
