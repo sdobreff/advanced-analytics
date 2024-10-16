@@ -87,7 +87,6 @@ Rails
 *.sublime-project
 
 
-/vendor/
 /builds/
 /testing/
 /vendor-bin/
