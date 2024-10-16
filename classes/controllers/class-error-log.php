@@ -125,7 +125,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 */
 		public static function get_modification_time( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-				return filemtime( $filename );
+				if ( $filename ) {
+					return filemtime( $filename );
+				} else {
+					return false;
+				}
 			}
 
 			return false;
@@ -146,7 +150,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 			if ( \is_resource( $file ) && 'handle' === \get_resource_type( $file ) ) {
 				$meta_data = \stream_get_meta_data( $file );
 				$filename  = $meta_data['uri'];
-			} elseif ( \file_exists( $file ) && \is_readable( $file ) ) {
+			} elseif ( is_string( $file ) && \file_exists( $file ) && \is_readable( $file ) ) {
 				$filename = $file;
 			}
 

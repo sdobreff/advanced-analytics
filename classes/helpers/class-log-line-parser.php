@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			$line      = rtrim( $line );
 			$timestamp = null;
 			$message   = $line;
-			$level     = null;
+			$level     = '';
 			$context   = null;
 
 			/*
@@ -77,7 +77,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			return array(
 				'message'        => $message,
 				'timestamp'      => $timestamp,
-				'severity'          => $level,
+				'severity'       => $level,
 				'isContext'      => ( $context !== null ),
 				'contextPayload' => $context,
 			);
@@ -131,7 +131,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				$item = array( 'call' => trim( substr( $message, strlen( $matches[0] ) ) ) );
 				return $item;
 			} else {
-				return self::parse_php_error_log_line((string) $message);
+				return self::parse_php_error_log_line( (string) $message );
 			}
 		}
 

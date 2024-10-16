@@ -127,12 +127,12 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @since latest
 		 */
-		public static function format_file_size( string $filename ): string {
+		public static function format_file_size( $filename ): string {
 			global $wp_filesystem;
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 			WP_Filesystem();
 
-			if ( $wp_filesystem->exists( $filename ) ) {
+			if ( \is_string($filename) && $wp_filesystem->exists( $filename ) ) {
 
 				$size = filesize( $filename );
 
