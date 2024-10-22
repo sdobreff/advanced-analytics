@@ -679,8 +679,16 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			// Show site alerts widget.
 			// NOTE: this is shown when the filter IS NOT true.
 
-			echo '<div><b>' . __( 'File size: ', 'advanced-analytics' ) . '</b> ' . File_Helper::format_file_size( Error_Log::autodetect() ) . '</div>';
-			echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), Error_Log::get_modification_time( Error_Log::autodetect() ) ) . '</div>';
+			$log_file = Error_Log::extract_file_name( Error_Log::autodetect() );
+
+			if ( false !== $log_file ) {
+
+				echo '<div><b>' . __( 'Log file: ', 'advanced-analytics' ) . '</b> ' . Error_Log::extract_file_name( Error_Log::autodetect() ) . '</div>';
+				echo '<div><b>' . __( 'File size: ', 'advanced-analytics' ) . '</b> ' . File_Helper::format_file_size( Error_Log::autodetect() ) . '</div>';
+				echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), Error_Log::get_modification_time( Error_Log::autodetect() ) ) . '</div>';
+			} else {
+				echo '<div><b>' . __( 'No log file detected', 'advanced-analytics' ) . '</b></div>';
+			}
 
 			if ( 'top' === $which ) {
 				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security' );
@@ -703,12 +711,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				</script>
 				<?php
 			}
-
-			?>
+			if ( false !== $log_file ) {
+				?>
 			<div>
 				<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', 'advanced-analytics' ); ?>" />
 			</div>
-			<?php
+				<?php
+			}
 		}
 
 		/**
@@ -737,6 +746,23 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			</div>
 			<?php
 				$this->extra_tablenav( $which );
+			if ( 'top' !== $which && ! empty( $this->items ) ) {
+				?>
+				<style>
+					.toplevel_page_advan_logs #debug-log {
+					max-width: 95%;
+					padding: 10px;
+					word-wrap: break-word;
+					background: black;
+					color: #fff;
+					border-radius: 5px;
+					height: 400px;
+					overflow-y: auto;
+					}
+				</style>
+				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
+					<?php
+			}
 		}
 	}
 }

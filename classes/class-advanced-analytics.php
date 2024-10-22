@@ -33,7 +33,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 	 */
 	class Advanced_Analytics {
 
-		// public const REDIRECT_OPTION_NAME = 'awef_plugin_do_activation_redirect';
+		// public const REDIRECT_OPTION_NAME = 'aadvana_plugin_do_activation_redirect';
 
 		/**
 		 * Inits the class and hooks
@@ -159,11 +159,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 						is_array( $arr['function'] ) &&
 						isset( $arr['function'][0] ) &&
 						is_object( $arr['function'][0] ) &&
-						false !== strpos( ( get_class( $arr['function'][0] ) ), 'AWEF' )
+						false !== strpos( ( get_class( $arr['function'][0] ) ), 'ADVAN' )
 					) ||
 					( // Cover class static method callback case.
 						! empty( $name ) &&
-						false !== strpos( ( $name ), 'AWEF' )
+						false !== strpos( ( $name ), 'ADVAN' )
 					)
 					) {
 						continue;
@@ -188,7 +188,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				printf(
 					/* Translators: Plugin link. */
 					\esc_html__( 'Proudly powered by %s', 'advanced-analytics' ),
-					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/awesome-footnotes/', 'advanced-analytics' ) ) . '" rel="nofollow">' . \esc_attr( AWEF_NAME ) . '</a>'
+					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/awesome-footnotes/', 'advanced-analytics' ) ) . '" rel="nofollow">' . \esc_attr( ADVAN_NAME ) . '</a>'
 				);
 				?>
 				-->

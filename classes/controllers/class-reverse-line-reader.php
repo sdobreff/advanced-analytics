@@ -34,6 +34,15 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		private static $pos = null;
 
 		/**
+		 * Stores the temp file handle for showing the truncated error log.
+		 *
+		 * @var handle
+		 *
+		 * @since latest
+		 */
+		private static $temp_handle = null;
+
+		/**
 		 * Reads lines from given file reversed order.
 		 *
 		 * @param string|resource $file_or_handle - The file or handle to read from.
@@ -82,7 +91,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 					break;
 				}
 			}
-			$line   = fgets( $handle );
+			$line = fgets( $handle );
+			self::write_temp_file( $line );
 			$result = $callback( $line, $pos );
 
 			if ( false === $result ) {
@@ -103,6 +113,40 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			}
 
 			self::read_file_from_end( $handle, $callback, $max_ines, self::$pos );
+		}
+
+		/**
+		 * Writes temporary file used lated on to show the content of the error log (in reverse order and truncated to the last couple of errors)
+		 *
+		 * @param string $line - The line to be written.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function write_temp_file( string $line ) {
+			if ( null === self::$temp_handle ) {
+				self::$temp_handle = fopen( 'php://temp', 'w+' );
+			}
+
+			fwrite( self::$temp_handle, $line );
+		}
+
+		/**
+		 * Reads the contents of the temp file and returns the contents.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function read_temp_file() {
+			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {
+				rewind( self::$temp_handle ); // resets the position of pointer.
+
+				echo fread( self::$temp_handle, fstat( self::$temp_handle )['size'] ); // I am freaking awesome.
+
+				fclose( self::$temp_handle );
+			}
 		}
 	}
 }

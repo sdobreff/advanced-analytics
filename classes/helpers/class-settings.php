@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
+use ADVAN\Settings\Settings_Builder;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,17 +29,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		// public const OPTIONS_VERSION = '11'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '1'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
+		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
+
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
-		// public const SETTINGS_FILE_FIELD = 'awef_import_file';
+		public const SETTINGS_FILE_FIELD = 'aadvana_import_file';
 
-		// public const SETTINGS_FILE_UPLOAD_FIELD = 'awef_import_upload';
+		public const SETTINGS_FILE_UPLOAD_FIELD = 'aadvana_import_upload';
 
-		// public const SETTINGS_VERSION = 'awef_plugin_version';
+		public const SETTINGS_VERSION = 'aadvana_plugin_version';
 
 		/**
 		 * Array with the current options
@@ -98,7 +101,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			/**
 			 * Draws the save button in the settings
 			 */
-			// \add_action( 'awef_settings_save_button', array( __CLASS__, 'save_button' ) );
+			// \add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
 		}
 
 		/**
@@ -159,9 +162,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$footnotes_options['no_display_post'] = ( array_key_exists( 'no_display_post', $post_array ) ) ? true : false;
 
-			// add_settings_error(AWEF_SETTINGS_NAME, '<field_name>', 'Please enter a valid email!', $type = 'error'); .
+			// add_settings_error(ADVAN_SETTINGS_NAME, '<field_name>', 'Please enter a valid email!', $type = 'error'); .
 
-			// update_option( AWEF_SETTINGS_NAME, $footnotes_options ); .
+			// update_option( ADVAN_SETTINGS_NAME, $footnotes_options ); .
 
 			self::$current_options = $footnotes_options;
 
@@ -180,11 +183,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$current_options ) ) {
 
 				// Get the current settings or setup some defaults if needed.
-				self::$current_options = \get_option( AWEF_SETTINGS_NAME );
+				self::$current_options = \get_option( ADVAN_SETTINGS_NAME );
 				if ( ! self::$current_options ) {
 
 					self::$current_options = self::get_default_options();
-					\update_option( AWEF_SETTINGS_NAME, self::$current_options );
+					\update_option( ADVAN_SETTINGS_NAME, self::$current_options );
 				} elseif ( ! isset( self::$current_options['version'] ) || self::OPTIONS_VERSION !== self::$current_options['version'] ) {
 
 					// Set any unset options.
@@ -194,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 					}
 					self::$current_options['version'] = self::OPTIONS_VERSION;
-					\update_option( AWEF_SETTINGS_NAME, self::$current_options );
+					\update_option( ADVAN_SETTINGS_NAME, self::$current_options );
 				}
 			}
 
@@ -276,7 +279,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				'manage_options',
 				self::MENU_SLUG,
 				array( __CLASS__, 'analytics_options_page' ),
-				'', // 'data:image/svg+xml;base64,' . $base( file_get_contents( \AWEF_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+				'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 				30
 			);
 
@@ -293,6 +296,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				)
 			);
 
+			\add_submenu_page(
+				self::MENU_SLUG,
+				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
+				\esc_html__( 'Log viewer', 'advanced-analytics' ),
+				'manage_options', // No capability requirement.
+				self::MENU_SLUG,
+				array( __CLASS__, 'analytics_options_page' ),
+				1
+			);
+
+			\add_submenu_page(
+				self::MENU_SLUG,
+				\esc_html__( 'Settings', 'advanced-analytics' ),
+				\esc_html__( 'Settings', 'advanced-analytics' ),
+				'read', // No capability requirement.
+				self::SETTINGS_MENU_SLUG,
+				array( __CLASS__, 'aadvana_show_options' ),
+				301
+			);
+
 			// if ( ! self::is_plugin_settings_page() ) {
 			// return;
 			// }
@@ -300,7 +323,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// // Reset settings.
 			// if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
 
-			// \delete_option( AWEF_SETTINGS_NAME );
+			// \delete_option( ADVAN_SETTINGS_NAME );
 
 			// Redirect to the plugin settings page.
 			// \wp_safe_redirect(
@@ -318,16 +341,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// global $wpdb;
 
 			// $stored_options = $wpdb->get_results(
-			// $wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \AWEF_SETTINGS_NAME )
+			// $wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \ADVAN_SETTINGS_NAME )
 			// );
 
 			// header( 'Cache-Control: public, must-revalidate' );
 			// header( 'Pragma: hack' );
 			// header( 'Content-Type: text/plain' );
-			// header( 'Content-Disposition: attachment; filename="' . AWEF_TEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
+			// header( 'Content-Disposition: attachment; filename="' . ADVANTEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
 			// echo \wp_json_encode( unserialize( $stored_options[0]->option_value ) );
 			// die();
-			// } elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'awef-plugin-data', 'awef-security' ) ) { // Import the settings.
+			// } elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) { // Import the settings.
 			// if ( isset( $_FILES ) &&
 			// isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) &&
 			// isset( $_FILES[ self::SETTINGS_FILE_FIELD ]['error'] ) &&
@@ -344,7 +367,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// }
 
 			// if ( ! empty( $options ) && is_array( $options ) ) {
-			// \update_option( AWEF_SETTINGS_NAME, self::store_options( $options ) );
+			// \update_option( ADVAN_SETTINGS_NAME, self::store_options( $options ) );
 			// }
 			// }
 
@@ -386,10 +409,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$events_list->display();
 
-			// \wp_enqueue_script( 'awef-admin-scripts', \AWEF_PLUGIN_ROOT_URL . '/js/admin/awef-settings.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'wp-color-picker', 'jquery-ui-autocomplete' ), \AWEF_VERSION, false );
-			// \wp_enqueue_style( 'awef-admin-style', \AWEF_PLUGIN_ROOT_URL . '/css/admin/style.css', array(), \AWEF_VERSION, 'all' );
-
-			// self::awef_show_options();
+			// self::aadvana_show_options();
 		}
 
 		/**
@@ -479,8 +499,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function save_button() {
 
 			?>
-			<div class="awef-panel-submit">
-				<button name="save" class="awef-save-button awef-primary-button button button-primary button-hero"
+			<div class="aadvana-panel-submit">
+				<button name="save" class="aadvana-save-button aadvana-primary-button button button-primary button-hero"
 						type="submit"><?php esc_html_e( 'Save Changes', 'advanced-analytics' ); ?></button>
 			</div>
 			<?php
@@ -493,31 +513,23 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @since 2.0.0
 		 */
-		public static function awef_show_options() {
+		public static function aadvana_show_options() {
 
+			\wp_enqueue_script( 'aadvana-admin-scripts', \ADVAN_PLUGIN_ROOT_URL . 'js/admin/aadvana-settings.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'wp-color-picker', 'jquery-ui-autocomplete' ), \ADVAN_VERSION, false );
+
+			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 			\wp_enqueue_media();
 
 			$settings_tabs = array(
 
-				'general'     => array(
+				'head-general' => esc_html__( 'General Settings', 'advanced-analytics' ),
+
+				'general'      => array(
 					'icon'  => 'admin-generic',
 					'title' => esc_html__( 'General', 'advanced-analytics' ),
 				),
 
-				'formatting'  => array(
-					'icon'  => 'media-text',
-					'title' => esc_html__( 'Formatting', 'advanced-analytics' ),
-				),
-
-				'options'     => array(
-					'icon'  => 'admin-settings',
-					'title' => esc_html__( 'Options', 'advanced-analytics' ),
-				),
-
-				'advanced'    => array(
-					'icon'  => 'admin-tools',
-					'title' => esc_html__( 'Advanced', 'advanced-analytics' ),
-				),
+				'head-global' => esc_html__( 'Global Settings', 'advanced-analytics' ),
 
 				'backup'      => array(
 					'icon'  => 'migrate',
@@ -532,9 +544,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			?>
 
-			<div id="awef-page-overlay"></div>
+			<div id="aadvana-page-overlay"></div>
 
-			<div id="awef-saving-settings">
+			<div id="aadvana-saving-settings">
 				<svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
 					<circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
 					<path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
@@ -543,111 +555,131 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				</svg>
 			</div>
 
-			<div class="awef-panel wrap">
+			<div class="aadvana-panel wrap">
+			<?xml version="1.0" encoding="iso-8859-1"?>
 
-				<div class="awef-panel-tabs">
-					<div class="awef-logo">
+				<div class="aadvana-panel-tabs">
+					<div class="aadvana-logo">
 						<svg fill="currentColor" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="0 0 512.001 512.001" xml:space="preserve">
 							<g>
 								<g>
-									<path d="M510.674,193.267l-75.466-130.71c-2.735-4.734-8.788-6.359-13.525-3.624l-78.83,45.513V17.381
-										c0-5.467-4.434-9.901-9.901-9.901H182.019c-5.467,0-9.901,4.434-9.901,9.901v90.494l-81.8-47.227
-										c-4.738-2.734-10.79-1.112-13.525,3.624L1.327,194.982c-1.313,2.274-1.669,4.976-0.989,7.513c0.679,2.537,2.339,4.699,4.613,6.012
-										l78.831,45.513l-75.4,43.533c-4.736,2.735-6.359,8.789-3.624,13.525l75.465,130.71c2.735,4.736,8.79,6.36,13.525,3.624
-										l78.37-45.247v94.455c0,5.467,4.434,9.901,9.901,9.901h150.932c5.469,0,9.901-4.434,9.902-9.901v-91.026l75.4,43.533
-										c2.273,1.313,4.975,1.67,7.513,0.989c2.537-0.679,4.699-2.339,6.012-4.613l75.465-130.71c2.735-4.736,1.112-10.79-3.624-13.525
-										l-78.37-45.248l81.801-47.228c2.274-1.313,3.933-3.474,4.613-6.012C512.344,198.244,511.987,195.542,510.674,193.267z
-										M400.496,245.447c-3.063,1.768-4.951,5.038-4.951,8.574c0,3.537,1.887,6.806,4.951,8.575l84.648,48.872l-65.564,113.56
-										l-81.677-47.157c-3.063-1.769-6.838-1.769-9.901,0c-3.063,1.768-4.951,5.038-4.951,8.575v98.274h-131.13V383.016
-										c0-3.537-1.887-6.806-4.951-8.574c-3.063-1.769-6.838-1.769-9.901,0l-84.648,48.871l-65.564-113.56l81.677-47.157
-										c3.063-1.768,4.951-5.038,4.951-8.574c0-3.537-1.887-6.806-4.951-8.574l-85.108-49.137L88.991,82.748l88.078,50.852
-										c3.063,1.769,6.838,1.769,9.901,0c3.063-1.768,4.951-5.038,4.951-8.575V27.282h131.13v94.313c0,3.537,1.887,6.806,4.951,8.574
-										c3.063,1.769,6.838,1.769,9.901,0l85.107-49.137l65.565,113.562L400.496,245.447z"/>
-								</g>
-							</g>
-							<g>
-								<g>
-									<path d="M213.92,76.788c-5.467,0-9.901,4.434-9.901,9.901v46.536c0,5.467,4.434,9.901,9.901,9.901s9.901-4.434,9.901-9.901V86.689
-										C223.821,81.222,219.388,76.788,213.92,76.788z"/>
-								</g>
-							</g>
-							<g>
-								<g>
-									<path d="M213.92,40.153c-5.467,0-9.901,4.434-9.901,9.901v5.941c0,5.467,4.434,9.901,9.901,9.901s9.901-4.434,9.901-9.901v-5.941
-										C223.821,44.587,219.388,40.153,213.92,40.153z"/>
+								<path d="M484.312,86.624H19.688C8.812,86.624,0,95.436,0,106.312v291.376c0,10.876,8.812,19.688,19.688,19.688h464.624
+			c10.876,0,19.688-8.812,19.688-19.688V106.312C504,95.436,495.188,86.624,484.312,86.624z M330.56,149.624h71.068V189H330.56
+			c-10.884,0-19.736-8.804-19.736-19.688C310.824,158.428,319.676,149.624,330.56,149.624z M330.56,208.688h27.752v39.376H330.56
+			c-10.884,0-19.736-8.804-19.736-19.688C310.824,217.492,319.676,208.688,330.56,208.688z M330.56,263.812h55.316v39.376H330.56
+			c-10.884,0-19.736-8.804-19.736-19.688C310.824,272.616,319.676,263.812,330.56,263.812z M149.164,362.156
+			c-51.984,0-94.276-42.296-94.276-94.276c0-51.98,42.524-94.272,94.508-94.272c2.172,0,4.168,1.764,4.168,3.936v86.272h85.94
+			c2.172,0,3.936,1.828,3.936,4C243.44,319.8,201.148,362.156,149.164,362.156z M262.916,248.064H172.58
+			c-2.172,0-3.264-1.42-3.264-3.596v-90.34c0-2.172,1.424-3.936,3.6-3.936c51.98,0,94.104,42.12,94.104,94.1
+			C267.02,246.472,265.088,248.064,262.916,248.064z M334.688,358.312h-4.128c-10.884,0-19.736-8.804-19.736-19.688
+			c0-10.884,8.852-19.688,19.736-19.688h4.128V358.312z M428.904,358.312h-66.656v-39.376H428.9
+			c10.884,0,19.736,8.804,19.736,19.688C448.636,349.508,439.784,358.312,428.904,358.312z M428.904,303.188H413.44v-39.376h15.464
+			c10.884,0,19.736,8.804,19.736,19.688C448.64,294.384,439.784,303.188,428.904,303.188z M428.904,248.064h-43.028v-39.376h43.028
+			c10.884,0,19.736,8.804,19.736,19.688C448.64,239.26,439.784,248.064,428.904,248.064z M429.188,189.272v-39.46
+			c11.812,0.028,19.688,8.864,19.688,19.732S441,189.248,429.188,189.272z"/>
 								</g>
 							</g>
 						</svg>
 					</div>
-					<div class="plugin-name" style="color: #fff; text-align: center; font-size: 1.4em; padding: 30px 0;"><?php echo \esc_html( AWEF_NAME ); ?></div>
 
 					<ul>
-						<?php
-						foreach ( $settings_tabs as $tab => $settings ) {
+					<?php
+					foreach ( $settings_tabs as $tab => $settings ) {
 
+						if ( ! empty( $settings['title'] ) ) {
 							$icon  = $settings['icon'];
 							$title = $settings['title'];
 							?>
 
-							<li class="awef-tabs awef-options-tab-<?php echo \esc_attr( $tab ); ?>">
-								<a href="#awef-options-tab-<?php echo \esc_attr( $tab ); ?>">
-									<span class="dashicons-before dashicons-<?php echo \esc_html( $icon ); ?> awef-icon-menu"></span>
-									<?php echo \esc_html( $title ); ?>
+							<li class="aadvana-tabs aadvana-options-tab-<?php echo \esc_attr( $tab ); ?>">
+								<a href="#aadvana-options-tab-<?php echo \esc_attr( $tab ); ?>">
+									<span class="dashicons-before dashicons-<?php echo \esc_html( $icon ); ?> aadvana-icon-menu"></span>
+								<?php echo \esc_html( $title ); ?>
 								</a>
 							</li>
+						<?php } else { ?>
+							<li class="aadvana-tab-menu-head"><?php echo $settings; ?></li>
 							<?php
 						}
+					}
 
-						?>
+					?>
 					</ul>
 					<div class="clear"></div>
-				</div> <!-- .awef-panel-tabs -->
+				</div> <!-- .aadvana-panel-tabs -->
 
-				<div class="awef-panel-content">
+				<div class="aadvana-panel-content">
 
-					<div id="awef-options-search-wrap">
-						<input id="awef-panel-search" type="text" placeholder="<?php esc_html_e( 'Search', 'advanced-analytics' ); ?>">
-						<div id="awef-search-list-wrap" class="has-custom-scroll">
-							<ul id="awef-search-list"></ul>
+					<form method="post" name="aadvana_form" id="aadvana_form" enctype="multipart/form-data">
+
+						<div class="aadvana-tab-head">
+							<div id="aadvana-options-search-wrap">
+								<input id="aadvana-panel-search" type="text" placeholder="<?php esc_html_e( 'Search', 'advanced-analytics' ); ?>">
+								<div id="aadvana-search-list-wrap" class="has-custom-scroll">
+									<ul id="aadvana-search-list"></ul>
+								</div>
+							</div>
+
+							<div class="awefpanel-head-elements">
+
+							<?php do_action( 'aadvana_settings_save_button' ); ?>
+
+							
+								<ul>
+									<li>
+										<div id="awefpanel-darkskin-wrap">
+											<span class="darkskin-label"><svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><title/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="256" x2="256" y1="48" y2="96"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="256" x2="256" y1="416" y2="464"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="403.08" x2="369.14" y1="108.92" y2="142.86"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="142.86" x2="108.92" y1="369.14" y2="403.08"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="464" x2="416" y1="256" y2="256"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="96" x2="48" y1="256" y2="256"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="403.08" x2="369.14" y1="403.08" y2="369.14"/><line style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px" x1="142.86" x2="108.92" y1="142.86" y2="108.92"/><circle cx="256" cy="256" r="80" style="fill:none;stroke:#000;stroke-linecap:round;stroke-miterlimit:10;stroke-width:32px"/></svg></span>
+											<input id="awefpanel-darkskin" class="aadvana-js-switch" type="checkbox" value="true">
+											<span class="darkskin-label"><svg height="512" viewBox="0 0 512 512" width="512" xmlns="http://www.w3.org/2000/svg"><title/><path d="M160,136c0-30.62,4.51-61.61,16-88C99.57,81.27,48,159.32,48,248c0,119.29,96.71,216,216,216,88.68,0,166.73-51.57,200-128-26.39,11.49-57.38,16-88,16C256.71,352,160,255.29,160,136Z" style="fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:32px"/></svg></span>
+											<script>
+												if( 'undefined' != typeof localStorage ){
+													var skin = localStorage.getItem('aadvana-backend-skin');
+													if( skin == 'dark' ){
+														document.getElementById('awefpanel-darkskin').setAttribute('checked', 'checked');
+													}
+												}
+											</script>
+										</div>
+									</li>
+
+								</ul>
+							</div>
 						</div>
-					</div>
-
-
-					<form method="post" name="awef_form" id="awef_form" enctype="multipart/form-data">
 
 						<?php
 						foreach ( $settings_tabs as $tab => $settings ) {
-
-							?>
+							if ( ! empty( $settings['title'] ) ) {
+								?>
 						<!-- <?php echo \esc_attr( $tab ); ?> Settings -->
-						<div id="awef-options-tab-<?php echo \esc_attr( $tab ); ?>" class="tabs-wrap">
+						<div id="aadvana-options-tab-<?php echo \esc_attr( $tab ); ?>" class="tabs-wrap">
 
-							<?php
-							include_once \AWEF_PLUGIN_ROOT . 'classes/settings/settings-options/' . $tab . '.php';
+								<?php
+								include_once \ADVAN_PLUGIN_ROOT . 'classes/settings/settings-options/' . $tab . '.php';
 
-							\do_action( 'awef_plugin_options_tab_' . $tab );
-							?>
+								\do_action( 'aadvana_plugin_options_tab_' . $tab );
+								?>
 
 						</div>
-							<?php
+								<?php
+							}
 						}
 						?>
 
-						<?php \wp_nonce_field( 'awef-plugin-data', 'awef-security' ); ?>
-						<input type="hidden" name="action" value="awef_plugin_data_save" />
+						<?php \wp_nonce_field( 'aadvana-plugin-data', 'aadvana-security' ); ?>
+						<input type="hidden" name="action" value="aadvana_plugin_data_save" />
 
-						<div class="awef-footer">
+						<div class="aadvana-footer">
 
-							<?php \do_action( 'awef_settings_save_button' ); ?>
+						<?php \do_action( 'aadvana_settings_save_button' ); ?>
 						</div>
 					</form>
 
-				</div><!-- .awef-panel-content -->
+				</div><!-- .aadvana-panel-content -->
 				<div class="clear"></div>
 
-			</div><!-- .awef-panel -->
+			</div><!-- .aadvana-panel -->
 
-			<?php
+						<?php
 		}
 
 		/**
@@ -725,7 +757,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$data = self::get_current_options()[ $value['id'] ];
 			}
 
-			Settings_Builder::create( $value, \AWEF_SETTINGS_NAME . '[' . $value['id'] . ']', $data );
+			Settings_Builder::create( $value, \ADVAN_SETTINGS_NAME . '[' . $value['id'] . ']', $data );
 		}
 
 		/**
@@ -739,7 +771,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : '';
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -769,7 +801,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 2.0.0
 		 */
 		public static function store_version(): void {
-			\update_option( self::SETTINGS_VERSION, \AWEF_VERSION );
+			\update_option( self::SETTINGS_VERSION, \ADVAN_VERSION );
 		}
 	}
 }

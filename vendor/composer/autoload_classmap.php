@@ -14,6 +14,8 @@ return array(
     'ADVAN\\Helpers\\File_Helper' => $baseDir . '/classes/helpers/class-file-helper.php',
     'ADVAN\\Helpers\\Log_Line_Parser' => $baseDir . '/classes/helpers/class-log-line-parser.php',
     'ADVAN\\Helpers\\Settings' => $baseDir . '/classes/helpers/class-settings.php',
+    'ADVAN\\Helpers\\System_Status' => $baseDir . '/classes/helpers/class-system-status.php',
     'ADVAN\\Lists\\Logs_List' => $baseDir . '/classes/lists/class-logs-list.php',
+    'ADVAN\\Settings\\Settings_Builder' => $baseDir . '/classes/settings/class-settings-builder.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

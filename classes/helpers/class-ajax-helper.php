@@ -26,6 +26,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 	 */
 	class Ajax_Helper {
 
+		/**
+		 * Inits the class and sets the defaults
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function init() {
 			if ( \is_admin() && \wp_doing_ajax() ) {
 
@@ -36,6 +43,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			}
 		}
 
+		/**
+		 * Truncates the error log file.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function truncate_log_file() {
 			// Check nonce.
 
