@@ -816,10 +816,18 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				if ( $event && ! empty( $event ) ) {
 
+					echo '<style>
+					#wp-admin-bar-aadvan-menu {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						max-width: 50%;
+					}
+					</style>';
+
 					$admin_bar->add_node(
 						array(
 							'id'    => 'aadvan-menu',
-							'title' => $event['severity'] . ' : ' . $event['message'],
+							'title' => ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
 							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 							'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
 						)
