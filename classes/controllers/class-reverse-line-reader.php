@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		/**
 		 * Holds the value of the buffer size.
 		 *
-		 * @var array
+		 * @var int
 		 *
 		 * @since latest
 		 */
@@ -83,9 +83,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @since latest
 		 */
-		public static function read_file_from_end( $file_or_handle, $callback, $max_ines = 0, $pos = null ) {
+		public static function read_file_from_end( $file_or_handle, $callback, $max_ines = 0, $pos = null, bool $temp_writer = true ) {
 			if ( null === $pos ) {
-				self::$pos = -2;
+				self::$pos = -1;
 			}
 			if ( \is_string( $file_or_handle ) ) {
 				if ( \file_exists( $file_or_handle ) && \is_readable( $file_or_handle ) ) {
@@ -149,7 +149,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			self::$pos -= \mb_strlen( (string) $line );
 			*/
 
-			self::write_temp_file( $line . self::SEPARATOR );
+			if ( $temp_writer ) {
+				self::write_temp_file( $line . self::SEPARATOR );
+			}
 			$result = $callback( $line, $pos );
 
 			if ( false === $result ) {
@@ -169,16 +171,36 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				}
 			}
 
-			self::read_file_from_end( $handle, $callback, $max_ines, self::$pos );
+			self::read_file_from_end( $handle, $callback, $max_ines, self::$pos, $temp_writer );
 		}
 
-		public static function read( $size, &$file_or_handle ) {
+		/**
+		 * Reads buffer from the end of the file backwards to the beginning.
+		 *
+		 * @param int      $size - The buffer size to read.
+		 * @param resource $file_or_handle - The resource to read from.
+		 *
+		 * @return string|false
+		 *
+		 * @since latest
+		 */
+		public static function read( int $size, &$file_or_handle ) {
 			self::$pos -= $size;
 			fseek( $file_or_handle, self::$pos, SEEK_END );
 			$read_string = fread( $file_or_handle, $size );
+
 			return $read_string;
 		}
 
+		/**
+		 * Reads line from file
+		 *
+		 * @param resource $file_or_handle - The file handle to read from.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function readline( &$file_or_handle ) {
 			$buffer =& self::$buffer;
 			while ( true ) {
@@ -188,7 +210,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( count( $buffer ) > 1 ) {
 					return array_pop( $buffer );
 				}
-				$buffer = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . $buffer[0] );
+				$buffer = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
 			}
 		}
 
@@ -220,7 +242,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {
 				rewind( self::$temp_handle ); // resets the position of pointer.
 
-				echo fread( self::$temp_handle, fstat( self::$temp_handle )['size'] ); // I am freaking awesome.
+				echo fread( self::$temp_handle, fstat( self::$temp_handle )['size'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.Security.EscapeOutput.OutputNotEscaped
 
 				fclose( self::$temp_handle );
 			}

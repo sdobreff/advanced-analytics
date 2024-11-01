@@ -63,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						sprintf(
 						// translators: the name of the log file.
 							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', 'advanced-analysis' ),
-							esc_html( $log_file )
+							esc_html( self::$log_file )
 						)
 					);
 				} elseif ( ! is_readable( self::$log_file ) ) {

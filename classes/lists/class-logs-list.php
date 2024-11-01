@@ -353,6 +353,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
+			$this->items = self::get_error_items(true);
+
+			return $this->items;
+		}
+
+		public static function get_error_items(bool $write_temp= true): array {
 			$collected_items = array();
 			$errors          = array();
 			$position        = null;
@@ -390,7 +396,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						// }
 					},
 					100,
-					$position
+					$position,
+					$write_temp
 				);
 
 				if ( false === $result ) {
@@ -398,9 +405,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 			}
 
-			$this->items = $errors;
-
-			return $this->items;
+			return $errors;
 		}
 
 		/**

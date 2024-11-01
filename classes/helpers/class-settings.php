@@ -306,14 +306,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				1
 			);
 
+			add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+			add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
+
 			// \add_submenu_page(
-			// 	self::MENU_SLUG,
-			// 	\esc_html__( 'Settings', 'advanced-analytics' ),
-			// 	\esc_html__( 'Settings', 'advanced-analytics' ),
-			// 	'read', // No capability requirement.
-			// 	self::SETTINGS_MENU_SLUG,
-			// 	array( __CLASS__, 'aadvana_show_options' ),
-			// 	301
+			// self::MENU_SLUG,
+			// \esc_html__( 'Settings', 'advanced-analytics' ),
+			// \esc_html__( 'Settings', 'advanced-analytics' ),
+			// 'read', // No capability requirement.
+			// self::SETTINGS_MENU_SLUG,
+			// array( __CLASS__, 'aadvana_show_options' ),
+			// 301
 			// );
 
 			// if ( ! self::is_plugin_settings_page() ) {
@@ -529,14 +532,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'General', 'advanced-analytics' ),
 				),
 
-				'head-global' => esc_html__( 'Global Settings', 'advanced-analytics' ),
+				'head-global'  => esc_html__( 'Global Settings', 'advanced-analytics' ),
 
-				'backup'      => array(
+				'backup'       => array(
 					'icon'  => 'migrate',
 					'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
 				),
 
-				'system-info' => array(
+				'system-info'  => array(
 					'icon'  => 'wordpress-alt',
 					'title' => esc_html__( 'System Info', 'advanced-analytics' ),
 				),
@@ -802,6 +805,27 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function store_version(): void {
 			\update_option( self::SETTINGS_VERSION, \ADVAN_VERSION );
+		}
+
+		public static function live_notifications( $admin_bar ) {
+			if ( current_user_can( 'manage_options' ) && \is_admin() ) {
+
+				$logs = Logs_List::get_error_items( false );
+
+				$event = ( isset( $logs[0] ) ) ? $logs[0] : null;
+
+				if ( $event && ! empty( $event ) ) {
+
+					$admin_bar->add_node(
+						array(
+							'id'    => 'aadvan-menu',
+							'title' => $event['severity'] . ' : ' . $event['message'],
+							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
+							'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
+						)
+					);
+				}
+			}
 		}
 	}
 }
