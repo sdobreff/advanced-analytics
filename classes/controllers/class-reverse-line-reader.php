@@ -23,6 +23,35 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 	 * @since latest
 	 */
 	class Reverse_Line_Reader {
+		const BUFFER_SIZE = 4096;
+		const SEPARATOR   = PHP_EOL;
+
+		/**
+		 * Keeps track of of the current position in the file.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $buffer = array( '' );
+
+		/**
+		 * Holds the value of the buffer size.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $buffer_size = self::BUFFER_SIZE;
+
+		/**
+		 * The file size.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $file_size = 0;
 
 		/**
 		 * Keeps track of of the current position in the file.
@@ -69,30 +98,58 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			} else {
 				return false;
 			}
-			// Lets check the size and act aproperly.
+			// Lets check the size and act appropriately.
 			if ( null === $pos ) {
 				fseek( $handle, 0, SEEK_END );
 				$size = ftell( $handle );
 				if ( 0 === (int) $size ) {
 					fclose( $handle );
 					return false;
+				} elseif ( self::$buffer_size >= (int) $size ) {
+					// self::$pos is holding negative values - so sum.
+					self::$buffer_size = ( (int) $size ) + self::$pos;
 				}
+
+				self::$file_size = - (int) $size;
 			}
 
-			while ( true ) {
-				fseek( $handle, self::$pos, SEEK_END );
-				--self::$pos;
-				$char = fgetc( $handle );
-				if ( "\n" === $char ) {
-					break;
-				}
-				if ( false === $char ) {
-					fseek( $handle, 0 );
-					break;
-				}
+			// while ( true ) {
+			// fseek( $handle, self::$pos, SEEK_END );
+			// --self::$pos;
+			// $char = fgetc( $handle );
+			// if ( "\n" === $char ) {
+			// break;
+			// }
+			// if ( false === $char ) {
+			// fseek( $handle, 0 );
+			// break;
+			// }
+			// }
+
+			// $line = fgets( $handle );
+
+			$line = self::readline( $handle );
+
+			if ( null === $line ) {
+				fclose( $handle );
+
+				return;
 			}
-			$line = fgets( $handle );
-			self::write_temp_file( $line );
+
+			/*
+			New shit
+			while ( ( $buffer = fgets( $fp, 4096 ) ) !== false ) {
+				echo $buffer, PHP_EOL;
+			}
+
+			fseek( $handle, self::$pos - 4096, SEEK_END );
+
+			$line = fgets( $handle, 4096 );
+
+			self::$pos -= \mb_strlen( (string) $line );
+			*/
+
+			self::write_temp_file( $line . self::SEPARATOR );
 			$result = $callback( $line, $pos );
 
 			if ( false === $result ) {
@@ -100,9 +157,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				return;
 			}
-			if ( false === $char ) {
-				return;
-			}
+			// if ( false === $char ) {
+			// return;
+			// }
 			if ( $max_ines > 0 ) {
 				--$max_ines;
 				if ( 0 === $max_ines ) {
@@ -113,6 +170,26 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			}
 
 			self::read_file_from_end( $handle, $callback, $max_ines, self::$pos );
+		}
+
+		public static function read( $size, &$file_or_handle ) {
+			self::$pos -= $size;
+			fseek( $file_or_handle, self::$pos, SEEK_END );
+			$read_string = fread( $file_or_handle, $size );
+			return $read_string;
+		}
+
+		public static function readline( &$file_or_handle ) {
+			$buffer =& self::$buffer;
+			while ( true ) {
+				if ( 0 === self::$pos || self::$pos <= self::$file_size ) {
+					return array_pop( $buffer );
+				}
+				if ( count( $buffer ) > 1 ) {
+					return array_pop( $buffer );
+				}
+				$buffer = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . $buffer[0] );
+			}
 		}
 
 		/**

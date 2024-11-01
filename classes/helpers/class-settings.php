@@ -306,15 +306,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				1
 			);
 
-			\add_submenu_page(
-				self::MENU_SLUG,
-				\esc_html__( 'Settings', 'advanced-analytics' ),
-				\esc_html__( 'Settings', 'advanced-analytics' ),
-				'read', // No capability requirement.
-				self::SETTINGS_MENU_SLUG,
-				array( __CLASS__, 'aadvana_show_options' ),
-				301
-			);
+			// \add_submenu_page(
+			// 	self::MENU_SLUG,
+			// 	\esc_html__( 'Settings', 'advanced-analytics' ),
+			// 	\esc_html__( 'Settings', 'advanced-analytics' ),
+			// 	'read', // No capability requirement.
+			// 	self::SETTINGS_MENU_SLUG,
+			// 	array( __CLASS__, 'aadvana_show_options' ),
+			// 	301
+			// );
 
 			// if ( ! self::is_plugin_settings_page() ) {
 			// return;

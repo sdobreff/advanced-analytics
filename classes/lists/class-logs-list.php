@@ -389,7 +389,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						// return false; // returning false here "breaks" the loop
 						// }
 					},
-					300,
+					100,
 					$position
 				);
 

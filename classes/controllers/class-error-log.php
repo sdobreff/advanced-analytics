@@ -25,6 +25,15 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 	class Error_Log {
 
 		/**
+		 * Path to the error log file.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $log_file = null;
+
+		/**
 		 * Tries to detect the log filename.
 		 *
 		 * @return string|\WP_Error
@@ -32,53 +41,55 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 * @since latest
 		 */
 		public static function autodetect() {
-			$log_errors            = strtolower( strval( ini_get( 'log_errors' ) ) );
-			$error_logging_enabled = ! empty( $log_errors ) && ! in_array( $log_errors, array( 'off', '0', 'false', 'no' ) );
-			$log_file              = ini_get( 'error_log' );
+			if ( null === self::$log_file ) {
+				$log_errors            = strtolower( strval( ini_get( 'log_errors' ) ) );
+				$error_logging_enabled = ! empty( $log_errors ) && ! in_array( $log_errors, array( 'off', '0', 'false', 'no' ) );
+				self::$log_file        = ini_get( 'error_log' );
 
-			// Check for common problems that could prevent us from displaying the error log.
-			if ( ! $error_logging_enabled ) {
-				return new \WP_Error(
-					'log_errors_off',
-					__( 'Error logging is disabled.', 'advanced-analysis' )
-				);
-			} elseif ( empty( $log_file ) ) {
-				return new \WP_Error(
-					'error_log_not_set',
-					__( 'Error log filename is not set.', 'advanced-analysis' )
-				);
-			} elseif ( ( strpos( $log_file, '/' ) === false ) && ( strpos( $log_file, '\\' ) === false ) ) {
-				return new \WP_Error(
-					'error_log_uses_relative_path',
-					sprintf(
+				// Check for common problems that could prevent us from displaying the error log.
+				if ( ! $error_logging_enabled ) {
+					return new \WP_Error(
+						'log_errors_off',
+						__( 'Error logging is disabled.', 'advanced-analysis' )
+					);
+				} elseif ( empty( self::$log_file ) ) {
+					return new \WP_Error(
+						'error_log_not_set',
+						__( 'Error log filename is not set.', 'advanced-analysis' )
+					);
+				} elseif ( ( strpos( self::$log_file, '/' ) === false ) && ( strpos( self::$log_file, '\\' ) === false ) ) {
+					return new \WP_Error(
+						'error_log_uses_relative_path',
+						sprintf(
 						// translators: the name of the log file.
-						__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', 'advanced-analysis' ),
-						esc_html( $log_file )
-					)
-				);
-			} elseif ( ! is_readable( $log_file ) ) {
-				if ( file_exists( $log_file ) ) {
-					return new \WP_Error(
-						'error_log_not_accessible',
-						sprintf(
-							// translators: the name of the log file.
-							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', 'advanced-analysis' ),
+							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', 'advanced-analysis' ),
 							esc_html( $log_file )
 						)
 					);
-				} else {
-					return new \WP_Error(
-						'error_log_not_found',
-						sprintf(
+				} elseif ( ! is_readable( self::$log_file ) ) {
+					if ( file_exists( self::$log_file ) ) {
+						return new \WP_Error(
+							'error_log_not_accessible',
+							sprintf(
 							// translators: the name of the log file.
-							__( 'The log file <code>%s</code> does not exist or is inaccessible.', 'advanced-analysis' ),
-							esc_html( $log_file )
-						)
-					);
+								__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', 'advanced-analysis' ),
+								esc_html( self::$log_file )
+							)
+						);
+					} else {
+						return new \WP_Error(
+							'error_log_not_found',
+							sprintf(
+							// translators: the name of the log file.
+								__( 'The log file <code>%s</code> does not exist or is inaccessible.', 'advanced-analysis' ),
+								esc_html( self::$log_file )
+							)
+						);
+					}
 				}
 			}
 
-			return $log_file;
+			return self::$log_file;
 		}
 
 		/**
