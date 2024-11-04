@@ -86,6 +86,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		public static function read_file_from_end( $file_or_handle, $callback, $max_ines = 0, $pos = null, bool $temp_writer = true ) {
 			if ( null === $pos ) {
 				self::$pos = -1;
+				self::$buffer = array( '' );
 			}
 			if ( \is_string( $file_or_handle ) ) {
 				if ( \file_exists( $file_or_handle ) && \is_readable( $file_or_handle ) ) {
@@ -155,7 +156,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			$result = $callback( $line, $pos );
 
 			if ( false === $result ) {
-				fclose( $handle );
+				\fclose( $handle );
 
 				return;
 			}
@@ -165,7 +166,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( $max_ines > 0 ) {
 				--$max_ines;
 				if ( 0 === $max_ines ) {
-					fclose( $handle );
+					\fclose( $handle );
 
 					return;
 				}

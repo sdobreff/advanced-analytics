@@ -125,6 +125,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		private static $query_order = array();
 
 		/**
+		 * Holds the read lines from error log.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $read_items = array();
+
+		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args Events query arguments.
@@ -353,59 +362,73 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
-			$this->items = self::get_error_items(true);
+			$this->items = self::get_error_items( true );
 
 			return $this->items;
 		}
 
-		public static function get_error_items(bool $write_temp= true): array {
-			$collected_items = array();
-			$errors          = array();
-			$position        = null;
+		/**
+		 * Collect error items.
+		 *
+		 * @param boolean $write_temp
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function get_error_items( bool $write_temp = true ): array {
 
-			if ( function_exists( 'set_time_limit' ) ) {
-				set_time_limit( 0 );
-			}
+			if ( empty( self::$read_items ) ) {
+				$collected_items = array();
+				$errors          = array();
+				$position        = null;
 
-			while ( empty( $errors ) ) {
-				$result = Reverse_Line_Reader::read_file_from_end(
-					Error_Log::autodetect(),
-					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
-
-						$position = $pos;
-
-						// Check if this is the last line, and if not try to parse the line.
-						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
-							$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
-
-							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
-								if ( ! empty( $collected_items ) ) {
-									$parsed_data['sub_items'] = $collected_items;
-									$collected_items          = array();
-								}
-								$errors[] = $parsed_data;
-							} elseif ( \is_array( $parsed_data ) ) {
-								$collected_items[] = $parsed_data;
-							}
-						}
-
-						// if ( ! str_contains( $address, 'stop_word' ) ) {
-						// echo "\nFound 'stop_word'!";
-
-						// return false; // returning false here "breaks" the loop
-						// }
-					},
-					100,
-					$position,
-					$write_temp
-				);
-
-				if ( false === $result ) {
-					break;
+				if ( \function_exists( 'set_time_limit' ) ) {
+					\set_time_limit( 0 );
 				}
+
+				while ( empty( $errors ) ) {
+					$result = Reverse_Line_Reader::read_file_from_end(
+						Error_Log::autodetect(),
+						function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
+
+							$position = $pos;
+
+							// Check if this is the last line, and if not try to parse the line.
+							if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
+								$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+
+								if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
+									if ( ! empty( $collected_items ) ) {
+										$parsed_data['sub_items'] = $collected_items;
+										$collected_items          = array();
+									}
+									$errors[] = $parsed_data;
+								} elseif ( \is_array( $parsed_data ) ) {
+									$collected_items[] = $parsed_data;
+								}
+							}
+
+							// if ( ! str_contains( $address, 'stop_word' ) ) {
+							// echo "\nFound 'stop_word'!";
+
+							// return false; // returning false here "breaks" the loop
+							// }
+						},
+						100,
+						$position,
+						$write_temp
+					);
+
+					if ( false === $result ) {
+						break;
+					}
+				}
+
+				self::$read_items = $errors;
 			}
 
-			return $errors;
+			return self::$read_items;
 		}
 
 		/**
