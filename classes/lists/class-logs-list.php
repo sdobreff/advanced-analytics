@@ -378,7 +378,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function get_error_items( bool $write_temp = true ): array {
 
-			if ( empty( self::$read_items ) ) {
+			//if ( empty( self::$read_items ) ) {
 				$collected_items = array();
 				$errors          = array();
 				$position        = null;
@@ -426,7 +426,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				self::$read_items = $errors;
-			}
+			//}
 
 			return self::$read_items;
 		}
