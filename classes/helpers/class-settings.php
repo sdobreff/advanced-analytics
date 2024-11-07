@@ -559,7 +559,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			</div>
 
 			<div class="aadvana-panel wrap">
-			<?xml version="1.0" encoding="iso-8859-1"?>
 
 				<div class="aadvana-panel-tabs">
 					<div class="aadvana-logo">
