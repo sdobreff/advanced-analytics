@@ -40,6 +40,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 * Truncate file
 				 */
 				\add_action( 'wp_ajax_advanced_analytics_truncate_log_file', array( __CLASS__, 'truncate_log_file' ) );
+
+				/**
+				 * Download file
+				 */
+				\add_action( 'wp_ajax_advanced_analytics_download_log_file', array( __CLASS__, 'download_log_file' ) );
 			}
 		}
 
@@ -56,11 +61,32 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
 
 				Error_Log::clear( Error_Log::autodetect() );
+				Log_Line_Parser::delete_last_parsed_timestamp();
 
 				\wp_send_json_success( 2 );
 
 				\wp_die();
 			}
+		}
+
+		/**
+		 * Downloads the error log file.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function download_log_file() {
+			// Check nonce.
+
+			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
+
+				echo File_Helper::download( Error_Log::autodetect() );
+			}
+
+			\wp_send_json_success( 2 );
+
+			\wp_die();
 		}
 	}
 }

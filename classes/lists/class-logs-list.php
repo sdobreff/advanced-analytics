@@ -378,55 +378,57 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function get_error_items( bool $write_temp = true ): array {
 
-			//if ( empty( self::$read_items ) ) {
+			// if ( empty( self::$read_items ) ) {
 				$collected_items = array();
 				$errors          = array();
 				$position        = null;
 
-				if ( \function_exists( 'set_time_limit' ) ) {
-					\set_time_limit( 0 );
-				}
+			if ( \function_exists( 'set_time_limit' ) ) {
+				\set_time_limit( 0 );
+			}
 
-				while ( empty( $errors ) ) {
-					$result = Reverse_Line_Reader::read_file_from_end(
-						Error_Log::autodetect(),
-						function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
+			while ( empty( $errors ) ) {
+				$result = Reverse_Line_Reader::read_file_from_end(
+					Error_Log::autodetect(),
+					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
 
-							$position = $pos;
+						$position = $pos;
 
-							// Check if this is the last line, and if not try to parse the line.
-							if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
-								$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+						// Check if this is the last line, and if not try to parse the line.
+						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
+							$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
 
-								if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
-									if ( ! empty( $collected_items ) ) {
-										$parsed_data['sub_items'] = $collected_items;
-										$collected_items          = array();
-									}
-									$errors[] = $parsed_data;
-								} elseif ( \is_array( $parsed_data ) ) {
-									$collected_items[] = $parsed_data;
+							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
+								if ( ! empty( $collected_items ) ) {
+									$parsed_data['sub_items'] = $collected_items;
+									$collected_items          = array();
 								}
+								$errors[] = $parsed_data;
+							} elseif ( \is_array( $parsed_data ) ) {
+								$collected_items[] = $parsed_data;
 							}
+						}
 
-							// if ( ! str_contains( $address, 'stop_word' ) ) {
-							// echo "\nFound 'stop_word'!";
+						// if ( ! str_contains( $address, 'stop_word' ) ) {
+						// echo "\nFound 'stop_word'!";
 
-							// return false; // returning false here "breaks" the loop
-							// }
-						},
-						100,
-						$position,
-						$write_temp
-					);
+						// return false; // returning false here "breaks" the loop
+						// }
+					},
+					100,
+					$position,
+					$write_temp
+				);
 
-					if ( false === $result ) {
-						break;
-					}
+				if ( false === $result ) {
+					break;
 				}
+			}
 
 				self::$read_items = $errors;
-			//}
+			// }
+
+			Log_Line_Parser::store_last_parsed_timestamp();
 
 			return self::$read_items;
 		}
@@ -736,6 +738,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}, 'json');
 					});
+					jQuery( document ).on( 'click', '#top-downloadlog, #bottom-downloadlog', function ( e ) {
+						
+						const a = document.createElement('a');
+						a.href = '<?php echo File_Helper::download_link(); ?>';
+
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+					});
 				</script>
 				<?php
 			}
@@ -743,6 +754,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				?>
 			<div>
 				<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', 'advanced-analytics' ); ?>" />
+
+				<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', 'advanced-analytics' ); ?>">
 			</div>
 				<?php
 			}

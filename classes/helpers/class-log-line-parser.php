@@ -25,6 +25,36 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 	 * @since 1.0.0
 	 */
 	class Log_Line_Parser {
+
+		public const TIMESTAMP_TRANSIENT = 'advan_timestamp';
+
+		/**
+		 * Holds the last timestamp read from the log file.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $last_timestamp = null;
+
+		/**
+		 * Holds the last parsed timestamp from previous (if any) reading.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $last_parsed_timestamp = null;
+
+		/**
+		 * Stores the newest lines read from the log file.
+		 *
+		 * @var integer
+		 *
+		 * @since latest
+		 */
+		private static $newer_lines = 0;
+
 		public static function parse_php_error_log_line( string $line ) {
 			$line      = rtrim( $line );
 			$timestamp = null;
@@ -55,9 +85,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 
 				if ( ! empty( $matches['timestamp'] ) ) {
 					// Attempt to parse the timestamp, if any. Timestamp format can vary by server.
-					$parsedTimestamp = strtotime( $matches['timestamp'] );
-					if ( ! empty( $parsedTimestamp ) ) {
-						$timestamp = $parsedTimestamp;
+					$parsed_timestamp = strtotime( $matches['timestamp'] );
+					if ( ! empty( $parsed_timestamp ) ) {
+						$timestamp = $parsed_timestamp;
+
+						self::$last_timestamp = $timestamp;
+
+						if ( self::get_last_parsed_timestamp() < self::$last_timestamp ) {
+							++self::$newer_lines;
+						}
 					}
 				}
 
@@ -78,12 +114,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				'message'        => $message,
 				'timestamp'      => $timestamp,
 				'severity'       => $level,
-				'isContext'      => ( $context !== null ),
+				'isContext'      => ( null !== $context ),
 				'contextPayload' => $context,
 			);
 		}
 
-		public static function parse_php_error_log_stack_line( $message, $isLastLine = false ) {
+		public static function parse_php_error_log_stack_line( $message, $is_last_line = false ) {
 			// It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()".
 			// The last line of a very long entry can be truncated.
 			if ( preg_match(
@@ -124,7 +160,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				return $item;
 			} elseif (
 			// Simplified parsing for truncated stack trace entries.
-			$isLastLine
+			$is_last_line
 			&& preg_match( '@^\#(?P<index>\d++)\s@', $message, $matches )
 			&& preg_match( '@\son\sline\s\d++$@', $message )
 			) {
@@ -141,6 +177,76 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Stores the last known Timestamp as transient
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function store_last_parsed_timestamp() {
+			if ( null !== self::$last_timestamp ) {
+
+				if ( false === self::get_last_parsed_timestamp() ) {
+					\set_transient( self::TIMESTAMP_TRANSIENT, time(), self::$last_timestamp, 600 );
+				}
+
+				if ( 1 <= self::get_newer_lines() ) {
+					?>
+					<script>
+						if (jQuery('#advan-errors-menu .update-count').length) {
+							jQuery('#advan-errors-menu').show();
+							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( self::get_newer_lines() ) ); ?>');
+						}
+					</script>
+					<?php
+				}
+			}
+		}
+
+		/**
+		 * Returns the last known Timestamp transient.
+		 *
+		 * @return null|string
+		 *
+		 * @since latest
+		 */
+		public static function get_last_parsed_timestamp() {
+			if ( null === self::$last_parsed_timestamp ) {
+				self::$last_parsed_timestamp = \get_transient( self::TIMESTAMP_TRANSIENT );
+				if ( false === self::$last_parsed_timestamp ) {
+					self::$last_parsed_timestamp = 0;
+					return false;
+				}
+			}
+
+			return self::$last_parsed_timestamp;
+		}
+
+		/**
+		 * Clears the variable and deletes the transient.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function delete_last_parsed_timestamp() {
+			self::$last_parsed_timestamp = null;
+
+			\delete_transient( self::TIMESTAMP_TRANSIENT );
+		}
+
+		/**
+		 * Returns newer errors from last log parsing.
+		 *
+		 * @return int
+		 *
+		 * @since latest
+		 */
+		public static function get_newer_lines(): int {
+			return (int) self::$newer_lines;
 		}
 	}
 }

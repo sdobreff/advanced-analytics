@@ -275,7 +275,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			self::$hook = \add_menu_page(
 				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-				\esc_html__( 'Analytics', 'advanced-analytics' ),
+				\esc_html__( 'Analytics', 'advanced-analytics' ) . self::get_updates_count_html(),
 				'manage_options',
 				self::MENU_SLUG,
 				array( __CLASS__, 'analytics_options_page' ),
@@ -385,6 +385,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// );
 			// exit;
 			// }
+		}
+
+		/**
+		 * Return the updates count markup.
+		 *
+		 * @return string Updates count markup, empty string if no updates available.
+		 *
+		 * @since latest
+		 */
+		public static function get_updates_count_html(): string {
+
+			$count_html = sprintf(
+				' <span id="advan-errors-menu" style="display:none" class="update-plugins"><span class="update-count">%s</span></span>',
+				''
+				// \number_format_i18n( $count )
+			);
+
+			return $count_html;
 		}
 
 		/**
@@ -823,10 +841,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					}
 					</style>';
 
+					$date_time_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+$time = wp_date( $date_time_format, $event['timestamp'] );
+
 					$admin_bar->add_node(
 						array(
 							'id'    => 'aadvan-menu',
-							'title' => ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
+							'title' => ( ( ! empty( $time  ) ) ? '<b><i>'.$time.'</i></b>'  . ' : ' : '' ).( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
 							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 							'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
 						)

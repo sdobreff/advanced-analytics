@@ -22,10 +22,7 @@
  */
 
 use ADVAN\Advanced_Analytics;
-use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Context_Helper;
-use ADVAN\Helpers\Log_Line_Parser;
-use ADVAN\Controllers\Reverse_Line_Reader;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
