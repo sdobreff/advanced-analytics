@@ -47,6 +47,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			'error'      => array( 'color' => '#ffb3b3' ),
 			'success'    => array( 'color' => '#00ff00' ),
 			'info'       => array( 'color' => '#0000ff' ),
+			'notice'     => array( 'color' => '#feeb8e' ),
 			'warning'    => array( 'color' => '#ffff00' ),
 		);
 

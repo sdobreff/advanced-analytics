@@ -190,15 +190,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			if ( null !== self::$last_timestamp ) {
 
 				if ( false === self::get_last_parsed_timestamp() ) {
-					\set_transient( self::TIMESTAMP_TRANSIENT, time(), self::$last_timestamp, 600 );
+					\set_transient( self::TIMESTAMP_TRANSIENT, self::$last_timestamp - 1, 600 ); // get back 1 second - sometimes there delays.
 				}
 
-				if ( 1 <= ( $count = self::get_newer_lines() ) ) {
+				if ( 1 <= ( $count = self::get_newer_lines() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found
 					?>
 					<script>
 						if (jQuery('#advan-errors-menu .update-count').length) {
 							jQuery('#advan-errors-menu').show();
-							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( $count  ) ); ?>');
+							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( $count ) ); ?>');
 						}
 					</script>
 					<?php
@@ -246,7 +246,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 * @since latest
 		 */
 		public static function get_newer_lines(): int {
-			$lines = (int) self::$newer_lines;
+			$lines             = (int) self::$newer_lines;
 			self::$newer_lines = 0;
 			return $lines;
 		}

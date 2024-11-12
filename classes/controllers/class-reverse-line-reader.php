@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		/**
 		 * The file size.
 		 *
-		 * @var array
+		 * @var int
 		 *
 		 * @since latest
 		 */
@@ -85,7 +85,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 */
 		public static function read_file_from_end( $file_or_handle, $callback, $max_ines = 0, $pos = null, bool $temp_writer = true ) {
 			if ( null === $pos ) {
-				self::$pos = -1;
+				self::$pos    = -1;
 				self::$buffer = array( '' );
 			}
 			if ( \is_string( $file_or_handle ) ) {
@@ -187,7 +187,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 */
 		public static function read( int $size, &$file_or_handle ) {
 			self::$pos -= $size;
-			fseek( $file_or_handle, self::$pos, SEEK_END );
+			if ( 0 === self::$pos ) {
+				fseek( $file_or_handle, 0 );
+			} else {
+				fseek( $file_or_handle, self::$pos, SEEK_END );
+			}
 			$read_string = fread( $file_or_handle, $size );
 
 			return $read_string;
@@ -206,6 +210,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			$buffer =& self::$buffer;
 			while ( true ) {
 				if ( 0 === self::$pos || self::$pos <= self::$file_size ) {
+
+					if ( self::$pos < self::$file_size ) {
+
+						self::$buffer_size = abs( self::$file_size - -self::$buffer_size );
+						self::$pos         = self::$buffer_size;
+						$buffer            = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
+
+						self::$pos = 0;
+
+						return array_pop( $buffer );
+					}
+
 					return array_pop( $buffer );
 				}
 				if ( count( $buffer ) > 1 ) {
