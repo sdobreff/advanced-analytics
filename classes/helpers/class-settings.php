@@ -833,23 +833,40 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				if ( $event && ! empty( $event ) ) {
 
-					echo '<style>
-					#wp-admin-bar-aadvan-menu {
-						overflow: hidden;
-						text-overflow: ellipsis;
-						max-width: 50%;
-					}
-					</style>';
+					?>
+					<style>
+						#wp-admin-bar-aadvan-menu {
+							overflow: hidden;
+							text-overflow: ellipsis;
+							max-width: 50%;
+						}
+						#wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
+							background: #d7dce0;
+							color: #42425d !important;
+						}
+						<?php
+						foreach ( Logs_List::ROW_CLASSES as $class => $properties ) {
+							echo '.aadvan-live-notif-item.'. $class. '{ background: '. $properties['color']. ' !important; }';
+							echo '.aadvan-live-notif-item.'. $class. ' a { color: #42425d !important; }';
+
+						}
+					?>
+					</style>
+					<?php
 
 					$date_time_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-$time = wp_date( $date_time_format, $event['timestamp'] );
+					$time             = wp_date( $date_time_format, $event['timestamp'] );
 
+					$classes = '';
+					if ( isset( $event['severity'] ) && ! empty( $event['severity'] ) ) {
+						$classes .= ' '. $event['severity'];
+					}
 					$admin_bar->add_node(
 						array(
 							'id'    => 'aadvan-menu',
-							'title' => ( ( ! empty( $time  ) ) ? '<b><i>'.$time.'</i></b>'  . ' : ' : '' ).( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
+							'title' => ( ( ! empty( $time ) ) ? '<b><i>' . $time . '</i></b>' . ' : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
 							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
-							'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
+							'meta'  => array( 'class' => 'aadvan-live-notif-item' . $classes ),
 						)
 					);
 				}

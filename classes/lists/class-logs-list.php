@@ -42,6 +42,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 		public const SEARCH_INPUT = 'sgp';
 
+		public const ROW_CLASSES = array(
+			'deprecated' => array( 'color' => '#ffeb8e' ),
+			'error'      => array( 'color' => '#ffb3b3' ),
+			'success'    => array( 'color' => '#00ff00' ),
+			'info'       => array( 'color' => '#0000ff' ),
+			'warning'    => array( 'color' => '#ffff00' ),
+		);
+
 		/**
 		 * Current screen.
 		 *
@@ -179,6 +187,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @param string $input_id ID attribute value for the search input field.
 		 */
 		public function search_box( $text, $input_id ) {
+
 			if ( empty( $_REQUEST[ self::SEARCH_INPUT ] ) && ! $this->has_items() ) {
 				return;
 			}
@@ -192,6 +201,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
+
 			<?php
 		}
 
@@ -476,6 +486,21 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			switch ( $column_name ) {
 				case 'timestamp':
 					return \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $item['timestamp'] );
+				case 'message':
+					$message = esc_html( $item[ $column_name ] );
+					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
+						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', 'advanced-analytics' ) . '"></div>';
+
+						$reversed_details = \array_reverse( $item['sub_items'] );
+						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px;">';
+						foreach ( $reversed_details as $key => $val ) {
+							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b>' . ' - ' : '';
+							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
+							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
+						}
+						$message .= '</pre></div>';
+					}
+					return $message;
 				default:
 					return isset( $item[ $column_name ] )
 						? esc_html( $item[ $column_name ] )
@@ -704,6 +729,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @param string $which - Position of the nav.
 		 */
 		public function extra_tablenav( $which ) {
+
 			// If the position is not top then render.
 
 			// Show site alerts widget.
@@ -747,6 +773,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						a.click();
 						document.body.removeChild(a);
 					});
+
+					jQuery( document ).on( 'click', '.show_log_details', function() {
+						jQuery(this).parent().next().closest('.log_details_show').toggle();
+					});
 				</script>
 				<?php
 			}
@@ -759,6 +789,23 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			</div>
 				<?php
 			}
+		}
+
+		/**
+		 * Generates content for a single row of the table.
+		 *
+		 * @since 3.1.0
+		 *
+		 * @param object|array $item The current item
+		 */
+		public function single_row( $item ) {
+			$classes = '';
+			if ( isset( $item['severity'] ) && ! empty( $item['severity'] ) ) {
+				$classes .= ' ' . $item['severity'];
+			}
+			echo '<tr class="' . $classes . '">';
+			$this->single_row_columns( $item );
+			echo '</tr>';
 		}
 
 		/**
@@ -791,15 +838,23 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				?>
 				<style>
 					.toplevel_page_advan_logs #debug-log {
-					max-width: 95%;
-					padding: 10px;
-					word-wrap: break-word;
-					background: black;
-					color: #fff;
-					border-radius: 5px;
-					height: 400px;
-					overflow-y: auto;
+						max-width: 95%;
+						padding: 10px;
+						word-wrap: break-word;
+						background: black;
+						color: #fff;
+						border-radius: 5px;
+						height: 400px;
+						overflow-y: auto;
 					}
+					.generated-logs #timestamp { width: 15%; }
+					.generated-logs #severity { width: 10%; }
+
+					<?php
+					foreach ( self::ROW_CLASSES as $class => $properties ) {
+						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important; }';
+					}
+					?>
 				</style>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
 					<?php

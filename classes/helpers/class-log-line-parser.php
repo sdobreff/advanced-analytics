@@ -91,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 
 						self::$last_timestamp = $timestamp;
 
-						if ( self::get_last_parsed_timestamp() < self::$last_timestamp ) {
+						if ( (int) self::get_last_parsed_timestamp() < self::$last_timestamp ) {
 							++self::$newer_lines;
 						}
 					}
@@ -193,12 +193,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					\set_transient( self::TIMESTAMP_TRANSIENT, time(), self::$last_timestamp, 600 );
 				}
 
-				if ( 1 <= self::get_newer_lines() ) {
+				if ( 1 <= ( $count = self::get_newer_lines() ) ) {
 					?>
 					<script>
 						if (jQuery('#advan-errors-menu .update-count').length) {
 							jQuery('#advan-errors-menu').show();
-							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( self::get_newer_lines() ) ); ?>');
+							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( $count  ) ); ?>');
 						}
 					</script>
 					<?php
@@ -217,7 +217,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			if ( null === self::$last_parsed_timestamp ) {
 				self::$last_parsed_timestamp = \get_transient( self::TIMESTAMP_TRANSIENT );
 				if ( false === self::$last_parsed_timestamp ) {
-					self::$last_parsed_timestamp = 0;
+					self::$last_parsed_timestamp = null;
 					return false;
 				}
 			}
@@ -246,7 +246,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 * @since latest
 		 */
 		public static function get_newer_lines(): int {
-			return (int) self::$newer_lines;
+			$lines = (int) self::$newer_lines;
+			self::$newer_lines = 0;
+			return $lines;
 		}
 	}
 }
