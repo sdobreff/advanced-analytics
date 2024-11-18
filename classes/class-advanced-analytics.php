@@ -14,15 +14,17 @@ declare(strict_types=1);
 
 namespace ADVAN;
 
-use ADVAN\Migration\Migration;
-use ADVAN\Helpers\Settings;
-use ADVAN\Helpers\Review_Plugin;
-use ADVAN\Controllers\Integrations;
-use ADVAN\Controllers\Footnotes_Formatter;
-use ADVAN\Controllers\Pointers;
 use ADVAN\Helpers\Ajax;
+use ADVAN\Lists\Logs_List;
+use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\Ajax_Helper;
+use ADVAN\Migration\Migration;
+use ADVAN\Controllers\Pointers;
+use ADVAN\Helpers\Review_Plugin;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\Controllers\Integrations;
+use ADVAN\Helpers\WP_Error_Handler;
+use ADVAN\Controllers\Footnotes_Formatter;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -48,12 +50,15 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// \add_action( 'current_screen', array( '\AWEF\Helpers\Upgrade_Notice', 'init' ) );
 
+				// Setup screen options. Needs to be here as admin_init hook it too late.
+				\add_filter( 'set-screen-option', array( Logs_List::class, 'set_screen_option' ), 10, 3 );
+
 				\add_filter( 'plugin_action_links', array( __CLASS__, 'add_settings_link' ), 10, 2 );
 				// \add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta' ), 10, 2 );
 
 				// Review_Plugin::init();
 
-				//Integrations::init();
+				// Integrations::init();
 				Settings::init();
 
 				// Pointers::init();
@@ -64,6 +69,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Footnotes_Formatter::init();
 			}
 
+			\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
+
+			// if ( \WP_DEBUG ) {
+			// set_error_handler( 'WP_Error_Handler::handle_error' );
+			// }
 			Ajax_Helper::init();
 		}
 
@@ -223,24 +233,24 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			}
 		}
 
-		
-public static function shutdown() {
-    $errfile = "unknown file";
-    $errstr  = "shutdown";
-    $errno   = E_CORE_ERROR;
-    $errline = 0;
 
-    $error = error_get_last();
+		public static function shutdown() {
+			$errfile = 'unknown file';
+			$errstr  = 'shutdown';
+			$errno   = E_CORE_ERROR;
+			$errline = 0;
 
-    if($error !== NULL) {
-        $errno   = $error["type"];
-        $errfile = $error["file"];
-        $errline = $error["line"];
-        $errstr  = $error["message"];
+			$error = error_get_last();
 
-        //error_mail(format_error( $errno, $errstr, $errfile, $errline));
-    }
-}
+			if ( $error !== null ) {
+				$errno   = $error['type'];
+				$errfile = $error['file'];
+				$errline = $error['line'];
+				$errstr  = $error['message'];
+
+				// error_mail(format_error( $errno, $errstr, $errfile, $errline));
+			}
+		}
 
 	}
 }

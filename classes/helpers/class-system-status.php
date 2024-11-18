@@ -4,9 +4,9 @@
  *
  * Helper class to determine the proper status of the request.
  *
- * @package awesome-footnotes
+ * @package advanced-analytics
  *
- * @since 3.2.0
+ * @since latest
  */
 
 declare(strict_types=1);
@@ -557,11 +557,14 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 					<tr>
 						<td data-export-label="DefinedConstants"><?php esc_html_e( 'Defined Constants', 'advanced-analytics' ); ?>:</td>
 						<td>
-							<pre>
-							<?php
-								print_r(\get_defined_constants(true));
-							?>
-							</pre>
+							<details>
+								<summary><?php echo esc_html__( 'Click here to expand the whole info.', 'advanced-analytics' ); ?></summary>
+								<pre>
+								<?php
+									print_r( \get_defined_constants( true ) );
+								?>
+								</pre>
+							</details>
 						</td>
 					</tr>
 					<?php

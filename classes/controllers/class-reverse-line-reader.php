@@ -153,7 +153,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( $temp_writer ) {
 				self::write_temp_file( $line . self::SEPARATOR );
 			}
-			$result = $callback( $line, $pos );
+			$result = $callback( $line, self::$pos );
 
 			if ( false === $result ) {
 				\fclose( $handle );
@@ -213,7 +213,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 					if ( self::$pos < self::$file_size ) {
 
-						self::$buffer_size = abs( self::$file_size - -self::$buffer_size );
+						self::$buffer_size = abs( ( self::$file_size - -self::$buffer_size ) +1 );
 						self::$pos         = self::$buffer_size;
 						$buffer            = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
 

@@ -309,15 +309,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 			add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
-			// \add_submenu_page(
-			// self::MENU_SLUG,
-			// \esc_html__( 'Settings', 'advanced-analytics' ),
-			// \esc_html__( 'Settings', 'advanced-analytics' ),
-			// 'read', // No capability requirement.
-			// self::SETTINGS_MENU_SLUG,
-			// array( __CLASS__, 'aadvana_show_options' ),
-			// 301
-			// );
+			\add_submenu_page(
+			self::MENU_SLUG,
+			\esc_html__( 'Settings', 'advanced-analytics' ),
+			\esc_html__( 'Settings', 'advanced-analytics' ),
+			'read', // No capability requirement.
+			self::SETTINGS_MENU_SLUG,
+			array( __CLASS__, 'aadvana_show_options' ),
+			301
+			);
 
 			// if ( ! self::is_plugin_settings_page() ) {
 			// return;
@@ -543,19 +543,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$settings_tabs = array(
 
-				'head-general' => esc_html__( 'General Settings', 'advanced-analytics' ),
+				// 'head-general' => esc_html__( 'General Settings', 'advanced-analytics' ),
 
-				'general'      => array(
-					'icon'  => 'admin-generic',
-					'title' => esc_html__( 'General', 'advanced-analytics' ),
-				),
+				// 'general'      => array(
+				// 	'icon'  => 'admin-generic',
+				// 	'title' => esc_html__( 'General', 'advanced-analytics' ),
+				// ),
 
-				'head-global'  => esc_html__( 'Global Settings', 'advanced-analytics' ),
+				// 'head-global'  => esc_html__( 'Global Settings', 'advanced-analytics' ),
 
-				'backup'       => array(
-					'icon'  => 'migrate',
-					'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
-				),
+				// 'backup'       => array(
+				// 	'icon'  => 'migrate',
+				// 	'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
+				// ),
 
 				'system-info'  => array(
 					'icon'  => 'wordpress-alt',
@@ -824,10 +824,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\update_option( self::SETTINGS_VERSION, \ADVAN_VERSION );
 		}
 
+		/**
+		 * Shows live notifications in the admin bar if there are candidates.
+		 *
+		 * @param \WP_Admin_Bar $admin_bar - Current admin bar object.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function live_notifications( $admin_bar ) {
 			if ( current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				$logs = Logs_List::get_error_items( false );
+				$logs = Logs_List::get_error_items( false, 1 );
 
 				$event = ( isset( $logs[0] ) ) ? $logs[0] : null;
 

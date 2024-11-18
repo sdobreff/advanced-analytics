@@ -38,7 +38,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 	 */
 	class Logs_List extends \WP_List_Table {
 
-		public const SCREEN_OPTIONS_SLUG = 'advanced-analytics-logs-list';
+		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_logs_list';
+
+		public const PAGE_SLUG = 'toplevel_page_advan_logs';
 
 		public const SEARCH_INPUT = 'sgp';
 
@@ -58,7 +60,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 5.0.0
 		 */
-		protected $wp_screen;
+		protected static $wp_screen;
 
 		/**
 		 * Name of the table to show.
@@ -79,13 +81,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		protected $count;
 
 		/**
-		 * How many records to show per page - that is a fall back option, it will try to extract that first from the stored user data, then from the settings and from here as a last resort.
+		 * How many log records to read from the log page - that is a fall back option, it will try to extract that first from the stored user data, then from the settings and from here as a last resort.
 		 *
 		 * @var int
 		 *
 		 * @since 5.0.0
 		 */
-		protected $records_per_page = 10;
+		protected static $log_errors_to_read = 100;
 
 		/**
 		 * Holds the array with all of the column names and their representation in the table header.
@@ -251,12 +253,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 5.0.0
 		 */
-		private function get_wp_screen() {
-			if ( empty( $this->wp_screen ) ) {
-				$this->wp_screen = get_current_screen();
+		private static function get_wp_screen() {
+			if ( empty( self::$wp_screen ) ) {
+				self::$wp_screen = \get_current_screen();
 			}
 
-			return $this->wp_screen;
+			return self::$wp_screen;
 		}
 
 		/**
@@ -381,13 +383,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Collect error items.
 		 *
-		 * @param boolean $write_temp
+		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?
+		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page
 		 *
 		 * @return array
 		 *
 		 * @since latest
 		 */
-		public static function get_error_items( bool $write_temp = true ): array {
+		public static function get_error_items( bool $write_temp = true, $items = false ): array {
 
 			// if ( empty( self::$read_items ) ) {
 				$collected_items = array();
@@ -426,7 +429,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						// return false; // returning false here "breaks" the loop
 						// }
 					},
-					100,
+					( ! $items ) ? self::get_screen_option_per_page() : $items,
 					$position,
 					$write_temp
 				);
@@ -610,12 +613,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @return void
 		 */
 		public function invalid_nonce_redirect() {
-			wp_die(
+			\wp_die(
 				'Invalid Nonce',
 				'Error',
 				array(
 					'response'  => 403,
-					'back_link' => esc_url( \network_admin_url( 'users.php' ) ),
+					'back_link' => \esc_url( \network_admin_url( 'users.php' ) ),
 				)
 			);
 		}
@@ -627,8 +630,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 5.0.0
 		 */
-		public function get_records_per_page() {
-			return $this->records_per_page;
+		public static function get_log_errors_to_read() {
+			return self::$log_errors_to_read;
 		}
 
 		/**
@@ -638,18 +641,23 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 5.0.0
 		 */
-		private function get_screen_option_per_page() {
-			$this->get_wp_screen();
-			$option = $this->wp_screen->get_option( 'per_page', 'option' );
-			if ( ! $option ) {
-				$option = str_replace( '-', '_', "{$this->wp_screen->id}_per_page" );
+		private static function get_screen_option_per_page() {
+			self::get_wp_screen();
+
+			if ( self::PAGE_SLUG === self::$wp_screen->base ) {
+				$option = self::$wp_screen->get_option( 'per_page', 'option' );
+				if ( ! $option ) {
+					$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
+				}
+			} else {
+				$option = 'advanced_analytics_logs_list_per_page';
 			}
 
-			$per_page = (int) get_user_option( $option );
+			$per_page = (int) \get_user_option( $option );
 			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = $this->wp_screen->get_option( 'per_page', 'default' );
+				$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
 				if ( ! $per_page ) {
-					$per_page = $this->get_records_per_page();
+					$per_page = self::get_log_errors_to_read();
 				}
 			}
 
@@ -677,11 +685,11 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 5.0.0
 		 */
 		public static function add_screen_options( $hook ) {
-			$screen_options = array( 'per_page' => __( 'Records per page', 'advanced-analytics' ) );
+			$screen_options = array( 'per_page' => __( 'Number of errors to read', 'advanced-analytics' ) );
 
 			$result = array();
 
-			array_walk(
+			\array_walk(
 				$screen_options,
 				function ( &$a, $b ) use ( &$result ) {
 					$result[ self::SCREEN_OPTIONS_SLUG . '_' . $b ] = $a;
@@ -696,7 +704,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$option = 'per_page';
 						$args   = array(
 							'label'   => $value,
-							'default' => 10,
+							'default' => self::get_log_errors_to_read(),
 							'option'  => $key,
 						);
 						\add_screen_option( $option, $args );
@@ -717,6 +725,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @return mixed
 		 */
 		public static function set_screen_option( $keep, $option, $value ) {
+
 			if ( false !== \strpos( $option, self::SCREEN_OPTIONS_SLUG . '_' ) ) {
 				return $value;
 			}
