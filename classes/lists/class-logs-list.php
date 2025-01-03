@@ -383,8 +383,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Collect error items.
 		 *
-		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?
-		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page
+		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?.
+		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
 		 *
 		 * @return array
 		 *
@@ -392,7 +392,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function get_error_items( bool $write_temp = true, $items = false ): array {
 
-			// if ( empty( self::$read_items ) ) {
+			// if ( empty( self::$read_items ) ) { .
 				$collected_items = array();
 				$errors          = array();
 				$position        = null;
@@ -424,10 +424,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 
 						// if ( ! str_contains( $address, 'stop_word' ) ) {
-						// echo "\nFound 'stop_word'!";
+						// echo "\nFound 'stop_word'!"; .
 
 						// return false; // returning false here "breaks" the loop
-						// }
+						// } .
 					},
 					( ! $items ) ? self::get_screen_option_per_page() : $items,
 					$position,
@@ -489,16 +489,20 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
 				case 'timestamp':
-					return \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), $item['timestamp'] );
+
+					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
+					$time             = \wp_date( $date_time_format, $item['timestamp'] );
+
+					return $time;
 				case 'message':
 					$message = esc_html( $item[ $column_name ] );
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
 						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', 'advanced-analytics' ) . '"></div>';
 
 						$reversed_details = \array_reverse( $item['sub_items'] );
-						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px;">';
+						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px; overflow-y:auto;">';
 						foreach ( $reversed_details as $key => $val ) {
-							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b>' . ' - ' : '';
+							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b> - ' : '';
 							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
 							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
 						}
@@ -737,6 +741,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * Table navigation.
 		 *
 		 * @param string $which - Position of the nav.
+		 * 
+		 * @since latest
 		 */
 		public function extra_tablenav( $which ) {
 
@@ -749,9 +755,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			if ( false !== $log_file ) {
 
+				$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
+				$time             = \wp_date( $date_time_format, Error_Log::get_modification_time( Error_Log::autodetect() ) );
+
 				echo '<div><b>' . __( 'Log file: ', 'advanced-analytics' ) . '</b> ' . Error_Log::extract_file_name( Error_Log::autodetect() ) . '</div>';
 				echo '<div><b>' . __( 'File size: ', 'advanced-analytics' ) . '</b> ' . File_Helper::format_file_size( Error_Log::autodetect() ) . '</div>';
-				echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . \date_i18n( \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' ), Error_Log::get_modification_time( Error_Log::autodetect() ) ) . '</div>';
+				echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . $time . '</div>';
 			} else {
 				echo '<div><b>' . __( 'No log file detected', 'advanced-analytics' ) . '</b></div>';
 			}
@@ -804,9 +813,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Generates content for a single row of the table.
 		 *
-		 * @since 3.1.0
+		 * @param object|array $item The current item,
 		 *
-		 * @param object|array $item The current item
+		 * @since 3.1.0
 		 */
 		public function single_row( $item ) {
 			$classes = '';

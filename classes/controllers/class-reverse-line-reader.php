@@ -78,6 +78,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 * @param function        $callback - The function to call back when result is returned.
 		 * @param integer         $max_ines - Maximum number of lines to read.
 		 * @param int|null        $pos - The current position to start reading from.
+		 * @param bool            $temp_writer - Whether to write the error log to a temporary file or not.
 		 *
 		 * @return void|bool
 		 *
@@ -213,7 +214,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 					if ( self::$pos < self::$file_size ) {
 
-						self::$buffer_size = abs( ( self::$file_size - -self::$buffer_size ) +1 );
+						self::$buffer_size = abs( ( self::$file_size - -self::$buffer_size ) + 1 );
 						self::$pos         = self::$buffer_size;
 						$buffer            = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
 

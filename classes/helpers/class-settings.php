@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function init() {
 
-			// self::get_current_options();
+			self::get_current_options();
 
 			// Hook me up.
 			\add_action( 'admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin panel.
@@ -101,7 +101,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			/**
 			 * Draws the save button in the settings
 			 */
-			// \add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
+			\add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
 		}
 
 		/**
@@ -118,57 +118,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'advanced-analytics' ) );
 			}
 
-			$footnotes_options = array();
+			self::$current_options = $plugin_options;
 
-			$footnotes_options['superscript'] = ( array_key_exists( 'superscript', $post_array ) ) ? true : false;
-
-			$footnotes_options['pre_backlink']  = ( array_key_exists( 'pre_backlink', $post_array ) ) ? sanitize_text_field( $post_array['pre_backlink'] ) : '';
-			$footnotes_options['backlink']      = ( array_key_exists( 'backlink', $post_array ) ) ? sanitize_text_field( $post_array['backlink'] ) : '';
-			$footnotes_options['post_backlink'] = ( array_key_exists( 'post_backlink', $post_array ) ) ? sanitize_text_field( $post_array['post_backlink'] ) : '';
-
-			$footnotes_options['pre_identifier']        = ( array_key_exists( 'pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['pre_identifier'] ) : '';
-			$footnotes_options['inner_pre_identifier']  = ( array_key_exists( 'inner_pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_pre_identifier'] ) : '';
-			$footnotes_options['list_style_type']       = ( array_key_exists( 'list_style_type', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_type'] ) : '';
-			$footnotes_options['inner_post_identifier'] = ( array_key_exists( 'inner_post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_post_identifier'] ) : '';
-			$footnotes_options['post_identifier']       = ( array_key_exists( 'post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['post_identifier'] ) : '';
-			$footnotes_options['list_style_symbol']     = ( array_key_exists( 'list_style_symbol', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_symbol'] ) : '';
-
-			$footnotes_options['pre_footnotes']  = ( array_key_exists( 'pre_footnotes', $post_array ) ) ? \wpautop( $post_array['pre_footnotes'], true ) : '';
-			$footnotes_options['post_footnotes'] = ( array_key_exists( 'post_footnotes', $post_array ) ) ? \wpautop( $post_array['post_footnotes'], true ) : '';
-
-			$footnotes_options['position_before_footnote'] = ( array_key_exists( 'position_before_footnote', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_home']          = ( array_key_exists( 'no_display_home', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_preview']       = ( array_key_exists( 'no_display_preview', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_archive']       = ( array_key_exists( 'no_display_archive', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_date']          = ( array_key_exists( 'no_display_date', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_category']      = ( array_key_exists( 'no_display_category', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_search']        = ( array_key_exists( 'no_display_search', $post_array ) ) ? true : false;
-			$footnotes_options['no_display_feed']          = ( array_key_exists( 'no_display_feed', $post_array ) ) ? true : false;
-
-			$footnotes_options['no_editor_header_footer'] = ( array_key_exists( 'no_editor_header_footer', $post_array ) ) ? true : false;
-
-			$footnotes_options['combine_identical_notes'] = ( array_key_exists( 'combine_identical_notes', $post_array ) ) ? true : false;
-			$footnotes_options['priority']                = ( array_key_exists( 'priority', $post_array ) ) ? \sanitize_text_field( $post_array['priority'] ) : '';
-
-			$footnotes_options['footnotes_open']  = ( array_key_exists( 'footnotes_open', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_open'] ) : '';
-			$footnotes_options['footnotes_close'] = ( array_key_exists( 'footnotes_close', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_close'] ) : '';
-
-			$footnotes_options['pretty_tooltips'] = ( array_key_exists( 'pretty_tooltips', $post_array ) ) ? true : false;
-
-			$footnotes_options['vanilla_js_tooltips'] = ( array_key_exists( 'vanilla_js_tooltips', $post_array ) ) ? true : false;
-
-			$footnotes_options['back_link_title'] = ( array_key_exists( 'back_link_title', $post_array ) ) ? \sanitize_text_field( $post_array['back_link_title'] ) : '';
-			$footnotes_options['css_footnotes']   = ( array_key_exists( 'css_footnotes', $post_array ) ) ? \_sanitize_text_fields( $post_array['css_footnotes'], true ) : '';
-
-			$footnotes_options['no_display_post'] = ( array_key_exists( 'no_display_post', $post_array ) ) ? true : false;
-
-			// add_settings_error(ADVAN_SETTINGS_NAME, '<field_name>', 'Please enter a valid email!', $type = 'error'); .
-
-			// update_option( ADVAN_SETTINGS_NAME, $footnotes_options ); .
-
-			self::$current_options = $footnotes_options;
-
-			return $footnotes_options;
+			return $plugin_options;
 		}
 
 		/**
@@ -216,44 +168,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$default_options ) ) {
 				// Define default options.
 				self::$default_options = array(
-					'superscript'              => true,
-					'pre_backlink'             => '[',
-					'backlink'                 => '&#8617;',
-					'post_backlink'            => ']',
-					'pre_identifier'           => '',
-					'inner_pre_identifier'     => '',
-					'list_style_type'          => 'decimal',
-					'list_style_symbol'        => '&dagger;',
-					'inner_post_identifier'    => '',
-					'post_identifier'          => '',
-					'pre_footnotes'            => '',
-					'post_footnotes'           => '',
-					'no_display_home'          => false,
-					'no_display_preview'       => false,
-					'no_display_archive'       => false,
-					'no_display_date'          => false,
-					'no_display_category'      => false,
-					'no_display_search'        => false,
-					'no_display_feed'          => false,
-					'combine_identical_notes'  => true,
-					'priority'                 => 11,
-					'footnotes_open'           => '((',
-					'footnotes_close'          => '))',
-					'pretty_tooltips'          => false,
-					'vanilla_js_tooltips'      => false,
-					'version'                  => self::OPTIONS_VERSION,
-					'back_link_title'          => \__( 'Jump back to text', 'advanced-analytics' ),
-					'css_footnotes'            => 'ol.footnotes { color:#666666; }' . "\n" . 'ol.footnotes li { font-size:80%; }',
-					'no_editor_header_footer'  => false,
-					'no_display_post'          => false,
-					'position_before_footnote' => false,
-					'no_posts_footnotes'       => false,
+					'menu_admins_only' => true,
 				);
 			}
 
 			return self::$default_options;
 		}
 
+		/**
+		 * Returns the stored main menu hook
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function get_main_menu_page_hook() {
 			return self::$hook;
 		}
@@ -275,7 +203,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			self::$hook = \add_menu_page(
 				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-				\esc_html__( 'Analytics', 'advanced-analytics' ) . self::get_updates_count_html(),
+				\esc_html__( 'Analyze', 'advanced-analytics' ) . self::get_updates_count_html(),
 				'manage_options',
 				self::MENU_SLUG,
 				array( __CLASS__, 'analytics_options_page' ),
@@ -306,18 +234,22 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				1
 			);
 
-			add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
-			add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
+			\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+			\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
-			\add_submenu_page(
-			self::MENU_SLUG,
-			\esc_html__( 'Settings', 'advanced-analytics' ),
-			\esc_html__( 'Settings', 'advanced-analytics' ),
-			'read', // No capability requirement.
-			self::SETTINGS_MENU_SLUG,
-			array( __CLASS__, 'aadvana_show_options' ),
-			301
-			);
+			\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
+
+			if ( \current_user_can( 'manage_options' ) ) {
+				\add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'Settings', 'advanced-analytics' ),
+					\esc_html__( 'Settings', 'advanced-analytics' ),
+					'read', // No capability requirement.
+					self::SETTINGS_MENU_SLUG,
+					array( __CLASS__, 'aadvana_show_options' ),
+					301
+				);
+			}
 
 			// if ( ! self::is_plugin_settings_page() ) {
 			// return;
@@ -440,17 +372,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @since 2.0.0
 		 */
-		public static function footnotes_help() {
+		public static function aadvana_help() {
 
-			global $footnotes_hook;
 			$screen = \get_current_screen();
 
-			if ( $screen->id !== $footnotes_hook ) {
+			if ( $screen->id !== self::$hook ) {
 				return; }
 
 			$screen->add_help_tab(
 				array(
-					'id'      => 'footnotes-help-tab',
+					'id'      => 'advanced-analytics-help-tab',
 					'title'   => __( 'Help', 'advanced-analytics' ),
 					'content' => self::add_help_content(),
 				)
@@ -546,18 +477,37 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				// 'head-general' => esc_html__( 'General Settings', 'advanced-analytics' ),
 
 				// 'general'      => array(
-				// 	'icon'  => 'admin-generic',
-				// 	'title' => esc_html__( 'General', 'advanced-analytics' ),
+				// 'icon'  => 'admin-generic',
+				// 'title' => esc_html__( 'General', 'advanced-analytics' ),
 				// ),
 
 				// 'head-global'  => esc_html__( 'Global Settings', 'advanced-analytics' ),
 
 				// 'backup'       => array(
-				// 	'icon'  => 'migrate',
-				// 	'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
+				// 'icon'  => 'migrate',
+				// 'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
 				// ),
 
-				'system-info'  => array(
+				'head-error-log-list' => esc_html__( 'Error Log', 'awesome-footnotes' ),
+
+				'error-log-list'      => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Error Log Listing', 'advanced-analytics' ),
+				),
+
+				'head-advanced'       => esc_html__( 'Advanced', 'awesome-footnotes' ),
+
+				'advanced'            => array(
+					'icon'  => 'admin-tools',
+					'title' => esc_html__( 'Advanced', 'awesome-footnotes' ),
+				),
+
+				'backup'              => array(
+					'icon'  => 'migrate',
+					'title' => \esc_html__( 'Export/Import', 'advanced-analytics' ),
+				),
+
+				'system-info'         => array(
 					'icon'  => 'wordpress-alt',
 					'title' => esc_html__( 'System Info', 'advanced-analytics' ),
 				),
@@ -642,7 +592,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 							<div class="awefpanel-head-elements">
 
-							<?php do_action( 'aadvana_settings_save_button' ); ?>
+							<?php \do_action( 'aadvana_settings_save_button' ); ?>
 
 							
 								<ul>
@@ -656,6 +606,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 													var skin = localStorage.getItem('aadvana-backend-skin');
 													if( skin == 'dark' ){
 														document.getElementById('awefpanel-darkskin').setAttribute('checked', 'checked');
+
+														var element = document.getElementsByTagName("html")[0];
+														element.classList.add("aadvana-darkskin");
 													}
 												}
 											</script>
@@ -834,7 +787,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since latest
 		 */
 		public static function live_notifications( $admin_bar ) {
-			if ( current_user_can( 'manage_options' ) && \is_admin() ) {
+			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
 				$logs = Logs_List::get_error_items( false, 1 );
 
@@ -856,20 +809,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 						<?php
 						foreach ( Logs_List::ROW_CLASSES as $class => $properties ) {
-							echo '.aadvan-live-notif-item.'. $class. '{ background: '. $properties['color']. ' !important; }';
-							echo '.aadvan-live-notif-item.'. $class. ' a { color: #42425d !important; }';
+							echo '.aadvan-live-notif-item.' . $class . '{ background: ' . $properties['color'] . ' !important; }';
+							echo '.aadvan-live-notif-item.' . $class . ' a { color: #42425d !important; }';
 
 						}
-					?>
+						?>
 					</style>
 					<?php
 
-					$date_time_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
-					$time             = wp_date( $date_time_format, $event['timestamp'] );
+					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
+					$time             = \wp_date( $date_time_format, $event['timestamp'] );
 
 					$classes = '';
 					if ( isset( $event['severity'] ) && ! empty( $event['severity'] ) ) {
-						$classes .= ' '. $event['severity'];
+						$classes .= ' ' . $event['severity'];
 					}
 					$admin_bar->add_node(
 						array(
@@ -881,6 +834,78 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					);
 				}
 			}
+		}
+
+		/**
+		 * Collects the passed options, validates them and stores them.
+		 *
+		 * @param array $post_array - The collected settings array.
+		 *
+		 * @return array
+		 *
+		 * @since 2.0.0
+		 */
+		public static function collect_and_sanitize_options( array $post_array ): array {
+			if ( ! \current_user_can( 'manage_options' ) ) {
+				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'awesome-footnotes' ) );
+			}
+
+			$footnotes_options = array();
+
+			$footnotes_options['superscript'] = ( array_key_exists( 'superscript', $post_array ) ) ? filter_var( $post_array['superscript'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['pre_backlink']  = ( array_key_exists( 'pre_backlink', $post_array ) ) ? sanitize_text_field( $post_array['pre_backlink'] ) : '';
+			$footnotes_options['backlink']      = ( array_key_exists( 'backlink', $post_array ) ) ? sanitize_text_field( $post_array['backlink'] ) : '';
+			$footnotes_options['post_backlink'] = ( array_key_exists( 'post_backlink', $post_array ) ) ? sanitize_text_field( $post_array['post_backlink'] ) : '';
+
+			$footnotes_options['pre_identifier']        = ( array_key_exists( 'pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['pre_identifier'] ) : '';
+			$footnotes_options['inner_pre_identifier']  = ( array_key_exists( 'inner_pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_pre_identifier'] ) : '';
+			$footnotes_options['list_style_type']       = ( array_key_exists( 'list_style_type', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_type'] ) : '';
+			$footnotes_options['inner_post_identifier'] = ( array_key_exists( 'inner_post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_post_identifier'] ) : '';
+			$footnotes_options['post_identifier']       = ( array_key_exists( 'post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['post_identifier'] ) : '';
+			$footnotes_options['list_style_symbol']     = ( array_key_exists( 'list_style_symbol', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_symbol'] ) : '';
+
+			$footnotes_options['pre_footnotes'] = ( array_key_exists( 'pre_footnotes', $post_array ) ) ? \wpautop( $post_array['pre_footnotes'], true ) : '';
+
+			$footnotes_options['post_footnotes'] = ( array_key_exists( 'post_footnotes', $post_array ) ) ? \wpautop( $post_array['post_footnotes'], true ) : '';
+
+			$footnotes_options['position_before_footnote'] = ( array_key_exists( 'position_before_footnote', $post_array ) ) ? filter_var( $post_array['position_before_footnote'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_home']          = ( array_key_exists( 'no_display_home', $post_array ) ) ? filter_var( $post_array['no_display_home'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_preview']       = ( array_key_exists( 'no_display_preview', $post_array ) ) ? filter_var( $post_array['no_display_preview'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_archive']       = ( array_key_exists( 'no_display_archive', $post_array ) ) ? filter_var( $post_array['no_display_archive'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_date']          = ( array_key_exists( 'no_display_date', $post_array ) ) ? filter_var( $post_array['no_display_date'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_category']      = ( array_key_exists( 'no_display_category', $post_array ) ) ? filter_var( $post_array['no_display_category'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_search']        = ( array_key_exists( 'no_display_search', $post_array ) ) ? filter_var( $post_array['no_display_search'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['no_display_feed']          = ( array_key_exists( 'no_display_feed', $post_array ) ) ? filter_var( $post_array['no_display_feed'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['no_editor_header_footer'] = ( array_key_exists( 'no_editor_header_footer', $post_array ) ) ? filter_var( $post_array['no_editor_header_footer'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['combine_identical_notes'] = ( array_key_exists( 'combine_identical_notes', $post_array ) ) ? filter_var( $post_array['combine_identical_notes'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$footnotes_options['priority']                = ( array_key_exists( 'priority', $post_array ) ) ? \sanitize_text_field( $post_array['priority'] ) : self::get_default_options()['priority'];
+
+			$footnotes_options['footnotes_open']  = ( array_key_exists( 'footnotes_open', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_open'] ) : self::get_default_options()['footnotes_open']; // That one can not be without a value.
+			$footnotes_options['footnotes_close'] = ( array_key_exists( 'footnotes_close', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_close'] ) : self::get_default_options()['footnotes_close']; // That one can not be without a value.
+
+			$footnotes_options['pretty_tooltips'] = ( array_key_exists( 'pretty_tooltips', $post_array ) ) ? filter_var( $post_array['pretty_tooltips'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['vanilla_js_tooltips'] = ( array_key_exists( 'vanilla_js_tooltips', $post_array ) ) ? filter_var( $post_array['vanilla_js_tooltips'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['back_link_title'] = ( array_key_exists( 'back_link_title', $post_array ) ) ? \sanitize_text_field( $post_array['back_link_title'] ) : '';
+			$footnotes_options['css_footnotes']   = ( array_key_exists( 'css_footnotes', $post_array ) ) ? \_sanitize_text_fields( $post_array['css_footnotes'], true ) : '';
+
+			$footnotes_options['no_display_post'] = ( array_key_exists( 'no_display_post', $post_array ) ) ? filter_var( $post_array['no_display_post'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$footnotes_options['version'] = self::OPTIONS_VERSION;
+
+			$footnotes_options['no_posts_footnotes'] = ( array_key_exists( 'no_posts_footnotes', $post_array ) ) ? filter_var( $post_array['no_posts_footnotes'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			// add_settings_error(AWEF_SETTINGS_NAME, '<field_name>', 'Please enter a valid email!', $type = 'error'); .
+
+			// update_option( AWEF_SETTINGS_NAME, $footnotes_options ); .
+
+			self::$current_options = $footnotes_options;
+
+			return $footnotes_options;
 		}
 	}
 }

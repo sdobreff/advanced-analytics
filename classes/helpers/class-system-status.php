@@ -757,7 +757,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 							}
 
 							if ( false != $plugin['network_activated'] ) {
-								$network_string = ' &ndash; <strong>' . esc_html__( 'Network enabled', 'advanced-analytics' ) . '</strong>';
+								$network_string = ' &ndash; <strong>' . esc_html__( '(Network enabled in plugin\'s meta)', 'advanced-analytics' ) . '</strong>';
 							}
 
 							?>

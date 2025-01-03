@@ -69,7 +69,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Footnotes_Formatter::init();
 			}
 
-			\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
 
 			// if ( \WP_DEBUG ) {
 			// set_error_handler( 'WP_Error_Handler::handle_error' );

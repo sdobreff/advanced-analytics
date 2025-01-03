@@ -45,6 +45,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 * Download file
 				 */
 				\add_action( 'wp_ajax_advanced_analytics_download_log_file', array( __CLASS__, 'download_log_file' ) );
+
+				/**
+				 * Save Options
+				 */
+				\add_action( 'wp_ajax_aadvana_plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
+
 			}
 		}
 
@@ -81,12 +87,38 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
 
-				echo File_Helper::download( Error_Log::autodetect() );
+				echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			\wp_send_json_success( 2 );
 
 			\wp_die();
+		}
+
+		/**
+		 * Method responsible for AJAX data saving
+		 *
+		 * @return void
+		 *
+		 * @since 3.7.0
+		 */
+		public static function save_settings_ajax() {
+
+			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) {
+
+				if ( isset( $_POST[ \ADVAN_SETTINGS_NAME ] ) && ! empty( $_POST[ \ADVAN_SETTINGS_NAME ] ) && \is_array( $_POST[ \ADVAN_SETTINGS_NAME ] ) ) {
+
+					$data = array_map( 'sanitize_text_field', \stripslashes_deep( $_POST[ \ADVAN_SETTINGS_NAME ] ) );
+
+					\update_option( \ADVAN_SETTINGS_NAME, Settings::collect_and_sanitize_options( $data ) );
+
+					\wp_send_json_success( 2 );
+				}
+				\wp_die();
+			} else {
+				\wp_send_json_success( 0 );
+				\wp_die();
+			}
 		}
 	}
 }

@@ -23,6 +23,7 @@
 
 use ADVAN\Advanced_Analytics;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\Helpers\WP_Error_Handler;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -103,6 +104,7 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 $plugin_name_libraries = require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
 if ( ! Context_Helper::is_installing() ) {
+	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
 	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }

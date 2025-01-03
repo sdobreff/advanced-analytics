@@ -27,10 +27,10 @@ Settings::build_option(
 
 	Settings::build_option(
 		array(
-			'name'    => \esc_html__( 'Do not use separate footnotes settings in posts', 'advanced-analytics' ),
-			'id'      => 'no_posts_footnotes',
+			'name'    => \esc_html__( 'Show plugin menu to admins only', 'advanced-analytics' ),
+			'id'      => 'menu_admins_only',
 			'type'    => 'checkbox',
-			'default' => Settings::get_current_options()['no_posts_footnotes'],
+			'default' => Settings::get_current_options()['menu_admins_only'],
 		)
 	);
 
