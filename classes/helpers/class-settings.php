@@ -105,25 +105,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		}
 
 		/**
-		 * Collects the passed options, validates them and stores them.
-		 *
-		 * @param array $post_array - The collected settings array.
-		 *
-		 * @return array
-		 *
-		 * @since 2.0.0
-		 */
-		public static function store_options( array $post_array ): array {
-			if ( ! \current_user_can( 'manage_options' ) ) {
-				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'advanced-analytics' ) );
-			}
-
-			self::$current_options = $plugin_options;
-
-			return $plugin_options;
-		}
-
-		/**
 		 * Returns the current options.
 		 * Fills the current options array with values if empty.
 		 *
@@ -169,6 +150,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				// Define default options.
 				self::$default_options = array(
 					'menu_admins_only' => true,
+					'severity_colors'  => array(
+						'deprecated' => array( 'color' => '#ffeb8e' ),
+						'error'      => array( 'color' => '#ffb3b3' ),
+						'success'    => array( 'color' => '#00ff00' ),
+						'info'       => array( 'color' => '#0000ff' ),
+						'notice'     => array( 'color' => '#feeb8e' ),
+						'warning'    => array( 'color' => '#ffff00' ),
+					),
 				);
 			}
 
@@ -195,128 +184,131 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_options_page() {
 
-			$base = 'base';
+			if ( self::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
+				return;
+			} else {
 
-			$base .= '64_en';
+				$base = 'base';
 
-			$base .= 'code';
+				$base .= '64_en';
 
-			self::$hook = \add_menu_page(
-				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-				\esc_html__( 'Analyze', 'advanced-analytics' ) . self::get_updates_count_html(),
-				'manage_options',
-				self::MENU_SLUG,
-				array( __CLASS__, 'analytics_options_page' ),
-				'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-				30
-			);
+				$base .= 'code';
 
-			\add_filter( 'manage_' . self::$hook . '_columns', array( Logs_List::class, 'manage_columns' ) );
+				self::$hook = \add_menu_page(
+					\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
+					\esc_html__( 'Analyze', 'advanced-analytics' ) . self::get_updates_count_html(),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ),
+					self::MENU_SLUG,
+					array( __CLASS__, 'analytics_options_page' ),
+					'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+					30
+				);
 
-			Logs_List::add_screen_options( self::$hook );
+				\add_filter( 'manage_' . self::$hook . '_columns', array( Logs_List::class, 'manage_columns' ) );
 
-			\register_setting(
-				\ADVAN_SETTINGS_NAME,
-				\ADVAN_SETTINGS_NAME,
-				array(
-					self::class,
-					'store_options',
-				)
-			);
+				Logs_List::add_screen_options( self::$hook );
 
-			\add_submenu_page(
-				self::MENU_SLUG,
-				\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-				\esc_html__( 'Log viewer', 'advanced-analytics' ),
-				'manage_options', // No capability requirement.
-				self::MENU_SLUG,
-				array( __CLASS__, 'analytics_options_page' ),
-				1
-			);
+				\register_setting(
+					\ADVAN_SETTINGS_NAME,
+					\ADVAN_SETTINGS_NAME,
+					array(
+						self::class,
+						'collect_and_sanitize_options',
+					)
+				);
 
-			\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
-			\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
+				\add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
+					\esc_html__( 'Log viewer', 'advanced-analytics' ),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					self::MENU_SLUG,
+					array( __CLASS__, 'analytics_options_page' ),
+					1
+				);
 
-			\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
+				\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
-			if ( \current_user_can( 'manage_options' ) ) {
+				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
+
 				\add_submenu_page(
 					self::MENU_SLUG,
 					\esc_html__( 'Settings', 'advanced-analytics' ),
 					\esc_html__( 'Settings', 'advanced-analytics' ),
-					'read', // No capability requirement.
+					'manage_options', // No capability requirement.
 					self::SETTINGS_MENU_SLUG,
 					array( __CLASS__, 'aadvana_show_options' ),
 					301
 				);
+
+				if ( ! self::is_plugin_settings_page() ) {
+					return;
+				}
+
+				// Reset settings.
+				if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
+
+					\delete_option( ADVAN_SETTINGS_NAME );
+
+					// Redirect to the plugin settings page.
+					\wp_safe_redirect(
+						\add_query_arg(
+							array(
+								'page'  => self::MENU_SLUG,
+								'reset' => 'true',
+							),
+							\admin_url( 'admin.php' )
+						)
+					);
+					exit;
+				} elseif ( isset( $_REQUEST['export-settings'] ) && \check_admin_referer( 'export-plugin-settings', 'export_nonce' ) ) { // Export Settings.
+
+					global $wpdb;
+
+					$stored_options = $wpdb->get_results(
+						$wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \ADVAN_SETTINGS_NAME )
+					);
+
+					header( 'Cache-Control: public, must-revalidate' );
+					header( 'Pragma: hack' );
+					header( 'Content-Type: text/plain' );
+					header( 'Content-Disposition: attachment; filename="' . ADVAN_TEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
+					echo \wp_json_encode( unserialize( $stored_options[0]->option_value ) );
+					die();
+				} elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) { // Import the settings.
+					if ( isset( $_FILES ) &&
+					isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) &&
+					isset( $_FILES[ self::SETTINGS_FILE_FIELD ]['error'] ) &&
+					! $_FILES[ self::SETTINGS_FILE_FIELD ]['error'] > 0 &&
+					isset( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) {
+						global $wp_filesystem;
+
+						if ( null === $wp_filesystem ) {
+							\WP_Filesystem();
+						}
+
+						if ( $wp_filesystem->exists( \sanitize_text_field( \wp_unslash( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) ) ) {
+							$options = json_decode( $wp_filesystem->get_contents( \sanitize_text_field( \wp_unslash( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) ), true );
+						}
+
+						if ( ! empty( $options ) && is_array( $options ) ) {
+							\update_option( ADVAN_SETTINGS_NAME, self::collect_and_sanitize_options( $options ) );
+						}
+					}
+
+					\wp_safe_redirect(
+						\add_query_arg(
+							array(
+								'page'   => self::MENU_SLUG,
+								'import' => 'true',
+							),
+							\admin_url( 'admin.php' )
+						)
+					);
+					exit;
+				}
 			}
-
-			// if ( ! self::is_plugin_settings_page() ) {
-			// return;
-			// }
-
-			// // Reset settings.
-			// if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
-
-			// \delete_option( ADVAN_SETTINGS_NAME );
-
-			// Redirect to the plugin settings page.
-			// \wp_safe_redirect(
-			// \add_query_arg(
-			// array(
-			// 'page'  => self::MENU_SLUG,
-			// 'reset' => 'true',
-			// ),
-			// \admin_url( 'admin.php' )
-			// )
-			// );
-			// exit;
-			// } elseif ( isset( $_REQUEST['export-settings'] ) && \check_admin_referer( 'export-plugin-settings', 'export_nonce' ) ) { // Export Settings.
-
-			// global $wpdb;
-
-			// $stored_options = $wpdb->get_results(
-			// $wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \ADVAN_SETTINGS_NAME )
-			// );
-
-			// header( 'Cache-Control: public, must-revalidate' );
-			// header( 'Pragma: hack' );
-			// header( 'Content-Type: text/plain' );
-			// header( 'Content-Disposition: attachment; filename="' . ADVANTEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
-			// echo \wp_json_encode( unserialize( $stored_options[0]->option_value ) );
-			// die();
-			// } elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) { // Import the settings.
-			// if ( isset( $_FILES ) &&
-			// isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) &&
-			// isset( $_FILES[ self::SETTINGS_FILE_FIELD ]['error'] ) &&
-			// ! $_FILES[ self::SETTINGS_FILE_FIELD ]['error'] > 0 &&
-			// isset( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) {
-			// global $wp_filesystem;
-
-			// if ( null === $wp_filesystem ) {
-			// \WP_Filesystem();
-			// }
-
-			// if ( $wp_filesystem->exists( \sanitize_text_field( \wp_unslash( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) ) ) {
-			// $options = json_decode( $wp_filesystem->get_contents( \sanitize_text_field( \wp_unslash( $_FILES[ self::SETTINGS_FILE_FIELD ]['tmp_name'] ) ) ), true );
-			// }
-
-			// if ( ! empty( $options ) && is_array( $options ) ) {
-			// \update_option( ADVAN_SETTINGS_NAME, self::store_options( $options ) );
-			// }
-			// }
-
-			// \wp_safe_redirect(
-			// \add_query_arg(
-			// array(
-			// 'page'   => self::MENU_SLUG,
-			// 'import' => 'true',
-			// ),
-			// \admin_url( 'admin.php' )
-			// )
-			// );
-			// exit;
-			// }
 		}
 
 		/**
@@ -357,6 +349,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function render() {
 
+			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
+			\wp_enqueue_media();
+			?>
+			<script>
+				if( 'undefined' != typeof localStorage ){
+					var skin = localStorage.getItem('aadvana-backend-skin');
+					if( skin == 'dark' ){
+
+						var element = document.getElementsByTagName("html")[0];
+						element.classList.add("aadvana-darkskin");
+					}
+				}
+			</script>
+			<?php
 			$events_list = new Logs_List( array() );
 			$events_list->prepare_items();
 
@@ -452,7 +458,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			?>
 			<div class="aadvana-panel-submit">
-				<button name="save" class="aadvana-save-button aadvana-primary-button button button-primary button-hero"
+				<button name="<?php echo \esc_attr( \ADVAN_SETTINGS_NAME ); ?>[save_button]" class="aadvana-save-button aadvana-primary-button button button-primary button-hero"
 						type="submit"><?php esc_html_e( 'Save Changes', 'advanced-analytics' ); ?></button>
 			</div>
 			<?php
@@ -734,6 +740,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		}
 
 		/**
+		 * Setter method for the current options
+		 *
+		 * @param array $options - Array with the options to store.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function set_current_options( array $options ) {
+			return self::$current_options = $options; // phpcs:ignore Squiz.PHP.DisallowMultipleAssignments.Found
+		}
+
+		/**
 		 * Checks if current page is plugin settings page
 		 *
 		 * @return boolean
@@ -808,10 +827,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							color: #42425d !important;
 						}
 						<?php
-						foreach ( Logs_List::ROW_CLASSES as $class => $properties ) {
+						foreach ( self::get_current_options()['severity_colors'] as $class => $properties ) {
 							echo '.aadvan-live-notif-item.' . $class . '{ background: ' . $properties['color'] . ' !important; }';
 							echo '.aadvan-live-notif-item.' . $class . ' a { color: #42425d !important; }';
-
 						}
 						?>
 					</style>
@@ -850,62 +868,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'awesome-footnotes' ) );
 			}
 
-			$footnotes_options = array();
+			$advanced_options = array();
 
-			$footnotes_options['superscript'] = ( array_key_exists( 'superscript', $post_array ) ) ? filter_var( $post_array['superscript'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['menu_admins_only'] = ( array_key_exists( 'menu_admins_only', $post_array ) ) ? filter_var( $post_array['menu_admins_only'], FILTER_VALIDATE_BOOLEAN ) : false;
 
-			$footnotes_options['pre_backlink']  = ( array_key_exists( 'pre_backlink', $post_array ) ) ? sanitize_text_field( $post_array['pre_backlink'] ) : '';
-			$footnotes_options['backlink']      = ( array_key_exists( 'backlink', $post_array ) ) ? sanitize_text_field( $post_array['backlink'] ) : '';
-			$footnotes_options['post_backlink'] = ( array_key_exists( 'post_backlink', $post_array ) ) ? sanitize_text_field( $post_array['post_backlink'] ) : '';
+			if ( array_key_exists( 'severity_colors', $post_array ) && \is_array( $post_array['severity_colors'] ) ) {
+				$advanced_options['severity_colors'] = array_merge( self::get_current_options()['severity_colors'], $post_array['severity_colors'] );
+			}
 
-			$footnotes_options['pre_identifier']        = ( array_key_exists( 'pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['pre_identifier'] ) : '';
-			$footnotes_options['inner_pre_identifier']  = ( array_key_exists( 'inner_pre_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_pre_identifier'] ) : '';
-			$footnotes_options['list_style_type']       = ( array_key_exists( 'list_style_type', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_type'] ) : '';
-			$footnotes_options['inner_post_identifier'] = ( array_key_exists( 'inner_post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['inner_post_identifier'] ) : '';
-			$footnotes_options['post_identifier']       = ( array_key_exists( 'post_identifier', $post_array ) ) ? \sanitize_text_field( $post_array['post_identifier'] ) : '';
-			$footnotes_options['list_style_symbol']     = ( array_key_exists( 'list_style_symbol', $post_array ) ) ? \sanitize_text_field( $post_array['list_style_symbol'] ) : '';
+			foreach ( self::get_current_options()['severity_colors'] as $name => $severity ) {
+				$advanced_options['severity_colors'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severity_colors'][ $name ]['color'] ) ) ? $advanced_options['severity_colors'][ $name ]['color'] : $severity['color'] );
+			}
 
-			$footnotes_options['pre_footnotes'] = ( array_key_exists( 'pre_footnotes', $post_array ) ) ? \wpautop( $post_array['pre_footnotes'], true ) : '';
+			self::$current_options = $advanced_options;
 
-			$footnotes_options['post_footnotes'] = ( array_key_exists( 'post_footnotes', $post_array ) ) ? \wpautop( $post_array['post_footnotes'], true ) : '';
-
-			$footnotes_options['position_before_footnote'] = ( array_key_exists( 'position_before_footnote', $post_array ) ) ? filter_var( $post_array['position_before_footnote'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_home']          = ( array_key_exists( 'no_display_home', $post_array ) ) ? filter_var( $post_array['no_display_home'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_preview']       = ( array_key_exists( 'no_display_preview', $post_array ) ) ? filter_var( $post_array['no_display_preview'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_archive']       = ( array_key_exists( 'no_display_archive', $post_array ) ) ? filter_var( $post_array['no_display_archive'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_date']          = ( array_key_exists( 'no_display_date', $post_array ) ) ? filter_var( $post_array['no_display_date'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_category']      = ( array_key_exists( 'no_display_category', $post_array ) ) ? filter_var( $post_array['no_display_category'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_search']        = ( array_key_exists( 'no_display_search', $post_array ) ) ? filter_var( $post_array['no_display_search'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['no_display_feed']          = ( array_key_exists( 'no_display_feed', $post_array ) ) ? filter_var( $post_array['no_display_feed'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			$footnotes_options['no_editor_header_footer'] = ( array_key_exists( 'no_editor_header_footer', $post_array ) ) ? filter_var( $post_array['no_editor_header_footer'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			$footnotes_options['combine_identical_notes'] = ( array_key_exists( 'combine_identical_notes', $post_array ) ) ? filter_var( $post_array['combine_identical_notes'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$footnotes_options['priority']                = ( array_key_exists( 'priority', $post_array ) ) ? \sanitize_text_field( $post_array['priority'] ) : self::get_default_options()['priority'];
-
-			$footnotes_options['footnotes_open']  = ( array_key_exists( 'footnotes_open', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_open'] ) : self::get_default_options()['footnotes_open']; // That one can not be without a value.
-			$footnotes_options['footnotes_close'] = ( array_key_exists( 'footnotes_close', $post_array ) ) ? \sanitize_text_field( $post_array['footnotes_close'] ) : self::get_default_options()['footnotes_close']; // That one can not be without a value.
-
-			$footnotes_options['pretty_tooltips'] = ( array_key_exists( 'pretty_tooltips', $post_array ) ) ? filter_var( $post_array['pretty_tooltips'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			$footnotes_options['vanilla_js_tooltips'] = ( array_key_exists( 'vanilla_js_tooltips', $post_array ) ) ? filter_var( $post_array['vanilla_js_tooltips'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			$footnotes_options['back_link_title'] = ( array_key_exists( 'back_link_title', $post_array ) ) ? \sanitize_text_field( $post_array['back_link_title'] ) : '';
-			$footnotes_options['css_footnotes']   = ( array_key_exists( 'css_footnotes', $post_array ) ) ? \_sanitize_text_fields( $post_array['css_footnotes'], true ) : '';
-
-			$footnotes_options['no_display_post'] = ( array_key_exists( 'no_display_post', $post_array ) ) ? filter_var( $post_array['no_display_post'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			$footnotes_options['version'] = self::OPTIONS_VERSION;
-
-			$footnotes_options['no_posts_footnotes'] = ( array_key_exists( 'no_posts_footnotes', $post_array ) ) ? filter_var( $post_array['no_posts_footnotes'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			// add_settings_error(AWEF_SETTINGS_NAME, '<field_name>', 'Please enter a valid email!', $type = 'error'); .
-
-			// update_option( AWEF_SETTINGS_NAME, $footnotes_options ); .
-
-			self::$current_options = $footnotes_options;
-
-			return $footnotes_options;
+			return $advanced_options;
 		}
 	}
 }

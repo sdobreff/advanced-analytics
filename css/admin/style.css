@@ -1396,6 +1396,18 @@ body:not(.analytics_page_advan_logs_settings) #aadvana-page-overlay {
   box-shadow: none !important;
 }
 
+.aadvana-darkskin .aadvana-custom-color-picker .wp-picker-container input[type="text"].wp-color-picker {
+  color: #b5bfc9;
+  line-height: 1.4em;
+  height: 20px;
+  padding: 0;
+  border: none !important;
+  background-color: #062038;
+  margin-left: 8px;
+  text-transform: uppercase;
+  box-shadow: none !important;
+}
+
 #aadvana_background_pattern {
   height: 281px;
   overflow: auto;
@@ -1535,6 +1547,10 @@ body:not(.analytics_page_advan_logs_settings) #aadvana-page-overlay {
 
 .aadvana-darkskin ol.footnotes li {
   filter: invert(100%);
+}
+
+.aadvana-darkskin body {
+  color: #c2d3e7;
 }
 
 #plugin-skins li {
@@ -2601,6 +2617,9 @@ html.aadvana-darkskin .widefat td, html.aadvana-darkskin .widefat td ol, html.aa
   color: #fff !important;
 }
 
+html.aadvana-darkskin #wpfooter {
+  color: #c3c4da !important;
+}
 
 .aadvana-number-of-years {
   display: block;

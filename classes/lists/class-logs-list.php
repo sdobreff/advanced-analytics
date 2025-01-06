@@ -44,15 +44,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 		public const SEARCH_INPUT = 'sgp';
 
-		public const ROW_CLASSES = array(
-			'deprecated' => array( 'color' => '#ffeb8e' ),
-			'error'      => array( 'color' => '#ffb3b3' ),
-			'success'    => array( 'color' => '#00ff00' ),
-			'info'       => array( 'color' => '#0000ff' ),
-			'notice'     => array( 'color' => '#feeb8e' ),
-			'warning'    => array( 'color' => '#ffff00' ),
-		);
-
 		/**
 		 * Current screen.
 		 *
@@ -489,7 +480,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
 				case 'timestamp':
-
 					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
 					$time             = \wp_date( $date_time_format, $item['timestamp'] );
 
@@ -741,7 +731,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * Table navigation.
 		 *
 		 * @param string $which - Position of the nav.
-		 * 
+		 *
 		 * @since latest
 		 */
 		public function extra_tablenav( $which ) {
@@ -802,8 +792,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			if ( false !== $log_file ) {
 				?>
 			<div>
+				<?php if ( \current_user_can( 'manage_options' ) ) { ?>
 				<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', 'advanced-analytics' ); ?>" />
-
+				<?php } ?>
 				<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', 'advanced-analytics' ); ?>">
 			</div>
 				<?php
@@ -870,8 +861,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					.generated-logs #severity { width: 10%; }
 
 					<?php
-					foreach ( self::ROW_CLASSES as $class => $properties ) {
-						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important; }';
+					foreach ( Settings::get_current_options()['severity_colors'] as $class => $properties ) {
+						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important;}';
+						echo '#the-list .' . $class . ' td { color: #252630 !important;}'; 
 					}
 					?>
 				</style>

@@ -534,7 +534,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 */
 		private static function color() {
 
-			$custom_class = ! empty( self::$settings['color_class'] ) ? self::$settings['color_class'] : 'figaroColorSelectortor';
+			$custom_class = ! empty( self::$settings['color_class'] ) ? self::$settings['color_class'] : 'figaroColorSelector';
 
 			?>
 

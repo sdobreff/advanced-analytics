@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Helpers\Settings;
 use ADVAN\Controllers\Error_Log;
 
 // Exit if accessed directly.
@@ -84,13 +85,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 */
 		public static function download_log_file() {
 			// Check nonce.
+			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
+				\wp_send_json_error( 0 );
+			} else {
+				if ( \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
 
-			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
+					echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
 
-				echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				\wp_send_json_success( 2 );
 			}
-
-			\wp_send_json_success( 2 );
 
 			\wp_die();
 		}

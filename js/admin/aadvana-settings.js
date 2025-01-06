@@ -374,7 +374,7 @@ $doc.ready(function () {
         return false;
     });
 
-    /* Chnage the Block Title */
+    /* Change the Block Title */
     $doc.on('keyup', '.block-title-item-options input', function () {
         var NewTitleText = jQuery(this).val();
         jQuery(this).parents('.block-item').find('.block-preview-title').text(NewTitleText);
@@ -437,7 +437,7 @@ $doc.ready(function () {
     ------------------------------------------------------------------------------------------ */
     /* COLOR PICKER */
     if (jQuery().wpColorPicker) {
-        aadvana_color_picker();
+       aadvana_color_picker();
     }
 
 
@@ -553,7 +553,6 @@ $doc.ready(function () {
             ajaxurl,
             data,
             function (response) {
-                console.log(response);
                 if (response.data == 1) {
                     $saveAlert.addClass('is-success').delay(900).fadeOut(700);
                     setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
@@ -574,6 +573,14 @@ $doc.ready(function () {
     /* SAVE SETTINGS ALERT */
     $saveAlert.fadeOut();
     jQuery('.aadvana-save-button').click(function () {
+
+        jQuery('<input>').attr({
+            type: 'hidden',
+            id: 'fieldId',
+            name: jQuery(this).attr('name'),
+            value: 'save'
+        }).appendTo(jQuery(this).closest('form'));
+
         $saveAlert.fadeIn();
     });
 
