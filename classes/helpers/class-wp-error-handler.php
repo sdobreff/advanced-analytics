@@ -36,8 +36,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 			// $errfile  = self::clean_file_path( $errfile );
-			$errname  = self::error_code_to_string( $errno );
-			$out      = "$errname ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$errname = self::error_code_to_string( $errno );
+			$out     = "$errname ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -51,7 +51,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$sf    = (object) shortcode_atts( $defaults, $trace[ $i ] );
 				$index = $i - 1;
 				$file  = $sf->file;
-				//$file  = self::clean_file_path( $sf->file );
+				// $file  = self::clean_file_path( $sf->file );
 
 				if ( 1 === $i ) {
 					$thrown_file = $file;
@@ -85,7 +85,12 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			return true;
 		}
 
-		public static function trigger_error($status, string $function_name, $errstr, $version, $errno = E_USER_NOTICE) {
+		public static function trigger_error( $status, string $function_name, $errstr, $version, $errno = E_USER_NOTICE ) {
+
+			if ( false === $status ) {
+				return $status;
+			}
+
 			$defaults = array(
 				'line'     => '',
 				'file'     => '',
@@ -93,8 +98,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 
-			$errname  = self::error_code_to_string( $errno );
-			$out      = "PHP $errname: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$errname = self::error_code_to_string( $errno );
+			$out     = "PHP $errname: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -102,13 +107,15 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			$thrown_file = '';
 			$thrown_line = '';
 
+			$args = '';
+
 			// skip current function and require() in /index.php .
 			$counter = count( $trace ) - 3;
 			for ( $i = 1; $i < $counter; $i++ ) {
 				$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 3 ] );
 				$index = $i - 1;
 				$file  = $sf->file;
-				//$file  = self::clean_file_path( $sf->file );
+				// $file  = self::clean_file_path( $sf->file );
 
 				if ( 1 === $i ) {
 					$thrown_file = $file;
@@ -125,11 +132,17 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 					$caller     = '{main}';
 				}
 
-				$out .= "#$index $file({$sf->line}): $caller" . PHP_EOL;
+				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
+					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
+				} else {
+					$args = '';
+				}
+
+				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
 
 			}
 			if ( ! $main_shown ) {
-				$out .= '#' . ( $index++ ) . ' {main}' . PHP_EOL;
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_DISPLAY ) {
@@ -139,7 +152,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				error_log( $out );
 			}
 
-			return false;
+			return $status;
 		}
 
 		/**

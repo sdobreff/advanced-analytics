@@ -495,6 +495,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b> - ' : '';
 							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
 							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
+
+							$message = \rtrim( $message, ' - ');
 						}
 						$message .= '</pre></div>';
 					}
@@ -864,6 +866,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					foreach ( Settings::get_current_options()['severity_colors'] as $class => $properties ) {
 						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important;}';
 						echo '#the-list .' . $class . ' td { color: #252630 !important;}'; 
+						echo '#the-list td { color: #fff !important; }'; 
+						echo '#the-list tr { background: #1d456b;}'; 
+						
 					}
 					?>
 				</style>

@@ -131,8 +131,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			        (?P<file>
 			             (?:phar://)?          # PHAR archive prefix (optional).
 			             (?:[a-zA-Z]:)?        # Drive letter (optional).
-			             [^:?*<>{}]+           # File path.
-			        ) \((?P<line>\d{1,6})\)    # Line number.
+			             ([^:?*<>{}]+)?           # File path.
+			        ) \((?P<line>\d{1,6})?\)    # Line number.
 			    ):
 			    | (?P<main>{main})\s*?$
 			)@x',
@@ -155,6 +155,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 
 				if ( ! empty( $matches['line'] ) ) {
 					$item['line'] = $matches['line'];
+				} elseif ( empty( $matches['main'] ) ) {
+					// Line is missing from log (unknown reason).
+					$item['line'] = 'Line Unknown';
 				}
 
 				return $item;
