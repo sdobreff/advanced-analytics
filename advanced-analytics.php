@@ -19,6 +19,7 @@
  * License:         GPL v3
  * License URI:     http://www.gnu.org/licenses/gpl-3.0.txt
  * Requires PHP:    7.4
+ * Network:         true
  */
 
 use ADVAN\Advanced_Analytics;

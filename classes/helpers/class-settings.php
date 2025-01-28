@@ -97,6 +97,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			// Hook me up.
 			\add_action( 'admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin panel.
+			if ( \is_multisite() ) {
+				\add_action( 'network_admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin on multisite install panel.
+			}
 
 			/**
 			 * Draws the save button in the settings
