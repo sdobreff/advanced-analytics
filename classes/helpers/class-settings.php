@@ -902,6 +902,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			Config_Transformer::update( 'constant', 'WP_DEBUG', $wp_debug_enable, self::$config_args );
 
+			$wp_debug_display_enable = ( array_key_exists( 'wp_debug_display_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_display_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			Config_Transformer::update( 'constant', 'WP_DEBUG_DISPLAY', $wp_debug_display_enable, self::$config_args );
+
 			return $advanced_options;
 		}
 	}

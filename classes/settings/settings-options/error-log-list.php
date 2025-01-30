@@ -50,10 +50,19 @@ Settings::set_current_options( $settings );
 
 		Settings::build_option(
 			array(
-				'name'     => \esc_html__( 'WP Debug enable', 'advanced-analytics' ),
+				'name'     => \esc_html__( 'WP Debug Enable', 'advanced-analytics' ),
 				'id'       => 'wp_debug_enable',
 				'type'     => 'checkbox',
 				'default'  => $env_info['wp_debug_mode'],
+			)
+		);
+
+		Settings::build_option(
+			array(
+				'name'     => \esc_html__( 'WP Debug Display Errors in HTML', 'advanced-analytics' ),
+				'id'       => 'wp_debug_display_enable',
+				'type'     => 'checkbox',
+				'default'  => $env_info['wp_debug_display'],
 			)
 		);
 	}
