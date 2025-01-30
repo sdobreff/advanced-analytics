@@ -159,7 +159,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		public static function download_link(): string {
 			$url = \add_query_arg(
 				array(
-					'action' => 'advanced_analytics_download_log_file',
+					'action'   => 'advanced_analytics_download_log_file',
 					'_wpnonce' => \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' ),
 				),
 				\admin_url( 'admin-ajax.php' )
@@ -243,7 +243,6 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 				echo 'There is no file to download!';
 			}
 		}
-
 
 		/**
 		 * Function to get correct MIME type for download
@@ -479,6 +478,20 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			$path = \apply_filters( ADVAN_TEXTDOMAIN . 'config_file_path', (string) $path );
 
 			return $path;
+		}
+
+		/**
+		 * Just returns randomized string.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function generate_random_file_name() {
+
+			$random_string = uniqid();
+			
+			return $random_string;
 		}
 	}
 }

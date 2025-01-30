@@ -151,8 +151,9 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				'wp_version'                => get_bloginfo( 'version' ),
 				'wp_multisite'              => is_multisite(),
 				'wp_memory_limit'           => self::_memory_limit(),
-				'wp_debug_mode'             => ( defined( 'WP_DEBUG' ) && WP_DEBUG ),
-				'wp_debug_display'          => ( defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ),
+				'wp_debug_mode'             => ( defined( 'WP_DEBUG' ) && \WP_DEBUG ),
+				'wp_debug_display'          => ( defined( 'WP_DEBUG_DISPLAY' ) && \WP_DEBUG_DISPLAY ),
+				'wp_debug_log'              => ( defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ),
 				'language'                  => get_locale(),
 				'server_info'               => $_SERVER['SERVER_SOFTWARE'],
 				'php_version'               => phpversion(),
@@ -393,6 +394,16 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						<td data-export-label="WP Debug Display"><?php esc_html_e( 'WP debug display errors in HTML', 'advanced-analytics' ); ?>:</td>
 						<td>
 							<?php if ( $environment['wp_debug_display'] ) : ?>
+								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
+							<?php else : ?>
+								<mark class="no">&ndash;</mark>
+							<?php endif; ?>
+						</td>
+					</tr>
+					<tr>
+						<td data-export-label="WP Debug Log"><?php esc_html_e( 'WP debug log errors', 'advanced-analytics' ); ?>:</td>
+						<td>
+							<?php if ( $environment['wp_debug_log'] ) : ?>
 								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
 							<?php else : ?>
 								<mark class="no">&ndash;</mark>

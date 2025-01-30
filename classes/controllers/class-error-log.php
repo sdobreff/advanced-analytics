@@ -66,8 +66,17 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 							esc_html( self::$log_file )
 						)
 					);
-				} elseif ( ! is_readable( self::$log_file ) ) {
-					if ( file_exists( self::$log_file ) ) {
+				} elseif ( ! is_writable( \dirname( self::$log_file ) ) ) {
+					return new \WP_Error(
+						'error_log_not_accessible',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', 'advanced-analysis' ),
+							esc_html( self::$log_file )
+						)
+					);
+				} elseif ( file_exists( self::$log_file ) && ! is_readable( self::$log_file ) ) {
+
 						return new \WP_Error(
 							'error_log_not_accessible',
 							sprintf(
@@ -76,16 +85,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 								esc_html( self::$log_file )
 							)
 						);
-					} else {
-						return new \WP_Error(
-							'error_log_not_found',
-							sprintf(
-							// translators: the name of the log file.
-								__( 'The log file <code>%s</code> does not exist or is inaccessible.', 'advanced-analysis' ),
-								esc_html( self::$log_file )
-							)
-						);
-					}
+
 				}
 			}
 

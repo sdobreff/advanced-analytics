@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
+use ADVAN\Controllers\Error_Log;
 use ADVAN\Settings\Settings_Builder;
 
 // Exit if accessed directly.
@@ -905,6 +906,35 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$wp_debug_display_enable = ( array_key_exists( 'wp_debug_display_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_display_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			Config_Transformer::update( 'constant', 'WP_DEBUG_DISPLAY', $wp_debug_display_enable, self::$config_args );
+
+			$wp_debug_log_enable = ( array_key_exists( 'wp_debug_log_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_log_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $wp_debug_log_enable, self::$config_args );
+
+			if ( $wp_debug_log_enable ) {
+				$wp_debug_log_generate = ( array_key_exists( 'wp_debug_log_file_generate', $post_array ) ) ? filter_var( $post_array['wp_debug_log_file_generate'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+				$wp_debug_log_filename = ( array_key_exists( 'wp_debug_log_filename', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['wp_debug_log_filename'] ) ) : '';
+
+				if ( ! empty( $wp_debug_log_filename ) && Error_Log::autodetect() !== $wp_debug_log_filename ) {
+
+					if ( is_writable( \dirname( $wp_debug_log_filename ) ) ) {
+						$file_name = \dirname( $wp_debug_log_filename ) . \DIRECTORY_SEPARATOR . 'debug_' . File_Helper::generate_random_file_name() . '.log';
+
+						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $file_name, self::$config_args );
+					} elseif ( \is_string( Error_Log::autodetect() ) ) {
+						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+					}
+				} elseif ( \is_string( Error_Log::autodetect() ) ) {
+					Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+				}
+
+				if ( $wp_debug_log_generate ) {
+					$file_name = \WP_CONTENT_DIR . \DIRECTORY_SEPARATOR . 'debug_' . File_Helper::generate_random_file_name() . '.log';
+
+					Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $file_name, self::$config_args );
+				}
+			}
 
 			return $advanced_options;
 		}

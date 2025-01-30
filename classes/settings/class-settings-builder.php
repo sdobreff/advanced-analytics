@@ -123,6 +123,78 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		public static $settings;
 
 		/**
+		 * Integer - minimum value
+		 *
+		 * @var int
+		 *
+		 * @since 5.0.0
+		 */
+		public static $min;
+
+		/**
+		 * Integer - maximum value
+		 *
+		 * @var int
+		 *
+		 * @since 5.0.0
+		 */
+		public static $max;
+
+		/**
+		 * Integer - step value
+		 *
+		 * @var int
+		 *
+		 * @since 5.0.0
+		 */
+		public static $step;
+
+		/**
+		 * Holds the type of the edit HTML field
+		 *
+		 * @var string
+		 *
+		 * @since 5.0.0
+		 */
+		public static $edit_type;
+
+		/**
+		 * Holds the validation pattern for the text field
+		 *
+		 * @var string
+		 *
+		 * @since 5.0.0
+		 */
+		public static $validate_pattern;
+
+		/**
+		 * Holds the maximum characters for the text field
+		 *
+		 * @var string
+		 *
+		 * @since 5.0.0
+		 */
+		public static $max_chars;
+
+		/**
+		 * Holds the title attribute for the text field
+		 *
+		 * @var string
+		 *
+		 * @since 5.3.0
+		 */
+		public static $title_attr;
+
+		/**
+		 * The given field is required
+		 *
+		 * @var string
+		 *
+		 * @since 5.0.0
+		 */
+		public static $required;
+
+		/**
 		 * Builds the element
 		 *
 		 * @param array  $settings - Array with settings.
@@ -145,6 +217,12 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			self::$option_type      = null;
 			self::$option_name      = null;
 			self::$settings         = null;
+			self::$edit_type        = null;
+			self::$validate_pattern = null;
+			self::$max_chars        = null;
+			self::$min              = null;
+			self::$max              = null;
+			self::$step             = null;
 
 			self::prepare_data( $settings, $option_name, $data );
 
@@ -369,8 +447,29 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 * @since latest
 		 */
 		private static function text() {
+			$type_attr  = 'type="text"';
+			$pattern    = '';
+			$step       = '';
+			$max_chars  = '';
+			$title_attr = '';
+
+			if ( ! empty( self::$edit_type ) ) {
+				$type_attr = ' type="' . self::$edit_type . '"';
+			}
+			if ( ! empty( self::$title_attr ) ) {
+				$title_attr = ' title="' . self::$title_attr . '"';
+			}
+			if ( ! empty( self::$validate_pattern ) ) {
+				$pattern = ' pattern="' . self::$validate_pattern . '"';
+			}
+			if ( ! empty( self::$step ) ) {
+				$step = ' step="' . self::$step . '"';
+			}
+			if ( ! empty( self::$max_chars ) ) {
+				$max_chars = ' maxlength="' . self::$max_chars . '"';
+			}
 			?>
-			<input <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> type="text"	value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?>>
+			<input <?php echo self::$item_id_attr; ?> <?php echo $title_attr; ?> <?php echo self::$name_attr; ?> <?php echo $type_attr; ?>	value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?><?php echo $pattern; ?><?php echo $max_chars; ?><?php echo ( ( self::$required ) ? ' required' : '' ); ?><?php echo $step; ?>>
 			<?php
 		}
 
@@ -997,7 +1096,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			<div class="aadvana-custom-select">
 				<select <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?>>
 					<?php
-							$i = 0;
+					$i = 0;
 					if ( ! empty( self::$settings['options'] ) && is_array( self::$settings['options'] ) ) {
 						foreach ( self::$settings['options'] as $option_key => $option ) {
 							++$i;
@@ -1327,6 +1426,19 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			extract( $settings ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 
 			self::$option_type = ! empty( $type ) ? $type : false;
+			self::$required    = ! empty( $required ) ? $required : false;
+
+			self::$min = ! empty( $min ) ? $min : null;
+			self::$max = ! empty( $max ) ? $max : null;
+
+			self::$step = ! empty( $step ) ? $step : null;
+
+			if ( 'text' === self::$option_type ) {
+				self::$edit_type        = ! empty( $validate ) ? $validate : false;
+				self::$validate_pattern = ! empty( $pattern ) ? $pattern : false;
+				self::$max_chars        = ! empty( $max_chars ) ? $max_chars : false;
+				self::$title_attr       = ! empty( $title_attr ) ? $title_attr : false;
+			}
 
 			// ID.
 			self::$item_id .= ! empty( $prefix ) ? $prefix . '-' : '';
