@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * @since 3.2.0
 		 */
-		private static function environment_info() {
+		public static function environment_info() {
 			global $wpdb;
 
 			// $get_response_msg = '';

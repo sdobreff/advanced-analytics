@@ -445,5 +445,40 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			);
 			return $mime_types;
 		}
+
+		/**
+		 * Get full file path to the site's wp-config.php file.
+		 *
+		 * @since latest
+		 *
+		 * @return string Full path to the wp-config.php file or a blank string if modifications for the file are disabled.
+		 */
+		public static function get_wp_config_file_path() {
+
+			if ( file_exists( ABSPATH . 'wp-config.php' ) ) {
+
+				/** The config file resides in ABSPATH */
+				$path = ABSPATH . 'wp-config.php';
+
+			} elseif ( @file_exists( dirname( ABSPATH ) . '/wp-config.php' ) && ! @file_exists( dirname( ABSPATH ) . '/wp-settings.php' ) ) {
+
+				/** The config file resides one level above ABSPATH */
+				$path = dirname( ABSPATH ) . '/wp-config.php';
+
+			} else {
+				$path = '';
+			}
+
+			/**
+			 * Gives the ability to manually change the path to the config file.
+			 *
+			 * @param string - The current value for WP config file path.
+			 *
+			 * @since latest
+			 */
+			$path = \apply_filters( ADVAN_TEXTDOMAIN . 'config_file_path', (string) $path );
+
+			return $path;
+		}
 	}
 }

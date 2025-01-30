@@ -7,7 +7,9 @@
  * @since 2.0.0
  */
 
+use ADVAN\Helpers\File_Helper;
 use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\System_Status;
 
 $settings = Settings::get_current_options();
 
@@ -25,7 +27,38 @@ Settings::set_current_options( $settings );
 		)
 	);
 
-	// Pretty tooltips formatting.
+	// Debugging options.
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Debugging options', 'advanced-analytics' ),
+			'id'    => 'jquery-pretty-tooltips-format-settings',
+			'type'  => 'header',
+		)
+	);
+
+	if ( ! is_writable( File_Helper::get_wp_config_file_path() ) ) {
+		Settings::build_option(
+			array(
+				'text' => \esc_html__( 'WP Config is not writable - you can not make changes from here', 'advanced-analytics' ),
+				'id'   => 'wp_config_not_writable',
+				'type' => 'error',
+			)
+		);
+	} else {
+
+		$env_info = System_Status::environment_info();
+
+		Settings::build_option(
+			array(
+				'name'     => \esc_html__( 'WP Debug enable', 'advanced-analytics' ),
+				'id'       => 'wp_debug_enable',
+				'type'     => 'checkbox',
+				'default'  => $env_info['wp_debug_mode'],
+			)
+		);
+	}
+
+	// Error log coloring formatting.
 	Settings::build_option(
 		array(
 			'title' => \esc_html__( 'Error severities coloring', 'advanced-analytics' ),

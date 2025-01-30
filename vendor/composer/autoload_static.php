@@ -25,6 +25,7 @@ class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
         'ADVAN\\Controllers\\Error_Log' => __DIR__ . '/../..' . '/classes/controllers/class-error-log.php',
         'ADVAN\\Controllers\\Reverse_Line_Reader' => __DIR__ . '/../..' . '/classes/controllers/class-reverse-line-reader.php',
         'ADVAN\\Helpers\\Ajax_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-ajax-helper.php',
+        'ADVAN\\Helpers\\Config_Transformer' => __DIR__ . '/../..' . '/classes/helpers/class-config-transformer.php',
         'ADVAN\\Helpers\\Context_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-context-helper.php',
         'ADVAN\\Helpers\\File_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-file-helper.php',
         'ADVAN\\Helpers\\Log_Line_Parser' => __DIR__ . '/../..' . '/classes/helpers/class-log-line-parser.php',

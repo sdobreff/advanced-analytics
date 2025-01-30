@@ -10,6 +10,7 @@ return array(
     'ADVAN\\Controllers\\Error_Log' => $baseDir . '/classes/controllers/class-error-log.php',
     'ADVAN\\Controllers\\Reverse_Line_Reader' => $baseDir . '/classes/controllers/class-reverse-line-reader.php',
     'ADVAN\\Helpers\\Ajax_Helper' => $baseDir . '/classes/helpers/class-ajax-helper.php',
+    'ADVAN\\Helpers\\Config_Transformer' => $baseDir . '/classes/helpers/class-config-transformer.php',
     'ADVAN\\Helpers\\Context_Helper' => $baseDir . '/classes/helpers/class-context-helper.php',
     'ADVAN\\Helpers\\File_Helper' => $baseDir . '/classes/helpers/class-file-helper.php',
     'ADVAN\\Helpers\\Log_Line_Parser' => $baseDir . '/classes/helpers/class-log-line-parser.php',

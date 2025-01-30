@@ -44,6 +44,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const SETTINGS_VERSION = 'aadvana_plugin_version';
 
 		/**
+		 * Default wp_config.php writer configs
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $config_args = array(
+			'normalize' => true,
+			'raw'       => true,
+			'add'       => true,
+		);
+
+		/**
 		 * Array with the current options
 		 *
 		 * @var array
@@ -884,6 +897,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			self::$current_options = $advanced_options;
+
+			$wp_debug_enable = ( array_key_exists( 'wp_debug_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			Config_Transformer::update( 'constant', 'WP_DEBUG', $wp_debug_enable, self::$config_args );
 
 			return $advanced_options;
 		}
