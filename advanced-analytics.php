@@ -111,3 +111,23 @@ if ( ! Context_Helper::is_installing() ) {
 }
 
 register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );
+
+if ( ! function_exists( 'str_starts_with' ) ) {
+	/**
+	 * PHP lower than 8 is missing that function but it required in the newer versions of our plugin.
+	 *
+	 * @param string $haystack - The string to search in.
+	 * @param string $needle - The needle to search for.
+	 *
+	 * @return bool
+	 *
+	 * @since latest
+	 */
+	function str_starts_with( $haystack, $needle ): bool {
+		if ( '' === $needle ) {
+			return true;
+		}
+
+		return 0 === strpos( $haystack, $needle );
+	}
+}

@@ -14,6 +14,7 @@ return array(
     'ADVAN\\Helpers\\Context_Helper' => $baseDir . '/classes/helpers/class-context-helper.php',
     'ADVAN\\Helpers\\File_Helper' => $baseDir . '/classes/helpers/class-file-helper.php',
     'ADVAN\\Helpers\\Log_Line_Parser' => $baseDir . '/classes/helpers/class-log-line-parser.php',
+    'ADVAN\\Helpers\\Plugin_Theme_Helper' => $baseDir . '/classes/helpers/class-plugin-theme-helper.php',
     'ADVAN\\Helpers\\Settings' => $baseDir . '/classes/helpers/class-settings.php',
     'ADVAN\\Helpers\\System_Status' => $baseDir . '/classes/helpers/class-system-status.php',
     'ADVAN\\Helpers\\WP_Error_Handler' => $baseDir . '/classes/helpers/class-wp-error-handler.php',

@@ -29,6 +29,7 @@ class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
         'ADVAN\\Helpers\\Context_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-context-helper.php',
         'ADVAN\\Helpers\\File_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-file-helper.php',
         'ADVAN\\Helpers\\Log_Line_Parser' => __DIR__ . '/../..' . '/classes/helpers/class-log-line-parser.php',
+        'ADVAN\\Helpers\\Plugin_Theme_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-plugin-theme-helper.php',
         'ADVAN\\Helpers\\Settings' => __DIR__ . '/../..' . '/classes/helpers/class-settings.php',
         'ADVAN\\Helpers\\System_Status' => __DIR__ . '/../..' . '/classes/helpers/class-system-status.php',
         'ADVAN\\Helpers\\WP_Error_Handler' => __DIR__ . '/../..' . '/classes/helpers/class-wp-error-handler.php',

@@ -14,11 +14,12 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
+use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Controllers\Reverse_Line_Reader;
-use ADVAN\Helpers\File_Helper;
-use ADVAN\Helpers\Settings;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -220,9 +221,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
 				// 'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
-				'timestamp' => __( 'Time', 'advanced-analytics' ),
-				'severity'  => __( 'Severity', 'advanced-analytics' ),
-				'message'   => __( 'Message', 'advanced-analytics' ),
+				'timestamp'    => __( 'Time', 'advanced-analytics' ),
+				'severity'     => __( 'Severity', 'advanced-analytics' ),
+				'message'      => __( 'Message', 'advanced-analytics' ),
+				'plugin_theme' => __( 'Possible Plugin /Theme', 'advanced-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -496,15 +498,46 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
 							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
 
-							$message = \rtrim( $message, ' - ');
+							$message = \rtrim( $message, ' - ' );
 						}
 						$message .= '</pre></div>';
 					}
 					return $message;
+				case 'plugin_theme':
+					$message = esc_html( $item['message'] );
+
+					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
+
+					if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+						$split_plugin = explode( '/', $message );
+
+						$next        = false;
+						$plugin_base = '';
+						foreach ( $split_plugin as $part ) {
+							if ( $next ) {
+								$plugin_base = $part;
+								break;
+							}
+							if ( $plugins_dir_basename === $part ) {
+								$next = true;
+							}
+						}
+
+						$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+						if ( ! empty( $plugin ) ) {
+							return esc_html( $plugin['Name'] );
+						}
+					}
+
+					$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
+
+					return '';
 				default:
 					return isset( $item[ $column_name ] )
-						? esc_html( $item[ $column_name ] )
-						: 'Column "' . esc_html( $column_name ) . '" not found';
+						? \esc_html( $item[ $column_name ] )
+						: 'Column "' . \esc_html( $column_name ) . '" not found';
 			}
 		}
 
@@ -865,10 +898,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					<?php
 					foreach ( Settings::get_current_options()['severity_colors'] as $class => $properties ) {
 						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important;}';
-						echo '#the-list .' . $class . ' td { color: #252630 !important;}'; 
-						echo '#the-list td { color: #fff !important; }'; 
-						echo '#the-list tr { background: #1d456b;}'; 
-						
+						echo '#the-list .' . $class . ' td { color: #252630 !important;}';
+						echo '#the-list td { color: #fff !important; }';
+						echo '#the-list tr { background: #1d456b;}';
+
 					}
 					?>
 				</style>
