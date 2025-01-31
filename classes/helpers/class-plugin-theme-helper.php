@@ -87,16 +87,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 			if ( empty( self::$theme_path ) ) {
 				global $wp_theme_directories;
 
-				$stylesheet = \get_stylesheet();
+				$stylesheet       = \get_stylesheet();
 				self::$theme_path = \get_raw_theme_root( $stylesheet );
 				if ( false === self::$theme_path ) {
 					self::$theme_path = WP_CONTENT_DIR . \DIRECTORY_SEPARATOR . 'themes';
 				} elseif ( ! in_array( self::$theme_path, (array) $wp_theme_directories, true ) ) {
 					self::$theme_path = WP_CONTENT_DIR . self::$theme_path;
 				}
-
-				return self::$theme_path;
 			}
+
+			return (string) self::$theme_path;
 		}
 
 		/**
