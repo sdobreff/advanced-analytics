@@ -34,6 +34,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		private static $plugins = array();
 
 		/**
+		 * Holds cache of the themes installed
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $themes = array();
+
+		/**
 		 * Caches the theme directory name
 		 *
 		 * @var string
@@ -76,12 +85,43 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 			return array();
 		}
 
-		public static function get_theme_from_path( $path_name ): array {
+		/**
+		 * Gets all themes and starts checking against the given possible path
+		 *
+		 * @param string $path_name - The path to check for.
+		 *
+		 * @return \WP_Theme|false
+		 *
+		 * @since latest
+		 */
+		public static function get_theme_from_path( string $path_name ) {
+
 			// About to be implemented.
-			wp_get_themes();
-			\WP_Theme::get_theme_root();
+
+			if ( empty( self::$themes ) ) {
+				self::$themes = wp_get_themes();
+			}
+			foreach ( self::$themes as $theme ) {
+				// $path = $theme->get_theme_root();
+				$template = $theme->get_template();
+				// $theme_root   = get_theme_root( $template );
+				// $template_dir = "$theme_root/$template";
+				if ( \mb_strtolower( $template ) === \mb_strtolower( $path_name ) ) {
+					return $theme;
+				}
+			}
+
+			return false;
+			// \WP_Theme::get_theme_root();
 		}
 
+		/**
+		 * Tries to find the path root for the thems (not exactly possible as they might be everywhere but it gets the current theme and extracts the path from there)
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function get_default_path_for_themes(): string {
 
 			if ( empty( self::$theme_path ) ) {
