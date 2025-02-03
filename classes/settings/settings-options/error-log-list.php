@@ -18,6 +18,10 @@ foreach ( $settings['severity_colors'] as $name => $severity ) {
 	$settings[ 'severity_colors_' . $name . '_color' ] = $severity['color'];
 }
 
+foreach ( $settings['severity_show'] as $name => $severity ) {
+	$settings[ 'severity_show_' . $name . '_display' ] = $severity['display'];
+}
+
 Settings::set_current_options( $settings );
 
 	Settings::build_option(
@@ -99,6 +103,70 @@ Settings::set_current_options( $settings );
 			);
 		}
 	}
+
+	// Columns of types of errors showing.
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Display these types of errors in the view', 'advanced-analytics' ),
+			'id'    => 'jquery-pretty-tooltips-format-settings',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Error', 'advanced-analytics' ),
+			'id'      => 'severity_show_error_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Deprecated', 'advanced-analytics' ),
+			'id'      => 'severity_show_deprecated_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Success', 'advanced-analytics' ),
+			'id'      => 'severity_show_success_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Info', 'advanced-analytics' ),
+			'id'      => 'severity_show_info_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Notice', 'advanced-analytics' ),
+			'id'      => 'severity_show_notice_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Warning', 'advanced-analytics' ),
+			'id'      => 'severity_show_warning_display',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options(),
+		)
+	);
+
 
 	// Error log coloring formatting.
 	Settings::build_option(

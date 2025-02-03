@@ -1408,6 +1408,10 @@ body:not(.analytics_page_advan_logs_settings) #aadvana-page-overlay {
   box-shadow: none !important;
 }
 
+.aadvana-darkskin #screen-meta {
+  background-color: #153b5e !important;
+}
+
 #aadvana_background_pattern {
   height: 281px;
   overflow: auto;

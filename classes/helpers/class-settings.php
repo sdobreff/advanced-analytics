@@ -30,7 +30,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '1'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '2'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -43,6 +43,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const SETTINGS_FILE_UPLOAD_FIELD = 'aadvana_import_upload';
 
 		public const SETTINGS_VERSION = 'aadvana_plugin_version';
+
+		/**
+		 * Holds cache for disabled severity levels
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $disabled_severities = null;
 
 		/**
 		 * Default wp_config.php writer configs
@@ -174,6 +183,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						'info'       => array( 'color' => '#0000ff' ),
 						'notice'     => array( 'color' => '#feeb8e' ),
 						'warning'    => array( 'color' => '#ffff00' ),
+					),
+					'severity_show'    => array(
+						'deprecated' => array( 'display' => true ),
+						'error'      => array( 'display' => true ),
+						'success'    => array( 'display' => true ),
+						'info'       => array( 'display' => true ),
+						'notice'     => array( 'display' => true ),
+						'warning'    => array( 'display' => true ),
 					),
 				);
 			}
@@ -897,6 +914,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$advanced_options['severity_colors'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severity_colors'][ $name ]['color'] ) ) ? $advanced_options['severity_colors'][ $name ]['color'] : $severity['color'] );
 			}
 
+			if ( array_key_exists( 'severity_show', $post_array ) && \is_array( $post_array['severity_show'] ) ) {
+				$advanced_options['severity_show'] = array_merge( self::get_current_options()['severity_show'], $post_array['severity_show'] );
+			}
+
+			foreach ( self::get_current_options()['severity_show'] as $name => $severity ) {
+				$advanced_options['severity_show'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : false;
+			}
+
 			self::$current_options = $advanced_options;
 
 			$wp_debug_enable = ( array_key_exists( 'wp_debug_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
@@ -937,6 +962,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return $advanced_options;
+		}
+
+		/**
+		 * Returns the disabled severities levels and stores them in the internal class cache.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function get_disabled_severities(): array {
+			if ( null === self::$disabled_severities ) {
+				self::$disabled_severities = array();
+				foreach ( self::get_current_options()['severity_show'] as $name => $severity ) {
+					if ( ! $severity['display'] ) {
+						self::$disabled_severities[] = $name;
+					}
+				}
+			}
+
+			return self::$disabled_severities;
 		}
 	}
 }

@@ -432,6 +432,16 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 			}
 
+			$disabled = Settings::get_disabled_severities();
+			if ( ! empty( $disabled ) ) {
+				foreach ( $disabled as $severity ) {
+					foreach ( $errors as $key => $error ) {
+						if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
+							unset( $errors[ $key ] );
+						}
+					}
+				}
+			}
 				self::$read_items = $errors;
 			// }
 
