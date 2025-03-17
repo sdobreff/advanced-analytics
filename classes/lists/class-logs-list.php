@@ -224,7 +224,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				'timestamp'    => __( 'Time', 'advanced-analytics' ),
 				'severity'     => __( 'Severity', 'advanced-analytics' ),
 				'message'      => __( 'Message', 'advanced-analytics' ),
-				'plugin_theme' => __( 'Possible Plugin /Theme', 'advanced-analytics' ),
+				'plugin_theme' => __( 'Source', 'advanced-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -408,11 +408,21 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
 								if ( ! empty( $collected_items ) ) {
 									$parsed_data['sub_items'] = $collected_items;
-									$collected_items          = array();
+									if ( isset( $collected_items[0]['message'] ) ) {
+										$parsed_data['message'] = $collected_items[0]['message'] . "\n" . $parsed_data['message'];
+										unset( $collected_items[0] );
+									}
+									$collected_items = array();
 								}
 								$errors[] = $parsed_data;
 							} elseif ( \is_array( $parsed_data ) ) {
-								$collected_items[] = $parsed_data;
+								if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
+									$collected_items[] = array(
+										'message' => $parsed_data['call'],
+									);
+								} else {
+									$collected_items[] = $parsed_data;
+								}
 							}
 						}
 
@@ -514,73 +524,77 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 					return $message;
 				case 'plugin_theme':
-					$message = esc_html( $item['message'] );
+					if ( isset( $item['source'] ) ) {
+						return $item['source'];
+					} else {
+						$message = esc_html( $item['message'] );
 
-					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
+						$plugins_dir_basename = basename( WP_PLUGIN_DIR );
 
-					if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+						if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
 
-						$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
+							$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
 
-						$next        = false;
-						$plugin_base = '';
-						foreach ( $split_plugin as $part ) {
-							if ( $next ) {
-								$plugin_base = $part;
-								break;
+							$next        = false;
+							$plugin_base = '';
+							foreach ( $split_plugin as $part ) {
+								if ( $next ) {
+									$plugin_base = $part;
+									break;
+								}
+								if ( $plugins_dir_basename === $part ) {
+									$next = true;
+								}
 							}
-							if ( $plugins_dir_basename === $part ) {
-								$next = true;
+
+							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+							if ( ! empty( $plugin ) ) {
+								return esc_html( $plugin['Name'] );
 							}
 						}
 
-						$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+						$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
 
-						if ( ! empty( $plugin ) ) {
-							return esc_html( $plugin['Name'] );
+						if ( false !== \mb_strpos( $message, $theme_root . \DIRECTORY_SEPARATOR ) ) {
+
+							$theme_dir_basename = basename( $theme_root );
+
+							$split_theme = explode( \DIRECTORY_SEPARATOR, $message );
+
+							$next       = false;
+							$theme_base = '';
+							foreach ( $split_theme as $part ) {
+								if ( $next ) {
+									$theme_base = $part;
+									break;
+								}
+								if ( $theme_dir_basename === $part ) {
+									$next = true;
+								}
+							}
+
+							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
+
+							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
+								$name = $theme->get( 'Name' );
+
+								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', 'advanced-analytics' );
+
+								$parent = $theme->parent(); // ( 'parent_theme' );
+								if ( $parent ) {
+									$parent = $theme->parent()->get( 'Name' );
+
+									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', 'advanced-analytics' ) . $parent . '</div>' : '';
+								}
+								$name .= (string) $parent;
+
+								return ( $name );
+							}
 						}
+
+						return '';
 					}
-
-					$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
-
-					if ( false !== \mb_strpos( $message, $theme_root . \DIRECTORY_SEPARATOR ) ) {
-
-						$theme_dir_basename = basename( $theme_root );
-
-						$split_theme = explode( \DIRECTORY_SEPARATOR, $message );
-
-						$next       = false;
-						$theme_base = '';
-						foreach ( $split_theme as $part ) {
-							if ( $next ) {
-								$theme_base = $part;
-								break;
-							}
-							if ( $theme_dir_basename === $part ) {
-								$next = true;
-							}
-						}
-
-						$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
-
-						if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
-							$name = $theme->get( 'Name' );
-
-							$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', 'advanced-analytics' );
-
-							$parent = $theme->parent(); // ( 'parent_theme' );
-							if ( $parent ) {
-								$parent = $theme->parent()->get( 'Name' );
-
-								$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', 'advanced-analytics' ) . $parent . '</div>' : '';
-							}
-							$name .= (string) $parent;
-
-							return ( $name );
-						}
-					}
-
-					return '';
 				default:
 					return isset( $item[ $column_name ] )
 						? \esc_html( $item[ $column_name ] )

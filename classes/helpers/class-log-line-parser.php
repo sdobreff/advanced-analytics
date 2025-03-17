@@ -59,6 +59,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			$line      = rtrim( $line );
 			$timestamp = null;
 			$message   = $line;
+			$source    = '';
 			$level     = '';
 			$context   = null;
 
@@ -76,7 +77,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			$pattern = '/
                 ^(?:\[(?P<timestamp>[\w \-+:\/]{6,50}?)\]\ )?
                 (?P<message>
-                    (?:(?:PHP\ )?(?P<severity>[a-zA-Z][a-zA-Z ]{3,40}?):\ )?
+                    (?:(?:(?P<source>PHP|WordPress\ database)\ )?(?P<severity>[a-zA-Z][a-zA-Z ]{3,40}?):?\ )?
                 .+)$
             /x';
 
@@ -97,16 +98,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					}
 				}
 
-				if ( ! empty( $matches['severity'] ) ) {
+				if ( ! empty( $matches['severity'] ) && ! empty( $matches['source'] ) ) {
 					// Parse the severity level.
 					$level = strtolower( trim( $matches['severity'] ) );
+				}
+
+				if ( ! empty( $matches['source'] ) ) {
+					// Parse the severity level.
+					$source = strtolower( trim( $matches['source'] ) );
 				}
 
 				// Does this line contain contextual data for another error?
 				$contextPrefix  = '[ELM_context_';
 				$trimmedMessage = trim( $message );
 				if ( substr( $trimmedMessage, 0, strlen( $contextPrefix ) ) === $contextPrefix ) {
-					$context = $this->parseContextLine( $trimmedMessage );
+					$context = self::parse_context_line( $trimmedMessage );
 				}
 			}
 
@@ -114,9 +120,39 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				'message'        => $message,
 				'timestamp'      => $timestamp,
 				'severity'       => $level,
+				'source'         => $source,
 				'isContext'      => ( null !== $context ),
 				'contextPayload' => $context,
 			);
+		}
+
+
+		private static function parse_context_line( $message ) {
+			if ( ! preg_match( '@^\[(ELM_context_\d{1,8}?)\]@', $message, $matches ) ) {
+				return null;
+			}
+
+			$endTag         = '[/' . $matches[1] . ']';
+			$endTagPosition = strrpos( $message, $endTag );
+			if ( $endTagPosition === false ) {
+				return null;
+			}
+
+			$serializedContext = substr(
+				$message,
+				strlen( $matches[0] ),
+				$endTagPosition - strlen( $matches[0] )
+			);
+			$context           = @json_decode( $serializedContext, true );
+
+			if ( ! is_array( $context ) ) {
+				return null;
+			}
+
+			if ( ! isset( $context['parentEntryPosition'] ) ) {
+				$context['parentEntryPosition'] = 'next';
+			}
+			return $context;
 		}
 
 		public static function parse_php_error_log_stack_line( $message, $is_last_line = false ) {
@@ -168,6 +204,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			&& preg_match( '@\son\sline\s\d++$@', $message )
 			) {
 				$item = array( 'call' => trim( substr( $message, strlen( $matches[0] ) ) ) );
+				return $item;
+			} elseif ( false === \str_starts_with( $message, '[' ) ) {
+				// Some modules are writing in error log with new lines - this logic tries to cover that case.
+				$item = array( 'call' => trim( $message ) . "\n" );
 				return $item;
 			} else {
 				return self::parse_php_error_log_line( (string) $message );
@@ -255,3 +295,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		}
 	}
 }
+
+/**
+ * debug example wp database error
+ * [17-Mar-2025 06:24:30 UTC] WordPress database error Unknown column 'dateholiday' in 'field list' for query SELECT   gitpod_posts.`ID`, gitpod_posts.`post_author`, gitpod_posts.`post_date_gmt`, gitpod_posts.`post_content`, gitpod_posts.`post_title`, gitpod_posts.`post_excerpt`, gitpod_posts.`post_status` , gitpod_posts.`comment_status`, gitpod_posts.`ping_status`, gitpod_posts.`post_password`, gitpod_posts.`post_name`, gitpod_posts.`to_ping`, gitpod_posts.`pinged`, gitpod_posts.`post_modified`, gitpod_posts.`post_modified_gmt`, gitpod_posts.`post_content_filtered`, gitpod_posts.`post_parent`, gitpod_posts.`guid`, gitpod_posts.`menu_order`, gitpod_posts.`post_type`, gitpod_posts.`post_mime_type`, gitpod_posts.`comment_count`,if(YEAR(post_date)='1999', dateholiday, date_Add(post_date,INTERVAL (year(now())-Year(post_date)) YEAR) ) as post_date
+					FROM gitpod_posts
+					WHERE 1=1  AND (
+	gitpod_term_relationships.term_taxonomy_id IN (1264)
+) AND gitpod_posts.post_type = 'post' AND ((gitpod_posts.post_status = 'publish')) AND (month(post_date) >= month('2025-02-24')) AND (month(post_date) < month('2025-04-07')) AND ( (month(dateholiday) = "3" and year(dateholiday) = "2025") or (month(post_date) = "3" and year(post_date) = 2000))
+					GROUP BY gitpod_posts.ID
+					ORDER BY gitpod_posts.post_date ASC
+						made by do_action('wp_ajax_WP_FullCalendar'), WP_Hook->do_action, WP_Hook->apply_filters, WP_FullCalendar::ajax, WP_Query->__construct, WP_Query->query, WP_Query->get_posts, QM_DB->query
+[17-Mar-2025 06:25:00 UTC] WordPress database error Unknown column 'dateholiday' in 'field list' for query SELECT   gitpod_posts.`ID`, gitpod_posts.`post_author`, gitpod_posts.`post_date_gmt`, gitpod_posts.`post_content`, gitpod_posts.`post_title`, gitpod_posts.`post_excerpt`, gitpod_posts.`post_status` , gitpod_posts.`comment_status`, gitpod_posts.`ping_status`, gitpod_posts.`post_password`, gitpod_posts.`post_name`, gitpod_posts.`to_ping`, gitpod_posts.`pinged`, gitpod_posts.`post_modified`, gitpod_posts.`post_modified_gmt`, gitpod_posts.`post_content_filtered`, gitpod_posts.`post_parent`, gitpod_posts.`guid`, gitpod_posts.`menu_order`, gitpod_posts.`post_type`, gitpod_posts.`post_mime_type`, gitpod_posts.`comment_count`,if(YEAR(post_date)='1999', dateholiday, date_Add(post_date,INTERVAL (year(now())-Year(post_date)) YEAR) ) as post_date
+					FROM gitpod_posts
+					WHERE 1=1  AND (
+	gitpod_term_relationships.term_taxonomy_id IN (1264)
+) AND gitpod_posts.post_type = 'post' AND ((gitpod_posts.post_status = 'publish')) AND (month(post_date) >= month('2025-02-24')) AND (month(post_date) < month('2025-04-07')) AND ( (month(dateholiday) = "3" and year(dateholiday) = "2025") or (month(post_date) = "3" and year(post_date) = 2000))
+					GROUP BY gitpod_posts.ID
+					ORDER BY gitpod_posts.post_date ASC
+						made by do_action('wp_ajax_WP_FullCalendar'), WP_Hook->do_action, WP_Hook->apply_filters, WP_FullCalendar::ajax, WP_Query->__construct, WP_Query->query, WP_Query->get_posts, QM_DB->query
+[17-Mar-2025 07:03:29 UTC] PHP Warning:  Undefined array key 0 in /workspace/sanovnik/wp-content/plugins/advanced-analytics/classes/helpers/class-log-line-parser.php on line 173
+ */
