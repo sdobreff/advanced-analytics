@@ -34,6 +34,8 @@ class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
         'ADVAN\\Helpers\\System_Status' => __DIR__ . '/../..' . '/classes/helpers/class-system-status.php',
         'ADVAN\\Helpers\\WP_Error_Handler' => __DIR__ . '/../..' . '/classes/helpers/class-wp-error-handler.php',
         'ADVAN\\Lists\\Logs_List' => __DIR__ . '/../..' . '/classes/lists/class-logs-list.php',
+        'ADVAN\\Migration\\Abstract_Migration' => __DIR__ . '/../..' . '/classes/migration/class-abstract-migration.php',
+        'ADVAN\\Migration\\Migration' => __DIR__ . '/../..' . '/classes/migration/class-migration.php',
         'ADVAN\\Settings\\Settings_Builder' => __DIR__ . '/../..' . '/classes/settings/class-settings-builder.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );

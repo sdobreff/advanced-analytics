@@ -146,7 +146,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( ! self::$current_options ) {
 
 					self::$current_options = self::get_default_options();
-					\update_option( ADVAN_SETTINGS_NAME, self::$current_options );
+					self::store_options( self::$current_options );
 				} elseif ( ! isset( self::$current_options['version'] ) || self::OPTIONS_VERSION !== self::$current_options['version'] ) {
 
 					// Set any unset options.
@@ -156,11 +156,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 					}
 					self::$current_options['version'] = self::OPTIONS_VERSION;
-					\update_option( ADVAN_SETTINGS_NAME, self::$current_options );
+					self::store_options( self::$current_options );
 				}
 			}
 
 			return self::$current_options;
+		}
+
+		/**
+		 * Stores the options in the database
+		 *
+		 * @param array $options - The array with the options to store.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function store_options( array $options ): void {
+			\update_option( ADVAN_SETTINGS_NAME, $options );
 		}
 
 		/**
@@ -176,21 +189,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				// Define default options.
 				self::$default_options = array(
 					'menu_admins_only' => true,
-					'severity_colors'  => array(
-						'deprecated' => array( 'color' => '#ffeb8e' ),
-						'error'      => array( 'color' => '#ffb3b3' ),
-						'success'    => array( 'color' => '#00ff00' ),
-						'info'       => array( 'color' => '#0000ff' ),
-						'notice'     => array( 'color' => '#feeb8e' ),
-						'warning'    => array( 'color' => '#ffff00' ),
-					),
-					'severity_show'    => array(
-						'deprecated' => array( 'display' => true ),
-						'error'      => array( 'display' => true ),
-						'success'    => array( 'display' => true ),
-						'info'       => array( 'display' => true ),
-						'notice'     => array( 'display' => true ),
-						'warning'    => array( 'display' => true ),
+					'severities'       => array(
+						'deprecated' => array(
+							'name'    => __( 'Deprecated', 'advanced-analytics' ),
+							'color'   => '#ffeb8e',
+							'display' => true,
+						),
+						'error'      => array(
+							'name'    => __( 'Error', 'advanced-analytics' ),
+							'color'   => '#ffb3b3',
+							'display' => true,
+						),
+						'success'    => array(
+							'name'    => __( 'Success', 'advanced-analytics' ),
+							'color'   => '#00ff00',
+							'display' => true,
+						),
+						'info'       => array(
+							'name'    => __( 'Info', 'advanced-analytics' ),
+							'color'   => '#0000ff',
+							'display' => true,
+						),
+						'notice'     => array(
+							'name'    => __( 'Notice', 'advanced-analytics' ),
+							'color'   => '#feeb8e',
+							'display' => true,
+						),
+						'warning'    => array(
+							'name'    => __( 'Warning', 'advanced-analytics' ),
+							'color'   => '#ffff00',
+							'display' => true,
+						),
+						'fatal'      => array(
+							'name'    => __( 'Fatal', 'advanced-analytics' ),
+							'color'   => '#b92a2a',
+							'display' => true,
+						),
 					),
 				);
 			}
@@ -861,7 +895,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							color: #42425d !important;
 						}
 						<?php
-						foreach ( self::get_current_options()['severity_colors'] as $class => $properties ) {
+						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
 							echo '.aadvan-live-notif-item.' . $class . '{ background: ' . $properties['color'] . ' !important; }';
 							echo '.aadvan-live-notif-item.' . $class . ' a { color: #42425d !important; }';
 						}
@@ -906,20 +940,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['menu_admins_only'] = ( array_key_exists( 'menu_admins_only', $post_array ) ) ? filter_var( $post_array['menu_admins_only'], FILTER_VALIDATE_BOOLEAN ) : false;
 
-			if ( array_key_exists( 'severity_colors', $post_array ) && \is_array( $post_array['severity_colors'] ) ) {
-				$advanced_options['severity_colors'] = array_merge( self::get_current_options()['severity_colors'], $post_array['severity_colors'] );
-			}
+			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
+				$advanced_options['severities'][ $name ]['color']   = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severities'][ $name ]['color'] ) ) ? $advanced_options['severities'][ $name ]['color'] : $severity['color'] );
+				$advanced_options['severities'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : false;
 
-			foreach ( self::get_current_options()['severity_colors'] as $name => $severity ) {
-				$advanced_options['severity_colors'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severity_colors'][ $name ]['color'] ) ) ? $advanced_options['severity_colors'][ $name ]['color'] : $severity['color'] );
-			}
-
-			if ( array_key_exists( 'severity_show', $post_array ) && \is_array( $post_array['severity_show'] ) ) {
-				$advanced_options['severity_show'] = array_merge( self::get_current_options()['severity_show'], $post_array['severity_show'] );
-			}
-
-			foreach ( self::get_current_options()['severity_show'] as $name => $severity ) {
-				$advanced_options['severity_show'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : false;
+				$advanced_options['severities'][ $name ]['name'] = self::get_current_options()['severities'][ $name ]['name'];
 			}
 
 			self::$current_options = $advanced_options;
@@ -974,7 +999,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function get_disabled_severities(): array {
 			if ( null === self::$disabled_severities ) {
 				self::$disabled_severities = array();
-				foreach ( self::get_current_options()['severity_show'] as $name => $severity ) {
+				foreach ( self::get_current_options()['severities'] as $name => $severity ) {
 					if ( ! $severity['display'] ) {
 						self::$disabled_severities[] = $name;
 					}

@@ -44,7 +44,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function init() {
 			if ( \is_admin() && ! \wp_doing_ajax() ) {
-				// Migration::migrate();
+				Migration::migrate();
 
 				// \add_action( 'admin_init', array( __CLASS__, 'plugin_redirect' ) );
 

@@ -2,7 +2,7 @@
     "name": "advanced/analytics",
     "description": "Make WP analytics easier",
     "type": "wordpress-plugin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "authors": [
       {
         "name": "advanced-analytics",

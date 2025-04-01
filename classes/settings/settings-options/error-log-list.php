@@ -14,11 +14,8 @@ use ADVAN\Helpers\System_Status;
 
 $settings = Settings::get_current_options();
 
-foreach ( $settings['severity_colors'] as $name => $severity ) {
+foreach ( $settings['severities'] as $name => $severity ) {
 	$settings[ 'severity_colors_' . $name . '_color' ] = $severity['color'];
-}
-
-foreach ( $settings['severity_show'] as $name => $severity ) {
 	$settings[ 'severity_show_' . $name . '_display' ] = $severity['display'];
 }
 
@@ -113,6 +110,18 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	foreach ( $settings['severities'] as $name => $severity ) {
+		Settings::build_option(
+			array(
+				'name'    => $severity['name'],
+				'id'      => 'severity_show_' . $name . '_display',
+				'type'    => 'checkbox',
+				'default' => Settings::get_current_options(),
+			)
+		);
+	}
+
+	/*
 	Settings::build_option(
 		array(
 			'name'    => \esc_html__( 'Error', 'advanced-analytics' ),
@@ -166,6 +175,7 @@ Settings::set_current_options( $settings );
 			'default' => Settings::get_current_options(),
 		)
 	);
+	*/
 
 
 	// Error log coloring formatting.
@@ -177,6 +187,19 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	foreach ( $settings['severities'] as $name => $severity ) {
+
+		Settings::build_option(
+			array(
+				'name'    => $severity['name'],
+				'id'      => 'severity_colors_' . $name . '_color',
+				'type'    => 'color',
+				'default' => Settings::get_current_options(),
+			)
+		);
+
+	}
+	/*
 	Settings::build_option(
 		array(
 			'name'    => \esc_html__( 'Error', 'advanced-analytics' ),
@@ -230,3 +253,4 @@ Settings::set_current_options( $settings );
 			'default' => Settings::get_current_options(),
 		)
 	);
+	*/

@@ -900,7 +900,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Generates content for a single row of the table.
 		 *
-		 * @param object|array $item The current item,
+		 * @param object|array $item - The current item.
 		 *
 		 * @since 3.1.0
 		 */
@@ -909,7 +909,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			if ( isset( $item['severity'] ) && ! empty( $item['severity'] ) ) {
 				$classes .= ' ' . $item['severity'];
 			}
-			echo '<tr class="' . $classes . '">';
+			echo '<tr class="' . \esc_attr( $classes ) . '">';
 			$this->single_row_columns( $item );
 			echo '</tr>';
 		}
@@ -957,9 +957,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					.generated-logs #severity { width: 10%; }
 
 					<?php
-					foreach ( Settings::get_current_options()['severity_colors'] as $class => $properties ) {
+					foreach ( Settings::get_current_options()['severities'] as $class => $properties ) {
 						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important;}';
-						echo '#the-list .' . $class . ' td { color: #252630 !important;}';
+						echo '#the-list .' . ( 'fatal' === $class ) ? $class . ' td { color: #AAA !important;}' : $class . ' td { color: #252630 !important;}';
 						echo '#the-list td { color: #fff !important; }';
 						echo '#the-list tr { background: #1d456b;}';
 
