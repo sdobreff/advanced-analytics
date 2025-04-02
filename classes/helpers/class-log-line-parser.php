@@ -55,6 +55,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 */
 		private static $newer_lines = 0;
 
+		/**
+		 * Parses a line from the PHP error log.
+		 *
+		 * @param string $line - The line to parse.
+		 *
+		 * @return array An associative array containing the parsed data.
+		 *
+		 * @since latest
+		 */
 		public static function parse_php_error_log_line( string $line ) {
 			$line      = rtrim( $line );
 			$timestamp = null;
@@ -109,10 +118,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				}
 
 				// Does this line contain contextual data for another error?
-				$contextPrefix  = '[ELM_context_';
-				$trimmedMessage = trim( $message );
-				if ( substr( $trimmedMessage, 0, strlen( $contextPrefix ) ) === $contextPrefix ) {
-					$context = self::parse_context_line( $trimmedMessage );
+				$context_prefix  = '[ELM_context_';
+				$trimmed_message = trim( $message );
+				if ( substr( $trimmed_message, 0, strlen( $context_prefix ) ) === $context_prefix ) {
+					$context = self::parse_context_line( $trimmed_message );
 				}
 			}
 
@@ -126,24 +135,32 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			);
 		}
 
-
+		/**
+		 * Parses the context line from the log message.
+		 *
+		 * @param string $message - The log message.
+		 *
+		 * @return array|null - The parsed context or null if not found.
+		 *
+		 * @since latest
+		 */
 		private static function parse_context_line( $message ) {
 			if ( ! preg_match( '@^\[(ELM_context_\d{1,8}?)\]@', $message, $matches ) ) {
 				return null;
 			}
 
-			$endTag         = '[/' . $matches[1] . ']';
-			$endTagPosition = strrpos( $message, $endTag );
-			if ( $endTagPosition === false ) {
+			$end_tag          = '[/' . $matches[1] . ']';
+			$end_tag_position = strrpos( $message, $end_tag );
+			if ( false === $end_tag_position ) {
 				return null;
 			}
 
-			$serializedContext = substr(
+			$serialized_context = substr(
 				$message,
 				strlen( $matches[0] ),
-				$endTagPosition - strlen( $matches[0] )
+				$end_tag_position - strlen( $matches[0] )
 			);
-			$context           = @json_decode( $serializedContext, true );
+			$context            = @json_decode( $serialized_context, true );
 
 			if ( ! is_array( $context ) ) {
 				return null;
@@ -155,6 +172,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			return $context;
 		}
 
+		/**
+		 * Parses a line from the PHP error log with stack trace.
+		 *
+		 * @param string $message    - The line to parse.
+		 * @param bool   $is_last_line - Whether this is the last line of a stack trace.
+		 *
+		 * @return array An associative array containing the parsed data.
+		 *
+		 * @since latest
+		 */
 		public static function parse_php_error_log_stack_line( $message, $is_last_line = false ) {
 			// It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()".
 			// The last line of a very long entry can be truncated.
@@ -214,6 +241,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			}
 		}
 
+		/**
+		 * Parses a line from the PHP error log with stack trace.
+		 *
+		 * @param string $line - The line to parse.
+		 *
+		 * @return bool|null
+		 *
+		 * @since latest
+		 */
 		public static function parse_entry_with_stack_trace( string $line ) {
 			if ( false !== \strpos( $line, 'throw' ) || false !== \strpos( $line, 'Stack trace' ) ) {
 				return \null;
@@ -236,7 +272,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					\set_transient( self::TIMESTAMP_TRANSIENT, self::$last_timestamp - 1, 600 ); // get back 1 second - sometimes there delays.
 				}
 
-				if ( 1 <= ( $count = self::get_newer_lines() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found
+				if ( 1 <= ( $count = self::get_newer_lines() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					?>
 					<script>
 						if (jQuery('#advan-errors-menu .update-count').length) {
@@ -295,24 +331,3 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		}
 	}
 }
-
-/**
- * debug example wp database error
- * [17-Mar-2025 06:24:30 UTC] WordPress database error Unknown column 'dateholiday' in 'field list' for query SELECT   gitpod_posts.`ID`, gitpod_posts.`post_author`, gitpod_posts.`post_date_gmt`, gitpod_posts.`post_content`, gitpod_posts.`post_title`, gitpod_posts.`post_excerpt`, gitpod_posts.`post_status` , gitpod_posts.`comment_status`, gitpod_posts.`ping_status`, gitpod_posts.`post_password`, gitpod_posts.`post_name`, gitpod_posts.`to_ping`, gitpod_posts.`pinged`, gitpod_posts.`post_modified`, gitpod_posts.`post_modified_gmt`, gitpod_posts.`post_content_filtered`, gitpod_posts.`post_parent`, gitpod_posts.`guid`, gitpod_posts.`menu_order`, gitpod_posts.`post_type`, gitpod_posts.`post_mime_type`, gitpod_posts.`comment_count`,if(YEAR(post_date)='1999', dateholiday, date_Add(post_date,INTERVAL (year(now())-Year(post_date)) YEAR) ) as post_date
-					FROM gitpod_posts
-					WHERE 1=1  AND (
-	gitpod_term_relationships.term_taxonomy_id IN (1264)
-) AND gitpod_posts.post_type = 'post' AND ((gitpod_posts.post_status = 'publish')) AND (month(post_date) >= month('2025-02-24')) AND (month(post_date) < month('2025-04-07')) AND ( (month(dateholiday) = "3" and year(dateholiday) = "2025") or (month(post_date) = "3" and year(post_date) = 2000))
-					GROUP BY gitpod_posts.ID
-					ORDER BY gitpod_posts.post_date ASC
-						made by do_action('wp_ajax_WP_FullCalendar'), WP_Hook->do_action, WP_Hook->apply_filters, WP_FullCalendar::ajax, WP_Query->__construct, WP_Query->query, WP_Query->get_posts, QM_DB->query
-[17-Mar-2025 06:25:00 UTC] WordPress database error Unknown column 'dateholiday' in 'field list' for query SELECT   gitpod_posts.`ID`, gitpod_posts.`post_author`, gitpod_posts.`post_date_gmt`, gitpod_posts.`post_content`, gitpod_posts.`post_title`, gitpod_posts.`post_excerpt`, gitpod_posts.`post_status` , gitpod_posts.`comment_status`, gitpod_posts.`ping_status`, gitpod_posts.`post_password`, gitpod_posts.`post_name`, gitpod_posts.`to_ping`, gitpod_posts.`pinged`, gitpod_posts.`post_modified`, gitpod_posts.`post_modified_gmt`, gitpod_posts.`post_content_filtered`, gitpod_posts.`post_parent`, gitpod_posts.`guid`, gitpod_posts.`menu_order`, gitpod_posts.`post_type`, gitpod_posts.`post_mime_type`, gitpod_posts.`comment_count`,if(YEAR(post_date)='1999', dateholiday, date_Add(post_date,INTERVAL (year(now())-Year(post_date)) YEAR) ) as post_date
-					FROM gitpod_posts
-					WHERE 1=1  AND (
-	gitpod_term_relationships.term_taxonomy_id IN (1264)
-) AND gitpod_posts.post_type = 'post' AND ((gitpod_posts.post_status = 'publish')) AND (month(post_date) >= month('2025-02-24')) AND (month(post_date) < month('2025-04-07')) AND ( (month(dateholiday) = "3" and year(dateholiday) = "2025") or (month(post_date) = "3" and year(post_date) = 2000))
-					GROUP BY gitpod_posts.ID
-					ORDER BY gitpod_posts.post_date ASC
-						made by do_action('wp_ajax_WP_FullCalendar'), WP_Hook->do_action, WP_Hook->apply_filters, WP_FullCalendar::ajax, WP_Query->__construct, WP_Query->query, WP_Query->get_posts, QM_DB->query
-[17-Mar-2025 07:03:29 UTC] PHP Warning:  Undefined array key 0 in /workspace/sanovnik/wp-content/plugins/advanced-analytics/classes/helpers/class-log-line-parser.php on line 173
- */

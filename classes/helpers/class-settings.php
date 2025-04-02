@@ -30,7 +30,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '2'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '3'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -192,7 +192,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'severities'       => array(
 						'deprecated' => array(
 							'name'    => __( 'Deprecated', 'advanced-analytics' ),
-							'color'   => '#ffeb8e',
+							'color'   => '#c4b576',
 							'display' => true,
 						),
 						'error'      => array(
@@ -223,6 +223,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						'fatal'      => array(
 							'name'    => __( 'Fatal', 'advanced-analytics' ),
 							'color'   => '#b92a2a',
+							'display' => true,
+						),
+						'parse'      => array(
+							'name'    => __( 'Parse', 'advanced-analytics' ),
+							'color'   => '#b9762a',
 							'display' => true,
 						),
 					),
@@ -342,7 +347,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					header( 'Pragma: hack' );
 					header( 'Content-Type: text/plain' );
 					header( 'Content-Disposition: attachment; filename="' . ADVAN_TEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
-					echo \wp_json_encode( unserialize( $stored_options[0]->option_value ) );
+					echo \wp_json_encode( unserialize( $stored_options[0]->option_value ), array( 'allowed_classes' => false ) );
 					die();
 				} elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) { // Import the settings.
 					if ( isset( $_FILES ) &&
