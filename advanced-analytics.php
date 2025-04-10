@@ -1,21 +1,21 @@
 <?php
 /**
- * Advanced analysis
+ * 0-day Amalytics
  *
  * Do WP Advanced Analysis
  *
- * @package   advanced-analysis
+ * @package   0-day-analytics
  * @author    sdobreff
  * @copyright Copyright (C) 2023-%%YEAR%%, Advanced analysis
  * @license   GPL v3
- * @link      https://wordpress.org/plugins/advanced-analysis/
+ * @link      https://wordpress.org/plugins/0-day-analytics/
  *
  * Plugin Name:     Advanced analysis
  * Description:     Allows admins to do WP analytics.
  * Version:         1.0.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
- * Text Domain:     advanced-analysis
+ * Text Domain:     0-day-analytics
  * License:         GPL v3
  * License URI:     http://www.gnu.org/licenses/gpl-3.0.txt
  * Requires PHP:    7.4
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'ADVAN_VERSION', '1.0.1' );
-define( 'ADVAN_TEXTDOMAIN', 'advanced-analysis' );
+define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
 define( 'ADVAN_PLUGIN_ROOT_URL', \plugin_dir_url( __FILE__ ) );
@@ -40,7 +40,7 @@ define( 'ADVAN_PLUGIN_BASENAME', \plugin_basename( __FILE__ ) );
 define( 'ADVAN_PLUGIN_ABSOLUTE', __FILE__ );
 define( 'ADVAN_MIN_PHP_VERSION', '7.4' );
 define( 'ADVAN_WP_VERSION', '6.0' );
-define( 'ADVAN_SETTINGS_NAME', 'advanced-analysis_options' );
+define( 'ADVAN_SETTINGS_NAME', '0-day-analytics_options' );
 
 if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 	\add_action(

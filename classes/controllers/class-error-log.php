@@ -50,19 +50,19 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 				if ( ! $error_logging_enabled ) {
 					return new \WP_Error(
 						'log_errors_off',
-						__( 'Error logging is disabled.', 'advanced-analysis' )
+						__( 'Error logging is disabled.', '0-day-analytics' )
 					);
 				} elseif ( empty( self::$log_file ) ) {
 					return new \WP_Error(
 						'error_log_not_set',
-						__( 'Error log filename is not set.', 'advanced-analysis' )
+						__( 'Error log filename is not set.', '0-day-analytics' )
 					);
 				} elseif ( ( strpos( self::$log_file, '/' ) === false ) && ( strpos( self::$log_file, '\\' ) === false ) ) {
 					return new \WP_Error(
 						'error_log_uses_relative_path',
 						sprintf(
 						// translators: the name of the log file.
-							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', 'advanced-analysis' ),
+							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', '0-day-analytics' ),
 							esc_html( self::$log_file )
 						)
 					);
@@ -71,7 +71,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						'error_log_not_accessible',
 						sprintf(
 						// translators: the name of the log file.
-							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', 'advanced-analysis' ),
+							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', '0-day-analytics' ),
 							esc_html( self::$log_file )
 						)
 					);
@@ -81,7 +81,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 							'error_log_not_accessible',
 							sprintf(
 							// translators: the name of the log file.
-								__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', 'advanced-analysis' ),
+								__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', '0-day-analytics' ),
 								esc_html( self::$log_file )
 							)
 						);
