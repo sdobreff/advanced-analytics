@@ -6,11 +6,11 @@
  *
  * @package   0-day-analytics
  * @author    sdobreff
- * @copyright Copyright (C) 2023-%%YEAR%%, Advanced analysis
+ * @copyright Copyright (C) 2023-%%YEAR%%, Advanced analytics
  * @license   GPL v3
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
- * Plugin Name:     Advanced analysis
+ * Plugin Name:     Advanced analytics
  * Description:     Allows admins to do WP analytics.
  * Version:         1.0.1
  * Author:          Stoil Dobrev
