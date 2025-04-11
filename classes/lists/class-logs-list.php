@@ -958,8 +958,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 					<?php
 					foreach ( Settings::get_current_options()['severities'] as $class => $properties ) {
-						echo '.generated-logs .' . $class . '{ background: ' . $properties['color'] . ' !important;}';
-						echo '#the-list .' . ( ( \in_array( $class, array( 'fatal', 'warning' ), true ) ) ? $class . ' td { color: #6C6262 !important;}' : $class . ' td { color: #252630 !important;}' );
+
+						$color = '#252630';
+
+						$color = ( \in_array( $class, array( 'warning' ), true ) ) ? '#6C6262' : $color;
+						$color = ( \in_array( $class, array( 'parse', 'fatal' ), true ) ) ? '#fff' : $color;
+
+						echo '.generated-logs .' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important;}';
+						echo '#the-list .' . \esc_attr( $class ) . ' td { color: ' . \esc_attr( $color ) . ' !important;}';
 						echo '#the-list td { color: #fff !important; }';
 						echo '#the-list tr { background: #1d456b;}';
 
