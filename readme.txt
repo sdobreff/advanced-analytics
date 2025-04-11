@@ -18,6 +18,8 @@ Advanced Analytics is a powerful plugin designed for WordPress sites with extens
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
+You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?preview=1&networking=yes "WP Playground") or use the "Live Preview" button on the WordPress plugin page.
+
 **Key Features**:
 - Handles gigabyte-sized error logs seamlessly.
 - Option to enable or disable logging via the admin interface.
