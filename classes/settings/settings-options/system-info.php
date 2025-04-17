@@ -12,7 +12,7 @@ use ADVAN\Helpers\System_Status;
 
 Settings::build_option(
 	array(
-		'title' => esc_html__( 'System Info', 'advanced-analytics' ),
+		'title' => esc_html__( 'System Info', '0-day-analytics' ),
 		'id'    => 'advanced-settings-tab',
 		'type'  => 'tab-title',
 	)
@@ -22,7 +22,7 @@ Settings::build_option(
 	array(
 		'type'  => 'header',
 		'id'    => 'advanced-settings',
-		'title' => esc_html__( 'Environment Information', 'advanced-analytics' ),
+		'title' => esc_html__( 'Environment Information', '0-day-analytics' ),
 	)
 );
 

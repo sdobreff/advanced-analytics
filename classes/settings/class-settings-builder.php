@@ -6,7 +6,7 @@
  *
  * @package awesome-footnotes
  *
- * @since latest
+ * @since 
  */
 
 // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 	 *
 	 * @package awe
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class Settings_Builder {
 		/**
@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $item_id;
 
@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $item_id_attr;
 
@@ -55,7 +55,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $item_id_wrap;
 
@@ -64,7 +64,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $name_attr;
 
@@ -73,7 +73,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $placeholder_attr;
 
@@ -82,7 +82,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $custom_class;
 
@@ -91,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var mixed
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $current_value;
 
@@ -100,7 +100,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $option_type;
 
@@ -109,7 +109,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $option_name;
 
@@ -118,7 +118,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static $settings;
 
@@ -203,7 +203,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function create( $settings, $option_name, $data ) {
 
@@ -366,7 +366,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * HTML code
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function html() {
 
@@ -378,7 +378,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Setting Description
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function hint() {
 
@@ -394,11 +394,11 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Upload
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function upload() {
 
-			$upload_button = ! empty( self::$settings['custom_text'] ) ? self::$settings['custom_text'] : esc_html__( 'Upload', 'advanced-analytics' );
+			$upload_button = ! empty( self::$settings['custom_text'] ) ? self::$settings['custom_text'] : esc_html__( 'Upload', '0-day-analytics' );
 			$image_preview = ! empty( self::$current_value ) ? self::$current_value : '/framework/admin/assets/images/empty.png';
 			$hide_preview  = ! empty( self::$current_value ) ? '' : 'style="display:none"';
 			?>
@@ -423,11 +423,11 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Upload Font
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function upload_font() {
 
-			$upload_button = ! empty( self::$settings['custom_text'] ) ? self::$settings['custom_text'] : esc_html__( 'Upload', 'advanced-analytics' );
+			$upload_button = ! empty( self::$settings['custom_text'] ) ? self::$settings['custom_text'] : esc_html__( 'Upload', '0-day-analytics' );
 			?>
 
 			<div class="image-preview-wrapper">
@@ -444,7 +444,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Text
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function text() {
 			$type_attr  = 'type="text"';
@@ -476,7 +476,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Text Array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function text_array() {
 
@@ -493,7 +493,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Checkbox
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function checkbox() {
 
@@ -512,7 +512,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Radio
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function radio() {
 
@@ -588,7 +588,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Multiple Select
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function multiple_select() {
 			?>
@@ -617,7 +617,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Textarea
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function textarea() {
 			?>
@@ -629,7 +629,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Color
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function color() {
 
@@ -649,7 +649,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Posts selector
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function posts() {
 			?>
@@ -687,7 +687,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Post
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function post() {
 			?>
@@ -703,7 +703,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Editor
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function editor() {
 
@@ -730,7 +730,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Fonts
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function fonts() {
 			?>
@@ -741,7 +741,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Tab Title
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function tab_title() {
 			?>
@@ -757,7 +757,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Notice Message
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function notice_message() {
 
@@ -779,7 +779,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Hidden
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function hidden() {
 			?>
@@ -790,7 +790,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Number
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function number() {
 			?>
@@ -801,7 +801,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Section Head
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function section_head() {
 			?>
@@ -823,7 +823,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Option Head
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function option_head() {
 			// Everything is ok with not closed div - dont worry about it.
@@ -849,7 +849,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Visual
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function visual() {
 			?>
@@ -973,14 +973,14 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Gallery
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function gallery() {
 			?>
 
 			<input id="<?php echo esc_attr( self::$item_id ); ?>-upload" type="button"
 			class="aadvana-upload-image aadvana-primary-buttonton button button-primary button-large"
-			value="<?php esc_html_e( 'Add Image', 'advanced-analytics' ); ?>">
+			value="<?php esc_html_e( 'Add Image', '0-day-analytics' ); ?>">
 
 			<ul id="<?php echo esc_attr( self::$item_id ); ?>-gallery-items" class="aadvana-gallery-items">
 				<?php
@@ -1030,12 +1030,12 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					event) {
 					event.preventDefault();
 					awef_slider_uploader = wp.media.frames.awef_slider_uploader = wp.media({
-						title: '<?php esc_html_e( 'Add Image', 'advanced-analytics' ); ?>',
+						title: '<?php esc_html_e( 'Add Image', '0-day-analytics' ); ?>',
 						library: {
 							type: 'image'
 						},
 						button: {
-							text: '<?php esc_html_e( 'Select', 'advanced-analytics' ); ?>'
+							text: '<?php esc_html_e( 'Select', '0-day-analytics' ); ?>'
 						},
 						multiple: true,
 					});
@@ -1072,7 +1072,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Icon
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function icon() {
 			?>
@@ -1089,7 +1089,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Select
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function select() {
 			?>
@@ -1163,7 +1163,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Background
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function background() {
 
@@ -1178,7 +1178,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 									?>
 			">
 			<input id="upload_<?php echo esc_attr( self::$item_id ); ?>_button" type="button" class="button"
-			value="<?php esc_html_e( 'Upload', 'advanced-analytics' ); ?>">
+			value="<?php esc_html_e( 'Upload', '0-day-analytics' ); ?>">
 
 			<div class="aadvana-background-options">
 
@@ -1190,25 +1190,25 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					if ( ! empty( $current_value['repeat'] ) ) {
 						selected( $current_value['repeat'], 'no-repeat' );}
 					?>
-					><?php esc_html_e( 'no-repeat', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'no-repeat', '0-day-analytics' ); ?></option>
 					<option value="repeat" 
 					<?php
 					if ( ! empty( $current_value['repeat'] ) ) {
 						selected( $current_value['repeat'], 'repeat' );}
 					?>
-					><?php esc_html_e( 'Tile', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Tile', '0-day-analytics' ); ?></option>
 					<option value="repeat-x" 
 					<?php
 					if ( ! empty( $current_value['repeat'] ) ) {
 						selected( $current_value['repeat'], 'repeat-x' );}
 					?>
-					><?php esc_html_e( 'Tile Horizontally', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Tile Horizontally', '0-day-analytics' ); ?></option>
 					<option value="repeat-y" 
 					<?php
 					if ( ! empty( $current_value['repeat'] ) ) {
 						selected( $current_value['repeat'], 'repeat-y' );}
 					?>
-					><?php esc_html_e( 'Tile Vertically', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Tile Vertically', '0-day-analytics' ); ?></option>
 				</select>
 
 				<select name="<?php echo esc_attr( self::$option_name ); ?>[attachment]"
@@ -1219,19 +1219,19 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					if ( ! empty( $current_value['attachment'] ) ) {
 						selected( $current_value['attachment'], 'fixed' );}
 					?>
-					><?php esc_html_e( 'Fixed', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Fixed', '0-day-analytics' ); ?></option>
 					<option value="scroll" 
 					<?php
 					if ( ! empty( $current_value['attachment'] ) ) {
 						selected( $current_value['attachment'], 'scroll' );}
 					?>
-					><?php esc_html_e( 'Scroll', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Scroll', '0-day-analytics' ); ?></option>
 					<option value="cover" 
 					<?php
 					if ( ! empty( $current_value['attachment'] ) ) {
 						selected( $current_value['attachment'], 'cover' );}
 					?>
-					><?php esc_html_e( 'Cover', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Cover', '0-day-analytics' ); ?></option>
 				</select>
 
 				<select name="<?php echo esc_attr( self::$option_name ); ?>[hor]"
@@ -1242,19 +1242,19 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					if ( ! empty( $current_value['hor'] ) ) {
 						selected( $current_value['hor'], 'left' );}
 					?>
-					><?php esc_html_e( 'Left', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Left', '0-day-analytics' ); ?></option>
 					<option value="right" 
 					<?php
 					if ( ! empty( $current_value['hor'] ) ) {
 						selected( $current_value['hor'], 'right' );}
 					?>
-					><?php esc_html_e( 'Right', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Right', '0-day-analytics' ); ?></option>
 					<option value="center" 
 					<?php
 					if ( ! empty( $current_value['hor'] ) ) {
 						selected( $current_value['hor'], 'center' );}
 					?>
-					><?php esc_html_e( 'Center', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Center', '0-day-analytics' ); ?></option>
 				</select>
 
 				<select name="<?php echo esc_attr( self::$option_name ); ?>[ver]"
@@ -1265,19 +1265,19 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					if ( ! empty( $current_value['ver'] ) ) {
 						selected( $current_value['ver'], 'top' );}
 					?>
-					><?php esc_html_e( 'Top', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Top', '0-day-analytics' ); ?></option>
 					<option value="bottom" 
 					<?php
 					if ( ! empty( $current_value['ver'] ) ) {
 						selected( $current_value['ver'], 'bottom' );}
 					?>
-					><?php esc_html_e( 'Bottom', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Bottom', '0-day-analytics' ); ?></option>
 					<option value="center" 
 					<?php
 					if ( ! empty( $current_value['ver'] ) ) {
 						selected( $current_value['ver'], 'center' );}
 					?>
-					><?php esc_html_e( 'Center', 'advanced-analytics' ); ?></option>
+					><?php esc_html_e( 'Center', '0-day-analytics' ); ?></option>
 				</select>
 			</div>
 
@@ -1296,7 +1296,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					}
 					?>
 					" alt="">
-				<a class="del-img" title="<?php esc_html_e( 'Remove', 'advanced-analytics' ); ?>"></a>
+				<a class="del-img" title="<?php esc_html_e( 'Remove', '0-day-analytics' ); ?>"></a>
 			</div>
 
 			<?php
@@ -1305,7 +1305,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Typography
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function typography() {
 
@@ -1326,8 +1326,8 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					id="<?php echo esc_attr( self::$settings['id'] ); ?>[size]">
 
 					<option <?php selected( $current_value['size'], '' ); ?> <?php disabled( 1, 1 ); ?>>
-						<?php esc_html_e( 'Font Size in Pixels', 'advanced-analytics' ); ?></option>
-					<option value=""><?php esc_html_e( 'Default', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Font Size in Pixels', '0-day-analytics' ); ?></option>
+					<option value=""><?php esc_html_e( 'Default', '0-day-analytics' ); ?></option>
 					<?php for ( $i = 8; $i < 61; $i++ ) { ?>
 					<option value="<?php echo ( $i ); ?>" <?php selected( $current_value['size'], $i ); ?>>
 						<?php echo ( $i ); ?></option>
@@ -1340,8 +1340,8 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					id="<?php echo esc_attr( self::$settings['id'] ); ?>[line_height]">
 
 					<option <?php selected( $current_value['line_height'], '' ); ?> <?php disabled( 1, 1 ); ?>>
-						<?php esc_html_e( 'Line Height', 'advanced-analytics' ); ?></option>
-					<option value=""><?php esc_html_e( 'Default', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Line Height', '0-day-analytics' ); ?></option>
+					<option value=""><?php esc_html_e( 'Default', '0-day-analytics' ); ?></option>
 
 					<?php
 					for ( $i = 10; $i <= 60; $i += 2.5 ) {
@@ -1359,26 +1359,26 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 				<select name="<?php echo esc_attr( self::$option_name ); ?>[weight]"
 					id="<?php echo esc_attr( self::$settings['id'] ); ?>[weight]">
 					<option <?php selected( $current_value['weight'], '' ); ?> <?php disabled( 1, 1 ); ?>>
-						<?php esc_html_e( 'Font Weight', 'advanced-analytics' ); ?></option>
-					<option value=""><?php esc_html_e( 'Default', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Font Weight', '0-day-analytics' ); ?></option>
+					<option value=""><?php esc_html_e( 'Default', '0-day-analytics' ); ?></option>
 					<option value="100" <?php selected( $current_value['weight'], 100 ); ?>>
-						<?php esc_html_e( 'Thin 100', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Thin 100', '0-day-analytics' ); ?></option>
 					<option value="200" <?php selected( $current_value['weight'], 200 ); ?>>
-						<?php esc_html_e( 'Extra 200 Light', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Extra 200 Light', '0-day-analytics' ); ?></option>
 					<option value="300" <?php selected( $current_value['weight'], 300 ); ?>>
-						<?php esc_html_e( 'Light 300', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Light 300', '0-day-analytics' ); ?></option>
 					<option value="400" <?php selected( $current_value['weight'], 400 ); ?>>
-						<?php esc_html_e( 'Regular 400', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Regular 400', '0-day-analytics' ); ?></option>
 					<option value="500" <?php selected( $current_value['weight'], 500 ); ?>>
-						<?php esc_html_e( 'Medium 500', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Medium 500', '0-day-analytics' ); ?></option>
 					<option value="600" <?php selected( $current_value['weight'], 600 ); ?>>
-						<?php esc_html_e( 'Semi 600 Bold', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Semi 600 Bold', '0-day-analytics' ); ?></option>
 					<option value="700" <?php selected( $current_value['weight'], 700 ); ?>>
-						<?php esc_html_e( 'Bold 700', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Bold 700', '0-day-analytics' ); ?></option>
 					<option value="800" <?php selected( $current_value['weight'], 800 ); ?>>
-						<?php esc_html_e( 'Extra 800 Bold', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Extra 800 Bold', '0-day-analytics' ); ?></option>
 					<option value="900" <?php selected( $current_value['weight'], 900 ); ?>>
-						<?php esc_html_e( 'Black 900', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Black 900', '0-day-analytics' ); ?></option>
 				</select>
 			</div>
 
@@ -1387,14 +1387,14 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 					id="<?php echo esc_attr( self::$settings['id'] ); ?>[transform]">
 
 					<option <?php selected( $current_value['transform'], '' ); ?> <?php disabled( 1, 1 ); ?>>
-						<?php esc_html_e( 'Capitalization', 'advanced-analytics' ); ?></option>
-					<option value=""><?php esc_html_e( 'Default', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Capitalization', '0-day-analytics' ); ?></option>
+					<option value=""><?php esc_html_e( 'Default', '0-day-analytics' ); ?></option>
 					<option value="uppercase" <?php selected( $current_value['transform'], 'uppercase' ); ?>>
-						<?php esc_html_e( 'UPPERCASE', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'UPPERCASE', '0-day-analytics' ); ?></option>
 					<option value="capitalize" <?php selected( $current_value['transform'], 'capitalize' ); ?>>
-						<?php esc_html_e( 'Capitalize', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'Capitalize', '0-day-analytics' ); ?></option>
 					<option value="lowercase" <?php selected( $current_value['transform'], 'lowercase' ); ?>>
-						<?php esc_html_e( 'lowercase', 'advanced-analytics' ); ?></option>
+						<?php esc_html_e( 'lowercase', '0-day-analytics' ); ?></option>
 				</select>
 			</div>
 			<?php
@@ -1407,7 +1407,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 * @param string $option_name - Name of the option.
 		 * @param mixed  $data - The data to show.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function prepare_data( $settings, $option_name, $data ) {
 

@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced analytics
  * Description:     Allows admins to do WP analytics.
- * Version:         1.0.1
+ * Version:         1.1.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'We\'re sorry, but you can not directly access this file.' );
 }
 
-define( 'ADVAN_VERSION', '1.0.1' );
+define( 'ADVAN_VERSION', '1.1.0' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -59,7 +59,7 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 						// translators: the minimum version of the PHP required by the plugin.
 						__(
 							'"%1$s" requires PHP %2$s or newer. Plugin is automatically deactivated.',
-							'advanced-analytics'
+							'0-day-analytics'
 						),
 						ADVAN_NAME,
 						ADVAN_MIN_PHP_VERSION
@@ -90,7 +90,7 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 						// translators: the mbstring extensions is required by the plugin.
 						__(
 							'"%1$s" requires multi byte string extension loaded. Plugin is automatically deactivated.',
-							'advanced-analytics'
+							'0-day-analytics'
 						)
 					)
 				)
@@ -121,7 +121,7 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 	 *
 	 * @return bool
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	function str_starts_with( $haystack, $needle ): bool {
 		if ( '' === $needle ) {

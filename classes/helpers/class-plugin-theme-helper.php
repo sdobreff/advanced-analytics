@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $plugins = array();
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $themes = array();
 
@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $theme_path = '';
 
@@ -56,7 +56,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_plugins(): array {
 			if ( empty( self::$plugins ) ) {
@@ -73,7 +73,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_plugin_from_path( string $path_name ): array {
 			foreach ( self::get_plugins() as $path => $plugin ) {
@@ -92,7 +92,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return \WP_Theme|false
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_theme_from_path( string $path_name ) {
 
@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_default_path_for_themes(): string {
 
@@ -146,7 +146,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function is_plugin_active( string $plugin_slug ): bool {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';

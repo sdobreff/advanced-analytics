@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 	/**
 	 * Responsible for reding lines from the end of file.
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class Reverse_Line_Reader {
 		const BUFFER_SIZE = 4096;
@@ -31,7 +31,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $buffer = array( '' );
 
@@ -40,7 +40,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $buffer_size = self::BUFFER_SIZE;
 
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $file_size = 0;
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $pos = null;
 
@@ -67,7 +67,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var handle
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $temp_handle = null;
 
@@ -76,15 +76,19 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @param string|resource $file_or_handle - The file or handle to read from.
 		 * @param function        $callback - The function to call back when result is returned.
-		 * @param integer         $max_ines - Maximum number of lines to read.
+		 * @param integer         $max_lines - Maximum number of lines to read.
 		 * @param int|null        $pos - The current position to start reading from.
 		 * @param bool            $temp_writer - Whether to write the error log to a temporary file or not.
 		 *
 		 * @return void|bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
-		public static function read_file_from_end( $file_or_handle, $callback, $max_ines = 0, $pos = null, bool $temp_writer = true ) {
+		public static function read_file_from_end( $file_or_handle, $callback, $max_lines = 0, $pos = null, bool $temp_writer = true ) {
+			if ( \is_a( $file_or_handle, 'WP_Error' ) ) {
+				return $file_or_handle;
+			}
+
 			if ( null === $pos ) {
 				self::$pos    = -1;
 				self::$buffer = array( '' );
@@ -156,7 +160,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			}
 			$result = $callback( $line, self::$pos );
 
-			if ( false === $result ) {
+			if ( true === $result['close'] ) {
 				\fclose( $handle );
 
 				return;
@@ -164,16 +168,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			// if ( false === $char ) {
 			// return;
 			// }
-			if ( $max_ines > 0 ) {
-				--$max_ines;
-				if ( 0 === $max_ines ) {
+			if ( $max_lines > 0 ) {
+				if ( $result['line_done'] ) {
+					--$max_lines;
+				}
+				if ( 0 === $max_lines ) {
 					\fclose( $handle );
 
 					return;
 				}
 			}
 
-			self::read_file_from_end( $handle, $callback, $max_ines, self::$pos, $temp_writer );
+			self::read_file_from_end( $handle, $callback, $max_lines, self::$pos, $temp_writer );
 		}
 
 		/**
@@ -184,7 +190,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return string|false
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function read( int $size, &$file_or_handle ) {
 			self::$pos -= $size;
@@ -205,7 +211,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function readline( &$file_or_handle ) {
 			$buffer =& self::$buffer;
@@ -239,7 +245,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function write_temp_file( string $line ) {
 			if ( null === self::$temp_handle ) {
@@ -254,7 +260,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function read_temp_file() {
 			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {

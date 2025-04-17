@@ -27,13 +27,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 	class Log_Line_Parser {
 
 		public const TIMESTAMP_TRANSIENT = 'advan_timestamp';
+		public const LINES_TRANSIENT     = 'advan_newer_lines';
 
 		/**
 		 * Holds the last timestamp read from the log file.
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $last_timestamp = null;
 
@@ -42,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $last_parsed_timestamp = null;
 
@@ -51,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $newer_lines = 0;
 
@@ -62,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array An associative array containing the parsed data.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function parse_php_error_log_line( string $line ) {
 			$line      = rtrim( $line );
@@ -99,7 +100,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					if ( ! empty( $parsed_timestamp ) ) {
 						$timestamp = $parsed_timestamp;
 
-						self::$last_timestamp = $timestamp;
+						if ( $timestamp > self::$last_timestamp ) {
+							self::$last_timestamp = $timestamp;
+						}
 
 						if ( (int) self::get_last_parsed_timestamp() < self::$last_timestamp ) {
 							++self::$newer_lines;
@@ -142,7 +145,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array|null - The parsed context or null if not found.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function parse_context_line( $message ) {
 			if ( ! preg_match( '@^\[(ELM_context_\d{1,8}?)\]@', $message, $matches ) ) {
@@ -180,7 +183,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array An associative array containing the parsed data.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function parse_php_error_log_stack_line( $message, $is_last_line = false ) {
 			// It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()".
@@ -248,7 +251,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return bool|null
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function parse_entry_with_stack_trace( string $line ) {
 			if ( false !== \strpos( $line, 'throw' ) || false !== \strpos( $line, 'Stack trace' ) ) {
@@ -263,16 +266,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function store_last_parsed_timestamp() {
 			if ( null !== self::$last_timestamp ) {
 
-				if ( false === self::get_last_parsed_timestamp() ) {
-					\set_transient( self::TIMESTAMP_TRANSIENT, self::$last_timestamp - 1, 600 ); // get back 1 second - sometimes there delays.
+				if ( false === self::get_last_parsed_timestamp() || self::$last_timestamp > (int) self::get_last_parsed_timestamp() ) {
+					self::$last_parsed_timestamp = self::$last_timestamp;
+					\set_transient( self::TIMESTAMP_TRANSIENT, self::$last_timestamp, 600 );
 				}
 
-				if ( 1 <= ( $count = self::get_newer_lines() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
+				if ( 1 <= ( $count = self::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					?>
 					<script>
 						if (jQuery('#advan-errors-menu .update-count').length) {
@@ -288,16 +292,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		/**
 		 * Returns the last known Timestamp transient.
 		 *
-		 * @return null|string
+		 * @return bool|string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_last_parsed_timestamp() {
 			if ( null === self::$last_parsed_timestamp ) {
 				self::$last_parsed_timestamp = \get_transient( self::TIMESTAMP_TRANSIENT );
 				if ( false === self::$last_parsed_timestamp ) {
-					self::$last_parsed_timestamp = null;
-					return false;
+
+					return self::$last_parsed_timestamp;
 				}
 			}
 
@@ -309,7 +313,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function delete_last_parsed_timestamp() {
 			self::$last_parsed_timestamp = null;
@@ -322,11 +326,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_newer_lines(): int {
 			$lines             = (int) self::$newer_lines;
 			self::$newer_lines = 0;
+
+			return $lines;
+		}
+
+		public static function get_lines_to_show_interface() {
+			$lines = self::get_newer_lines();
+
+			if ( 0 >= $lines ) {
+				$lines = (int) \get_transient( self::LINES_TRANSIENT );
+			} else {
+				\set_transient( self::LINES_TRANSIENT, $lines, 600 );
+			}
+
 			return $lines;
 		}
 	}

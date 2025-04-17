@@ -11,7 +11,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Options', 'advanced-analytics' ),
+			'title' => esc_html__( 'Options', '0-day-analytics' ),
 			'id'    => 'options-settings-tab',
 			'type'  => 'tab-title',
 		)
@@ -20,7 +20,7 @@ use ADVAN\Helpers\Settings;
 	// Markup used.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Suppress footnotes', 'advanced-analytics' ),
+			'title' => esc_html__( 'Suppress footnotes', '0-day-analytics' ),
 			'id'    => 'markup-format-settings',
 			'type'  => 'header',
 		)
@@ -28,17 +28,17 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Do not autodisplay in posts', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Do not autodisplay in posts', '0-day-analytics' ),
 			'id'      => 'no_display_post',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_post'],
-			'hint'    => esc_html__( 'Use this option if you want to display footnotes on separate place other than below the post (default). To achieve that you have to either use a shortcode ([awef_show_footnotes]), or direct PHP call (Footnotes_Formatter::show_footnotes();).', 'advanced-analytics' ),
+			'hint'    => esc_html__( 'Use this option if you want to display footnotes on separate place other than below the post (default). To achieve that you have to either use a shortcode ([awef_show_footnotes]), or direct PHP call (Footnotes_Formatter::show_footnotes();).', '0-day-analytics' ),
 		)
 	);
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'On the home page', 'advanced-analytics' ),
+			'name'    => esc_html__( 'On the home page', '0-day-analytics' ),
 			'id'      => 'no_display_home',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_home'],
@@ -47,7 +47,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'When displaying a preview', 'advanced-analytics' ),
+			'name'    => esc_html__( 'When displaying a preview', '0-day-analytics' ),
 			'id'      => 'no_display_preview',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_preview'],
@@ -56,7 +56,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'In search results', 'advanced-analytics' ),
+			'name'    => esc_html__( 'In search results', '0-day-analytics' ),
 			'id'      => 'no_display_search',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_search'],
@@ -65,7 +65,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'In the feed (RSS, Atom, etc.)', 'advanced-analytics' ),
+			'name'    => esc_html__( 'In the feed (RSS, Atom, etc.)', '0-day-analytics' ),
 			'id'      => 'no_display_feed',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_feed'],
@@ -74,7 +74,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'In any kind of archive', 'advanced-analytics' ),
+			'name'    => esc_html__( 'In any kind of archive', '0-day-analytics' ),
 			'id'      => 'no_display_archive',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_archive'],
@@ -83,7 +83,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'In category archives', 'advanced-analytics' ),
+			'name'    => esc_html__( 'In category archives', '0-day-analytics' ),
 			'id'      => 'no_display_category',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_category'],
@@ -92,7 +92,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'in date-based archives', 'advanced-analytics' ),
+			'name'    => esc_html__( 'in date-based archives', '0-day-analytics' ),
 			'id'      => 'no_display_date',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['no_display_date'],
@@ -102,7 +102,7 @@ use ADVAN\Helpers\Settings;
 	// Priority.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Priority', 'advanced-analytics' ),
+			'title' => esc_html__( 'Priority', '0-day-analytics' ),
 			'id'    => 'priority-format-settings',
 			'type'  => 'header',
 		)
@@ -110,7 +110,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Plugin priority', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Plugin priority', '0-day-analytics' ),
 			'id'      => 'priority',
 			'type'    => 'number',
 			'default' => Settings::get_current_options()['priority'],
@@ -120,7 +120,7 @@ use ADVAN\Helpers\Settings;
 	// Combine footnotes.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Combine footnotes', 'advanced-analytics' ),
+			'title' => esc_html__( 'Combine footnotes', '0-day-analytics' ),
 			'id'    => 'priority-format-settings',
 			'type'  => 'header',
 		)
@@ -128,7 +128,7 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Combine identical footnotes', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Combine identical footnotes', '0-day-analytics' ),
 			'id'      => 'combine_identical_notes',
 			'type'    => 'checkbox',
 			'default' => Settings::get_current_options()['combine_identical_notes'],
@@ -138,7 +138,7 @@ use ADVAN\Helpers\Settings;
 	// Custom CSS.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Styling (CSS)', 'advanced-analytics' ),
+			'title' => esc_html__( 'Styling (CSS)', '0-day-analytics' ),
 			'id'    => 'markup-format-settings',
 			'type'  => 'header',
 		)
@@ -146,10 +146,10 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'CSS footnotes', 'advanced-analytics' ),
+			'name'    => esc_html__( 'CSS footnotes', '0-day-analytics' ),
 			'id'      => 'css_footnotes',
 			'type'    => 'textarea',
-			'hint'    => esc_html__( 'You can change the footnotes styling from here or leave it empty if you are using your own.', 'advanced-analytics' ),
+			'hint'    => esc_html__( 'You can change the footnotes styling from here or leave it empty if you are using your own.', '0-day-analytics' ),
 			'default' => Settings::get_current_options()['css_footnotes'],
 		)
 	);
@@ -157,7 +157,7 @@ use ADVAN\Helpers\Settings;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div class="symbol-example">' .
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div class="symbol-example">' .
 			$footnote_example
 			. '</div>',
 		)

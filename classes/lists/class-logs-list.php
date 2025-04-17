@@ -132,7 +132,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $read_items = array();
 
@@ -221,10 +221,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
 				// 'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
-				'timestamp'    => __( 'Time', 'advanced-analytics' ),
-				'severity'     => __( 'Severity', 'advanced-analytics' ),
-				'message'      => __( 'Message', 'advanced-analytics' ),
-				'plugin_theme' => __( 'Source', 'advanced-analytics' ),
+				'timestamp'    => __( 'Time', '0-day-analytics' ),
+				'severity'     => __( 'Severity', '0-day-analytics' ),
+				'message'      => __( 'Message', '0-day-analytics' ),
+				'plugin_theme' => __( 'Source', '0-day-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -356,7 +356,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @return void
 		 */
 		public function no_items() {
-			\esc_html_e( 'No reports found', 'advanced-analytics' );
+			\esc_html_e( 'No reports found', '0-day-analytics' );
 		}
 
 		/**
@@ -381,7 +381,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_error_items( bool $write_temp = true, $items = false ): array {
 
@@ -394,12 +394,26 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				\set_time_limit( 0 );
 			}
 
+			$file = Error_Log::autodetect();
+
+			if ( \is_a( $file, 'WP_Error' ) ) {
+				return array(
+					array(
+						'message'   => Error_Log::get_last_error(),
+						'timestamp' => time(),
+					),
+				);
+			}
+
 			while ( empty( $errors ) ) {
 				$result = Reverse_Line_Reader::read_file_from_end(
-					Error_Log::autodetect(),
+					$file,
 					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
 
 						$position = $pos;
+
+						// Flag that holds the status of the error - are there more lines to read or not.
+						$more_to_error = false;
 
 						// Check if this is the last line, and if not try to parse the line.
 						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
@@ -415,6 +429,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 									$collected_items = array();
 								}
 								$errors[] = $parsed_data;
+								$more_to_error = false;
 							} elseif ( \is_array( $parsed_data ) ) {
 								if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
 									$collected_items[] = array(
@@ -423,8 +438,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 								} else {
 									$collected_items[] = $parsed_data;
 								}
+
+								$more_to_error = true;
 							}
+						} elseif (!empty($line)){
+							$more_to_error = true;
 						}
+
+						return ['line_done' => !$more_to_error, 'close'=> false];
 
 						// if ( ! str_contains( $address, 'stop_word' ) ) {
 						// echo "\nFound 'stop_word'!"; .
@@ -509,7 +530,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				case 'message':
 					$message = esc_html( $item[ $column_name ] );
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
-						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', 'advanced-analytics' ) . '"></div>';
+						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', '0-day-analytics' ) . '"></div>';
 
 						$reversed_details = \array_reverse( $item['sub_items'] );
 						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px; overflow-y:auto;">';
@@ -579,13 +600,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
 								$name = $theme->get( 'Name' );
 
-								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', 'advanced-analytics' );
+								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', '0-day-analytics' );
 
 								$parent = $theme->parent(); // ( 'parent_theme' );
 								if ( $parent ) {
 									$parent = $theme->parent()->get( 'Name' );
 
-									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', 'advanced-analytics' ) . $parent . '</div>' : '';
+									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', '0-day-analytics' ) . $parent . '</div>' : '';
 								}
 								$name .= (string) $parent;
 
@@ -775,7 +796,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 5.0.0
 		 */
 		public static function add_screen_options( $hook ) {
-			$screen_options = array( 'per_page' => __( 'Number of errors to read', 'advanced-analytics' ) );
+			$screen_options = array( 'per_page' => __( 'Number of errors to read', '0-day-analytics' ) );
 
 			$result = array();
 
@@ -828,7 +849,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param string $which - Position of the nav.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public function extra_tablenav( $which ) {
 
@@ -839,16 +860,21 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			$log_file = Error_Log::extract_file_name( Error_Log::autodetect() );
 
+			if ( null !== Error_Log::get_last_error() ) {
+
+				echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
+			}
+
 			if ( false !== $log_file ) {
 
 				$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
 				$time             = \wp_date( $date_time_format, Error_Log::get_modification_time( Error_Log::autodetect() ) );
 
-				echo '<div><b>' . __( 'Log file: ', 'advanced-analytics' ) . '</b> ' . Error_Log::extract_file_name( Error_Log::autodetect() ) . '</div>';
-				echo '<div><b>' . __( 'File size: ', 'advanced-analytics' ) . '</b> ' . File_Helper::format_file_size( Error_Log::autodetect() ) . '</div>';
-				echo '<div><b>' . __( 'Last modified: ', 'advanced-analytics' ) . '</b> ' . $time . '</div>';
+				echo '<div><b>' . \esc_html__( 'Log file: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ) . '</div>';
+				echo '<div><b>' . \esc_html__( 'File size: ', '0-day-analytics' ) . '</b> ' . \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ) . '</div>';
+				echo '<div><b>' . \esc_html__( 'Last modified: ', '0-day-analytics' ) . '</b> ' . \esc_attr( $time ) . '</div>';
 			} else {
-				echo '<div><b>' . __( 'No log file detected', 'advanced-analytics' ) . '</b></div>';
+				echo '<div><b>' . \esc_html__( 'No log file detected', '0-day-analytics' ) . '</b></div>';
 			}
 
 			if ( 'top' === $which ) {
@@ -887,12 +913,22 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			}
 			if ( false !== $log_file ) {
 				?>
-			<div>
-				<?php if ( \current_user_can( 'manage_options' ) ) { ?>
-				<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', 'advanced-analytics' ); ?>" />
-				<?php } ?>
-				<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', 'advanced-analytics' ); ?>">
-			</div>
+				<div>
+					<?php
+					if ( \current_user_can( 'manage_options' ) ) {
+						if ( null === Error_Log::get_last_error() ) {
+							?>
+						
+
+							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
+							<?php
+						}
+						?>
+					<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
+						<?php
+					}
+					?>
+				</div>
 				<?php
 			}
 		}

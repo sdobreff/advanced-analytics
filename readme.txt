@@ -1,9 +1,9 @@
 === Advanced Analytics ===
 Tags: log, error log, 0-day, analytics
 Requires at least: 6.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -59,6 +59,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 
 == Changelog ==
+
+= 1.1.0 =  
+* Fixed lots of problems, code optimizations and functionality enhancements.
 
 = 1.0.1 =  
 * Small fixes and improvements.

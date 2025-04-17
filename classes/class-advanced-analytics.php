@@ -90,7 +90,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function add_settings_link( $links, $file ) {
 			if ( ADVAN_PLUGIN_BASENAME === $file ) {
-				$settings_link = '<a href="' . Settings::get_settings_page_link() . '">' . __( 'Settings', 'advanced-analytics' ) . '</a>';
+				$settings_link = '<a href="' . esc_url(Settings::get_settings_page_link()) . '">' . esc_html__( 'Settings', '0-day-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
 			}
 
@@ -112,7 +112,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		public static function plugin_meta( $links, $file ) {
 
 			if ( false !== strpos( $file, 'awesome-footnotes.php' ) ) {
-				$links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/awesome-footnotes">' . __( 'Support', 'advanced-analytics' ) . '</a>' ) );
+				$links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/awesome-footnotes">' . esc_html__( 'Support', '0-day-analytics' ) . '</a>' ) );
 			}
 
 			return $links;
@@ -127,7 +127,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function is_admin_page() {
 
-			return \is_admin() && ( false !== Settings::is_plugin_settings_page() );
+			return \is_admin() && ( Settings::is_plugin_settings_page() );
 		}
 
 		/**
@@ -196,8 +196,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				<?php
 				printf(
 					/* Translators: Plugin link. */
-					\esc_html__( 'Proudly powered by %s', 'advanced-analytics' ),
-					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/awesome-footnotes/', 'advanced-analytics' ) ) . '" rel="nofollow">' . \esc_attr( ADVAN_NAME ) . '</a>'
+					esc_html__( 'Proudly powered by %s', '0-day-analytics' ),
+					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/awesome-footnotes/', '0-day-analytics' ) ) . '" rel="nofollow">' . esc_attr( ADVAN_NAME ) . '</a>'
 				);
 				?>
 				-->
@@ -210,7 +210,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 */
 		public static function plugin_activate() {
 			\add_option( self::REDIRECT_OPTION_NAME, true );
@@ -221,7 +221,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.4.0
+		 * @since 1.0.0
 		 */
 		public static function plugin_redirect() {
 			if ( \get_option( self::REDIRECT_OPTION_NAME, false ) ) {

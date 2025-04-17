@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 
  */
 
 declare(strict_types=1);
@@ -348,32 +348,32 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			<table class="aadvana-status-table status-report widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th colspan="2" data-export-label="WordPress Environment"><?php esc_html_e( 'WordPress environment', 'advanced-analytics' ); ?></th>
+						<th colspan="2" data-export-label="WordPress Environment"><?php esc_html_e( 'WordPress environment', '0-day-analytics' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td data-export-label="Home URL"><?php esc_html_e( 'Home URL', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Home URL"><?php esc_html_e( 'Home URL', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $environment['home_url'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="Site URL"><?php esc_html_e( 'Site URL', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Site URL"><?php esc_html_e( 'Site URL', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $environment['site_url'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Version"><?php esc_html_e( 'WP version', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Version"><?php esc_html_e( 'WP version', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $environment['wp_version'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Multisite"><?php esc_html_e( 'WP multisite', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Multisite"><?php esc_html_e( 'WP multisite', '0-day-analytics' ); ?>:</td>
 						<td><?php echo ( $environment['wp_multisite'] ) ? '<span class="dashicons dashicons-yes"></span>' : '&ndash;'; ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Memory Limit"><?php esc_html_e( 'WP memory limit', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Memory Limit"><?php esc_html_e( 'WP memory limit', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['wp_memory_limit'] < 134217728 ) {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend setting memory to at least %2$s. To import the demo data %3$s of memory limit is required. See: %4$s', 'advanced-analytics' ), size_format( $environment['wp_memory_limit'] ), '128MB', '256MB', '<a href="https://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP" target="_blank">' . esc_html__( 'Increasing memory allocated to PHP', 'advanced-analytics' ) . '</a>' ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend setting memory to at least %2$s. To import the demo data %3$s of memory limit is required. See: %4$s', '0-day-analytics' ), size_format( $environment['wp_memory_limit'] ), '128MB', '256MB', '<a href="https://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP" target="_blank">' . esc_html__( 'Increasing memory allocated to PHP', '0-day-analytics' ) . '</a>' ) . '</mark>';
 						} else {
 							echo '<mark class="yes">' . size_format( $environment['wp_memory_limit'] ) . '</mark>';
 						}
@@ -381,7 +381,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Debug Mode"><?php esc_html_e( 'WP debug mode', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Debug Mode"><?php esc_html_e( 'WP debug mode', '0-day-analytics' ); ?>:</td>
 						<td>
 							<?php if ( $environment['wp_debug_mode'] ) : ?>
 								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
@@ -391,7 +391,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Debug Display"><?php esc_html_e( 'WP debug display errors in HTML', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Debug Display"><?php esc_html_e( 'WP debug display errors in HTML', '0-day-analytics' ); ?>:</td>
 						<td>
 							<?php if ( $environment['wp_debug_display'] ) : ?>
 								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
@@ -401,7 +401,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="WP Debug Log"><?php esc_html_e( 'WP debug log errors', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="WP Debug Log"><?php esc_html_e( 'WP debug log errors', '0-day-analytics' ); ?>:</td>
 						<td>
 							<?php if ( $environment['wp_debug_log'] ) : ?>
 								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
@@ -411,16 +411,16 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="Language"><?php esc_html_e( 'Language', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Language"><?php esc_html_e( 'Language', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $environment['language'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="Hide errors from visitors"><?php esc_html_e( 'Hide errors from visitors', 'advanced-analytics' ); ?></td>
+						<td data-export-label="Hide errors from visitors"><?php esc_html_e( 'Hide errors from visitors', '0-day-analytics' ); ?></td>
 						<td>
 							<?php if ( $environment['hide_errors'] ) : ?>
 								<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>
 							<?php else : ?>
-								<mark class="error"><span class="dashicons dashicons-warning"></span> <?php esc_html_e( 'Error messages can contain sensitive information about your website environment. These should be hidden from untrusted visitors.', 'advanced-analytics' ); ?></mark>
+								<mark class="error"><span class="dashicons dashicons-warning"></span> <?php esc_html_e( 'Error messages can contain sensitive information about your website environment. These should be hidden from untrusted visitors.', '0-day-analytics' ); ?></mark>
 							<?php endif; ?>
 						</td>
 					</tr>
@@ -431,22 +431,22 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			<table class="aadvana-status-table status-report widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th colspan="2" data-export-label="Server Environment"><?php esc_html_e( 'Server environment', 'advanced-analytics' ); ?></th>
+						<th colspan="2" data-export-label="Server Environment"><?php esc_html_e( 'Server environment', '0-day-analytics' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td data-export-label="Server Info"><?php esc_html_e( 'Server info', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Server Info"><?php esc_html_e( 'Server info', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $environment['server_info'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="PHP Version"><?php esc_html_e( 'PHP version', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="PHP Version"><?php esc_html_e( 'PHP version', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 							$php_version_requirements = '5.3';
 
 						if ( version_compare( $environment['php_version'], $php_version_requirements, '<' ) ) {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend a minimum PHP version of %2$s.', 'advanced-analytics' ), esc_html( $environment['php_version'] ), $php_version_requirements ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend a minimum PHP version of %2$s.', '0-day-analytics' ), esc_html( $environment['php_version'] ), $php_version_requirements ) . '</mark>';
 						} else {
 							echo '<mark class="yes">' . esc_html( $environment['php_version'] ) . '</mark>';
 						}
@@ -455,16 +455,16 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 					</tr>
 					<?php if ( function_exists( 'ini_get' ) ) : ?>
 						<tr>
-							<td data-export-label="PHP Post Max Size"><?php esc_html_e( 'PHP post max size', 'advanced-analytics' ); ?>:</td>
+							<td data-export-label="PHP Post Max Size"><?php esc_html_e( 'PHP post max size', '0-day-analytics' ); ?>:</td>
 							<td><?php esc_html_e( size_format( $environment['php_post_max_size'] ) ); ?></td>
 						</tr>
 						<tr>
-							<td data-export-label="PHP Execution Time Limit"><?php esc_html_e( 'PHP time limit', 'advanced-analytics' ); ?>:</td>
+							<td data-export-label="PHP Execution Time Limit"><?php esc_html_e( 'PHP time limit', '0-day-analytics' ); ?>:</td>
 							<td>
 								<?php
 
 								if ( 120 > $environment['php_max_execution_time'] && 0 != $environment['php_max_execution_time'] ) {
-									echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend setting max execution time to at least %2$s.', 'advanced-analytics' ), $environment['php_max_execution_time'], 120 ) . '</mark>';
+									echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - We recommend setting max execution time to at least %2$s.', '0-day-analytics' ), $environment['php_max_execution_time'], 120 ) . '</mark>';
 								} else {
 									esc_html_e( $environment['php_max_execution_time'] );
 								}
@@ -472,13 +472,13 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 							</td>
 						</tr>
 						<tr>
-							<td data-export-label="PHP Max Input Vars"><?php esc_html_e( 'PHP max input vars', 'advanced-analytics' ); ?>:</td>
+							<td data-export-label="PHP Max Input Vars"><?php esc_html_e( 'PHP max input vars', '0-day-analytics' ); ?>:</td>
 							<td>
 								<?php
 								if ( $environment['php_max_input_vars'] < 3000 ) {
 									echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' .
 									sprintf(
-										esc_html__( '%1$s - Recommended Value: %2$s. Max input vars limitation will truncate POST data such as menus.', 'advanced-analytics' ),
+										esc_html__( '%1$s - Recommended Value: %2$s. Max input vars limitation will truncate POST data such as menus.', '0-day-analytics' ),
 										$environment['php_max_input_vars'],
 										'3000'
 									) . '</mark>';
@@ -489,12 +489,12 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 							</td>
 						</tr>
 						<tr>
-							<td data-export-label="cURL Version"><?php esc_html_e( 'cURL version', 'advanced-analytics' ); ?>:</td>
+							<td data-export-label="cURL Version"><?php esc_html_e( 'cURL version', '0-day-analytics' ); ?>:</td>
 							<td><?php esc_html_e( $environment['curl_version'] ); ?></td>
 						</tr>
 						<tr>
-							<td data-export-label="SUHOSIN Installed"><?php esc_html_e( 'SUHOSIN installed', 'advanced-analytics' ); ?>:</td>
-							<td><?php echo ( $environment['suhosin_installed'] ) ? '<span class="dashicons dashicons-yes"></span> ' . esc_html__( 'You have to increase the suhosin.post.max_vars and suhosin.request.max_vars parameters to 2000 or more.', 'advanced-analytics' ) : '&ndash;'; ?></td>
+							<td data-export-label="SUHOSIN Installed"><?php esc_html_e( 'SUHOSIN installed', '0-day-analytics' ); ?>:</td>
+							<td><?php echo ( $environment['suhosin_installed'] ) ? '<span class="dashicons dashicons-yes"></span> ' . esc_html__( 'You have to increase the suhosin.post.max_vars and suhosin.request.max_vars parameters to 2000 or more.', '0-day-analytics' ) : '&ndash;'; ?></td>
 						</tr>
 						<?php
 					endif;
@@ -522,13 +522,13 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 					if ( ! empty( $wpdb->is_mysql ) && ! stristr( $ver, 'MariaDB' ) ) :
 						?>
 						<tr>
-							<td data-export-label="MySQL Version"><?php esc_html_e( 'MySQL version', 'advanced-analytics' ); ?>:</td>
+							<td data-export-label="MySQL Version"><?php esc_html_e( 'MySQL version', '0-day-analytics' ); ?>:</td>
 							<td>
 								<?php
 								$mysql_version_requirements = '5.0';
 
 								if ( version_compare( $environment['mysql_version'], $mysql_version_requirements, '<' ) ) {
-									echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - WordPress recommends a minimum MySQL version of %2$s. See: %3$sWordPress requirements%4$s', 'advanced-analytics' ), esc_html( $environment['mysql_version'] ), $mysql_version_requirements, '<a href="https://wordpress.org/about/requirements/" target="_blank">', '</a>' ) . '</mark>';
+									echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf( esc_html__( '%1$s - WordPress recommends a minimum MySQL version of %2$s. See: %3$sWordPress requirements%4$s', '0-day-analytics' ), esc_html( $environment['mysql_version'] ), $mysql_version_requirements, '<a href="https://wordpress.org/about/requirements/" target="_blank">', '</a>' ) . '</mark>';
 								} else {
 									echo '<mark class="yes">' . esc_html( $environment['mysql_version'] ) . '</mark>';
 								}
@@ -537,50 +537,50 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 						</tr>
 					<?php endif; ?>
 					<tr>
-						<td data-export-label="Max Upload Size"><?php esc_html_e( 'Max upload size', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Max Upload Size"><?php esc_html_e( 'Max upload size', '0-day-analytics' ); ?>:</td>
 						<td><?php echo size_format( $environment['max_upload_size'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="fsockopen/cURL"><?php esc_html_e( 'fsockopen/cURL', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="fsockopen/cURL"><?php esc_html_e( 'fsockopen/cURL', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['fsockopen_or_curl_enabled'] ) {
 							echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 						} else {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'Your server does not have fsockopen or cURL enabled. Contact your hosting provider.', 'advanced-analytics' ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'Your server does not have fsockopen or cURL enabled. Contact your hosting provider.', '0-day-analytics' ) . '</mark>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="Multibyte String"><?php esc_html_e( 'Multibyte string', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Multibyte String"><?php esc_html_e( 'Multibyte string', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['mbstring_enabled'] ) {
 							echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 						} else {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'Your server does not support the mbstring functions - this is required for better character encoding. Some fallbacks will be used instead for it.', 'advanced-analytics' ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'Your server does not support the mbstring functions - this is required for better character encoding. Some fallbacks will be used instead for it.', '0-day-analytics' ) . '</mark>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="XMLReader"><?php esc_html_e( 'XMLReader', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="XMLReader"><?php esc_html_e( 'XMLReader', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['xmlreader_enabled'] ) {
 							echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 						} else {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'The XMLReader PHP module/extension is missing. Please contact your hosting company and ask them to install that for you.', 'advanced-analytics' ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'The XMLReader PHP module/extension is missing. Please contact your hosting company and ask them to install that for you.', '0-day-analytics' ) . '</mark>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="DefinedConstants"><?php esc_html_e( 'Defined Constants', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="DefinedConstants"><?php esc_html_e( 'Defined Constants', '0-day-analytics' ); ?>:</td>
 						<td>
 							<details>
-								<summary><?php echo esc_html__( 'Click here to expand the whole info.', 'advanced-analytics' ); ?></summary>
+								<summary><?php echo esc_html__( 'Click here to expand the whole info.', '0-day-analytics' ); ?></summary>
 								<pre>
 								<?php
 									print_r( \get_defined_constants( true ) );
@@ -592,25 +592,25 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 					<?php
 					/*
 					<tr>
-						<td data-export-label="Remote Post"><?php esc_html_e( 'Remote post', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Remote Post"><?php esc_html_e( 'Remote post', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['remote_post_successful'] ) {
 							echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 						} else {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'wp_remote_post() failed. Contact your hosting provider.', 'advanced-analytics' ) . ' ' . esc_html( $environment['remote_post_response'] ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'wp_remote_post() failed. Contact your hosting provider.', '0-day-analytics' ) . ' ' . esc_html( $environment['remote_post_response'] ) . '</mark>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="Remote Get"><?php esc_html_e( 'Remote get', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Remote Get"><?php esc_html_e( 'Remote get', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						if ( $environment['remote_get_successful'] ) {
 							echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
 						} else {
-							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'wp_remote_get() failed. Contact your hosting provider.', 'advanced-analytics' ) . ' ' . esc_html( $environment['remote_get_response'] ) . '</mark>';
+							echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . esc_html__( 'wp_remote_get() failed. Contact your hosting provider.', '0-day-analytics' ) . ' ' . esc_html( $environment['remote_get_response'] ) . '</mark>';
 						}
 						?>
 						</td>
@@ -634,32 +634,32 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			<table class="aadvana-status-table status-report widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th colspan="2" data-export-label="Theme"><?php esc_html_e( 'Theme', 'advanced-analytics' ); ?></th>
+						<th colspan="2" data-export-label="Theme"><?php esc_html_e( 'Theme', '0-day-analytics' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<td data-export-label="Name"><?php esc_html_e( 'Name', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Name"><?php esc_html_e( 'Name', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $theme['parent_name'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="Version"><?php esc_html_e( 'Version', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Version"><?php esc_html_e( 'Version', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 						esc_html_e( $theme['parent_version'] );
 
 						if ( ! $theme['is_child_theme'] && version_compare( (string) $theme['parent_version'], (string) $theme['version_latest'], '<' ) ) {
-							echo ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', 'advanced-analytics' ), esc_html( $theme['version_latest'] ) ) . '</strong>';
+							echo ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', '0-day-analytics' ), esc_html( $theme['version_latest'] ) ) . '</strong>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="Author URL"><?php esc_html_e( 'Author URL', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Author URL"><?php esc_html_e( 'Author URL', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $theme['parent_author_url'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="Child Theme"><?php esc_html_e( 'Child theme', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Child Theme"><?php esc_html_e( 'Child theme', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 							echo ( $theme['is_child_theme'] ) ? '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>' : '&ndash;';
@@ -670,23 +670,23 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 					if ( $theme['is_child_theme'] ) :
 						?>
 					<tr>
-						<td data-export-label="Parent Theme Name"><?php esc_html_e( 'Parent theme name', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Parent Theme Name"><?php esc_html_e( 'Parent theme name', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $theme['parent_name'] ); ?></td>
 					</tr>
 					<tr>
-						<td data-export-label="Parent Theme Version"><?php esc_html_e( 'Parent theme version', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Parent Theme Version"><?php esc_html_e( 'Parent theme version', '0-day-analytics' ); ?>:</td>
 						<td>
 						<?php
 							esc_html_e( $theme['parent_version'] );
 
 						if ( version_compare( $theme['parent_version'], $theme['version_latest'], '<' ) ) {
-							echo ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', 'advanced-analytics' ), esc_html( $theme['version_latest'] ) ) . '</strong>';
+							echo ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', '0-day-analytics' ), esc_html( $theme['version_latest'] ) ) . '</strong>';
 						}
 						?>
 						</td>
 					</tr>
 					<tr>
-						<td data-export-label="Parent Theme Author URL"><?php esc_html_e( 'Parent theme author URL', 'advanced-analytics' ); ?>:</td>
+						<td data-export-label="Parent Theme Author URL"><?php esc_html_e( 'Parent theme author URL', '0-day-analytics' ); ?>:</td>
 						<td><?php esc_html_e( $theme['parent_author_url'] ); ?></td>
 					</tr>
 					<?php endif ?>
@@ -720,7 +720,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			<table class="aadvana-status-table status-report widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th colspan="2" data-export-label="Custom Post Types"><?php esc_html_e( 'Custom Post Types', 'advanced-analytics' ); ?></th>
+						<th colspan="2" data-export-label="Custom Post Types"><?php esc_html_e( 'Custom Post Types', '0-day-analytics' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -728,7 +728,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				<?php	foreach ( $post_types as $data ) { ?>
 					<tr id="<?php echo $data->name; ?>">
 						<td><?php echo $data->label; ?></td>
-						<td><?php echo $data->exclude_from_search ? '<span style="padding: 3px 8px; background: red; color: #fff;">' . esc_html__( 'Private', 'advanced-analytics' ) . '</span>' : esc_html__( 'Public', 'advanced-analytics' ); ?></td>
+						<td><?php echo $data->exclude_from_search ? '<span style="padding: 3px 8px; background: red; color: #fff;">' . esc_html__( 'Private', '0-day-analytics' ) . '</span>' : esc_html__( 'Public', '0-day-analytics' ); ?></td>
 					</tr>
 				<?php } ?>
 
@@ -756,7 +756,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			<table class="aadvana-status-table status-report widefat" cellspacing="0">
 				<thead>
 					<tr>
-						<th colspan="2" data-export-label="Active Plugins (<?php echo count( $active_plugins ); ?>)"><?php esc_html_e( 'Active plugins', 'advanced-analytics' ); ?> (<?php echo count( $active_plugins ); ?>)</th>
+						<th colspan="2" data-export-label="Active Plugins (<?php echo count( $active_plugins ); ?>)"><?php esc_html_e( 'Active plugins', '0-day-analytics' ); ?> (<?php echo count( $active_plugins ); ?>)</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -775,11 +775,11 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 							$network_string = '';
 
 							if ( ! empty( $plugin['version_latest'] ) && version_compare( $plugin['version_latest'], $plugin['version'], '>' ) ) {
-								$version_string = ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', 'advanced-analytics' ), $plugin['version_latest'] ) . '</strong>';
+								$version_string = ' &ndash; <strong style="color:red;">' . sprintf( esc_html__( '%s is available', '0-day-analytics' ), $plugin['version_latest'] ) . '</strong>';
 							}
 
 							if ( false != $plugin['network_activated'] ) {
-								$network_string = ' &ndash; <strong>' . esc_html__( '(Network enabled in plugin\'s meta)', 'advanced-analytics' ) . '</strong>';
+								$network_string = ' &ndash; <strong>' . esc_html__( '(Network enabled in plugin\'s meta)', '0-day-analytics' ) . '</strong>';
 							}
 
 							?>
@@ -787,7 +787,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 								<td><?php echo ( $plugin_name ); ?></td>
 								<td>
 								<?php
-									printf( esc_html__( 'by %s', 'advanced-analytics' ), $plugin['author_name'] );
+									printf( esc_html__( 'by %s', '0-day-analytics' ), $plugin['author_name'] );
 									echo ' &ndash; ' . esc_html( $plugin['version'] ) . $version_string . $network_string;
 								?>
 								</td>
@@ -815,8 +815,8 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				<tbody>
 				<tr>
 					<td>
-						<p><?php esc_html_e( 'Please copy and paste this information in your ticket when contacting support:', 'advanced-analytics' ); ?> </p>
-						<a id="get-debug-report" href="#" class="button-primary"><?php esc_html_e( 'Get system report', 'advanced-analytics' ); ?></a>
+						<p><?php esc_html_e( 'Please copy and paste this information in your ticket when contacting support:', '0-day-analytics' ); ?> </p>
+						<a id="get-debug-report" href="#" class="button-primary"><?php esc_html_e( 'Get system report', '0-day-analytics' ); ?></a>
 						<div id="aadvana-debug-report">
 							<textarea readonly="readonly"></textarea>
 						</div>

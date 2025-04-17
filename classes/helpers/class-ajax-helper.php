@@ -23,7 +23,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 	/**
 	 * Responsible for ajax operations.
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class Ajax_Helper {
 
@@ -32,7 +32,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function init() {
 			if ( \is_admin() && \wp_doing_ajax() ) {
@@ -60,7 +60,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function truncate_log_file() {
 			// Check nonce.
@@ -81,7 +81,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function download_log_file() {
 			// Check nonce.

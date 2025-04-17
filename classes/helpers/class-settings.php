@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $disabled_severities = null;
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $config_args = array(
 			'normalize' => true,
@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $hook = null;
 
@@ -170,7 +170,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function store_options( array $options ): void {
 			\update_option( ADVAN_SETTINGS_NAME, $options );
@@ -191,42 +191,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'menu_admins_only' => true,
 					'severities'       => array(
 						'deprecated' => array(
-							'name'    => __( 'Deprecated', 'advanced-analytics' ),
+							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
 							'display' => true,
 						),
 						'error'      => array(
-							'name'    => __( 'Error', 'advanced-analytics' ),
+							'name'    => __( 'Error', '0-day-analytics' ),
 							'color'   => '#ffb3b3',
 							'display' => true,
 						),
 						'success'    => array(
-							'name'    => __( 'Success', 'advanced-analytics' ),
+							'name'    => __( 'Success', '0-day-analytics' ),
 							'color'   => '#00ff00',
 							'display' => true,
 						),
 						'info'       => array(
-							'name'    => __( 'Info', 'advanced-analytics' ),
+							'name'    => __( 'Info', '0-day-analytics' ),
 							'color'   => '#0000ff',
 							'display' => true,
 						),
 						'notice'     => array(
-							'name'    => __( 'Notice', 'advanced-analytics' ),
+							'name'    => __( 'Notice', '0-day-analytics' ),
 							'color'   => '#feeb8e',
 							'display' => true,
 						),
 						'warning'    => array(
-							'name'    => __( 'Warning', 'advanced-analytics' ),
+							'name'    => __( 'Warning', '0-day-analytics' ),
 							'color'   => '#ffff00',
 							'display' => true,
 						),
 						'fatal'      => array(
-							'name'    => __( 'Fatal', 'advanced-analytics' ),
+							'name'    => __( 'Fatal', '0-day-analytics' ),
 							'color'   => '#b92a2a',
 							'display' => true,
 						),
 						'parse'      => array(
-							'name'    => __( 'Parse', 'advanced-analytics' ),
+							'name'    => __( 'Parse', '0-day-analytics' ),
 							'color'   => '#b9762a',
 							'display' => true,
 						),
@@ -242,7 +242,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_main_menu_page_hook() {
 			return self::$hook;
@@ -268,8 +268,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$base .= 'code';
 
 				self::$hook = \add_menu_page(
-					\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-					\esc_html__( 'Analyze', 'advanced-analytics' ) . self::get_updates_count_html(),
+					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'Analyze', '0-day-analytics' ) . self::get_updates_count_html(),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ),
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
@@ -292,8 +292,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				\add_submenu_page(
 					self::MENU_SLUG,
-					\esc_html__( 'Advanced Analytics', 'advanced-analytics' ),
-					\esc_html__( 'Log viewer', 'advanced-analytics' ),
+					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'Log viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
@@ -307,8 +307,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				\add_submenu_page(
 					self::MENU_SLUG,
-					\esc_html__( 'Settings', 'advanced-analytics' ),
-					\esc_html__( 'Settings', 'advanced-analytics' ),
+					\esc_html__( 'Settings', '0-day-analytics' ),
+					\esc_html__( 'Settings', '0-day-analytics' ),
 					'manage_options', // No capability requirement.
 					self::SETTINGS_MENU_SLUG,
 					array( __CLASS__, 'aadvana_show_options' ),
@@ -389,7 +389,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string Updates count markup, empty string if no updates available.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_updates_count_html(): string {
 
@@ -461,7 +461,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$screen->add_help_tab(
 				array(
 					'id'      => 'advanced-analytics-help-tab',
-					'title'   => __( 'Help', 'advanced-analytics' ),
+					'title'   => __( 'Help', '0-day-analytics' ),
 					'content' => self::add_help_content(),
 				)
 			);
@@ -480,9 +480,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_help_content() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to specify the default options for the Awesome Footnotes plugin.', 'advanced-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'The identifier is what appears when a footnote is inserted into your page contents. The back-link appear after each footnote, linking back to the identifier.', 'advanced-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'Remember to click the Save Changes button at the bottom of the screen for new settings to take effect.', 'advanced-analytics' ) . '</p></h4>';
+			$help_text  = '<p>' . __( 'This screen allows you to specify the default options for the Awesome Footnotes plugin.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'The identifier is what appears when a footnote is inserted into your page contents. The back-link appear after each footnote, linking back to the identifier.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Remember to click the Save Changes button at the bottom of the screen for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
 		}
@@ -498,9 +498,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_sidebar_content() {
 
-			$help_text  = '<p><strong>' . __( 'For more information:', 'advanced-analytics' ) . '</strong></p>';
-			$help_text .= '<p><a href="https://wordpress.org/plugins/awesome-footnotes/">' . __( 'Instructions', 'advanced-analytics' ) . '</a></p>';
-			$help_text .= '<p><a href="https://wordpress.org/support/plugin/awesome-footnotes">' . __( 'Support Forum', 'advanced-analytics' ) . '</a></p></h4>';
+			$help_text  = '<p><strong>' . __( 'For more information:', '0-day-analytics' ) . '</strong></p>';
+			$help_text .= '<p><a href="https://wordpress.org/plugins/awesome-footnotes/">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
+			$help_text .= '<p><a href="https://wordpress.org/support/plugin/awesome-footnotes">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
 
 			return $help_text;
 		}
@@ -532,7 +532,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			?>
 			<div class="aadvana-panel-submit">
 				<button name="<?php echo \esc_attr( \ADVAN_SETTINGS_NAME ); ?>[save_button]" class="aadvana-save-button aadvana-primary-button button button-primary button-hero"
-						type="submit"><?php esc_html_e( 'Save Changes', 'advanced-analytics' ); ?></button>
+						type="submit"><?php esc_html_e( 'Save Changes', '0-day-analytics' ); ?></button>
 			</div>
 			<?php
 		}
@@ -553,25 +553,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$settings_tabs = array(
 
-				// 'head-general' => esc_html__( 'General Settings', 'advanced-analytics' ),
+				// 'head-general' => esc_html__( 'General Settings', '0-day-analytics' ),
 
 				// 'general'      => array(
 				// 'icon'  => 'admin-generic',
-				// 'title' => esc_html__( 'General', 'advanced-analytics' ),
+				// 'title' => esc_html__( 'General', '0-day-analytics' ),
 				// ),
 
-				// 'head-global'  => esc_html__( 'Global Settings', 'advanced-analytics' ),
+				// 'head-global'  => esc_html__( 'Global Settings', '0-day-analytics' ),
 
 				// 'backup'       => array(
 				// 'icon'  => 'migrate',
-				// 'title' => esc_html__( 'Export/Import', 'advanced-analytics' ),
+				// 'title' => esc_html__( 'Export/Import', '0-day-analytics' ),
 				// ),
 
 				'head-error-log-list' => esc_html__( 'Error Log', 'awesome-footnotes' ),
 
 				'error-log-list'      => array(
 					'icon'  => 'list-view',
-					'title' => esc_html__( 'Error Log Listing', 'advanced-analytics' ),
+					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
 				),
 
 				'head-advanced'       => esc_html__( 'Advanced', 'awesome-footnotes' ),
@@ -583,12 +583,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				'backup'              => array(
 					'icon'  => 'migrate',
-					'title' => \esc_html__( 'Export/Import', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
 				),
 
 				'system-info'         => array(
 					'icon'  => 'wordpress-alt',
-					'title' => esc_html__( 'System Info', 'advanced-analytics' ),
+					'title' => esc_html__( 'System Info', '0-day-analytics' ),
 				),
 			);
 
@@ -663,7 +663,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 						<div class="aadvana-tab-head">
 							<div id="aadvana-options-search-wrap">
-								<input id="aadvana-panel-search" type="text" placeholder="<?php esc_html_e( 'Search', 'advanced-analytics' ); ?>">
+								<input id="aadvana-panel-search" type="text" placeholder="<?php esc_html_e( 'Search', '0-day-analytics' ); ?>">
 								<div id="aadvana-search-list-wrap" class="has-custom-scroll">
 									<ul id="aadvana-search-list"></ul>
 								</div>
@@ -747,43 +747,43 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				'general'       => array(
 					'icon'  => 'admin-generic',
-					'title' => \esc_html__( 'General', 'advanced-analytics' ),
+					'title' => \esc_html__( 'General', '0-day-analytics' ),
 				),
 
 				'logo'          => array(
 					'icon'  => 'lightbulb',
-					'title' => \esc_html__( 'Logo', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Logo', '0-day-analytics' ),
 				),
 
 				'posts'         => array(
 					'icon'  => 'media-text',
-					'title' => \esc_html__( 'Article types', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Article types', '0-day-analytics' ),
 				),
 
 				'footer'        => array(
 					'icon'  => 'editor-insertmore',
-					'title' => \esc_html__( 'Footer', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Footer', '0-day-analytics' ),
 				),
 
 				'seo'           => array(
 					'icon'  => 'google',
-					'title' => \esc_html__( 'SEO', 'advanced-analytics' ),
+					'title' => \esc_html__( 'SEO', '0-day-analytics' ),
 				),
 
 				'optimization'  => array(
 					'icon'  => 'dashboard',
-					'title' => \esc_html__( 'Optimization', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Optimization', '0-day-analytics' ),
 				),
 
 				'miscellaneous' => array(
 					'icon'  => 'shortcode',
-					'title' => \esc_html__( 'Miscellaneous', 'advanced-analytics' ),
+					'title' => \esc_html__( 'Miscellaneous', '0-day-analytics' ),
 				),
 			);
 
 			$settings_tabs['backup'] = array(
 				'icon'  => 'migrate',
-				'title' => \esc_html__( 'Export/Import', 'advanced-analytics' ),
+				'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
 			);
 
 			return $settings_tabs;
@@ -819,7 +819,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function set_current_options( array $options ) {
 			return self::$current_options = $options; // phpcs:ignore Squiz.PHP.DisallowMultipleAssignments.Found
@@ -876,12 +876,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				$logs = Logs_List::get_error_items( false, 1 );
+				$logs = Logs_List::get_error_items( false );
 
 				$event = ( isset( $logs[0] ) ) ? $logs[0] : null;
 
@@ -894,6 +894,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							text-overflow: ellipsis;
 							max-width: 50%;
 							height: 30px;
+							width: 400px;
 						}
 						#wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
 							background: #d7dce0;
@@ -901,8 +902,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 						<?php
 						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-							echo '.aadvan-live-notif-item.' . $class . '{ background: ' . $properties['color'] . ' !important; }';
-							echo '.aadvan-live-notif-item.' . $class . ' a { color: #42425d !important; }';
+							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important; }';
+							echo '.aadvan-live-notif-item.' . \esc_attr( $class )  . ' a { color: #42425d !important; }';
 						}
 						?>
 					</style>
@@ -999,7 +1000,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_disabled_severities(): array {
 			if ( null === self::$disabled_severities ) {

@@ -12,7 +12,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'General Settings', 'advanced-analytics' ),
+			'title' => esc_html__( 'General Settings', '0-day-analytics' ),
 			'id'    => 'general-settings-tab',
 			'type'  => 'tab-title',
 		)
@@ -21,7 +21,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	// Markup used.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Markup', 'advanced-analytics' ),
+			'title' => esc_html__( 'Markup', '0-day-analytics' ),
 			'id'    => 'markup-format-settings',
 			'type'  => 'header',
 		)
@@ -29,16 +29,16 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Markup', 'advanced-analytics' ),
+			'title' => esc_html__( 'Markup', '0-day-analytics' ),
 			'id'    => 'markup-format-settings',
 			'type'  => 'hint',
-			'hint'  => esc_html__( 'How the markup should be represented in the documents', 'advanced-analytics' ) . '<div>' . esc_html__( 'Changing the following settings will change functionality in a way which may stop footnotes from displaying correctly. For footnotes to work as expected after updating these settings, you will need to manually update all existing posts with footnotes.', 'advanced-analytics' ) . '</div>',
+			'hint'  => esc_html__( 'How the markup should be represented in the documents', '0-day-analytics' ) . '<div>' . esc_html__( 'Changing the following settings will change functionality in a way which may stop footnotes from displaying correctly. For footnotes to work as expected after updating these settings, you will need to manually update all existing posts with footnotes.', '0-day-analytics' ) . '</div>',
 		)
 	);
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Open footnote tag', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Open footnote tag', '0-day-analytics' ),
 			'id'      => 'footnotes_open',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['footnotes_open'],
@@ -47,7 +47,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Close footnote tag', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Close footnote tag', '0-day-analytics' ),
 			'id'      => 'footnotes_close',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['footnotes_close'],
@@ -57,7 +57,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div>' . esc_html__( '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', 'advanced-analytics' ) . Settings::get_current_options()['footnotes_open'] . '<b>' . esc_html__( 'Text of your footnote goes between these tags.', 'advanced-analytics' ) . Settings::get_current_options()['footnotes_close']
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div>' . esc_html__( '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.', '0-day-analytics' ) . Settings::get_current_options()['footnotes_open'] . '<b>' . esc_html__( 'Text of your footnote goes between these tags.', '0-day-analytics' ) . Settings::get_current_options()['footnotes_close']
 			. '</b>"</div>',
 		)
 	);
@@ -65,7 +65,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	// Identifier settings begin.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Identifier', 'advanced-analytics' ),
+			'title' => esc_html__( 'Identifier', '0-day-analytics' ),
 			'id'    => 'identifier-format-settings',
 			'type'  => 'header',
 		)
@@ -73,10 +73,10 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Type', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Type', '0-day-analytics' ),
 			'id'      => 'list_style_type',
 			'type'    => 'radio',
-			'hint'    => esc_html__( 'How the footnotes will be represented', 'advanced-analytics' ),
+			'hint'    => esc_html__( 'How the footnotes will be represented', '0-day-analytics' ),
 			'toggle'  => array(
 				''       => '',
 				'symbol' => '#list_style_symbol-item',
@@ -87,12 +87,12 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Symbol', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Symbol', '0-day-analytics' ),
 			'id'      => 'list_style_symbol',
 			'class'   => 'list_style_type',
 			'type'    => 'text',
 			'default' => Settings::get_default_options()['list_style_symbol'],
-			'hint'    => esc_html__( 'Preview: ', 'advanced-analytics' ) .
+			'hint'    => esc_html__( 'Preview: ', '0-day-analytics' ) .
 			'<b>' . html_entity_decode( Settings::get_current_options()['list_style_symbol'] ) . '</b>',
 		)
 	);
@@ -141,20 +141,20 @@ use AWEF\Controllers\Footnotes_Formatter;
 		<li id="footnote_0_1" class="footnote">
 			<span class="symbol"><?php echo html_entity_decode( Settings::get_current_options()['list_style_symbol'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 
-			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'First footnote', 'advanced-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'First footnote', '0-day-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</li>
 		<li id="footnote_1_1" class="footnote">
 			<span class="symbol"><?php echo str_repeat( html_entity_decode( Settings::get_current_options()['list_style_symbol'] ), 2 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 
 
-			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'Second footnote', 'advanced-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'Second footnote', '0-day-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</li>
 		<li id="footnote_2_1" class="footnote">
 			<span class="symbol"><?php echo str_repeat( html_entity_decode( Settings::get_current_options()['list_style_symbol'] ), 3 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 
 
 			
-			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'Third footnote', 'advanced-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo ( ( $before_position ) ? $back_link : '' ); ?> <?php esc_html_e( 'Third footnote', '0-day-analytics' ); ?> <?php echo ( ( ! $before_position ) ? $back_link : '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</li>
 	</ol>
 <?php
@@ -162,7 +162,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div class="symbol-example">' .
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div class="symbol-example">' .
 			$footnote_example
 			. '</div>',
 		)
@@ -170,7 +170,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name' => esc_html__( 'Show identifier as superscript', 'advanced-analytics' ),
+			'name' => esc_html__( 'Show identifier as superscript', '0-day-analytics' ),
 			'id'   => 'superscript',
 			'type' => 'checkbox',
 		)
@@ -184,7 +184,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div>' . esc_html__( '"Lorem ipsum dolor sit amet', 'advanced-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'advanced-analytics' ) . '"</div>',
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div>' . esc_html__( '"Lorem ipsum dolor sit amet', '0-day-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '0-day-analytics' ) . '"</div>',
 		)
 	);
 
@@ -197,7 +197,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Before identifiers', 'advanced-analytics' ),
+			'title' => esc_html__( 'Before identifiers', '0-day-analytics' ),
 			'id'    => 'before-identifier-format-settings',
 			'type'  => 'header',
 		)
@@ -205,7 +205,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Pre identifier', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Pre identifier', '0-day-analytics' ),
 			'id'      => 'pre_identifier',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['pre_identifier'],
@@ -214,7 +214,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Inner pre identifier', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Inner pre identifier', '0-day-analytics' ),
 			'id'      => 'inner_pre_identifier',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['inner_pre_identifier'],
@@ -224,14 +224,14 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div class="pre-show">"' . esc_html__( 'Lorem ipsum dolor sit amet', 'advanced-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'advanced-analytics' ) . '"</div>',
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div class="pre-show">"' . esc_html__( 'Lorem ipsum dolor sit amet', '0-day-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '0-day-analytics' ) . '"</div>',
 		)
 	);
 
 	// After identifiers.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Post identifiers', 'advanced-analytics' ),
+			'title' => esc_html__( 'Post identifiers', '0-day-analytics' ),
 			'id'    => 'post-identifier-format-settings',
 			'type'  => 'header',
 		)
@@ -239,7 +239,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Post identifier', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Post identifier', '0-day-analytics' ),
 			'id'      => 'post_identifier',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['post_identifier'],
@@ -248,7 +248,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Inner post identifier', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Inner post identifier', '0-day-analytics' ),
 			'id'      => 'inner_post_identifier',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['inner_post_identifier'],
@@ -258,14 +258,14 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div class="post-show">"' . esc_html__( 'Lorem ipsum dolor sit amet', 'advanced-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', 'advanced-analytics' ) . '"</div>',
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div class="post-show">"' . esc_html__( 'Lorem ipsum dolor sit amet', '0-day-analytics' ) . '<b>' . $id_replace . '</b>' . esc_html__( ', consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '0-day-analytics' ) . '"</div>',
 		)
 	);
 
 	// Back link.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Back link', 'advanced-analytics' ),
+			'title' => esc_html__( 'Back link', '0-day-analytics' ),
 			'id'    => 'before-identifier-format-settings',
 			'type'  => 'header',
 		)
@@ -273,7 +273,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Open back link tag', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Open back link tag', '0-day-analytics' ),
 			'id'      => 'pre_backlink',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['pre_backlink'],
@@ -282,7 +282,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Close back link tag', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Close back link tag', '0-day-analytics' ),
 			'id'      => 'post_backlink',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['post_backlink'],
@@ -291,7 +291,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Back link symbol', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Back link symbol', '0-day-analytics' ),
 			'id'      => 'backlink',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['backlink'],
@@ -300,7 +300,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name' => esc_html__( 'Show backlink in the beginning of the footnote', 'advanced-analytics' ),
+			'name' => esc_html__( 'Show backlink in the beginning of the footnote', '0-day-analytics' ),
 			'id'   => 'position_before_footnote',
 			'type' => 'checkbox',
 		)
@@ -309,7 +309,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	Settings::build_option(
 		array(
 			'type' => 'hint',
-			'hint' => '<b><i>' . esc_html__( 'Example:', 'advanced-analytics' ) . '</i></b><div class="backlink-example">' .
+			'hint' => '<b><i>' . esc_html__( 'Example:', '0-day-analytics' ) . '</i></b><div class="backlink-example">' .
 			$footnote_example
 			. '</div>',
 		)
@@ -318,7 +318,7 @@ use AWEF\Controllers\Footnotes_Formatter;
 	// Back link title.
 	Settings::build_option(
 		array(
-			'title' => esc_html__( 'Back link title', 'advanced-analytics' ),
+			'title' => esc_html__( 'Back link title', '0-day-analytics' ),
 			'id'    => 'backlink-general-settings',
 			'type'  => 'header',
 		)
@@ -326,10 +326,10 @@ use AWEF\Controllers\Footnotes_Formatter;
 
 	Settings::build_option(
 		array(
-			'name'    => esc_html__( 'Title to show on the backlinks', 'advanced-analytics' ),
+			'name'    => esc_html__( 'Title to show on the backlinks', '0-day-analytics' ),
 			'id'      => 'back_link_title',
 			'type'    => 'text',
 			'default' => Settings::get_current_options()['back_link_title'],
-			'hint'    => '<b><i>' . esc_html__( 'Options:', 'advanced-analytics' ) . '</i></b><div class="post-show">' . esc_html__( 'Add "###" (without the quotes) to include the footnote number.', 'advanced-analytics' ) . '</div>',
+			'hint'    => '<b><i>' . esc_html__( 'Options:', '0-day-analytics' ) . '</i></b><div class="post-show">' . esc_html__( 'Add "###" (without the quotes) to include the footnote number.', '0-day-analytics' ) . '</div>',
 		)
 	);

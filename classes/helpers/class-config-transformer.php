@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 
  *
  * This file originates from here - https://github.com/wp-cli/wp-config-transformer but like everything else that comes from the core team it requires lots of work and should follow the standards, so it is transformed
  */
@@ -24,13 +24,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 	/**
 	 * Transforms a wp-config.php file.
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class Config_Transformer {
 		/**
 		 * Append to end of file
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		const ANCHOR_EOF = 'EOF';
 
@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $wp_config_path = null;
 
@@ -48,7 +48,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $wp_config_src = null;
 
@@ -57,7 +57,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $wp_configs = array();
 
@@ -70,7 +70,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 * @param string $wp_config_path Path to a wp-config.php file.
 		 * @param bool   $read_only If the config is set to read-only.
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function init( $wp_config_path = '', $read_only = false ) {
 
@@ -96,7 +96,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static function auto_init() {
 			if ( is_null( self::$wp_config_path ) ) {
@@ -115,7 +115,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function exists( $type, $name ) {
 
@@ -148,7 +148,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return string|null
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_value( $type, $name ) {
 			self::auto_init();
@@ -182,7 +182,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function add( $type, $name, $value, array $options = array() ) {
 			self::auto_init();
@@ -236,7 +236,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function update( $type, $name, $value, array $options = array() ) {
 			self::auto_init();
@@ -292,7 +292,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function remove( $type, $name ) {
 			self::auto_init();
@@ -317,7 +317,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		protected static function format_value( $value, $raw ) {
 			if ( $raw && '' === trim( $value ) ) {
@@ -338,7 +338,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		protected static function normalize( $type, $name, $value ) {
 			if ( 'constant' === $type ) {
@@ -359,7 +359,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		protected static function parse_wp_config( $src ) {
 			self::auto_init();
@@ -426,7 +426,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		protected static function save( $contents ) {
 			self::auto_init();

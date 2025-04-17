@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 	/**
 	 * Responsible for operations related to the error log file.
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class Error_Log {
 
@@ -29,16 +29,25 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $log_file = null;
+
+		/**
+		 * Stores last error (if exists).
+		 *
+		 * @var string
+		 *
+		 * @since 
+		 */
+		private static $last_error = null;
 
 		/**
 		 * Tries to detect the log filename.
 		 *
 		 * @return string|\WP_Error
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function autodetect() {
 			if ( null === self::$log_file ) {
@@ -48,16 +57,19 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 
 				// Check for common problems that could prevent us from displaying the error log.
 				if ( ! $error_logging_enabled ) {
+					self::$last_error = __( 'Error logging is disabled.', '0-day-analytics' );
 					return new \WP_Error(
 						'log_errors_off',
 						__( 'Error logging is disabled.', '0-day-analytics' )
 					);
 				} elseif ( empty( self::$log_file ) ) {
+					self::$last_error = __( 'Error log filename is not set.', '0-day-analytics' );
 					return new \WP_Error(
 						'error_log_not_set',
 						__( 'Error log filename is not set.', '0-day-analytics' )
 					);
 				} elseif ( ( strpos( self::$log_file, '/' ) === false ) && ( strpos( self::$log_file, '\\' ) === false ) ) {
+					self::$last_error = __( 'Error log filename is not an absolute path.', '0-day-analytics' );
 					return new \WP_Error(
 						'error_log_uses_relative_path',
 						sprintf(
@@ -66,7 +78,29 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 							esc_html( self::$log_file )
 						)
 					);
-				} elseif ( ! is_writable( \dirname( self::$log_file ) ) ) {
+				} elseif ( ! file_exists( self::$log_file ) ) {
+
+					self::$last_error = __( 'Error log file does not exists.', '0-day-analytics' );
+					return new \WP_Error(
+						'error_log_not_exists',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> does not exists.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
+				} elseif ( ! is_writable( ( self::$log_file ) ) ) {
+					self::$last_error = __( 'Error log file is not writable.', '0-day-analytics' );
+					return new \WP_Error(
+						'error_log_not_writable',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> exists, but is not writable. Please check file permissions.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
+				} elseif ( file_exists( self::$log_file ) && ! is_readable( self::$log_file ) ) {
+					self::$last_error = __( 'Error log file is not readable.', '0-day-analytics' );
 					return new \WP_Error(
 						'error_log_not_accessible',
 						sprintf(
@@ -75,17 +109,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 							esc_html( self::$log_file )
 						)
 					);
-				} elseif ( file_exists( self::$log_file ) && ! is_readable( self::$log_file ) ) {
-
-						return new \WP_Error(
-							'error_log_not_accessible',
-							sprintf(
-							// translators: the name of the log file.
-								__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', '0-day-analytics' ),
-								esc_html( self::$log_file )
-							)
-						);
-
 				}
 			}
 
@@ -99,12 +122,23 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function clear( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-				$handle = fopen( $filename, 'w' );
-				fclose( $handle );
+				if ( \is_writable( $filename ) ) {
+					// Truncate the file.
+					$handle = fopen( $filename, 'w' );
+
+					if ( false === $handle ) {
+						return;
+					}
+
+					fclose( $handle );
+
+				} else {
+					return; // ERROR: file not writable.
+				}
 			}
 		}
 
@@ -115,7 +149,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return int|false
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_file_size( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
@@ -132,7 +166,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return int|false
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_modification_time( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
@@ -153,7 +187,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return string|bool
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function extract_file_name( $file ) {
 			$filename = false;
@@ -166,6 +200,17 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 			}
 
 			return $filename;
+		}
+
+		/**
+		 * Returns last stored error (if exists) or null.
+		 *
+		 * @return string|null
+		 *
+		 * @since 
+		 */
+		public static function get_last_error() {
+			return self::$last_error;
 		}
 	}
 }

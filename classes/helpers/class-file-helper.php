@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 	/**
 	 * Responsible for file operations.
 	 *
-	 * @since latest
+	 * @since 
 	 */
 	class File_Helper {
 
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		private static $last_error = '';
 
@@ -40,7 +40,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function create_index_file( string $path ): bool {
 			// Check if directory exists.
@@ -56,7 +56,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function create_htaccess_file( string $path ): bool {
 			// Check if directory exists.
@@ -112,7 +112,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function get_last_error(): string {
 			return self::$last_error;
@@ -125,7 +125,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function format_file_size( $filename ): string {
 
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function download_link(): string {
 			$url = \add_query_arg(
@@ -175,7 +175,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function download( $file_path ) {
 			set_time_limit( 0 );
@@ -249,7 +249,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function mime_types(): array {
 			/* Just add any required MIME type if you are going to download something not listed here.*/
@@ -448,7 +448,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		/**
 		 * Get full file path to the site's wp-config.php file.
 		 *
-		 * @since latest
+		 * @since 
 		 *
 		 * @return string Full path to the wp-config.php file or a blank string if modifications for the file are disabled.
 		 */
@@ -473,7 +473,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			 *
 			 * @param string - The current value for WP config file path.
 			 *
-			 * @since latest
+			 * @since 
 			 */
 			$path = \apply_filters( ADVAN_TEXTDOMAIN . 'config_file_path', (string) $path );
 
@@ -485,7 +485,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 
 		 */
 		public static function generate_random_file_name() {
 
