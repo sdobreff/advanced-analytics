@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -162,7 +162,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function clean_file_path( $path ) {
 			return str_replace( ABSPATH, '/', $path );
@@ -175,7 +175,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function error_code_to_string( $code ) {
 			$errors = array(

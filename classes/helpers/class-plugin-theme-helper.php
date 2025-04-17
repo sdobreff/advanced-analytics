@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since 2.0.0
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 	/**
 	 * Responsible for plugin and themes.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 */
 	class Plugin_Theme_Helper {
 
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $plugins = array();
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $themes = array();
 
@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $theme_path = '';
 
@@ -56,7 +56,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_plugins(): array {
 			if ( empty( self::$plugins ) ) {
@@ -73,7 +73,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_plugin_from_path( string $path_name ): array {
 			foreach ( self::get_plugins() as $path => $plugin ) {
@@ -92,7 +92,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return \WP_Theme|false
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_theme_from_path( string $path_name ) {
 
@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_default_path_for_themes(): string {
 
@@ -146,7 +146,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function is_plugin_active( string $plugin_slug ): bool {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';

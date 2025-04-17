@@ -5,7 +5,7 @@
  * @package    advanced-analytics
  * @subpackage helpers
  *
- * @since 1.0.0
+ * @since 1.1.0
  *
  * @license    https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
@@ -35,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 	/**
 	 * Responsible for rendering base table for manipulation.
 	 *
-	 * @since 5.0.0
+	 * @since 1.1.0
 	 */
 	class Logs_List extends \WP_List_Table {
 
@@ -50,7 +50,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var \WP_Screen
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		protected static $wp_screen;
 
@@ -59,7 +59,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static $table_name;
 
@@ -68,7 +68,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		protected $count;
 
@@ -77,7 +77,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		protected static $log_errors_to_read = 100;
 
@@ -86,15 +86,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static $columns = array();
 
 		/**
 		 * Events Query Arguments.
 		 *
-		 * @since 5.0.0
-		 * @since 5.0.0 Transformed to array
+		 * @since 1.1.0
+		 * @since 1.1.0 Transformed to array
 		 *
 		 * @var array
 		 */
@@ -105,7 +105,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var \wpdb
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static $wsal_db = null;
 
@@ -114,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		private static $query_occ = array();
 
@@ -123,7 +123,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		private static $query_order = array();
 
@@ -132,7 +132,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $read_items = array();
 
@@ -141,7 +141,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param stdClass $query_args Events query arguments.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public function __construct( $query_args ) {
 			self::$query_args = $query_args;
@@ -167,7 +167,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return \wpdb
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		public static function get_wsal_db() {
 			return self::$wsal_db;
@@ -176,7 +176,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Displays the search box.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @param string $text     The 'submit' button label.
 		 * @param string $input_id ID attribute value for the search input field.
@@ -205,7 +205,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static function escaped_search_input() {
 			return isset( $_REQUEST[ self::SEARCH_INPUT ] ) ? \esc_sql( \sanitize_text_field( \wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -216,7 +216,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param array $columns - Array of column names.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
@@ -235,7 +235,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Returns the table name.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static function get_table_name(): string {
 			return self::$table_name;
@@ -244,7 +244,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Returns the the wp_screen property.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static function get_wp_screen() {
 			if ( empty( self::$wp_screen ) ) {
@@ -259,7 +259,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * Query, filter data, handle sorting, and pagination, and any other data-manipulation required prior to rendering
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public function prepare_items() {
 			$columns = $this->get_columns();
@@ -296,7 +296,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		public static function get_hidden_columns() {
 			return array_filter(
@@ -308,7 +308,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * Get a list of columns. The format is:
 		 * 'internal-name' => 'Title'.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return array
 		 */
@@ -324,7 +324,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * The second format will make the initial sorting order be descending
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return array
 		 */
@@ -351,7 +351,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Text displayed when no user data is available.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return void
 		 */
@@ -362,7 +362,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Fetch table data from the WordPress database.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return array
 		 */
@@ -381,7 +381,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_error_items( bool $write_temp = true, $items = false ): array {
 
@@ -486,7 +486,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		public static function get_query_occ(): array {
 			return self::$query_occ;
@@ -502,7 +502,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public function column_default( $item, $column_name ) {
 			return self::format_column_value( $item, $column_name );
@@ -518,7 +518,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since 4.6.1
+		 * @since 1.1.0
 		 */
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
@@ -632,7 +632,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return string Text to be placed inside the column < td > .
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		protected function column_cb( $item ) {
 			return;
@@ -649,7 +649,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Returns an associative array containing the bulk actions.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return array
 		 */
@@ -662,7 +662,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Process actions triggered by the user.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public function handle_table_actions() {
 			if ( ! isset( $_REQUEST[ self::$table_name ] ) ) {
@@ -708,7 +708,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Stop execution and exit.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return void
 		 */
@@ -719,7 +719,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Die when the nonce check fails.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @return void
 		 */
@@ -739,7 +739,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static function get_log_errors_to_read() {
 			return self::$log_errors_to_read;
@@ -750,7 +750,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static function get_screen_option_per_page() {
 			self::get_wp_screen();
@@ -780,7 +780,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		private static function get_column_names() {
 			return self::$columns;
@@ -793,7 +793,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static function add_screen_options( $hook ) {
 			$screen_options = array( 'per_page' => __( 'Number of errors to read', '0-day-analytics' ) );
@@ -827,7 +827,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Form table per-page screen option value.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 *
 		 * @param bool   $keep   Whether to save or skip saving the screen option value. Default false.
 		 * @param string $option The option name.
@@ -849,7 +849,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param string $which - Position of the nav.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public function extra_tablenav( $which ) {
 
@@ -938,7 +938,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param object|array $item - The current item.
 		 *
-		 * @since 3.1.0
+		 * @since 1.1.0
 		 */
 		public function single_row( $item ) {
 			$classes = '';
@@ -955,7 +955,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param string $which - Holds info about the top and bottom navigation.
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {

@@ -16,9 +16,9 @@ esac
  
 log_step "Replacing latest version"
 
-log_step "Extract the version from wp-security-audit-log.php"
+log_step "Extract the version from plugin file"
 
-VERSION=$(grep 'Version: ' wp-security-audit-log.php | sed 's/.*:[ \t]*//g')
+VERSION=$(grep 'Version: ' advanced-analytics.php | sed 's/.*:[ \t]*//g')
 
 log_step "Extracted version is '$VERSION'"
 

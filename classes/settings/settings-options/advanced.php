@@ -4,7 +4,7 @@
  *
  * @package awe
  *
- * @since 2.0.0
+ * @since 1.1.0
  */
 
 use ADVAN\Helpers\Settings;

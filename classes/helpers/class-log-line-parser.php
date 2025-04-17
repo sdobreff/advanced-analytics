@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 2.0.0
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 	/**
 	 * Responsible for parsing lines of logs.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 */
 	class Log_Line_Parser {
 
@@ -34,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $last_timestamp = null;
 
@@ -43,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $last_parsed_timestamp = null;
 
@@ -52,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $newer_lines = 0;
 
@@ -63,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array An associative array containing the parsed data.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function parse_php_error_log_line( string $line ) {
 			$line      = rtrim( $line );
@@ -145,7 +145,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array|null - The parsed context or null if not found.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function parse_context_line( $message ) {
 			if ( ! preg_match( '@^\[(ELM_context_\d{1,8}?)\]@', $message, $matches ) ) {
@@ -183,7 +183,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return array An associative array containing the parsed data.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function parse_php_error_log_stack_line( $message, $is_last_line = false ) {
 			// It's usually "#123 C:\path\to\plugin.php(456): functionCallHere()".
@@ -251,7 +251,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return bool|null
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function parse_entry_with_stack_trace( string $line ) {
 			if ( false !== \strpos( $line, 'throw' ) || false !== \strpos( $line, 'Stack trace' ) ) {
@@ -266,7 +266,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function store_last_parsed_timestamp() {
 			if ( null !== self::$last_timestamp ) {
@@ -294,7 +294,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return bool|string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_last_parsed_timestamp() {
 			if ( null === self::$last_parsed_timestamp ) {
@@ -313,7 +313,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function delete_last_parsed_timestamp() {
 			self::$last_parsed_timestamp = null;
@@ -326,7 +326,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_newer_lines(): int {
 			$lines             = (int) self::$newer_lines;

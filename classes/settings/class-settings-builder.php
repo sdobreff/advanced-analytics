@@ -6,7 +6,7 @@
  *
  * @package awesome-footnotes
  *
- * @since 
+ * @since 1.1.0
  */
 
 // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 	 *
 	 * @package awe
 	 *
-	 * @since 
+	 * @since 1.1.0
 	 */
 	class Settings_Builder {
 		/**
@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $item_id;
 
@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $item_id_attr;
 
@@ -55,7 +55,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $item_id_wrap;
 
@@ -64,7 +64,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $name_attr;
 
@@ -73,7 +73,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $placeholder_attr;
 
@@ -82,7 +82,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $custom_class;
 
@@ -91,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var mixed
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $current_value;
 
@@ -100,7 +100,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $option_type;
 
@@ -109,7 +109,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $option_name;
 
@@ -118,7 +118,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static $settings;
 
@@ -127,7 +127,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $min;
 
@@ -136,7 +136,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $max;
 
@@ -145,7 +145,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $step;
 
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $edit_type;
 
@@ -163,7 +163,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $validate_pattern;
 
@@ -172,7 +172,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $max_chars;
 
@@ -181,7 +181,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.3.0
+		 * @since 1.1.0
 		 */
 		public static $title_attr;
 
@@ -190,7 +190,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 5.0.0
+		 * @since 1.1.0
 		 */
 		public static $required;
 
@@ -203,7 +203,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function create( $settings, $option_name, $data ) {
 
@@ -366,7 +366,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * HTML code
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function html() {
 
@@ -378,7 +378,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Setting Description
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function hint() {
 
@@ -394,7 +394,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Upload
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function upload() {
 
@@ -423,7 +423,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Upload Font
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function upload_font() {
 
@@ -444,7 +444,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Text
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function text() {
 			$type_attr  = 'type="text"';
@@ -476,7 +476,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Text Array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function text_array() {
 
@@ -493,7 +493,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Checkbox
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function checkbox() {
 
@@ -512,7 +512,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Radio
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function radio() {
 
@@ -588,7 +588,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Multiple Select
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function multiple_select() {
 			?>
@@ -617,7 +617,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Textarea
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function textarea() {
 			?>
@@ -629,7 +629,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Color
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function color() {
 
@@ -649,7 +649,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Posts selector
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function posts() {
 			?>
@@ -687,7 +687,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Post
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function post() {
 			?>
@@ -703,7 +703,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Editor
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function editor() {
 
@@ -730,7 +730,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Fonts
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function fonts() {
 			?>
@@ -741,7 +741,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Tab Title
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function tab_title() {
 			?>
@@ -757,7 +757,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Notice Message
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function notice_message() {
 
@@ -779,7 +779,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Hidden
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function hidden() {
 			?>
@@ -790,7 +790,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Number
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function number() {
 			?>
@@ -801,7 +801,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Section Head
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function section_head() {
 			?>
@@ -823,7 +823,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Option Head
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function option_head() {
 			// Everything is ok with not closed div - dont worry about it.
@@ -849,7 +849,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Visual
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function visual() {
 			?>
@@ -973,7 +973,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Gallery
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function gallery() {
 			?>
@@ -1072,7 +1072,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Icon
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function icon() {
 			?>
@@ -1089,7 +1089,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Select
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function select() {
 			?>
@@ -1163,7 +1163,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Background
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function background() {
 
@@ -1305,7 +1305,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		/**
 		 * Typography
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function typography() {
 
@@ -1407,7 +1407,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 * @param string $option_name - Name of the option.
 		 * @param mixed  $data - The data to show.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static function prepare_data( $settings, $option_name, $data ) {
 

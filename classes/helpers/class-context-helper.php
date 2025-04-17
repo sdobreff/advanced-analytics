@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 2.0.0
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since 1.0.0
+	 * @since 1.1.0
 	 */
 	class Context_Helper {
 
@@ -43,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static $all = array(
 			self::AJAX        => null,
@@ -71,7 +71,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @var bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static $not_installing = null;
 
@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @var bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static $undetermined = null;
 
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		final public static function determine() {
 			$is_installing     = defined( 'WP_INSTALLING' ) && WP_INSTALLING;
@@ -138,7 +138,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function is_rest_request(): bool {
 			if (
@@ -172,7 +172,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function is_login_request(): bool {
 			/**
@@ -205,7 +205,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function is_wp_activate_request(): bool {
 			return static::is_page_now( 'wp-activate.php', \network_site_url( 'wp-activate.php' ) );
@@ -219,7 +219,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_page_now( string $page, string $url = '' ): bool {
 			$page_now = (string) ( $GLOBALS['pagenow'] ?? '' );
@@ -244,7 +244,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @throws \LogicException - if that context is not valid.
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		final public static function force( string $context ) {
 			if ( ! \array_key_exists( $context, self::$all ) ) {
@@ -263,7 +263,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		/**
 		 * Sets the context wp-cli to true.
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		final public static function with_cli() {
 			self::$all[ self::CLI ] = true;
@@ -278,7 +278,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @throws \LogicException - if that context is not valid.
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		final public static function is( string $context ): bool {
 			if ( ! \array_key_exists( $context, self::$all ) ) {
@@ -306,7 +306,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_core(): bool {
 			if ( is_null( self::$all[ self::CORE ] ) ) {
@@ -325,7 +325,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_frontoffice(): bool {
 			if ( is_null( self::$all[ self::FRONTOFFICE ] ) ) {
@@ -342,7 +342,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_front(): bool {
 			return self::is_frontoffice();
@@ -353,7 +353,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_backoffice(): bool {
 			if ( is_null( self::$all[ self::BACKOFFICE ] ) ) {
@@ -369,7 +369,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_admin(): bool {
 			return self::is_backoffice();
@@ -380,7 +380,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_ajax(): bool {
 			if ( is_null( self::$all[ self::AJAX ] ) ) {
@@ -396,7 +396,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_login(): bool {
 			if ( is_null( self::$all[ self::LOGIN ] ) ) {
@@ -413,7 +413,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_rest(): bool {
 			if ( is_null( self::$all[ self::REST ] ) ) {
@@ -430,7 +430,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_cron(): bool {
 			if ( is_null( self::$all[ self::CRON ] ) ) {
@@ -446,7 +446,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_wp_cli(): bool {
 			if ( is_null( self::$all[ self::CLI ] ) ) {
@@ -461,7 +461,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_xml_rpc(): bool {
 			if ( is_null( self::$all[ self::XML_RPC ] ) ) {
@@ -479,7 +479,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_installing(): bool {
 			if ( is_null( self::$all[ self::INSTALLING ] ) ) {
@@ -496,7 +496,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_wp_activate(): bool {
 			if ( is_null( self::$all[ self::WP_ACTIVATE ] ) ) {
@@ -516,7 +516,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function add_action_hooks(): void {
 			if ( empty( self::$action_callbacks ) ) {
@@ -549,7 +549,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function remove_action_hooks(): void {
 			foreach ( self::$action_callbacks as $action => $callback ) {
@@ -563,7 +563,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function is_not_installing(): bool {
 			if ( is_null( self::$not_installing ) ) {
@@ -577,7 +577,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function is_undetermined(): bool {
 			if ( is_null( self::$undetermined ) ) {
@@ -601,7 +601,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 1.0.0
+		 * @since 1.1.0
 		 */
 		private static function reset_and_force( string $context ): void {
 			self::force( $context );

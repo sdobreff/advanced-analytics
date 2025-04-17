@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since 
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 	/**
 	 * Responsible for operations related to the error log file.
 	 *
-	 * @since 
+	 * @since 1.1.0
 	 */
 	class Error_Log {
 
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $log_file = null;
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $last_error = null;
 
@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return string|\WP_Error
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function autodetect() {
 			if ( null === self::$log_file ) {
@@ -122,7 +122,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function clear( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
@@ -149,7 +149,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return int|false
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_file_size( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
@@ -166,7 +166,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return int|false
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_modification_time( $filename ) {
 			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
@@ -187,7 +187,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return string|bool
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function extract_file_name( $file ) {
 			$filename = false;
@@ -207,7 +207,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return string|null
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_last_error() {
 			return self::$last_error;

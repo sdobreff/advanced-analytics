@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 1.0.0
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -26,7 +26,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since 2.0.0
+	 * @since 1.1.0
 	 */
 	class Settings {
 
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $disabled_severities = null;
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $config_args = array(
 			'normalize' => true,
@@ -71,7 +71,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static $current_options = array();
 
@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		private static $hook = null;
 
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static $default_options = array();
 
@@ -112,7 +112,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function init() {
 
@@ -136,7 +136,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function get_current_options(): array {
 			if ( empty( self::$current_options ) ) {
@@ -170,7 +170,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function store_options( array $options ): void {
 			\update_option( ADVAN_SETTINGS_NAME, $options );
@@ -181,7 +181,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function get_default_options(): array {
 
@@ -242,7 +242,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_main_menu_page_hook() {
 			return self::$hook;
@@ -253,7 +253,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * Add the options page to the admin menu
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function add_options_page() {
 
@@ -389,7 +389,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string Updates count markup, empty string if no updates available.
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_updates_count_html(): string {
 
@@ -407,7 +407,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * Get the options and display the page
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function analytics_options_page() {
 			self::render();
@@ -418,7 +418,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function render() {
 
@@ -449,7 +449,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * Add help tab to options screen
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function aadvana_help() {
 
@@ -476,7 +476,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function add_help_content() {
 
@@ -494,7 +494,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function add_sidebar_content() {
 
@@ -510,7 +510,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 1.6.0
+		 * @since 1.1.0
 		 */
 		public static function get_settings_page_link() {
 			if ( '' === self::$settings_page_link ) {
@@ -525,7 +525,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function save_button() {
 
@@ -542,7 +542,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function aadvana_show_options() {
 
@@ -739,7 +739,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function build_options_tabs(): array {
 
@@ -796,7 +796,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function build_option( array $value ) {
 			$data = false;
@@ -819,7 +819,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function set_current_options( array $options ) {
 			return self::$current_options = $options; // phpcs:ignore Squiz.PHP.DisallowMultipleAssignments.Found
@@ -830,7 +830,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function is_plugin_settings_page() {
 
@@ -844,7 +844,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function get_version(): string {
 			if ( empty( self::$current_version ) ) {
@@ -863,7 +863,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function store_version(): void {
 			\update_option( self::SETTINGS_VERSION, \ADVAN_VERSION );
@@ -876,7 +876,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
@@ -935,7 +935,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function collect_and_sanitize_options( array $post_array ): array {
 			if ( ! \current_user_can( 'manage_options' ) ) {
@@ -1000,7 +1000,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 
+		 * @since 1.1.0
 		 */
 		public static function get_disabled_severities(): array {
 			if ( null === self::$disabled_severities ) {

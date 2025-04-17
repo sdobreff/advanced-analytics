@@ -44,7 +44,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 	 *
 	 * @package ADVAN\Utils
 	 *
-	 * @since 2.0.0
+	 * @since 1.1.0
 	 */
 	class Abstract_Migration {
 
@@ -53,7 +53,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		protected static $stored_version = '';
 
@@ -72,7 +72,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		protected static $pad_length = 3;
 
@@ -81,7 +81,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function migrate() {
 
@@ -119,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 			 *
 			 * @return void
 			 *
-			 * @since 2.0.0
+			 * @since 1.1.0
 			 */
 			if ( version_compare( static::get_stored_version(), \ADVAN_VERSION, '>' ) ) {
 				self::store_updated_version();
@@ -131,7 +131,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static function get_stored_version() {
 
@@ -147,7 +147,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static function store_updated_version() {
 			Settings::store_version();
@@ -168,7 +168,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		public static function normalize_version( string $version ) {
 			$version_as_number = (int) filter_var( $version, FILTER_SANITIZE_NUMBER_INT );
@@ -188,7 +188,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.0.0
+		 * @since 1.1.0
 		 */
 		private static function get_all_migration_methods_as_numbers() {
 			$class_methods = \get_class_methods( get_called_class() );

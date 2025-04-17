@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since 3.2.0
+	 * @since 1.1.0
 	 */
 	class System_Status {
 
@@ -31,7 +31,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Figure out cURL version, if installed
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function _curl_version() {
 
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Get the wp memory limit
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function _memory_limit() {
 
@@ -66,7 +66,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Test POST requests
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 *
 		 * @return bool|\WP_Error
 		 */
@@ -99,7 +99,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function get_request() {
 
@@ -118,7 +118,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * All environment info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function environment_info() {
 			global $wpdb;
@@ -181,7 +181,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Get the theme info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function _theme_info() {
 
@@ -246,7 +246,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Get all active plugins info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function _get_active_plugins() {
 
@@ -311,7 +311,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 *
 		 * Transform the php.ini notation for numbers (like '2M') to an integer.
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function _let_to_num( $size ) {
 			$l   = substr( $size, -1 );
@@ -339,7 +339,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * _print_environment_info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function print_environment_info() {
 			global $wpdb;
@@ -625,7 +625,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * _print_theme_info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function print_theme_info() {
 			$theme = self::_theme_info();
@@ -699,7 +699,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * _custom_post_types_info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		private static function _custom_post_types_info() {
 
@@ -741,7 +741,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * _print_plugins_info
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function print_plugins_info() {
 
@@ -805,7 +805,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * _print_report
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function print_report() {
 
@@ -887,7 +887,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * Scan the template files
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function scan_template_files( $template_path ) {
 			$files  = scandir( $template_path );
@@ -913,7 +913,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		/**
 		 * Retrieve metadata from a file. Based on WP Core's get_file_data function
 		 *
-		 * @since 3.2.0
+		 * @since 1.1.0
 		 */
 		public static function get_template_version( $file ) {
 			// We don't need to write to the file, so just open for reading.
