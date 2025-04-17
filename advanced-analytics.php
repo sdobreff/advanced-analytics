@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced analytics
  * Description:     Allows admins to do WP analytics.
- * Version:         1.1.0
+ * Version:         1.1.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'We\'re sorry, but you can not directly access this file.' );
 }
 
-define( 'ADVAN_VERSION', '1.1.0' );
+define( 'ADVAN_VERSION', '1.1.1' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );

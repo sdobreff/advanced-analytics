@@ -44,6 +44,10 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function init() {
 			if ( \is_admin() && ! \wp_doing_ajax() ) {
+				// \add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 0, 3 );
+				// \add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 20, 3 );
+				// \add_filter( 'doing_it_wrong_trigger_error', array( __CLASS__, 'filter_doing_it_wrong_trigger_error' ), 10, 4 );
+
 				Migration::migrate();
 
 				// \add_action( 'admin_init', array( __CLASS__, 'plugin_redirect' ) );
@@ -59,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Review_Plugin::init();
 
 				// Integrations::init();
-				Settings::init();
+				\add_filter( 'init', array( Settings::class, 'init' ) );
 
 				// Pointers::init();
 
@@ -68,7 +72,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			} else {
 				// Footnotes_Formatter::init();
 			}
-
 
 			// if ( \WP_DEBUG ) {
 			// set_error_handler( 'WP_Error_Handler::handle_error' );
@@ -90,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function add_settings_link( $links, $file ) {
 			if ( ADVAN_PLUGIN_BASENAME === $file ) {
-				$settings_link = '<a href="' . esc_url(Settings::get_settings_page_link()) . '">' . esc_html__( 'Settings', '0-day-analytics' ) . '</a>';
+				$settings_link = '<a href="' . esc_url( Settings::get_settings_page_link() ) . '">' . esc_html__( 'Settings', '0-day-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
 			}
 
@@ -251,5 +254,85 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			}
 		}
 
+		/**
+		 * Action for _doing_it_wrong() calls.
+		 *
+		 * @since 1.9.2.2
+		 *
+		 * @param string $function_name The function that was called.
+		 * @param string $message       A message explaining what has been done incorrectly.
+		 * @param string $version       The version of WordPress where the message was added.
+		 *
+		 * @return void
+		 */
+		public static function action_doing_it_wrong_run( $function_name, $message, $version ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+			global $wp_filter;
+
+			$function_name = (string) $function_name;
+			$message       = (string) $message;
+
+			if ( ! class_exists( '\QM_Collectors', false ) || ! self::is_just_in_time_for_0_day_domain( $function_name, $message ) ) {
+				return;
+			}
+
+			$qm_collector_doing_it_wrong = \QM_Collectors::get( 'doing_it_wrong' );
+			$current_priority            = $wp_filter['doing_it_wrong_run']->current_priority();
+
+			if ( null === $qm_collector_doing_it_wrong || false === $current_priority ) {
+				return;
+			}
+
+			switch ( $current_priority ) {
+				case 0:
+					\remove_action( 'doing_it_wrong_run', array( $qm_collector_doing_it_wrong, 'action_doing_it_wrong_run' ) );
+					break;
+
+				case 20:
+					\add_action( 'doing_it_wrong_run', array( $qm_collector_doing_it_wrong, 'action_doing_it_wrong_run' ), 10, 3 );
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		/**
+		 * Filter for _doing_it_wrong() calls.
+		 *
+		 * @since 1.9.2.2
+		 *
+		 * @param bool|mixed $trigger       Whether to trigger the error for _doing_it_wrong() calls. Default true.
+		 * @param string     $function_name The function that was called.
+		 * @param string     $message       A message explaining what has been done incorrectly.
+		 * @param string     $version       The version of WordPress where the message was added.
+		 *
+		 * @return bool
+		 * @noinspection PhpMissingParamTypeInspection
+		 * @noinspection PhpUnusedParameterInspection
+		 */
+		public static function filter_doing_it_wrong_trigger_error( $trigger, $function_name, $message, $version ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+			$trigger       = (bool) $trigger;
+			$function_name = (string) $function_name;
+			$message       = (string) $message;
+
+			return self::is_just_in_time_for_0_day_domain( $function_name, $message ) ? false : $trigger;
+		}
+
+		/**
+		 * Whether it is the just_in_time_error for 0-Day-related domains.
+		 *
+		 * @since 1.9.2.2
+		 *
+		 * @param string $function_name Function name.
+		 * @param string $message       Message.
+		 *
+		 * @return bool
+		 */
+		public static function is_just_in_time_for_0_day_domain( string $function_name, string $message ): bool {
+
+			return '_load_textdomain_just_in_time' === $function_name && strpos( $message, '<code>' . ADVAN_TEXTDOMAIN ) !== false;
+		}
 	}
 }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Advanced_Analytics;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -87,8 +89,15 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 
 		public static function trigger_error( $status, string $function_name, $errstr, $version, $errno = E_USER_NOTICE ) {
 
+
 			if ( false === $status ) {
 				return $status;
+			}
+
+			if ( Advanced_Analytics::is_just_in_time_for_0_day_domain( $function_name, $errstr ) ) {
+				// This error code is not included in error_reporting, so let it fall.
+				// through to the standard PHP error handler.
+				return false;
 			}
 
 			$defaults = array(
