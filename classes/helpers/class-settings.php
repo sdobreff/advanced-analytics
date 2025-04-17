@@ -480,9 +480,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_help_content() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to specify the default options for the Awesome Footnotes plugin.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'The identifier is what appears when a footnote is inserted into your page contents. The back-link appear after each footnote, linking back to the identifier.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'Remember to click the Save Changes button at the bottom of the screen for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
+			$help_text  = '<p>' . __( 'This screen allows you to specify the options for the Advanced Analytics plugin.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Here you can set how many errors to be shown (maximum is 100), create new debug log, or enebale / disable WP logging..', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Remember to click the Save Changes button when on sexttings page for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
 		}
@@ -499,8 +499,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function add_sidebar_content() {
 
 			$help_text  = '<p><strong>' . __( 'For more information:', '0-day-analytics' ) . '</strong></p>';
-			$help_text .= '<p><a href="https://wordpress.org/plugins/awesome-footnotes/">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
-			$help_text .= '<p><a href="https://wordpress.org/support/plugin/awesome-footnotes">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
+			$help_text .= '<p><a href="https://wordpress.org/plugins/0-day-analytics/">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
+			$help_text .= '<p><a href="https://wordpress.org/support/plugin/0-day-analytics">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
 
 			return $help_text;
 		}
