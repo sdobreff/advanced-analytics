@@ -21,6 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
+	/**
+	 * Class: WP_Error_Handler
+	 *
+	 * Helper class to handle errors and exceptions.
+	 *
+	 * @since 1.1.0
+	 */
 	class WP_Error_Handler {
 		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null ) {
 			if ( ! ( error_reporting() & $errno ) ) {
@@ -87,8 +94,20 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			return true;
 		}
 
+		/**
+		 * Catches errors which come from the doing_it_wrong() function, WP core does not provide much information about what is really going on and where, this method adds some more information to the error log.
+		 *
+		 * @param bool   $status - Whether to trigger the error for _doing_it_wrong() calls. Default true.
+		 * @param string $function_name - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
+		 * @param string $errstr - The WP error string (message).
+		 * @param string $version - Since which WP version given error was added.
+		 * @param int    $errno - The number of the error (type of the error - that probably never get set by WP and always falls to the default which is E_USER_NOTICE).
+		 *
+		 * @return bool
+		 *
+		 * @since 1.1.1
+		 */
 		public static function trigger_error( $status, string $function_name, $errstr, $version, $errno = E_USER_NOTICE ) {
-
 
 			if ( false === $status ) {
 				return $status;

@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 							self::$last_timestamp = $timestamp;
 						}
 
-						if ( (int) self::get_last_parsed_timestamp() < self::$last_timestamp ) {
+						if ( (int) self::get_last_parsed_timestamp() < $timestamp ) {
 							++self::$newer_lines;
 						}
 					}

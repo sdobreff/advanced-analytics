@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -59,6 +59,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 
 == Changelog ==
+
+= 1.2.0 =  
+* Code optimizations and functionality enhancements. Console now shows lines the way PHP error log stores them (not in reverse order). The new errors (count) is now shown next to the admin menu item. Admin bar size is reduced.
 
 = 1.1.1 =  
 * :) .

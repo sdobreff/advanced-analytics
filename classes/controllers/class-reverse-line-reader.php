@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since 
+ * @since 1.1.1
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 	/**
 	 * Responsible for reding lines from the end of file.
 	 *
-	 * @since 
+	 * @since 1.1.1
 	 */
 	class Reverse_Line_Reader {
 		const BUFFER_SIZE = 4096;
@@ -31,7 +31,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		private static $buffer = array( '' );
 
@@ -40,7 +40,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		private static $buffer_size = self::BUFFER_SIZE;
 
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		private static $file_size = 0;
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		private static $pos = null;
 
@@ -67,9 +67,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var handle
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		private static $temp_handle = null;
+
+		/**
+		 * Stores the memory file handle for showing the truncated error log.
+		 *
+		 * @var handle
+		 *
+		 * @since 1.1.1
+		 */
+		private static $memory_handle = null;
 
 		/**
 		 * Reads lines from given file reversed order.
@@ -82,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void|bool
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		public static function read_file_from_end( $file_or_handle, $callback, $max_lines = 0, $pos = null, bool $temp_writer = true ) {
 			if ( \is_a( $file_or_handle, 'WP_Error' ) ) {
@@ -145,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			/*
 			New shit
 			while ( ( $buffer = fgets( $fp, 4096 ) ) !== false ) {
-				echo $buffer, PHP_EOL;
+			echo $buffer, PHP_EOL;
 			}
 
 			fseek( $handle, self::$pos - 4096, SEEK_END );
@@ -156,7 +165,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			*/
 
 			if ( $temp_writer ) {
-				self::write_temp_file( $line . self::SEPARATOR );
+				self::write_memory_file( $line . self::SEPARATOR );
 			}
 			$result = $callback( $line, self::$pos );
 
@@ -170,6 +179,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			// }
 			if ( $max_lines > 0 ) {
 				if ( $result['line_done'] ) {
+					if ( $temp_writer ) {
+						self::flush_memory_file_to_temp();
+					}
 					--$max_lines;
 				}
 				if ( 0 === $max_lines ) {
@@ -190,7 +202,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return string|false
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		public static function read( int $size, &$file_or_handle ) {
 			self::$pos -= $size;
@@ -211,7 +223,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		public static function readline( &$file_or_handle ) {
 			$buffer =& self::$buffer;
@@ -245,7 +257,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		public static function write_temp_file( string $line ) {
 			if ( null === self::$temp_handle ) {
@@ -256,11 +268,28 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		}
 
 		/**
+		 * Writes memory file used lated on to show the content of the error log (in reverse order and truncated to the last couple of errors)
+		 *
+		 * @param string $line - The line to be written.
+		 *
+		 * @return void
+		 *
+		 * @since 1.1.1
+		 */
+		public static function write_memory_file( string $line ) {
+			if ( null === self::$memory_handle ) {
+				self::$memory_handle = fopen( 'php://memory', 'w+' );
+			}
+
+			fwrite( self::$memory_handle, $line );
+		}
+
+		/**
 		 * Reads the contents of the temp file and returns the contents.
 		 *
 		 * @return void
 		 *
-		 * @since 
+		 * @since 1.1.1
 		 */
 		public static function read_temp_file() {
 			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {
@@ -269,6 +298,54 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				echo fread( self::$temp_handle, fstat( self::$temp_handle )['size'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.Security.EscapeOutput.OutputNotEscaped
 
 				fclose( self::$temp_handle );
+			}
+		}
+
+		/**
+		 * Reads the contents of the memory file and returns the contents.
+		 *
+		 * @return void
+		 *
+		 * @since 1.1.1
+		 */
+		public static function read_memory_file() {
+			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {
+				rewind( self::$memory_handle ); // resets the position of pointer.
+
+				echo fread( self::$memory_handle, fstat( self::$memory_handle )['size'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.Security.EscapeOutput.OutputNotEscaped
+
+				fclose( self::$memory_handle );
+			}
+		}
+
+		public static function flush_memory_file_to_temp() {
+			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {
+				// $fl = fopen("\some_file.txt", "r");
+				$line = '';
+				for ( $x_pos = 0; fseek( self::$memory_handle, $x_pos, SEEK_END ) !== -1; $x_pos-- ) {
+					$char = fgetc( self::$memory_handle );
+
+					if ( PHP_EOL === $char ) {
+						// analyse completed line $output[$ln] if need be
+						// ++$ln;
+						// continue;
+						self::write_temp_file( $line.PHP_EOL );
+						$line = '';
+						continue;
+					} else {
+						$line = $char.$line;
+					}
+					
+					//$output[ $ln ] = $char . ( ( array_key_exists( $ln, $output ) ) ? $output[ $ln ] : '' );
+				}
+				if ( ! empty( $line ) ) {
+					self::write_temp_file( $line.PHP_EOL );
+				}
+				fclose( self::$memory_handle );
+
+				self::$memory_handle = null;
+
+				
 			}
 		}
 	}
