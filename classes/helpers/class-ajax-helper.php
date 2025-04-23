@@ -73,17 +73,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function truncate_log_file() {
-			// Check nonce.
+			self::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
-			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
+			Error_Log::clear( Error_Log::autodetect() );
+			Log_Line_Parser::delete_last_parsed_timestamp();
 
-				Error_Log::clear( Error_Log::autodetect() );
-				Log_Line_Parser::delete_last_parsed_timestamp();
-
-				\wp_send_json_success( 2 );
-
-				\wp_die();
-			}
+			\wp_send_json_success( 2 );
 		}
 
 		/**
@@ -94,19 +89,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function download_log_file() {
-			// Check nonce.
 			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
-				\wp_send_json_error( 0 );
-			} else {
-				if ( \check_ajax_referer( 'advan-plugin-data', 'advanced-analytics-security' ) ) {
-
-					echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				}
-
-				\wp_send_json_success( 2 );
+				\wp_send_json_error( 'Insufficient permissions.', 403 );
 			}
 
-			\wp_die();
+			self::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+			echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+			\wp_send_json_success( 2 );
 		}
 
 		/**
@@ -118,21 +109,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 */
 		public static function save_settings_ajax() {
 
-			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) {
+			self::verify_admin_nonce( 'aadvana-plugin-data', 'aadvana-security' );
 
-				if ( isset( $_POST[ \ADVAN_SETTINGS_NAME ] ) && ! empty( $_POST[ \ADVAN_SETTINGS_NAME ] ) && \is_array( $_POST[ \ADVAN_SETTINGS_NAME ] ) ) {
+			if ( isset( $_POST[ \ADVAN_SETTINGS_NAME ] ) && ! empty( $_POST[ \ADVAN_SETTINGS_NAME ] ) && \is_array( $_POST[ \ADVAN_SETTINGS_NAME ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-					$data = array_map( 'sanitize_text_field', \stripslashes_deep( $_POST[ \ADVAN_SETTINGS_NAME ] ) );
+				$data = array_map( 'sanitize_text_field', \stripslashes_deep( $_POST[ \ADVAN_SETTINGS_NAME ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-					\update_option( \ADVAN_SETTINGS_NAME, Settings::collect_and_sanitize_options( $data ) );
+				\update_option( \ADVAN_SETTINGS_NAME, Settings::collect_and_sanitize_options( $data ) );
 
-					\wp_send_json_success( 2 );
-				}
-				\wp_die();
-			} else {
-				\wp_send_json_success( 0 );
-				\wp_die();
+				\wp_send_json_success( 2 );
 			}
+				\wp_die();
 		}
 
 		/**
@@ -143,29 +130,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function delete_cron() {
-			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {
+			self::verify_admin_nonce( 'bulk-custom-delete' );
 
-				if ( isset( $_REQUEST['hash'] ) && ! empty( $_REQUEST['hash'] ) ) {
-					$hash = \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
-				} else {
-					\wp_send_json_error( 0 );
+			$hash = self::validate_hash_param();
 
-					\wp_die();
-				}
+			$result = Crons_Helper::delete_event( $hash );
 
-				$result = Crons_Helper::delete_event( $hash );
-
-				if ( $result && ! \is_wp_error( $result ) ) {
-					\wp_send_json_success( 2 );
-				} elseif ( \is_wp_error( $result ) ) {
-					\wp_send_json_error( $result->get_error_message() );
-				} elseif ( false === $result ) {
-					\wp_send_json_error( 'Unable to delete cron' );
-				}
+			if ( $result && ! \is_wp_error( $result ) ) {
+				\wp_send_json_success( 2 );
+			} elseif ( \is_wp_error( $result ) ) {
+				\wp_send_json_error( $result->get_error_message(), 500 );
 			} else {
-				\wp_send_json_success( 0 );
+				\wp_send_json_error( 'Unable to delete cron.', 500 );
 			}
-			\wp_die();
 		}
 
 		/**
@@ -176,28 +153,52 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function run_cron() {
-			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {
+			self::verify_admin_nonce( 'bulk-custom-delete' );
 
-				if ( isset( $_REQUEST['hash'] ) && ! empty( $_REQUEST['hash'] ) ) {
-					$hash = \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
-				} else {
-					\wp_send_json_error( 0 );
+			$hash = self::validate_hash_param();
 
-					\wp_die();
-				}
-
-				if ( ! defined( 'DOING_CRON' ) ) {
-					define( 'DOING_CRON', true );
-				}
-
-				Crons_Helper::execute_event( $hash );
-
-				\wp_send_json_success( 2 );
-
-			} else {
-				\wp_send_json_success( 0 );
+			if ( ! defined( 'DOING_CRON' ) ) {
+				define( 'DOING_CRON', true );
 			}
-			\wp_die();
+
+			Crons_Helper::execute_event( $hash );
+
+			\wp_send_json_success( 2 );
+		}
+
+		/**
+		 * Verifies the nonce and user capability.
+		 *
+		 * @param string $action Nonce action.
+		 * @param string $nonce_name Nonce name.
+		 *
+		 * @return void
+		 *
+		 * @throws \Exception If the nonce is invalid or the user does not have the required capability.
+		 *
+		 * @since latest
+		 */
+		private static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ): void {
+			if ( ! \current_user_can( 'manage_options' ) || ! \check_ajax_referer( $action, $nonce_name, false ) ) {
+				\wp_send_json_error( 'Insufficient permissions or invalid nonce.', 403 );
+				\wp_die();
+			}
+		}
+
+		/**
+		 * Validates and retrieves the hash parameter from the request.
+		 *
+		 * @return string The sanitized hash.
+		 *
+		 * @since latest
+		 */
+		private static function validate_hash_param(): string {
+			if ( ! isset( $_REQUEST['hash'] ) || empty( $_REQUEST['hash'] ) ) {
+				\wp_send_json_error( 'Missing or empty hash parameter.', 400 );
+				\wp_die();
+			}
+
+			return \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
 		}
 	}
 }

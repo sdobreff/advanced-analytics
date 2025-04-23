@@ -10,8 +10,8 @@
  * @license   GPL v3
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
- * Plugin Name:     Advanced analytics
- * Description:     Allows admins to do WP analytics.
+ * Plugin Name:     Advanced Analytics
+ * Description:     Provides WordPress analytics with a focus on performance and security.
  * Version:         1.3.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
@@ -28,9 +28,10 @@ use ADVAN\Helpers\WP_Error_Handler;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
-	die( 'We\'re sorry, but you can not directly access this file.' );
+	exit; // More secure than die().
 }
 
+// Constants.
 define( 'ADVAN_VERSION', '1.3.0' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
@@ -73,6 +74,7 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 	return;
 }
 
+// Check mbstring extension.
 if ( ! extension_loaded( 'mbstring' ) ) {
 	\add_action(
 		'admin_init',
@@ -122,6 +124,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );
 
+// Polyfill for str_starts_with (PHP < 8.0).
 if ( ! function_exists( 'str_starts_with' ) ) {
 	/**
 	 * PHP lower than 8 is missing that function but it required in the newer versions of our plugin.
