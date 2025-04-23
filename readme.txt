@@ -1,9 +1,9 @@
 === Advanced Analytics ===
-Tags: log, error log, 0-day, analytics
+Tags: log, error log, 0-day, analytics, cron
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -15,6 +15,7 @@ Advanced Analytics is a powerful plugin designed for WordPress sites with extens
 - Read and analyze gigabytes of error logs efficiently.
 - Enable or disable error logging directly from the WordPress dashboard.
 - Manage large log files without performance degradation.
+- Cron manager at the tip of your fingers
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -59,6 +60,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 
 == Changelog ==
+
+= 1.3.0 =  
+* Code optimizations and functionality enhancements. More of WP deprecated events are now support. First version of Cron manager introduced (multisite is not fully supported yet and functionalities are limited)
 
 = 1.2.0 =  
 * Code optimizations and functionality enhancements. Console now shows lines the way PHP error log stores them (not in reverse order). The new errors (count) is now shown next to the admin menu item. Admin bar size is reduced.

@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced analytics
  * Description:     Allows admins to do WP analytics.
- * Version:         1.2.0
+ * Version:         1.3.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'We\'re sorry, but you can not directly access this file.' );
 }
 
-define( 'ADVAN_VERSION', '1.2.0' );
+define( 'ADVAN_VERSION', '1.3.0' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -106,6 +106,16 @@ $plugin_name_libraries = require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
 if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
+
+	// All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.
+	\add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+	\add_action( 'deprecated_constructor_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+	\add_action( 'deprecated_class_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+
+	// Need to add deprecated_argument_run as it is bit different than the others.
+
 	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }

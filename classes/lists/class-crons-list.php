@@ -1,6 +1,6 @@
 <?php
 /**
- * Responsible for the Showing the list of the events collected.
+ * Responsible for the Showing the list of the crons.
  *
  * @package    advanced-analytics
  * @subpackage helpers
@@ -20,6 +20,7 @@ use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Controllers\Reverse_Line_Reader;
+use ADVAN\Helpers\Crons_Helper;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -31,17 +32,17 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 /*
  * Base list table class
  */
-if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
+if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 	/**
 	 * Responsible for rendering base table for manipulation.
 	 *
 	 * @since 1.1.0
 	 */
-	class Logs_List extends \WP_List_Table {
+	class Crons_List extends \WP_List_Table {
 
-		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_logs_list';
+		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_crons_list';
 
-		public const PAGE_SLUG = 'toplevel_page_advan_logs';
+		public const PAGE_SLUG = 'toplevel_page_advan_crons';
 
 		public const SEARCH_INPUT = 'sgp';
 
@@ -125,7 +126,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		private static $read_items = array();
+		private static $read_items = null;
 
 		/**
 		 * Default class constructor.
@@ -139,8 +140,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			parent::__construct(
 				array(
-					'singular' => 'generated-log',
-					'plural'   => 'generated-logs',
+					'singular' => 'generated-cron',
+					'plural'   => 'generated-crons',
 					'ajax'     => true,
 					'screen'   => $this->get_wp_screen(),
 				)
@@ -148,7 +149,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			self::$columns = self::manage_columns( array() );
 
-			self::$table_name = 'php_error_logs';
+			self::$table_name = 'advanced_crons';
 		}
 
 		/**
@@ -198,11 +199,11 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
-				// 'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
-				'timestamp'    => __( 'Time', '0-day-analytics' ),
-				'severity'     => __( 'Severity', '0-day-analytics' ),
-				'message'      => __( 'Message', '0-day-analytics' ),
-				'plugin_theme' => __( 'Source', '0-day-analytics' ),
+				'cb'         => '<input type="checkbox" />', // to display the checkbox.
+				'hook'       => __( 'Hook', '0-day-analytics' ),
+				'schedule'   => __( 'Time', '0-day-analytics' ),
+				'recurrence' => __( 'Interval', '0-day-analytics' ),
+				'args'       => __( 'Args', '0-day-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -346,7 +347,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
-			$this->items = self::get_error_items( true );
+			$this->items = self::get_cron_items( true );
 
 			return $this->items;
 		}
@@ -361,100 +362,43 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		public static function get_error_items( bool $write_temp = true, $items = false ): array {
+		public static function get_cron_items( bool $write_temp = true, $items = false ): array {
 
-			// if ( empty( self::$read_items ) ) { .
-				$collected_items = array();
-				$errors          = array();
-				$position        = null;
+			if ( null === self::$read_items ) {
 
-			if ( \function_exists( 'set_time_limit' ) ) {
-				\set_time_limit( 0 );
+				self::$read_items = Crons_Helper::get_events();
+
+				// $crons = _get_cron_array();
+
+				// if ( $crons && is_array( $crons ) ) {
+				// if ( null === self::$read_items ) {
+				// self::$read_items = array();
+				// }
+				// foreach ( $crons as $timestamp => $cron ) {
+				// if ( ! is_array( $cron ) ) {
+				// continue;
+				// }
+				// foreach ( $cron as $hook => $events ) {
+				// foreach ( $events as $event ) {
+
+				// $cron_item = array();
+
+				// $cron_item['hook']     = \esc_html( $hook );
+				// $cron_item['schedule'] = $timestamp;
+				// if ( isset( $event['schedule'] ) ) {
+				// $cron_item['recurrence'] = \esc_html( $event['schedule'] );
+				// }
+				// if ( isset( $event['args'] ) ) {
+				// $cron_item['args'] = print_r( $event['args'], true );
+				// }
+
+				// $cron_item['hash'] = substr( md5( $cron_item['hook'] . $cron_item['recurrence'] . $cron_item['schedule'] . serialize( $event['args'] ) ), 0, 8 );
+				// }
+				// self::$read_items[] = $cron_item;
+				// }
+				// }
+				// }
 			}
-
-			$file = Error_Log::autodetect();
-
-			if ( \is_a( $file, 'WP_Error' ) ) {
-				return array(
-					array(
-						'message'   => Error_Log::get_last_error(),
-						'timestamp' => time(),
-					),
-				);
-			}
-
-			while ( empty( $errors ) ) {
-				$result = Reverse_Line_Reader::read_file_from_end(
-					$file,
-					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
-
-						$position = $pos;
-
-						// Flag that holds the status of the error - are there more lines to read or not.
-						$more_to_error = false;
-
-						// Check if this is the last line, and if not try to parse the line.
-						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
-							$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
-
-							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
-								if ( ! empty( $collected_items ) ) {
-									$parsed_data['sub_items'] = $collected_items;
-									if ( isset( $collected_items[0]['message'] ) ) {
-										$parsed_data['message'] = $collected_items[0]['message'] . "\n" . $parsed_data['message'];
-										unset( $collected_items[0] );
-									}
-									$collected_items = array();
-								}
-								$errors[] = $parsed_data;
-								$more_to_error = false;
-							} elseif ( \is_array( $parsed_data ) ) {
-								if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
-									$collected_items[] = array(
-										'message' => $parsed_data['call'],
-									);
-								} else {
-									$collected_items[] = $parsed_data;
-								}
-
-								$more_to_error = true;
-							}
-						} elseif (!empty($line)){
-							$more_to_error = true;
-						}
-
-						return ['line_done' => !$more_to_error, 'close'=> false];
-
-						// if ( ! str_contains( $address, 'stop_word' ) ) {
-						// echo "\nFound 'stop_word'!"; .
-
-						// return false; // returning false here "breaks" the loop
-						// } .
-					},
-					( ! $items ) ? self::get_screen_option_per_page() : $items,
-					$position,
-					$write_temp
-				);
-
-				if ( false === $result ) {
-					break;
-				}
-			}
-
-			$disabled = Settings::get_disabled_severities();
-			if ( ! empty( $disabled ) ) {
-				foreach ( $disabled as $severity ) {
-					foreach ( $errors as $key => $error ) {
-						if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
-							unset( $errors[ $key ] );
-						}
-					}
-				}
-			}
-				self::$read_items = $errors;
-			// }
-
-			Log_Line_Parser::store_last_parsed_timestamp();
 
 			return self::$read_items;
 		}
@@ -500,100 +444,25 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
-				case 'timestamp':
+				case 'hook':
+					$query_args_view_data['hash']     = $item['hash'];
+					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-custom-delete' );
+
+					$actions['delete'] = '<a class="aadvana-cron-delete" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
+
+
+					$actions['run'] = '<a class="aadvana-cron-run" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Run', '0-day-analytics' ) . '</a>';
+
+					return '<span>' . $item['hook'] . '</span>' . self::single_row_actions( $actions );
+				case 'recurrence':
+					return ( ! empty( $item['recurrence'] ) ? $item['recurrence'] : __( 'once', '0-day-analytics' ) );
+				case 'args':
+					return ( ! empty( $item['args'] ) ? \print_r( $item['args'], true ) : __( 'NO', '0-day-analytics' ) );
+				case 'schedule':
 					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-					$time             = \wp_date( $date_time_format, $item['timestamp'] );
+					$time             = \wp_date( $date_time_format, $item['schedule'] );
 
 					return $time;
-				case 'message':
-					$message = esc_html( $item[ $column_name ] );
-					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
-						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', '0-day-analytics' ) . '"></div>';
-
-						$reversed_details = \array_reverse( $item['sub_items'] );
-						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px; overflow-y:auto;">';
-						foreach ( $reversed_details as $key => $val ) {
-							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b> - ' : '';
-							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
-							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
-
-							$message = \rtrim( $message, ' - ' );
-						}
-						$message .= '</pre></div>';
-					}
-					return $message;
-				case 'plugin_theme':
-					if ( isset( $item['source'] ) ) {
-						return $item['source'];
-					} else {
-						$message = esc_html( $item['message'] );
-
-						$plugins_dir_basename = basename( WP_PLUGIN_DIR );
-
-						if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
-
-							$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
-
-							$next        = false;
-							$plugin_base = '';
-							foreach ( $split_plugin as $part ) {
-								if ( $next ) {
-									$plugin_base = $part;
-									break;
-								}
-								if ( $plugins_dir_basename === $part ) {
-									$next = true;
-								}
-							}
-
-							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
-
-							if ( ! empty( $plugin ) ) {
-								return esc_html( $plugin['Name'] );
-							}
-						}
-
-						$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
-
-						if ( false !== \mb_strpos( $message, $theme_root . \DIRECTORY_SEPARATOR ) ) {
-
-							$theme_dir_basename = basename( $theme_root );
-
-							$split_theme = explode( \DIRECTORY_SEPARATOR, $message );
-
-							$next       = false;
-							$theme_base = '';
-							foreach ( $split_theme as $part ) {
-								if ( $next ) {
-									$theme_base = $part;
-									break;
-								}
-								if ( $theme_dir_basename === $part ) {
-									$next = true;
-								}
-							}
-
-							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
-
-							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
-								$name = $theme->get( 'Name' );
-
-								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', '0-day-analytics' );
-
-								$parent = $theme->parent(); // ( 'parent_theme' );
-								if ( $parent ) {
-									$parent = $theme->parent()->get( 'Name' );
-
-									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', '0-day-analytics' ) . $parent . '</div>' : '';
-								}
-								$name .= (string) $parent;
-
-								return ( $name );
-							}
-						}
-
-						return '';
-					}
 				default:
 					return isset( $item[ $column_name ] )
 						? \esc_html( $item[ $column_name ] )
@@ -613,14 +482,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 1.1.0
 		 */
 		protected function column_cb( $item ) {
-			return;
 			return sprintf(
-				'<label class="screen-reader-text" for="' . self::$table_name . '_' . $item['id'] . '">' . sprintf(
+				'<label class="screen-reader-text" for="' . $item['hash'] . '">' . sprintf(
 					// translators: The column name.
 					__( 'Select %s' ),
 					'id'
 				) . '</label>'
-				. '<input type="checkbox" name="' . self::$table_name . '[]" id="' . self::$table_name . '_' . $item['id'] . '" value="' . $item['id'] . '" />'
+				. '<input type="checkbox" name="' . self::$table_name . '[]" id="' . $item['hash'] . '" value="' . $item['hash'] . '" />'
 			);
 		}
 
@@ -671,7 +539,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					$this->invalid_nonce_redirect();
 				} elseif ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
 					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-						
+
 					}
 				}
 				?>
@@ -739,7 +607,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
 				}
 			} else {
-				$option = 'advanced_analytics_logs_list_per_page';
+				$option = 'advanced_analytics_crons_list_per_page';
 			}
 
 			$per_page = (int) \get_user_option( $option );
@@ -835,80 +703,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			// Show site alerts widget.
 			// NOTE: this is shown when the filter IS NOT true.
-
-			$log_file = Error_Log::extract_file_name( Error_Log::autodetect() );
-
-			if ( null !== Error_Log::get_last_error() ) {
-
-				echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
-			}
-
-			if ( false !== $log_file ) {
-
-				$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-				$time             = \wp_date( $date_time_format, Error_Log::get_modification_time( Error_Log::autodetect() ) );
-
-				echo '<div><b>' . \esc_html__( 'Log file: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ) . '</div>';
-				echo '<div><b>' . \esc_html__( 'File size: ', '0-day-analytics' ) . '</b> ' . \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ) . '</div>';
-				echo '<div><b>' . \esc_html__( 'Last modified: ', '0-day-analytics' ) . '</b> ' . \esc_attr( $time ) . '</div>';
-			} else {
-				echo '<div><b>' . \esc_html__( 'No log file detected', '0-day-analytics' ) . '</b></div>';
-			}
-
-			if ( 'top' === $which ) {
-				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security' );
-
-				?>
-				<script>
-					jQuery( document ).on( 'click', '#top-truncate, #bottom-truncate', function ( e ) {
-						var data = {
-							'action': 'advanced_analytics_truncate_log_file',
-							'post_type': 'GET',
-							'_wpnonce': jQuery('#advanced-analytics-security').val(),
-						};
-
-						jQuery.post(ajaxurl, data, function(response) {
-							if( 2 === response['data'] ) {
-								window.location.reload();
-							}
-						}, 'json');
-					});
-					jQuery( document ).on( 'click', '#top-downloadlog, #bottom-downloadlog', function ( e ) {
-						
-						const a = document.createElement('a');
-						a.href = '<?php echo File_Helper::download_link(); ?>';
-
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-					});
-
-					jQuery( document ).on( 'click', '.show_log_details', function() {
-						jQuery(this).parent().next().closest('.log_details_show').toggle();
-					});
-				</script>
-				<?php
-			}
-			if ( false !== $log_file ) {
-				?>
-				<div>
-					<?php
-					if ( \current_user_can( 'manage_options' ) ) {
-						if ( null === Error_Log::get_last_error() ) {
-							?>
-						
-
-							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
-							<?php
-						}
-						?>
-					<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
-						<?php
-					}
-					?>
-				</div>
-				<?php
-			}
 		}
 
 		/**
@@ -938,6 +732,61 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {
 				wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+
+				?>
+				<script>
+					jQuery(document).ready(function(){
+						jQuery('.aadvana-cron-delete').on('click', function(e){
+
+							e.preventDefault();
+
+							let that = this;
+
+							var data = {
+								'action': 'aadvana_delete_cron',
+								'post_type': 'GET',
+								'_wpnonce': jQuery(this).data('nonce'),
+								'hash': jQuery(this).data('hash'),
+							};
+
+							jQuery.get(ajaxurl, data, function(response) {
+								if ( 2 === response['data'] || 0 === response['data'] ) {
+									jQuery(that).closest("tr").animate({
+										opacity: 0
+									}, 1000, function() {
+										jQuery(that).closest("tr").remove();
+									});
+								} else {
+									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
+								}
+							}, 'json');
+
+						});
+						jQuery('.aadvana-cron-run').on('click', function(e){
+
+							e.preventDefault();
+
+							let that = this;
+
+							var data = {
+								'action': 'aadvana_run_cron',
+								'post_type': 'GET',
+								'_wpnonce': jQuery(this).data('nonce'),
+								'hash': jQuery(this).data('hash'),
+							};
+
+							jQuery.get(ajaxurl, data, function(response) {
+								if ( 2 === response['data'] || 0 === response['data'] ) {
+									
+								} else {
+									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
+								}
+							}, 'json');
+
+						});
+					});
+				</script>
+				<?php
 			}
 			?>
 			<div class="tablenav <?php echo esc_attr( $which ); ?>">
@@ -980,8 +829,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						echo '.generated-logs .' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important;}';
 						echo '#the-list .' . \esc_attr( $class ) . ' td { color: ' . \esc_attr( $color ) . ' !important;}';
-						echo '#the-list td { color: #fff !important; }';
-						echo '#the-list tr { background: #1d456b;}';
+						echo '#the-list td { color: #333 !important; }';
+						echo '#the-list tr { background: #fff;}';
 
 					}
 					?>
@@ -990,5 +839,51 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					<?php
 			}
 		}
+
+		/**
+		 * Generates the required HTML for a list of row action links.
+		 *
+		 * @since latest
+		 *
+		 * @param string[] $actions        An array of action links.
+		 * @param bool     $always_visible Whether the actions should be always visible.
+		 * @return string The HTML for the row actions.
+		 */
+		protected static function single_row_actions( $actions, $always_visible = false ) {
+			$action_count = count( $actions );
+
+			if ( ! $action_count ) {
+				return '';
+			}
+
+			$mode = \get_user_setting( 'posts_list_mode', 'list' );
+
+			if ( 'excerpt' === $mode ) {
+				$always_visible = true;
+			}
+
+			$output = '<div class="' . ( $always_visible ? 'row-actions visible' : 'row-actions' ) . '">';
+
+			$i = 0;
+
+			foreach ( $actions as $action => $link ) {
+				++$i;
+
+				$separator = ( $i < $action_count ) ? ' | ' : '';
+
+				$output .= "<span class='$action'>{$link}{$separator}</span>";
+			}
+
+			$output .= '</div>';
+
+			$output .= '<button type="button" class="toggle-row"><span class="screen-reader-text">' .
+			/* translators: Hidden accessibility text. */
+			__( 'Show more details' ) .
+			'</span></button>';
+
+			return $output;
+		}
+
+
 	}
 }

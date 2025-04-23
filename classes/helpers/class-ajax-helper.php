@@ -52,6 +52,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 */
 				\add_action( 'wp_ajax_aadvana_plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
 
+				/**
+				 * Delete Cron
+				 */
+				\add_action( 'wp_ajax_aadvana_delete_cron', array( __CLASS__, 'delete_cron' ) );
+
+				/**
+				 * Run Cron
+				 */
+				\add_action( 'wp_ajax_aadvana_run_cron', array( __CLASS__, 'run_cron' ) );
+
 			}
 		}
 
@@ -123,6 +133,71 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\wp_send_json_success( 0 );
 				\wp_die();
 			}
+		}
+
+		/**
+		 * Executes cron deletion sequence.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function delete_cron() {
+			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {
+
+				if ( isset( $_REQUEST['hash'] ) && ! empty( $_REQUEST['hash'] ) ) {
+					$hash = \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
+				} else {
+					\wp_send_json_error( 0 );
+
+					\wp_die();
+				}
+
+				$result = Crons_Helper::delete_event( $hash );
+
+				if ( $result && ! \is_wp_error( $result ) ) {
+					\wp_send_json_success( 2 );
+				} elseif ( \is_wp_error( $result ) ) {
+					\wp_send_json_error( $result->get_error_message() );
+				} elseif ( false === $result ) {
+					\wp_send_json_error( 'Unable to delete cron' );
+				}
+			} else {
+				\wp_send_json_success( 0 );
+			}
+			\wp_die();
+		}
+
+		/**
+		 * Executes cron run sequence.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function run_cron() {
+			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {
+
+				if ( isset( $_REQUEST['hash'] ) && ! empty( $_REQUEST['hash'] ) ) {
+					$hash = \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
+				} else {
+					\wp_send_json_error( 0 );
+
+					\wp_die();
+				}
+
+				if ( ! defined( 'DOING_CRON' ) ) {
+					define( 'DOING_CRON', true );
+				}
+
+				Crons_Helper::execute_event( $hash );
+
+				\wp_send_json_success( 2 );
+
+			} else {
+				\wp_send_json_success( 0 );
+			}
+			\wp_die();
 		}
 	}
 }

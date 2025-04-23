@@ -184,6 +184,83 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		}
 
 		/**
+		 * Catches errors which come from the doing_it_wrong() function, WP core does not provide much information about what is really going on and where, this method adds some more information to the error log.
+		 *
+		 * @param bool   $status - Whether to trigger the error for _doing_it_wrong() calls. Default true.
+		 * @param string $function_name - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
+		 * @param string $errstr - The WP error string (message).
+		 * @param string $version - Since which WP version given error was added.
+		 * @param int    $errno - The number of the error (type of the error - that probably never get set by WP and always falls to the default which is E_USER_NOTICE).
+		 *
+		 * @return bool
+		 *
+		 * @since 1.1.1
+		 */
+		public static function deprecated_error( string $deprecated_name, $replacement, $version ) {
+
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
+
+			$errname = 'DEPRECATED';
+			$out     = "PHP $errname: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+
+			$trace      = debug_backtrace();
+			$main_shown = false;
+
+			$thrown_file = '';
+			$thrown_line = '';
+
+			$args = '';
+
+			// skip current function and require() in /index.php .
+			$counter = count( $trace ) - 3;
+			for ( $i = 1; $i < $counter; $i++ ) {
+				$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 3 ] );
+				$index = $i - 1;
+				$file  = $sf->file;
+				// $file  = self::clean_file_path( $sf->file );
+
+				if ( 1 === $i ) {
+					$thrown_file = $file;
+					$thrown_line = $sf->line;
+				}
+
+				$caller = '';
+				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
+					$caller = $sf->class . '::' . $sf->function . '()';
+				} elseif ( ! empty( $sf->function ) ) {
+					$caller = $sf->function . '()';
+				} else {
+					$main_shown = true;
+					$caller     = '{main}';
+				}
+
+				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
+					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
+				} else {
+					$args = '';
+				}
+
+				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
+
+			}
+			if ( ! $main_shown ) {
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
+			}
+			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
+			if ( WP_DEBUG_DISPLAY ) {
+				echo nl2br( $out );
+			}
+			if ( WP_DEBUG_LOG ) {
+				error_log( $out );
+			}
+		}
+
+		/**
 		 * Removes root path of WordPress from a given directory.
 		 *
 		 * @param string $path - The path string to strip from.

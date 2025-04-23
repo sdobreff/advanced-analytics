@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
+use ADVAN\Lists\Crons_List;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Settings\Settings_Builder;
 
@@ -35,6 +36,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const MENU_SLUG = 'advan_logs';
 
 		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
+
+		public const CRON_MENU_SLUG = 'advan_cron_jobs';
 
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
@@ -300,6 +303,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					1
 				);
 
+				\add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'Cron viewer', '0-day-analytics' ),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					self::CRON_MENU_SLUG,
+					array( __CLASS__, 'analytics_cron_page' ),
+					1
+				);
+
 				\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
@@ -442,6 +455,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$events_list->display();
 
 			// self::aadvana_show_options();
+		}
+
+		/**
+		 * Displays the cron page.
+		 *
+		 * @return void
+		 *
+		 * @since 1.1.0
+		 */
+		public static function analytics_cron_page() {
+
+			$events_list = new Crons_List( array() );
+			$events_list->prepare_items();
+
+			$events_list->display();
 		}
 
 		/**
@@ -903,7 +931,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						<?php
 						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
 							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important; }';
-							echo '.aadvan-live-notif-item.' . \esc_attr( $class )  . ' a { color: #42425d !important; }';
+							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: #42425d !important; }';
 						}
 						?>
 					</style>
