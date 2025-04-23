@@ -140,7 +140,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function delete_cron() {
 			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {
@@ -173,7 +173,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function run_cron() {
 			if ( \current_user_can( 'manage_options' ) && \check_ajax_referer( 'bulk-custom-delete' ) ) {

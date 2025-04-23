@@ -843,7 +843,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		/**
 		 * Generates the required HTML for a list of row action links.
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 *
 		 * @param string[] $actions        An array of action links.
 		 * @param bool     $always_visible Whether the actions should be always visible.

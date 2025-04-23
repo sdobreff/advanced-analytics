@@ -31,7 +31,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		private static $events = null;
 
@@ -43,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @param int|null $first_run Unix timestamp (null = current time).
 		 * @param array    $args Arguments to pass to the hook.
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function schedule_event( $hook, $recurrence, $first_run = null, $args = array() ) {
 			if ( ! wp_next_scheduled( $hook, $args ) ) {
@@ -60,7 +60,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function unschedule_event( $hook, $args = array() ) {
 			$timestamp = wp_next_scheduled( $hook, $args );
@@ -79,7 +79,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function is_scheduled( $hook, $args = array() ) {
 			return wp_next_scheduled( $hook, $args ) !== false;
@@ -90,7 +90,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @param array $event - The action hook.
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function run_event( $event ) {
 			\do_action_ref_array( $event['hook'], $event['args'] );
@@ -103,7 +103,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function delete_event( string $hash ) {
 			$events = self::get_events();
@@ -125,7 +125,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function execute_event( string $hash ) {
 			$events = self::get_events();
@@ -143,7 +143,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @param string $hook The action hook name.
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function clear_events( $hook ) {
 			wp_clear_scheduled_hook( $hook );
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		public static function get_events() {
 			if ( null === self::$events ) {
@@ -197,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		/**
 		 * Clears the inner events cache.
 		 *
-		 * @since latest
+		 * @since 1.3.0
 		 */
 		private static function clear_inner_events(): void {
 			self::$events = null;
