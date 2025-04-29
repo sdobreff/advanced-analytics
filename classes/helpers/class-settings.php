@@ -303,7 +303,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					1
 				);
 
-				\add_submenu_page(
+				$cron_hook = \add_submenu_page(
 					self::MENU_SLUG,
 					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
 					\esc_html__( 'Cron viewer', '0-day-analytics' ),
@@ -312,6 +312,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array( __CLASS__, 'analytics_cron_page' ),
 					1
 				);
+
+				Crons_List::add_screen_options( $cron_hook );
+
+				\add_filter( 'manage_' . $cron_hook . '_columns', array( Crons_List::class, 'manage_columns' ) );
 
 				\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );

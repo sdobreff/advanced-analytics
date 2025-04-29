@@ -172,7 +172,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return string The sanitized hash.
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		private static function validate_hash_param(): string {
 			if ( ! isset( $_REQUEST['hash'] ) || empty( $_REQUEST['hash'] ) ) {

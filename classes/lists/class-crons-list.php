@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @var string|false|null
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		private static $file_link_format = null;
 
@@ -206,7 +206,13 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			$admin_fields = array(
 				'cb'         => '<input type="checkbox" />', // to display the checkbox.
 				'hook'       => __( 'Hook', '0-day-analytics' ),
-				'schedule'   => __( 'Time', '0-day-analytics' ),
+				'schedule'   => esc_html(
+					sprintf(
+						/* translators: %s: UTC offset */
+						__( 'Next Run (%s)', '0-day-analytics' ),
+						WP_Helper::get_timezone_location()
+					),
+				),
 				'recurrence' => __( 'Interval', '0-day-analytics' ),
 				'args'       => __( 'Args', '0-day-analytics' ),
 				'actions'    => __( 'Actions', '0-day-analytics' ),
@@ -403,7 +409,18 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				// }
 			}
 
-			return self::$read_items ?? [];
+			if ( ! empty( $_REQUEST[ self::SEARCH_INPUT ] ) && is_string( $_REQUEST[ self::SEARCH_INPUT ] ) ) {
+				$s = sanitize_text_field( wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) );
+
+				self::$read_items = array_filter(
+					self::$read_items,
+					function ( $event ) use ( $s ) {
+						return ( false !== strpos( $event['hook'], $s ) );
+					}
+				);
+			}
+
+			return self::$read_items ?? array();
 		}
 
 		/**
@@ -461,6 +478,97 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				case 'args':
 					return ( ! empty( $item['args'] ) ? \print_r( $item['args'], true ) : __( 'NO', '0-day-analytics' ) );
 				case 'schedule':
+					if ( 1 === $item['schedule'] ) {
+						return sprintf(
+							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
+							\esc_html__( 'Immediately', '0-day-analytics' ),
+						);
+					}
+
+					$time_format = 'g:i a';
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['schedule'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+						$time_format .= ' (P)';
+					}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+					if ( $event_local === $today_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Today at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $tomorrow_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Tomorrow at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $yesterday_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Yesterday at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} else {
+						$date = sprintf(
+							/* translators: 1: Date, 2: Time */
+							__( '%1$s at %2$s', '0-day-analytics' ),
+							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+							$event_time_local,
+						);
+					}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $item['schedule'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $item['schedule'] - time();
+					$late  = Crons_Helper::is_late( $item );
+
+					if ( $late ) {
+						// Show a warning for events that are late.
+						$ago = sprintf(
+							/* translators: %s: Time period, for example "8 minutes" */
+							__( '%s ago', '0-day-analytics' ),
+							WP_Helper::interval( abs( $until ) )
+						);
+
+						return sprintf(
+							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
+							esc_html( $ago ),
+							$time,
+						);
+					}
+
+					if ( $until <= 0 ) {
+						$in = __( 'Now', '0-day-analytics' );
+					} else {
+						$in = sprintf(
+							/* translators: %s: Time period, for example "8 minutes" */
+							__( 'In %s', '0-day-analytics' ),
+							WP_Helper::interval( $until ),
+						);
+					}
+
+					return sprintf(
+						'%s<br>%s',
+						\esc_html( $in ),
+						$time,
+					);
+
 					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
 					$time             = \wp_date( $date_time_format, $item['schedule'] );
 
@@ -690,6 +798,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function add_screen_options( $hook ) {
+			return;
 			$screen_options = array( 'per_page' => __( 'Number of errors to read', '0-day-analytics' ) );
 
 			$result = array();
@@ -901,7 +1010,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		public static function are_there_items(): bool {
 			return ( isset( self::$read_items ) && ! empty( self::$read_items ) );
@@ -975,7 +1084,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return array<string, string>
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		public static function get_file_path_map() {
 			$map = array();
@@ -996,7 +1105,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return string|false
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		public static function get_file_link_format() {
 			if ( ! isset( self::$file_link_format ) ) {
@@ -1017,7 +1126,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		public static function has_clickable_links(): bool {
 			return ( false !== self::get_file_link_format() );
@@ -1028,7 +1137,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return array<int,string> Array of class names.
 		 *
-		 * @since latest
+		 * @since 1.4.0
 		 */
 		protected function get_table_classes() {
 			return array( 'widefat', 'striped', 'table-view-list', $this->_args['plural'] );

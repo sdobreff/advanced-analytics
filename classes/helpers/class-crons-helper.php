@@ -202,5 +202,22 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		private static function clear_inner_events(): void {
 			self::$events = null;
 		}
+
+		/**
+		 * Determines whether an event is late.
+		 *
+		 * An event which has missed its schedule by more than 10 minutes is considered late.
+		 *
+		 * @param array $event The event.
+		 *
+		 * @return bool Whether the event is late.
+		 *
+		 * @since 1.4.0
+		 */
+		public static function is_late( array $event ) {
+			$until = $event['schedule'] - time();
+
+			return ( $until < ( 0 - ( 10 * MINUTE_IN_SECONDS ) ) );
+		}
 	}
 }

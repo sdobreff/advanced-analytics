@@ -406,7 +406,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 									}
 									$collected_items = array();
 								}
-								$errors[] = $parsed_data;
+								$errors[]      = $parsed_data;
 								$more_to_error = false;
 							} elseif ( \is_array( $parsed_data ) ) {
 								if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
@@ -419,11 +419,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 								$more_to_error = true;
 							}
-						} elseif (!empty($line)){
+						} elseif ( ! empty( $line ) ) {
 							$more_to_error = true;
 						}
 
-						return ['line_done' => !$more_to_error, 'close'=> false];
+						return array(
+							'line_done' => ! $more_to_error,
+							'close'     => false,
+						);
 
 						// if ( ! str_contains( $address, 'stop_word' ) ) {
 						// echo "\nFound 'stop_word'!"; .
@@ -671,7 +674,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					$this->invalid_nonce_redirect();
 				} elseif ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
 					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-						
+
 					}
 				}
 				?>
