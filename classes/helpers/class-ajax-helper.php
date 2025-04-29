@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Error_Log;
 
 // Exit if accessed directly.
@@ -73,7 +74,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function truncate_log_file() {
-			self::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
 			Error_Log::clear( Error_Log::autodetect() );
 			Log_Line_Parser::delete_last_parsed_timestamp();
@@ -93,7 +94,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\wp_send_json_error( 'Insufficient permissions.', 403 );
 			}
 
-			self::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
 			echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
@@ -109,7 +110,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 */
 		public static function save_settings_ajax() {
 
-			self::verify_admin_nonce( 'aadvana-plugin-data', 'aadvana-security' );
+			WP_Helper::verify_admin_nonce( 'aadvana-plugin-data', 'aadvana-security' );
 
 			if ( isset( $_POST[ \ADVAN_SETTINGS_NAME ] ) && ! empty( $_POST[ \ADVAN_SETTINGS_NAME ] ) && \is_array( $_POST[ \ADVAN_SETTINGS_NAME ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
@@ -130,7 +131,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function delete_cron() {
-			self::verify_admin_nonce( 'bulk-custom-delete' );
+			WP_Helper::verify_admin_nonce( 'bulk-custom-delete' );
 
 			$hash = self::validate_hash_param();
 
@@ -153,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function run_cron() {
-			self::verify_admin_nonce( 'bulk-custom-delete' );
+			WP_Helper::verify_admin_nonce( 'bulk-custom-delete' );
 
 			$hash = self::validate_hash_param();
 
@@ -164,25 +165,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			Crons_Helper::execute_event( $hash );
 
 			\wp_send_json_success( 2 );
-		}
-
-		/**
-		 * Verifies the nonce and user capability.
-		 *
-		 * @param string $action Nonce action.
-		 * @param string $nonce_name Nonce name.
-		 *
-		 * @return void
-		 *
-		 * @throws \Exception If the nonce is invalid or the user does not have the required capability.
-		 *
-		 * @since latest
-		 */
-		private static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ): void {
-			if ( ! \current_user_can( 'manage_options' ) || ! \check_ajax_referer( $action, $nonce_name, false ) ) {
-				\wp_send_json_error( 'Insufficient permissions or invalid nonce.', 403 );
-				\wp_die();
-			}
 		}
 
 		/**

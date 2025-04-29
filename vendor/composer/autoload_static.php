@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
+class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
 {
     public static $prefixLengthsPsr4 = array (
         'A' => 
@@ -34,6 +34,7 @@ class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
         'ADVAN\\Helpers\\Settings' => __DIR__ . '/../..' . '/classes/helpers/class-settings.php',
         'ADVAN\\Helpers\\System_Status' => __DIR__ . '/../..' . '/classes/helpers/class-system-status.php',
         'ADVAN\\Helpers\\WP_Error_Handler' => __DIR__ . '/../..' . '/classes/helpers/class-wp-error-handler.php',
+        'ADVAN\\Helpers\\WP_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-wp-helper.php',
         'ADVAN\\Lists\\Crons_List' => __DIR__ . '/../..' . '/classes/lists/class-crons-list.php',
         'ADVAN\\Lists\\Logs_List' => __DIR__ . '/../..' . '/classes/lists/class-logs-list.php',
         'ADVAN\\Migration\\Abstract_Migration' => __DIR__ . '/../..' . '/classes/migration/class-abstract-migration.php',
@@ -45,9 +46,9 @@ class ComposerStaticInit75d5a0f192d79d9828c532fade941f75
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit75d5a0f192d79d9828c532fade941f75::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit75d5a0f192d79d9828c532fade941f75::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit75d5a0f192d79d9828c532fade941f75::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6::$classMap;
 
         }, null, ClassLoader::class);
     }

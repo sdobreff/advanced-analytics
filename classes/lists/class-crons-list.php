@@ -15,11 +15,7 @@ declare(strict_types=1);
 namespace ADVAN\Lists;
 
 use ADVAN\Helpers\Settings;
-use ADVAN\Helpers\File_Helper;
-use ADVAN\Controllers\Error_Log;
-use ADVAN\Helpers\Log_Line_Parser;
-use ADVAN\Helpers\Plugin_Theme_Helper;
-use ADVAN\Controllers\Reverse_Line_Reader;
+use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -45,6 +41,15 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		public const PAGE_SLUG = 'toplevel_page_advan_crons';
 
 		public const SEARCH_INPUT = 'sgp';
+
+		/**
+		 * Format for the file link.
+		 *
+		 * @var string|false|null
+		 *
+		 * @since latest
+		 */
+		private static $file_link_format = null;
 
 		/**
 		 * Current screen.
@@ -162,7 +167,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function search_box( $text, $input_id ) {
 
-			if ( empty( $_REQUEST[ self::SEARCH_INPUT ] ) && ! $this->has_items() ) {
+			if ( empty( $_REQUEST[ self::SEARCH_INPUT ] ) && ! self::are_there_items() ) {
 				return;
 			}
 
@@ -204,6 +209,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				'schedule'   => __( 'Time', '0-day-analytics' ),
 				'recurrence' => __( 'Interval', '0-day-analytics' ),
 				'args'       => __( 'Args', '0-day-analytics' ),
+				'actions'    => __( 'Actions', '0-day-analytics' ),
 			);
 
 			$screen_options = $admin_fields;
@@ -335,7 +341,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @return void
 		 */
 		public function no_items() {
-			\esc_html_e( 'No reports found', '0-day-analytics' );
+			\esc_html_e( 'No crons found', '0-day-analytics' );
 		}
 
 		/**
@@ -347,7 +353,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
-			$this->items = self::get_cron_items( true );
+			$this->items = self::get_cron_items();
 
 			return $this->items;
 		}
@@ -355,14 +361,11 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		/**
 		 * Collect error items.
 		 *
-		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?.
-		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
-		 *
 		 * @return array
 		 *
 		 * @since 1.1.0
 		 */
-		public static function get_cron_items( bool $write_temp = true, $items = false ): array {
+		public static function get_cron_items(): array {
 
 			if ( null === self::$read_items ) {
 
@@ -400,7 +403,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				// }
 			}
 
-			return self::$read_items;
+			return self::$read_items ?? [];
 		}
 
 		/**
@@ -450,10 +453,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 					$actions['delete'] = '<a class="aadvana-cron-delete" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
-
 					$actions['run'] = '<a class="aadvana-cron-run" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Run', '0-day-analytics' ) . '</a>';
 
-					return '<span>' . $item['hook'] . '</span>' . self::single_row_actions( $actions );
+					return '<span><b>' . $item['hook'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'recurrence':
 					return ( ! empty( $item['recurrence'] ) ? $item['recurrence'] : __( 'once', '0-day-analytics' ) );
 				case 'args':
@@ -463,6 +465,33 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					$time             = \wp_date( $date_time_format, $item['schedule'] );
 
 					return $time;
+				case 'actions':
+					$hook_callbacks = WP_Helper::get_cron_callbacks( $item['hook'] );
+
+					if ( ! empty( $hook_callbacks ) ) {
+						$callbacks = array();
+
+						foreach ( $hook_callbacks as $callback ) {
+							$callbacks[] = self::output_filename(
+								$callback['callback']['name'],
+								$callback['callback']['file'],
+								$callback['callback']['line']
+							);
+						}
+
+						if ( 'action_scheduler_run_queue' === $item['hook'] ) {
+							$callbacks[] = '';
+							$callbacks[] = sprintf(
+								'<span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> <a href="%s">%s</a></span>',
+								admin_url( 'tools.php?page=action-scheduler' ),
+								esc_html__( 'View the scheduled actions here &raquo;', '0-day-analytics' )
+							);
+						}
+
+						return implode( '<br>', $callbacks ); // WPCS:: XSS ok.
+					}
+
+					return '';
 				default:
 					return isset( $item[ $column_name ] )
 						? \esc_html( $item[ $column_name ] )
@@ -500,7 +529,16 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @return array
 		 */
 		public function get_bulk_actions() {
-			$actions = array();
+			/**
+			 * On hitting apply in bulk actions the url paramas are set as
+			 * ?action=bulk-download&paged=1&action2=-1.
+			 *
+			 * Action and action2 are set based on the triggers above or below the table
+			 */
+			$actions = array(
+				'delete' => __( 'Delete', '0-day-security' ),
+				'run'    => __( 'Run', '0-day-security' ),
+			);
 
 			return $actions;
 		}
@@ -525,21 +563,49 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			$the_table_action = $this->current_action();
 
 			// check for table bulk actions.
-			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) && Settings_Helper::current_user_can( 'view' ) ) {
+			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) ) {
 				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
 					$this->graceful_exit();
 				}
-				$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
-				// verify the nonce.
 				/**
 				 * Note: the nonce field is set by the parent class
 				 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );.
 				 */
-				if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
-					$this->invalid_nonce_redirect();
-				} elseif ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
-					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				WP_Helper::verify_admin_nonce( 'bulk-' . $this->_args['plural'] );
 
+				if ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
+					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$id = \sanitize_text_field( $id );
+						if ( ! empty( $id ) ) {
+							// Delete the cron.
+							Crons_Helper::delete_event( $id );
+						}
+					}
+				}
+				?>
+				<script>
+					jQuery('body').addClass('has-overlay');
+					
+				</script>
+				<?php
+			}
+			if ( ( ( isset( $_REQUEST['action'] ) && 'run' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'run' === $_REQUEST['action2'] ) ) ) {
+				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
+					$this->graceful_exit();
+				}
+				/**
+				 * Note: the nonce field is set by the parent class
+				 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );.
+				 */
+				WP_Helper::verify_admin_nonce( 'bulk-' . $this->_args['plural'] );
+
+				if ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
+					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$id = \sanitize_text_field( $id );
+						if ( ! empty( $id ) ) {
+							// Delete the cron.
+							Crons_Helper::execute_event( $id );
+						}
 					}
 				}
 				?>
@@ -560,24 +626,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function graceful_exit() {
 			exit;
-		}
-
-		/**
-		 * Die when the nonce check fails.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @return void
-		 */
-		public function invalid_nonce_redirect() {
-			\wp_die(
-				'Invalid Nonce',
-				'Error',
-				array(
-					'response'  => 403,
-					'back_link' => \esc_url( \network_admin_url( 'users.php' ) ),
-				)
-			);
 		}
 
 		/**
@@ -714,9 +762,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function single_row( $item ) {
 			$classes = '';
-			if ( isset( $item['severity'] ) && ! empty( $item['severity'] ) ) {
-				$classes .= ' ' . $item['severity'];
-			}
+
 			echo '<tr class="' . \esc_attr( $classes ) . '">';
 			$this->single_row_columns( $item );
 			echo '</tr>';
@@ -803,41 +849,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			</div>
 			<?php
 				$this->extra_tablenav( $which );
-			if ( 'top' !== $which && ! empty( $this->items ) ) {
-				?>
-				<style>
-					.toplevel_page_advan_logs #debug-log {
-						max-width: 95%;
-						padding: 10px;
-						word-wrap: break-word;
-						background: black;
-						color: #fff;
-						border-radius: 5px;
-						height: 400px;
-						overflow-y: auto;
-					}
-					.generated-logs #timestamp { width: 15%; }
-					.generated-logs #severity { width: 10%; }
-
-					<?php
-					foreach ( Settings::get_current_options()['severities'] as $class => $properties ) {
-
-						$color = '#252630';
-
-						$color = ( \in_array( $class, array( 'warning' ), true ) ) ? '#6C6262' : $color;
-						$color = ( \in_array( $class, array( 'parse', 'fatal' ), true ) ) ? '#fff' : $color;
-
-						echo '.generated-logs .' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important;}';
-						echo '#the-list .' . \esc_attr( $class ) . ' td { color: ' . \esc_attr( $color ) . ' !important;}';
-						echo '#the-list td { color: #333 !important; }';
-						echo '#the-list tr { background: #fff;}';
-
-					}
-					?>
-				</style>
-				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
-					<?php
-			}
 		}
 
 		/**
@@ -885,5 +896,142 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 
+		/**
+		 * Checks and returns if there are items to show.
+		 *
+		 * @return bool
+		 *
+		 * @since latest
+		 */
+		public static function are_there_items(): bool {
+			return ( isset( self::$read_items ) && ! empty( self::$read_items ) );
+		}
+
+		/**
+		 * Returns a file path, name, and line number, or a clickable link to the file. Safe for output.
+		 *
+		 * @link https://querymonitor.com/help/clickable-stack-traces-and-function-names/
+		 *
+		 * @param  string $text        The display text, such as a function name or file name.
+		 * @param  string $file        The full file path and name.
+		 * @param  int    $line        Optional. A line number, if appropriate.
+		 * @param  bool   $is_filename Optional. Is the text a plain file name? Default false.
+		 * @return string The fully formatted file link or file name, safe for output.
+		 */
+		public static function output_filename( $text, $file, $line = 0, $is_filename = false ) {
+			if ( empty( $file ) ) {
+				if ( $is_filename ) {
+					return esc_html( $text );
+				} else {
+					return '<code>' . esc_html( $text ) . '</code>';
+				}
+			}
+
+			$link_line = $line ? $line : 1;
+
+			if ( ! self::has_clickable_links() ) {
+				$fallback = WP_Helper::standard_dir( $file, '' );
+				if ( $line ) {
+					$fallback .= ':' . $line;
+				}
+				if ( $is_filename ) {
+					$return = esc_html( $text );
+				} else {
+					$return = '<code>' . esc_html( $text ) . '</code>';
+				}
+				if ( $fallback !== $text ) {
+					$return .= '<br><span class="qm-info qm-supplemental">' . esc_html( $fallback ) . '</span>';
+				}
+				return $return;
+			}
+
+			$map = self::get_file_path_map();
+
+			if ( ! empty( $map ) ) {
+				foreach ( $map as $from => $to ) {
+					$file = str_replace( $from, $to, $file );
+				}
+			}
+
+			$link_format = self::get_file_link_format();
+			$link        = sprintf( $link_format, rawurlencode( $file ), intval( $link_line ) );
+
+			if ( $is_filename ) {
+				$format = '<a href="%1$s" class="qm-edit-link">%2$s%3$s</a>';
+			} else {
+				$format = '<a href="%1$s" class="qm-edit-link"><code>%2$s</code>%3$s</a>';
+			}
+
+			return sprintf(
+				$format,
+				esc_attr( $link ),
+				esc_html( $text ),
+				( 'edit' )
+			);
+		}
+
+		/**
+		 * Returns file path map
+		 *
+		 * @return array<string, string>
+		 *
+		 * @since latest
+		 */
+		public static function get_file_path_map() {
+			$map = array();
+
+			$host_path = getenv( 'HOST_PATH' );
+
+			if ( ! empty( $host_path ) ) {
+				$source         = rtrim( ABSPATH, DIRECTORY_SEPARATOR );
+				$replacement    = rtrim( $host_path, DIRECTORY_SEPARATOR );
+				$map[ $source ] = $replacement;
+			}
+
+			return $map;
+		}
+
+		/**
+		 * Returns the extracted file format.
+		 *
+		 * @return string|false
+		 *
+		 * @since latest
+		 */
+		public static function get_file_link_format() {
+			if ( ! isset( self::$file_link_format ) ) {
+				$format = ini_get( 'xdebug.file_link_format' );
+
+				if ( empty( $format ) ) {
+					self::$file_link_format = false;
+				} else {
+					self::$file_link_format = str_replace( array( '%f', '%l' ), array( '%1$s', '%2$d' ), $format );
+				}
+			}
+
+			return self::$file_link_format;
+		}
+
+		/**
+		 * Check if there are clickable links in the file formatter.
+		 *
+		 * @return bool
+		 *
+		 * @since latest
+		 */
+		public static function has_clickable_links(): bool {
+			return ( false !== self::get_file_link_format() );
+		}
+
+		/**
+		 * Returns an array of CSS class names for the table.
+		 *
+		 * @return array<int,string> Array of class names.
+		 *
+		 * @since latest
+		 */
+		protected function get_table_classes() {
+			return array( 'widefat', 'striped', 'table-view-list', $this->_args['plural'] );
+		}
 	}
 }

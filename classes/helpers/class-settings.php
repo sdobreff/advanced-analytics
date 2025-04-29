@@ -468,8 +468,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$events_list = new Crons_List( array() );
 			$events_list->prepare_items();
+			?>
+			<div class="wrap">
+				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
+				<form id="crons-filter" method="get">
+				<?php
 
-			$events_list->display();
+				$page  = \sanitize_text_field( $_GET['page'] );
+				$paged = filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT );
+
+				printf( '<input type="hidden" name="page" value="%s" />', $page );
+				printf( '<input type="hidden" name="paged" value="%d" />', $paged );
+
+				echo '<div style="clear:both; float:right">';
+				$events_list->search_box(
+					__( 'Search', '0-day-analytics' ),
+					strtolower( $events_list::get_table_name() ) . '-find'
+				);
+				echo '</div>';
+				$events_list->display();
+
+				?>
+				</form>
+			</div>
+			<?php
 		}
 
 		/**

@@ -63,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function unschedule_event( $hook, $args = array() ) {
-			$timestamp = wp_next_scheduled( $hook, $args );
+			$timestamp = \wp_next_scheduled( $hook, $args );
 			if ( $timestamp ) {
 				return \wp_unschedule_event( $timestamp, $hook, $args );
 			}

@@ -19,6 +19,7 @@ return array(
     'ADVAN\\Helpers\\Settings' => $baseDir . '/classes/helpers/class-settings.php',
     'ADVAN\\Helpers\\System_Status' => $baseDir . '/classes/helpers/class-system-status.php',
     'ADVAN\\Helpers\\WP_Error_Handler' => $baseDir . '/classes/helpers/class-wp-error-handler.php',
+    'ADVAN\\Helpers\\WP_Helper' => $baseDir . '/classes/helpers/class-wp-helper.php',
     'ADVAN\\Lists\\Crons_List' => $baseDir . '/classes/lists/class-crons-list.php',
     'ADVAN\\Lists\\Logs_List' => $baseDir . '/classes/lists/class-logs-list.php',
     'ADVAN\\Migration\\Abstract_Migration' => $baseDir . '/classes/migration/class-abstract-migration.php',
