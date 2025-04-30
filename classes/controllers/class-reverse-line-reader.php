@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			}
 			if ( \is_string( $file_or_handle ) ) {
 				if ( \file_exists( $file_or_handle ) && \is_readable( $file_or_handle ) ) {
-					$handle = fopen( $file_or_handle, 'r' );
+					$handle = fopen( $file_or_handle, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 				} else {
 					return false;
 				}
@@ -118,7 +118,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				fseek( $handle, 0, SEEK_END );
 				$size = ftell( $handle );
 				if ( 0 === (int) $size ) {
-					fclose( $handle );
+					fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 					return false;
 				} elseif ( self::$buffer_size >= (int) $size ) {
 					// self::$pos is holding negative values - so sum.
@@ -128,41 +128,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				self::$file_size = - (int) $size;
 			}
 
-			// while ( true ) {
-			// fseek( $handle, self::$pos, SEEK_END );
-			// --self::$pos;
-			// $char = fgetc( $handle );
-			// if ( "\n" === $char ) {
-			// break;
-			// }
-			// if ( false === $char ) {
-			// fseek( $handle, 0 );
-			// break;
-			// }
-			// }
-
-			// $line = fgets( $handle );
-
 			$line = self::readline( $handle );
 
 			if ( null === $line ) {
-				fclose( $handle );
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 				return;
 			}
-
-			/*
-			New shit
-			while ( ( $buffer = fgets( $fp, 4096 ) ) !== false ) {
-			echo $buffer, PHP_EOL;
-			}
-
-			fseek( $handle, self::$pos - 4096, SEEK_END );
-
-			$line = fgets( $handle, 4096 );
-
-			self::$pos -= \mb_strlen( (string) $line );
-			*/
 
 			if ( $temp_writer ) {
 				self::write_memory_file( $line . self::SEPARATOR );
@@ -170,22 +142,27 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			$result = $callback( $line, self::$pos );
 
 			if ( true === $result['close'] ) {
-				\fclose( $handle );
+				\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 				return;
 			}
-			// if ( false === $char ) {
-			// return;
-			// }
 			if ( $max_lines > 0 ) {
-				if ( $result['line_done'] ) {
+				if ( $result['line_done'] && ! $result['no_flush'] ) {
 					if ( $temp_writer ) {
 						self::flush_memory_file_to_temp();
 					}
 					--$max_lines;
 				}
+				if ( $result['line_done'] && $result['no_flush'] ) {
+
+					if ( null !== self::$memory_handle ) {
+						\fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+						self::$memory_handle = null;
+					}
+				}
 				if ( 0 === $max_lines ) {
-					\fclose( $handle );
+					\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 					return;
 				}
@@ -211,7 +188,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			} else {
 				fseek( $file_or_handle, self::$pos, SEEK_END );
 			}
-			$read_string = fread( $file_or_handle, $size );
+			$read_string = fread( $file_or_handle, $size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 
 			return $read_string;
 		}
@@ -261,10 +238,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 */
 		public static function write_temp_file( string $line ) {
 			if ( null === self::$temp_handle ) {
-				self::$temp_handle = fopen( 'php://temp', 'w+' );
+				self::$temp_handle = fopen( 'php://temp', 'w+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 			}
 
-			fwrite( self::$temp_handle, $line );
+			fwrite( self::$temp_handle, $line ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 		}
 
 		/**
@@ -278,10 +255,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 */
 		public static function write_memory_file( string $line ) {
 			if ( null === self::$memory_handle ) {
-				self::$memory_handle = fopen( 'php://memory', 'w+' );
+				self::$memory_handle = fopen( 'php://memory', 'w+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 			}
 
-			fwrite( self::$memory_handle, $line );
+			fwrite( self::$memory_handle, $line ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 		}
 
 		/**
@@ -297,7 +274,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				echo fread( self::$temp_handle, fstat( self::$temp_handle )['size'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.Security.EscapeOutput.OutputNotEscaped
 
-				fclose( self::$temp_handle );
+				fclose( self::$temp_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			}
 		}
 
@@ -314,38 +291,38 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				echo fread( self::$memory_handle, fstat( self::$memory_handle )['size'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread, WordPress.Security.EscapeOutput.OutputNotEscaped
 
-				fclose( self::$memory_handle );
+				fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			}
 		}
 
+		/**
+		 * Writes the contents of the memory file to a temporary file in reverse order.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function flush_memory_file_to_temp() {
 			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {
-				// $fl = fopen("\some_file.txt", "r");
+
 				$line = '';
 				for ( $x_pos = 0; fseek( self::$memory_handle, $x_pos, SEEK_END ) !== -1; $x_pos-- ) {
 					$char = fgetc( self::$memory_handle );
 
 					if ( PHP_EOL === $char ) {
-						// analyse completed line $output[$ln] if need be
-						// ++$ln;
-						// continue;
-						self::write_temp_file( $line.PHP_EOL );
+						self::write_temp_file( $line . PHP_EOL );
 						$line = '';
 						continue;
 					} else {
-						$line = $char.$line;
+						$line = $char . $line;
 					}
-					
-					//$output[ $ln ] = $char . ( ( array_key_exists( $ln, $output ) ) ? $output[ $ln ] : '' );
 				}
 				if ( ! empty( $line ) ) {
-					self::write_temp_file( $line.PHP_EOL );
+					self::write_temp_file( $line . PHP_EOL );
 				}
-				fclose( self::$memory_handle );
+				fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 				self::$memory_handle = null;
-
-				
 			}
 		}
 	}

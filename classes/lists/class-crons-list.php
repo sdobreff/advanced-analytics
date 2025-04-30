@@ -569,10 +569,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						$time,
 					);
 
-					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-					$time             = \wp_date( $date_time_format, $item['schedule'] );
-
-					return $time;
 				case 'actions':
 					$hook_callbacks = WP_Helper::get_cron_callbacks( $item['hook'] );
 

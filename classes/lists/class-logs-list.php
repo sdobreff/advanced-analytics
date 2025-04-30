@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace ADVAN\Lists;
 
 use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
@@ -423,9 +424,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							$more_to_error = true;
 						}
 
+						$is_excluded = false;
+
+						if ( ! $more_to_error ) {
+							if ( isset( $parsed_data['severity'] ) && \in_array( $parsed_data['severity'], Settings::get_disabled_severities() ) ) {
+								$is_excluded = true;
+							}
+						}
+
 						return array(
 							'line_done' => ! $more_to_error,
 							'close'     => false,
+							'no_flush'  => $is_excluded,
 						);
 
 						// if ( ! str_contains( $address, 'stop_word' ) ) {
@@ -454,7 +464,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 				}
 			}
-				self::$read_items = $errors;
+			self::$read_items = $errors;
 			// }
 
 			Log_Line_Parser::store_last_parsed_timestamp();
@@ -504,10 +514,78 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
 				case 'timestamp':
-					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-					$time             = \wp_date( $date_time_format, $item['timestamp'] );
+					if ( 1 === $item['timestamp'] ) {
+						return sprintf(
+							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
+							\esc_html__( 'Immediately', '0-day-analytics' ),
+						);
+					}
 
-					return $time;
+					$time_format = 'g:i a';
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['timestamp'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+						$time_format .= ' (P)';
+					}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+					if ( $event_local === $today_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Today at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $tomorrow_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Tomorrow at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $yesterday_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Yesterday at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} else {
+						$date = sprintf(
+							/* translators: 1: Date, 2: Time */
+							__( '%1$s at %2$s', '0-day-analytics' ),
+							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+							$event_time_local,
+						);
+					}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $item['timestamp'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $item['timestamp'] - time();
+
+					// Show a warning for events that are late.
+					$ago = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+						__( '%s ago', '0-day-analytics' ),
+						WP_Helper::interval( abs( $until ) )
+					);
+
+					return sprintf(
+						'<span class="status-crontrol-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+						esc_html( $ago ),
+						$time,
+					);
+
 				case 'message':
 					$message = esc_html( $item[ $column_name ] );
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
