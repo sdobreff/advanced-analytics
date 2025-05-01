@@ -300,7 +300,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.5.0
 		 */
 		public static function flush_memory_file_to_temp() {
 			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {

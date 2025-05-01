@@ -945,6 +945,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					<style>
 						#wp-admin-bar-aadvan-menu {
 							overflow: auto;
+							overflow-x: hidden;
 							text-overflow: ellipsis;
 							max-width: 50%;
 							height: 30px;

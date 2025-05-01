@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics, cron
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -60,6 +60,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 
 == Changelog ==
+
+= 1.5.0 =  
+* Lots of code optimizations and improvements. Cron list extending and optimizing. UI changes. Bug and functionality fixes.
 
 = 1.4.0 =  
 * Code optimizations and functionality enhancements. Cron list extending and optimizing

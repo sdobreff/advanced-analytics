@@ -253,10 +253,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public function prepare_items() {
-			$columns = $this->get_columns();
-			$hidden  = array();
-			// $sortable              = $this->get_sortable_columns();
-			$sortable              = array();
+			$columns               = $this->get_columns();
+			$hidden                = array();
+			$sortable              = $this->get_sortable_columns();
 			$this->_column_headers = array( $columns, $hidden, $sortable );
 
 			$this->handle_table_actions();
@@ -320,23 +319,11 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @return array
 		 */
 		protected function get_sortable_columns() {
-			$first6_columns   = array_keys( self::get_column_names() );
-			$sortable_columns = array();
-
-			unset( $first6_columns[0], $first6_columns[9] ); // id column.
-			// data column.
-
-			/*
-			 * Actual sorting still needs to be done by prepare_items.
-			 * specify which columns should have the sort icon.
-			 *
-			 * The second bool param sets the colum sort order - true ASC, false - DESC or unsorted.
-			 */
-			foreach ( $first6_columns as $value ) {
-				$sortable_columns[ $value ] = array( $value, false );
-			}
-
-			return $sortable_columns;
+			return array(
+				'hook'       => array( 'hook', false ),
+				'schedule'   => array( 'schedule', false, null, null, 'asc' ),
+				'recurrence' => array( 'recurrence', false ),
+			);
 		}
 
 		/**
@@ -419,6 +406,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					}
 				);
 			}
+
+			uasort( self::$read_items, array( __CLASS__, 'uasort_order_events' ) );
 
 			return self::$read_items ?? array();
 		}
@@ -1137,6 +1126,48 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		protected function get_table_classes() {
 			return array( 'widefat', 'striped', 'table-view-list', $this->_args['plural'] );
+		}
+
+		/**
+		 * Sorts the events by the selected column.
+		 *
+		 * @param array $a - First item to compare.
+		 * @param array $b - Second item to compare.
+		 *
+		 * @return int
+		 *
+		 * @since 1.4.0
+		 */
+		private static function uasort_order_events( $a, $b ) {
+			$orderby = ( ! empty( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) ) ? sanitize_text_field( \wp_unslash( $_GET['orderby'] ) ) : 'crontrol_next';
+			$order   = ( ! empty( $_GET['order'] ) && is_string( $_GET['order'] ) ) ? sanitize_text_field( \wp_unslash( $_GET['order'] ) ) : 'asc';
+			$compare = 0;
+
+			switch ( $orderby ) {
+				case 'hook':
+					if ( 'asc' === $order ) {
+						$compare = strcmp( $a['hook'], $b['hook'] );
+					} else {
+						$compare = strcmp( $b['hook'], $a['hook'] );
+					}
+					break;
+				case 'recurrence':
+					if ( 'asc' === $order ) {
+						$compare = ( $a['recurrence'] ?? 0 ) <=> ( $b['recurrence'] ?? 0 );
+					} else {
+						$compare = ( $b['recurrence'] ?? 0 ) <=> ( $a['recurrence'] ?? 0 );
+					}
+					break;
+				default:
+					if ( 'asc' === $order ) {
+						$compare = $a['schedule'] <=> $b['schedule'];
+					} else {
+						$compare = $b['schedule'] <=> $a['schedule'];
+					}
+					break;
+			}
+
+			return $compare;
 		}
 	}
 }

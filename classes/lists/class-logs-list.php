@@ -200,7 +200,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function manage_columns( $columns ): array {
 			$admin_fields = array(
 				// 'cb'                                  => '<input type="checkbox" />', // to display the checkbox.
-				'timestamp'    => __( 'Time', '0-day-analytics' ),
+				'timestamp'    => esc_html(
+					sprintf(
+						/* translators: %s: UTC offset */
+						__( 'Time (%s)', '0-day-analytics' ),
+						WP_Helper::get_timezone_location()
+					)
+				),
 				'severity'     => __( 'Severity', '0-day-analytics' ),
 				'message'      => __( 'Message', '0-day-analytics' ),
 				'plugin_theme' => __( 'Source', '0-day-analytics' ),
@@ -573,16 +579,31 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 					$until = $item['timestamp'] - time();
 
-					// Show a warning for events that are late.
-					$ago = sprintf(
+					if ( $until < 0 ) {
+						$ago = sprintf(
 						/* translators: %s: Time period, for example "8 minutes" */
-						__( '%s ago', '0-day-analytics' ),
-						WP_Helper::interval( abs( $until ) )
-					);
+							__( '%s ago', '0-day-analytics' ),
+							WP_Helper::interval( abs( $until ) )
+						);
+
+						return sprintf(
+							'<span class="status-crontrol-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+							esc_html( $ago ),
+							$time,
+						);
+					} elseif ( $until === 0 ) {
+						$in = __( 'Now', '0-day-analytics' );
+					} else {
+						$in = sprintf(
+							/* translators: %s: Time period, for example "8 minutes" */
+							__( 'In %s', '0-day-analytics' ),
+							WP_Helper::interval( $until ),
+						);
+					}
 
 					return sprintf(
 						'<span class="status-crontrol-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
-						esc_html( $ago ),
+						\esc_html( $in ),
 						$time,
 					);
 
