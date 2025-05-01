@@ -407,7 +407,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				);
 			}
 
-			uasort( self::$read_items, array( __CLASS__, 'uasort_order_events' ) );
+			if ( null !== self::$read_items ) {
+				uasort( self::$read_items, array( __CLASS__, 'uasort_order_events' ) );
+			}
 
 			return self::$read_items ?? array();
 		}
