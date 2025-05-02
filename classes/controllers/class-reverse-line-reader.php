@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @since 1.1.1
 		 */
-		public static function read_file_from_end( $file_or_handle, $callback, $max_lines = 0, $pos = null, bool $temp_writer = true ) {
+		public static function read_file_from_end( $file_or_handle, $callback, &$max_lines = 0, $pos = null, bool $temp_writer = true ) {
 			if ( \is_a( $file_or_handle, 'WP_Error' ) ) {
 				return $file_or_handle;
 			}
@@ -106,11 +106,15 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( \file_exists( $file_or_handle ) && \is_readable( $file_or_handle ) ) {
 					$handle = fopen( $file_or_handle, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 				} else {
+					$max_lines = 0;
+
 					return false;
 				}
 			} elseif ( \is_resource( $file_or_handle ) && ( 'handle' === get_resource_type( $file_or_handle ) || 'stream' === get_resource_type( $file_or_handle ) ) ) {
 				$handle = $file_or_handle;
 			} else {
+				$max_lines = 0;
+
 				return false;
 			}
 			// Lets check the size and act appropriately.
@@ -119,6 +123,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				$size = ftell( $handle );
 				if ( 0 === (int) $size ) {
 					fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+					$max_lines = 0;
+
 					return false;
 				} elseif ( self::$buffer_size >= (int) $size ) {
 					// self::$pos is holding negative values - so sum.
@@ -133,7 +139,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( null === $line ) {
 				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-				return;
+				$max_lines = 0;
+
+				return 0;
 			}
 
 			if ( $temp_writer ) {
@@ -144,7 +152,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( true === $result['close'] ) {
 				\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-				return;
+				$max_lines = 0;
+
+				return 0;
 			}
 			if ( $max_lines > 0 ) {
 				if ( $result['line_done'] && ! $result['no_flush'] ) {
@@ -164,11 +174,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( 0 === $max_lines ) {
 					\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-					return;
+					$max_lines = 0;
+
+					return 0;
 				}
 			}
 
-			self::read_file_from_end( $handle, $callback, $max_lines, self::$pos, $temp_writer );
+			// self::read_file_from_end( $handle, $callback, $max_lines, self::$pos, $temp_writer );
 		}
 
 		/**

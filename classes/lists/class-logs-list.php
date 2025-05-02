@@ -390,73 +390,78 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				);
 			}
 
+			$items = ( ! $items ) ? self::get_screen_option_per_page() : $items;
+
 			while ( empty( $errors ) ) {
-				$result = Reverse_Line_Reader::read_file_from_end(
-					$file,
-					function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
 
-						$position = $pos;
+				while ( $items > 0 ) {
+					$result = Reverse_Line_Reader::read_file_from_end(
+						$file,
+						function( $line, $pos ) use ( &$collected_items, &$errors, &$position ) {
 
-						// Flag that holds the status of the error - are there more lines to read or not.
-						$more_to_error = false;
+							$position = $pos;
 
-						// Check if this is the last line, and if not try to parse the line.
-						if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
-							$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+							// Flag that holds the status of the error - are there more lines to read or not.
+							$more_to_error = false;
 
-							if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
-								if ( ! empty( $collected_items ) ) {
-									$parsed_data['sub_items'] = $collected_items;
-									if ( isset( $collected_items[0]['message'] ) ) {
-										$parsed_data['message'] = $collected_items[0]['message'] . "\n" . $parsed_data['message'];
-										unset( $collected_items[0] );
+							// Check if this is the last line, and if not try to parse the line.
+							if ( ! empty( $line ) && null !== Log_Line_Parser::parse_entry_with_stack_trace( $line ) ) {
+								$parsed_data = Log_Line_Parser::parse_php_error_log_stack_line( $line );
+
+								if ( \is_array( $parsed_data ) && isset( $parsed_data['message'] ) ) {
+									if ( ! empty( $collected_items ) ) {
+										$parsed_data['sub_items'] = $collected_items;
+										if ( isset( $collected_items[0]['message'] ) ) {
+											$parsed_data['message'] = $collected_items[0]['message'] . "\n" . $parsed_data['message'];
+											unset( $collected_items[0] );
+										}
+										$collected_items = array();
 									}
-									$collected_items = array();
-								}
-								$errors[]      = $parsed_data;
-								$more_to_error = false;
-							} elseif ( \is_array( $parsed_data ) ) {
-								if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
-									$collected_items[] = array(
-										'message' => $parsed_data['call'],
-									);
-								} else {
-									$collected_items[] = $parsed_data;
-								}
+									$errors[]      = $parsed_data;
+									$more_to_error = false;
+								} elseif ( \is_array( $parsed_data ) ) {
+									if ( isset( $parsed_data['call'] ) && str_starts_with( trim( $parsed_data['call'] ), 'made by' ) ) {
+										$collected_items[] = array(
+											'message' => $parsed_data['call'],
+										);
+									} else {
+										$collected_items[] = $parsed_data;
+									}
 
+									$more_to_error = true;
+								}
+							} elseif ( ! empty( $line ) ) {
 								$more_to_error = true;
 							}
-						} elseif ( ! empty( $line ) ) {
-							$more_to_error = true;
-						}
 
-						$is_excluded = false;
+							$is_excluded = false;
 
-						if ( ! $more_to_error ) {
-							if ( isset( $parsed_data['severity'] ) && \in_array( $parsed_data['severity'], Settings::get_disabled_severities() ) ) {
-								$is_excluded = true;
+							if ( ! $more_to_error ) {
+								if ( isset( $parsed_data['severity'] ) && \in_array( $parsed_data['severity'], Settings::get_disabled_severities() ) ) {
+									$is_excluded = true;
+								}
 							}
-						}
 
-						return array(
-							'line_done' => ! $more_to_error,
-							'close'     => false,
-							'no_flush'  => $is_excluded,
-						);
+							return array(
+								'line_done' => ! $more_to_error,
+								'close'     => false,
+								'no_flush'  => $is_excluded,
+							);
 
-						// if ( ! str_contains( $address, 'stop_word' ) ) {
-						// echo "\nFound 'stop_word'!"; .
+							// if ( ! str_contains( $address, 'stop_word' ) ) {
+							// echo "\nFound 'stop_word'!"; .
 
-						// return false; // returning false here "breaks" the loop
-						// } .
-					},
-					( ! $items ) ? self::get_screen_option_per_page() : $items,
-					$position,
-					$write_temp
-				);
+							// return false; // returning false here "breaks" the loop
+							// } .
+						},
+						$items,
+						$position,
+						$write_temp
+					);
 
-				if ( false === $result ) {
-					break;
+					if ( false === $result ) {
+						break 2;
+					}
 				}
 			}
 
