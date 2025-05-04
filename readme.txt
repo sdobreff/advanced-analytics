@@ -41,7 +41,6 @@ Voila! It's ready to go.
 * Designed for both single and multi-site installations
 * PHP8 fully compatible
 
-
 == Frequently Asked Questions ==
 
 = How do I enable or disable error logging? =  
@@ -58,6 +57,7 @@ The plugin autodetects default error log location, usually WordPress defines tha
 1. **Error Log Overview** - Displays a summary of recent errors logged.
 2. **Settings Page** - Toggle logging options and configure advanced settings.
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
+4. **Cron manager** - Build-in is very powerful cron manager.
 
 == Changelog ==
 
