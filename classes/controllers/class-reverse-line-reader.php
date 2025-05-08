@@ -141,7 +141,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				$max_lines = 0;
 
-				return 0;
+				return false;
 			}
 
 			if ( $temp_writer ) {
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				$max_lines = 0;
 
-				return 0;
+				return false;
 			}
 			if ( $max_lines > 0 ) {
 				if ( $result['line_done'] && ! $result['no_flush'] ) {
@@ -176,7 +176,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 					$max_lines = 0;
 
-					return 0;
+					return false;
 				}
 			}
 
@@ -305,6 +305,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			}
+
+			self::close_streams();
 		}
 
 		/**
@@ -332,6 +334,26 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( ! empty( $line ) ) {
 					self::write_temp_file( $line . PHP_EOL );
 				}
+				fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+				self::$memory_handle = null;
+			}
+		}
+
+		/**
+		 * Closes the streams.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function close_streams() {
+			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {
+				fclose( self::$temp_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+
+				self::$temp_handle = null;
+			}
+			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {
 				fclose( self::$memory_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 				self::$memory_handle = null;
