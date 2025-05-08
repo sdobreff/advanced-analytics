@@ -81,6 +81,15 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		private static $memory_handle = null;
 
 		/**
+		 * Stores the error log file handle for reading the error log.
+		 *
+		 * @var handle
+		 *
+		 * @since latest
+		 */
+		private static $error_log_handle = null;
+
+		/**
 		 * Reads lines from given file reversed order.
 		 *
 		 * @param string|resource $file_or_handle - The file or handle to read from.
@@ -102,27 +111,30 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				self::$pos    = -1;
 				self::$buffer = array( '' );
 			}
-			if ( \is_string( $file_or_handle ) ) {
+			if ( null === self::$error_log_handle && \is_string( $file_or_handle ) ) {
 				if ( \file_exists( $file_or_handle ) && \is_readable( $file_or_handle ) ) {
-					$handle = fopen( $file_or_handle, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+					self::$error_log_handle = fopen( $file_or_handle, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 				} else {
 					$max_lines = 0;
 
 					return false;
 				}
-			} elseif ( \is_resource( $file_or_handle ) && ( 'handle' === get_resource_type( $file_or_handle ) || 'stream' === get_resource_type( $file_or_handle ) ) ) {
-				$handle = $file_or_handle;
-			} else {
+			} elseif ( null === self::$error_log_handle && \is_resource( $file_or_handle ) && ( 'handle' === \get_resource_type( $file_or_handle ) || 'stream' === get_resource_type( $file_or_handle ) ) ) {
+				self::$error_log_handle = $file_or_handle;
+			} elseif ( null === self::$error_log_handle ) {
 				$max_lines = 0;
+
+				self::reset_class_globals();
 
 				return false;
 			}
 			// Lets check the size and act appropriately.
 			if ( null === $pos ) {
-				fseek( $handle, 0, SEEK_END );
-				$size = ftell( $handle );
+				fseek( self::$error_log_handle, 0, SEEK_END );
+				$size = ftell( self::$error_log_handle );
 				if ( 0 === (int) $size ) {
-					fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+					self::reset_class_globals();
+
 					$max_lines = 0;
 
 					return false;
@@ -134,10 +146,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				self::$file_size = - (int) $size;
 			}
 
-			$line = self::readline( $handle );
+			$line = self::readline();
 
 			if ( null === $line ) {
-				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+				self::reset_class_globals();
 
 				$max_lines = 0;
 
@@ -150,7 +162,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			$result = $callback( $line, self::$pos );
 
 			if ( true === $result['close'] ) {
-				\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+				self::reset_class_globals();
 
 				$max_lines = 0;
 
@@ -172,7 +184,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 					}
 				}
 				if ( 0 === $max_lines ) {
-					\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+					self::reset_class_globals();
 
 					$max_lines = 0;
 
@@ -187,20 +199,19 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 * Reads buffer from the end of the file backwards to the beginning.
 		 *
 		 * @param int      $size - The buffer size to read.
-		 * @param resource $file_or_handle - The resource to read from.
 		 *
 		 * @return string|false
 		 *
 		 * @since 1.1.1
 		 */
-		public static function read( int $size, &$file_or_handle ) {
+		public static function read( int $size ) {
 			self::$pos -= $size;
 			if ( 0 === self::$pos ) {
-				fseek( $file_or_handle, 0 );
+				fseek( self::$error_log_handle, 0 );
 			} else {
-				fseek( $file_or_handle, self::$pos, SEEK_END );
+				fseek( self::$error_log_handle, self::$pos, SEEK_END );
 			}
-			$read_string = fread( $file_or_handle, $size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
+			$read_string = fread( self::$error_log_handle, $size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 
 			return $read_string;
 		}
@@ -208,13 +219,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		/**
 		 * Reads line from file
 		 *
-		 * @param resource $file_or_handle - The file handle to read from.
-		 *
 		 * @return string
 		 *
 		 * @since 1.1.1
 		 */
-		public static function readline( &$file_or_handle ) {
+		public static function readline() {
 			$buffer =& self::$buffer;
 			while ( true ) {
 				if ( 0 === self::$pos || self::$pos <= self::$file_size ) {
@@ -223,7 +232,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 						self::$buffer_size = abs( ( self::$file_size - -self::$buffer_size ) + 1 );
 						self::$pos         = self::$buffer_size;
-						$buffer            = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
+						$buffer            = explode( self::SEPARATOR, self::read( self::$buffer_size, self::$error_log_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
 
 						self::$pos = 0;
 
@@ -235,7 +244,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( count( $buffer ) > 1 ) {
 					return array_pop( $buffer );
 				}
-				$buffer = explode( self::SEPARATOR, self::read( self::$buffer_size, $file_or_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
+				$buffer = explode( self::SEPARATOR, self::read( self::$buffer_size, self::$error_log_handle ) . ( ( isset( $buffer[0] ) ) ? $buffer[0] : '' ) );
 			}
 		}
 
@@ -358,6 +367,23 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 
 				self::$memory_handle = null;
 			}
+		}
+
+		/**
+		 * Resets the class globals.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function reset_class_globals() {
+			if ( \is_resource( self::$error_log_handle ) && ( 'handle' === get_resource_type( self::$error_log_handle ) || 'stream' === get_resource_type( self::$error_log_handle ) ) ) {
+				\fclose( self::$error_log_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+			}
+
+			self::$buffer_size = self::BUFFER_SIZE;
+
+					self::$error_log_handle = null;
 		}
 	}
 }
