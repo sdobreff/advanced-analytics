@@ -85,7 +85,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @var handle
 		 *
-		 * @since latest
+		 * @since 1.6.0
 		 */
 		private static $error_log_handle = null;
 
@@ -360,7 +360,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.6.0
 		 */
 		public static function close_streams() {
 			if ( \is_resource( self::$temp_handle ) && ( 'handle' === get_resource_type( self::$temp_handle ) || 'stream' === get_resource_type( self::$temp_handle ) ) ) {
@@ -380,7 +380,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.6.0
 		 */
 		public static function reset_class_globals() {
 			if ( \is_resource( self::$error_log_handle ) && ( 'handle' === get_resource_type( self::$error_log_handle ) || 'stream' === get_resource_type( self::$error_log_handle ) ) ) {

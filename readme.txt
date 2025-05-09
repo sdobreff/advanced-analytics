@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics, cron
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -60,6 +60,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 4. **Cron manager** - Build-in is very powerful cron manager.
 
 == Changelog ==
+
+= 1.6.1 =  
+* Fixed bugs with error reader and improved memory management.
 
 = 1.6.0 =  
 * Code and memory optimizations, new functionalities, features and UI changes in Cron manager.
