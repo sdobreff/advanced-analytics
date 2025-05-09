@@ -23,7 +23,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 	 * @since 1.1.1
 	 */
 	class Reverse_Line_Reader {
-		const BUFFER_SIZE = 4096;
+		const BUFFER_SIZE = 16384;
 		const SEPARATOR   = PHP_EOL;
 
 		/**
@@ -117,6 +117,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				} else {
 					$max_lines = 0;
 
+					self::reset_class_globals();
+
 					return false;
 				}
 			} elseif ( null === self::$error_log_handle && \is_resource( $file_or_handle ) && ( 'handle' === \get_resource_type( $file_or_handle ) || 'stream' === get_resource_type( $file_or_handle ) ) ) {
@@ -198,7 +200,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 		/**
 		 * Reads buffer from the end of the file backwards to the beginning.
 		 *
-		 * @param int      $size - The buffer size to read.
+		 * @param int $size - The buffer size to read.
 		 *
 		 * @return string|false
 		 *
@@ -209,6 +211,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( 0 === self::$pos ) {
 				fseek( self::$error_log_handle, 0 );
 			} else {
+				if ( self::$pos < self::$file_size ) {
+					$size      = abs( abs( self::$pos ) - abs( self::$file_size ) - self::$buffer_size );
+					self::$pos = self::$file_size;
+				}
 				fseek( self::$error_log_handle, self::$pos, SEEK_END );
 			}
 			$read_string = fread( self::$error_log_handle, $size ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
@@ -381,9 +387,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				\fclose( self::$error_log_handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			}
 
-			self::$buffer_size = self::BUFFER_SIZE;
-
-					self::$error_log_handle = null;
+			self::$buffer_size      = self::BUFFER_SIZE;
+			self::$buffer           = array( '' );
+			self::$pos              = null;
+			self::$error_log_handle = null;
 		}
 	}
 }
