@@ -63,6 +63,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 */
 				\add_action( 'wp_ajax_aadvana_run_cron', array( __CLASS__, 'run_cron' ) );
 
+				/**
+				 * Delete Cron
+				 */
+				\add_action( 'wp_ajax_aadvana_delete_transient', array( __CLASS__, 'delete_transient' ) );
+
 			}
 		}
 
@@ -147,6 +152,29 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		}
 
 		/**
+		 * Executes transient deletion sequence.
+		 *
+		 * @return void
+		 *
+		 * @since 1.7.0
+		 */
+		public static function delete_transient() {
+			WP_Helper::verify_admin_nonce( 'bulk-custom-delete' );
+
+			$id = self::validate_id_param();
+
+			$result = Transients_Helper::delete_transient( $id );
+
+			if ( $result && ! \is_wp_error( $result ) ) {
+				\wp_send_json_success( 2 );
+			} elseif ( \is_wp_error( $result ) ) {
+				\wp_send_json_error( $result->get_error_message(), 500 );
+			} else {
+				\wp_send_json_error( 'Unable to delete cron.', 500 );
+			}
+		}
+
+		/**
 		 * Executes cron run sequence.
 		 *
 		 * @return void
@@ -181,6 +209,22 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			}
 
 			return \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
+		}
+
+		/**
+		 * Validates and retrieves the id parameter from the request.
+		 *
+		 * @return int The sanitized id.
+		 *
+		 * @since 1.7.0
+		 */
+		private static function validate_id_param(): int {
+			if ( ! isset( $_REQUEST['id'] ) || empty( $_REQUEST['id'] ) ) {
+				\wp_send_json_error( 'Missing or empty id parameter.', 400 );
+				\wp_die();
+			}
+
+			return (int) \sanitize_text_field( \wp_unslash( $_REQUEST['id'] ) );
 		}
 	}
 }

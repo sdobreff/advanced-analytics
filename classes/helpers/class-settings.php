@@ -16,6 +16,7 @@ namespace ADVAN\Helpers;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Controllers\Error_Log;
+use ADVAN\Lists\Transients_List;
 use ADVAN\Settings\Settings_Builder;
 
 // Exit if accessed directly.
@@ -38,6 +39,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
 
 		public const CRON_MENU_SLUG = 'advan_cron_jobs';
+
+		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
 
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
@@ -303,6 +306,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					1
 				);
 
+				/* Crons */
 				$cron_hook = \add_submenu_page(
 					self::MENU_SLUG,
 					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
@@ -316,6 +320,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				Crons_List::add_screen_options( $cron_hook );
 
 				\add_filter( 'manage_' . $cron_hook . '_columns', array( Crons_List::class, 'manage_columns' ) );
+
+				/* Crons end */
+
+				/* Transients */
+				$transients_hook = \add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'Transients viewer', '0-day-analytics' ),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					self::TRANSIENTS_MENU_SLUG,
+					array( __CLASS__, 'analytics_transients_page' ),
+					2
+				);
+
+				Transients_List::add_screen_options( $transients_hook );
+
+				\add_filter( 'manage_' . $transients_hook . '_columns', array( Transients_List::class, 'manage_columns' ) );
+
+				/* Transients end */
 
 				\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
@@ -491,6 +514,43 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 				echo '</div>';
 				$events_list->display();
+
+				?>
+				</form>
+			</div>
+			<?php
+		}
+
+		/**
+		 * Displays the transients page.
+		 *
+		 * @return void
+		 *
+		 * @since 1.7.0
+		 */
+		public static function analytics_transients_page() {
+
+			$transients = new Transients_List( array() );
+			$transients->prepare_items();
+			?>
+			<div class="wrap">
+				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
+				<form id="crons-filter" method="get">
+				<?php
+
+				$page  = \sanitize_text_field( $_GET['page'] );
+				$paged = filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT );
+
+				printf( '<input type="hidden" name="page" value="%s" />', $page );
+				printf( '<input type="hidden" name="paged" value="%d" />', $paged );
+
+				echo '<div style="clear:both; float:right">';
+				$transients->search_box(
+					__( 'Search', '0-day-analytics' ),
+					strtolower( $transients::get_table_name() ) . '-find'
+				);
+				echo '</div>';
+				$transients->display();
 
 				?>
 				</form>
@@ -890,7 +950,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : '';
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page  || self::TRANSIENTS_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
 		}
 
 		/**

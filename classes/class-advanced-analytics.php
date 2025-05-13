@@ -25,6 +25,7 @@ use ADVAN\Helpers\Context_Helper;
 use ADVAN\Controllers\Integrations;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
+use ADVAN\Lists\Transients_List;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -56,6 +57,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// Setup screen options. Needs to be here as admin_init hook it too late.
 				\add_filter( 'set-screen-option', array( Logs_List::class, 'set_screen_option' ), 10, 3 );
+
+				\add_filter( 'set-screen-option', array( Transients_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'plugin_action_links', array( __CLASS__, 'add_settings_link' ), 10, 2 );
 				// \add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta' ), 10, 2 );

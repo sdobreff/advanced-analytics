@@ -530,17 +530,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * The `$accurate` parameter can be used to display an interval of less than an hour in minutes and seconds.
 		 *
-		 * Example:
-		 *
-		 *     echo \Crontrol\interval( 40 );
-		 *     // 40 seconds
-		 *     echo \Crontrol\interval( 450 );
-		 *     // 7 minutes
-		 *     echo \Crontrol\interval( 450, true );
-		 *     // 7 minutes 30 seconds
-		 *     echo \Crontrol\interval( 5678 );
-		 *     // 1 hour 34 minutes
-		 *
 		 * @param  int|float $since    A period of time in seconds.
 		 * @param  bool      $accurate Whether to display the interval in minutes and seconds.
 		 *
@@ -552,30 +541,30 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			// Array of time period chunks.
 			$chunks = array(
 				/* translators: %s: The number of years in an interval of time. */
-				array( YEAR_IN_SECONDS, _n_noop( '%s year', '%s years', 'wp-crontrol' ) ),
+				array( YEAR_IN_SECONDS, _n_noop( '%s year', '%s years', '0-day-analytics' ) ),
 				/* translators: %s: The number of months in an interval of time. */
-				array( MONTH_IN_SECONDS, _n_noop( '%s month', '%s months', 'wp-crontrol' ) ),
+				array( MONTH_IN_SECONDS, _n_noop( '%s month', '%s months', '0-day-analytics' ) ),
 				/* translators: %s: The number of weeks in an interval of time. */
-				array( WEEK_IN_SECONDS, _n_noop( '%s week', '%s weeks', 'wp-crontrol' ) ),
+				array( WEEK_IN_SECONDS, _n_noop( '%s week', '%s weeks', '0-day-analytics' ) ),
 				/* translators: %s: The number of days in an interval of time. */
-				array( DAY_IN_SECONDS, _n_noop( '%s day', '%s days', 'wp-crontrol' ) ),
+				array( DAY_IN_SECONDS, _n_noop( '%s day', '%s days', '0-day-analytics' ) ),
 				/* translators: %s: The number of hours in an interval of time. */
-				array( HOUR_IN_SECONDS, _n_noop( '%s hour', '%s hours', 'wp-crontrol' ) ),
+				array( HOUR_IN_SECONDS, _n_noop( '%s hour', '%s hours', '0-day-analytics' ) ),
 				/* translators: %s: The number of minutes in an interval of time. */
-				array( MINUTE_IN_SECONDS, _n_noop( '%s minute', '%s minutes', 'wp-crontrol' ) ),
+				array( MINUTE_IN_SECONDS, _n_noop( '%s minute', '%s minutes', '0-day-analytics' ) ),
 				/* translators: %s: The number of seconds in an interval of time. */
-				array( 1, _n_noop( '%s second', '%s seconds', 'wp-crontrol' ) ),
+				array( 1, _n_noop( '%s second', '%s seconds', '0-day-analytics' ) ),
 			);
 
 			if ( $since <= 0 ) {
-				return __( 'now', 'wp-crontrol' );
+				return __( 'now', '0-day-analytics' );
 			}
 
 			if ( ( ! $accurate ) && ( $since >= MINUTE_IN_SECONDS ) && ( $since < HOUR_IN_SECONDS ) ) {
 				$num = intval( floor( $since / MINUTE_IN_SECONDS ) );
 				return sprintf(
 					/* translators: %s: The number of minutes in an interval of time. */
-					_n( '%s minute', '%s minutes', $num, 'wp-crontrol' ),
+					_n( '%s minute', '%s minutes', $num, '0-day-analytics' ),
 					$num
 				);
 			}
@@ -600,7 +589,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			}
 
 			// Set output var.
-			$output = sprintf( translate_nooped_plural( $name, $count, 'wp-crontrol' ), $count );
+			$output = sprintf( translate_nooped_plural( $name, $count, '0-day-analytics' ), $count );
 
 			// Step two: the second chunk.
 			if ( $i + 1 < count( $chunks ) ) {
@@ -609,7 +598,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				$count2   = (int) floor( ( $since - ( $seconds * $count ) ) / $seconds2 );
 				if ( $count2 ) {
 					// Add to output var.
-					$output .= ' ' . sprintf( translate_nooped_plural( $name2, $count2, 'wp-crontrol' ), $count2 );
+					$output .= ' ' . sprintf( translate_nooped_plural( $name2, $count2, '0-day-analytics' ), $count2 );
 				}
 			}
 

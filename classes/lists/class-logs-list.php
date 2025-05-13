@@ -527,7 +527,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				case 'timestamp':
 					if ( 1 === $item['timestamp'] ) {
 						return sprintf(
-							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
+							'<span class="status-control-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
 							\esc_html__( 'Immediately', '0-day-analytics' ),
 						);
 					}
@@ -592,7 +592,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						);
 
 						return sprintf(
-							'<span class="status-crontrol-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 							esc_html( $ago ),
 							$time,
 						);
@@ -607,7 +607,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 
 					return sprintf(
-						'<span class="status-crontrol-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+						'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 						\esc_html( $in ),
 						$time,
 					);
