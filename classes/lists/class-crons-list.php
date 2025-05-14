@@ -567,11 +567,19 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						$callbacks = array();
 
 						foreach ( $hook_callbacks as $callback ) {
-							$callbacks[] = self::output_filename(
-								$callback['callback']['name'],
-								$callback['callback']['file'],
-								$callback['callback']['line']
-							);
+							if ( \key_exists( 'error', $callback['callback'] ) ) {
+								if ( \is_a( $callback['callback']['error'], '\WP_Error' ) ) {
+									$callbacks[] = '<span style="color: #b32d2e; background:#ffd6d6;padding:3px;">' . esc_html__( 'Error occurred with cron callback', '0-day-analytics' ) . ' - ' . $callback['callback']['error']->get_error_message() . '</span>';
+								} else {
+									$callbacks[] = '<span style="color: #b32d2e; background:#ffd6d6;padding:3px;">' . esc_html__( 'Unknown error occurred', '0-day-analytics' ) . '</span>';
+								}
+							} else {
+								$callbacks[] = self::output_filename(
+									$callback['callback']['name'],
+									$callback['callback']['file'],
+									$callback['callback']['line']
+								);
+							}
 						}
 
 						if ( 'action_scheduler_run_queue' === $item['hook'] ) {
@@ -919,7 +927,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 							jQuery.get(ajaxurl, data, function(response) {
 								if ( 2 === response['data'] || 0 === response['data'] ) {
-									
+
+									let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
+									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
 								} else {
 									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
 								}

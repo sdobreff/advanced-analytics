@@ -159,7 +159,12 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				} else {
 					$function_name  = is_string( $callback ) ? $callback : spl_object_hash( $callback );
 					$result['name'] = self::shorten_fqn( $function_name ) . '()';
-					$ref            = new \ReflectionFunction( $callback );
+					try {
+						$ref = new \ReflectionFunction( $callback );
+						// Class as string ?
+					} catch ( \ReflectionException $e ) {
+						$ref = new \ReflectionMethod( $callback );
+					}
 				}
 
 				$result['file'] = $ref->getFileName();
