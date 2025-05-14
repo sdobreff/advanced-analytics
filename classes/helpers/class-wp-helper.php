@@ -163,7 +163,11 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 						$ref = new \ReflectionFunction( $callback );
 						// Class as string ?
 					} catch ( \ReflectionException $e ) {
-						$ref = new \ReflectionMethod( $callback );
+						if ( PHP_VERSION_ID >= 80400 ) {
+							$ref = \ReflectionMethod::createFromMethodName( $callback );
+						} else {
+							$ref = new \ReflectionMethod( $callback );
+						}
 					}
 				}
 

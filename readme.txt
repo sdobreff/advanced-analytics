@@ -3,11 +3,11 @@ Tags: log, error log, 0-day, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.7.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-A WordPress plugin to manage large error logs, providing options to enable or disable logging and optimized for gigabyte-sized log files.
+**Advanced Analytics** is a WordPress plugin which purpose is to manage all kinds on error logs (large or small), providing options to enable or disable logging and optimized for gigabyte-sized log files. It is specially designed and optimized to work on production sites without slowing them. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
 
 == Description ==
 
@@ -27,6 +27,8 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Option to enable or disable logging via the admin interface.
 - Optimized for high-performance even with large log files.
 - Provides insights into logged errors for efficient troubleshooting.
+- Build-id fully functional Cron manager
+- Build-id fully functional Transients manager
 
 == Installation ==
 
@@ -61,6 +63,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 4. **Cron manager** - Build-in is very powerful cron manager.
 
 == Changelog ==
+
+= 1.7.2 =  
+* Deprecation error fix.
 
 = 1.7.1 =  
 * UI improvements. Fixed class reflection and method extraction in crons.
