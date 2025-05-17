@@ -72,13 +72,20 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
-			} else {
-				// Footnotes_Formatter::init();
 			}
 
-			// if ( \WP_DEBUG ) {
-			// set_error_handler( 'WP_Error_Handler::handle_error' );
-			// }
+			if ( \WP_DEBUG ) {
+				// \set_error_handler( '\ADVAN\Helpers\WP_Error_Handler::handle_error' );
+
+				\register_shutdown_function(
+					function() {
+						$error = error_get_last();
+						if ( $error && 1 === $error['type'] ) {
+							// Implement notifications here.
+						}
+					}
+				);
+			}
 			Ajax_Helper::init();
 		}
 
