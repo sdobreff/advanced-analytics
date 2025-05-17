@@ -478,10 +478,18 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			<?php
 			$events_list = new Logs_List( array() );
 			$events_list->prepare_items();
+			?>
+			<div class="wrap">
+			<h1 class="wp-heading-inline"><?php \esc_html_e( 'Error logs', '0-day-analytics' ); ?></h1>
+			<form id="error-logs-filter" method="get">
+				<?php
+				$events_list->display();
 
-			$events_list->display();
-
-			// self::aadvana_show_options();
+				// self::aadvana_show_options();
+				?>
+				</form>
+			</div>
+			<?php
 		}
 
 		/**
@@ -1109,15 +1117,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				if ( ! empty( $wp_debug_log_filename ) && Error_Log::autodetect() !== $wp_debug_log_filename ) {
 
-					if ( is_writable( \dirname( $wp_debug_log_filename ) ) ) {
-						$file_name = \dirname( $wp_debug_log_filename ) . \DIRECTORY_SEPARATOR . 'debug_' . File_Helper::generate_random_file_name() . '.log';
+					if ( \is_writable( \dirname( $wp_debug_log_filename ) ) ) {
+						// $file_name = \dirname( $wp_debug_log_filename ) . \DIRECTORY_SEPARATOR . 'debug_' . File_Helper::generate_random_file_name() . '.log';
 
-						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $file_name, self::$config_args );
-					} elseif ( \is_string( Error_Log::autodetect() ) ) {
-						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $wp_debug_log_filename, self::$config_args );
+					// } elseif ( \is_string( Error_Log::autodetect() ) ) {
+					// 	Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
 					}
-				} elseif ( \is_string( Error_Log::autodetect() ) ) {
-					Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+				// } elseif ( \is_string( Error_Log::autodetect() ) ) {
+				// 	Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
 				}
 
 				if ( $wp_debug_log_generate ) {

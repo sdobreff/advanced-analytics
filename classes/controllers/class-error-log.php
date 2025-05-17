@@ -57,19 +57,32 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 
 				// Check for common problems that could prevent us from displaying the error log.
 				if ( ! $error_logging_enabled ) {
-					self::$last_error = __( 'Error logging is disabled.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'log_errors_off',
+						__( 'Error logging is disabled.', '0-day-analytics' )
+					);
 					return new \WP_Error(
 						'log_errors_off',
 						__( 'Error logging is disabled.', '0-day-analytics' )
 					);
 				} elseif ( empty( self::$log_file ) ) {
-					self::$last_error = __( 'Error log filename is not set.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'error_log_not_set',
+						__( 'Error log filename is not set.', '0-day-analytics' )
+					);
 					return new \WP_Error(
 						'error_log_not_set',
 						__( 'Error log filename is not set.', '0-day-analytics' )
 					);
 				} elseif ( ( strpos( self::$log_file, '/' ) === false ) && ( strpos( self::$log_file, '\\' ) === false ) ) {
-					self::$last_error = __( 'Error log filename is not an absolute path.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'error_log_uses_relative_path',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
 					return new \WP_Error(
 						'error_log_uses_relative_path',
 						sprintf(
@@ -80,7 +93,14 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 					);
 				} elseif ( ! file_exists( self::$log_file ) ) {
 
-					self::$last_error = __( 'Error log file does not exists.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'error_log_not_exists',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> does not exists.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
 					return new \WP_Error(
 						'error_log_not_exists',
 						sprintf(
@@ -90,7 +110,14 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						)
 					);
 				} elseif ( ! is_writable( self::$log_file ) ) {
-					self::$last_error = __( 'Error log file is not writable.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'error_log_not_writable',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> exists, but is not writable. Please check file permissions.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
 					return new \WP_Error(
 						'error_log_not_writable',
 						sprintf(
@@ -100,7 +127,14 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						)
 					);
 				} elseif ( file_exists( self::$log_file ) && ! is_readable( self::$log_file ) ) {
-					self::$last_error = __( 'Error log file is not readable.', '0-day-analytics' );
+					self::$last_error = new \WP_Error(
+						'error_log_not_accessible',
+						sprintf(
+						// translators: the name of the log file.
+							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', '0-day-analytics' ),
+							esc_html( self::$log_file )
+						)
+					);
 					return new \WP_Error(
 						'error_log_not_accessible',
 						sprintf(

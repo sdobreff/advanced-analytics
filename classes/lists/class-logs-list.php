@@ -341,7 +341,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @return void
 		 */
 		public function no_items() {
-			\esc_html_e( 'No reports found', '0-day-analytics' );
+			\esc_html_e( 'No logs found', '0-day-analytics' );
 		}
 
 		/**
@@ -384,7 +384,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			if ( \is_a( $file, 'WP_Error' ) ) {
 				return array(
 					array(
-						'message'   => Error_Log::get_last_error(),
+						'message'   => Error_Log::get_last_error()->get_error_message(),
 						'timestamp' => time(),
 					),
 				);
@@ -946,8 +946,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$log_file = Error_Log::extract_file_name( Error_Log::autodetect() );
 
 			if ( null !== Error_Log::get_last_error() ) {
-
-				echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
+				if ( 'top' === $which ) {
+					?>
+					<div id="cron-status-notice" class="notice notice-info">
+						<p> <?php echo Error_Log::get_last_error()->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+					</div>
+					<?php
+				}
+					// echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
 			}
 
 			if ( false !== $log_file ) {
@@ -958,8 +964,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				echo '<div><b>' . \esc_html__( 'Log file: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ) . '</div>';
 				echo '<div><b>' . \esc_html__( 'File size: ', '0-day-analytics' ) . '</b> ' . \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ) . '</div>';
 				echo '<div><b>' . \esc_html__( 'Last modified: ', '0-day-analytics' ) . '</b> ' . \esc_attr( $time ) . '</div>';
-			} else {
-				echo '<div><b>' . \esc_html__( 'No log file detected', '0-day-analytics' ) . '</b></div>';
 			}
 
 			if ( 'top' === $which ) {
@@ -1003,7 +1007,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					if ( \current_user_can( 'manage_options' ) ) {
 						if ( null === Error_Log::get_last_error() ) {
 							?>
-						
 
 							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
 							<?php
