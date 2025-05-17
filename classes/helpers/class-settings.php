@@ -520,7 +520,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					if ( 'cron_info' === $status->get_error_code() ) {
 						?>
 						<div id="cron-status-notice" class="notice notice-info">
-							<p><?php echo esc_html( $status->get_error_message() ); ?></p>
+							<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 						</div>
 						<?php
 					}
@@ -701,9 +701,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
 				),
 
-				'head-cron-list' => esc_html__( 'Cron Log', '0-day-analytics' ),
+				'head-cron-list'      => esc_html__( 'Cron Log', '0-day-analytics' ),
 
-				'cron-list'      => array(
+				'cron-list'           => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
 				),

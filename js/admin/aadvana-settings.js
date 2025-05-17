@@ -558,7 +558,9 @@ $doc.ready(function () {
                     setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
                 }
                 else if (response.data == 2) {
-                    location.reload();
+                    // Disk operations take some time to be done - so postpone the reload with 2 seconds.
+                    setTimeout(function () { location.reload( true ); }, 2000);
+                    
                 }
                 else {
                     $saveAlert.addClass('is-failed').delay(900).fadeOut(700);

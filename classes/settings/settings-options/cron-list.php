@@ -9,7 +9,6 @@
 
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\File_Helper;
-use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\System_Status;
 
 $settings = Settings::get_current_options();
@@ -47,6 +46,8 @@ Settings::set_current_options( $settings );
 			)
 		);
 	} else {
+
+		$env_info = System_Status::environment_info();
 
 		Settings::build_option(
 			array(

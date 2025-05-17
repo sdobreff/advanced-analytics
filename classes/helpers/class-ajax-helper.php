@@ -125,7 +125,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 				\wp_send_json_success( 2 );
 			}
-				\wp_die();
+			\wp_die();
 		}
 
 		/**

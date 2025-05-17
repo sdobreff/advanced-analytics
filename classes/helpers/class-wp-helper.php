@@ -661,9 +661,10 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				return new \WP_Error(
 					'cron_info',
 					sprintf(
-					/* translators: %s: The name of the PHP constant that is set. */
-						__( 'The %s constant is set to true. WP-Cron spawning is disabled.', '0-day-analytics' ),
-						'DISABLE_WP_CRON'
+					/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
+						__( 'The %1$s constant is set to true. WP-Cron spawning is disabled. Try to enable it in settings - %2$s', '0-day-analytics' ),
+						'DISABLE_WP_CRON',
+						'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-cron-list">' . __( 'here', '0-day-analytics' ) . '</a>',
 					)
 				);
 			}
