@@ -30,11 +30,11 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	 */
 	class WP_Error_Handler {
 		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null ) {
-			if ( ! ( error_reporting() & $errno ) ) {
-				// This error code is not included in error_reporting, so let it fall.
-				// through to the standard PHP error handler.
-				return false;
-			}
+			// if ( ! ( error_reporting(E_ERROR) & $errno ) ) {
+			// 	// This error code is not included in error_reporting, so let it fall.
+			// 	// through to the standard PHP error handler.
+			// 	return false;
+			// }
 
 			// These are default values for a single trace.
 			// To prevent errors when a trace ommits some values.

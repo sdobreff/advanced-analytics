@@ -900,6 +900,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 							};
 
 							jQuery.get(ajaxurl, data, function(response) {
+
+							console.log(response);
 								if ( 2 === response['data'] || 0 === response['data'] ) {
 									jQuery(that).closest("tr").animate({
 										opacity: 0
@@ -955,6 +957,58 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			</div>
 			<?php
 				$this->extra_tablenav( $which );
+
+			if ( 'bottom' === $which ) {
+				$schedules = wp_get_schedules();
+				uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
+				?>
+				<h2><?php esc_html_e( 'Available schedules', '0-day-analytics' ); ?></h2>
+				<table class="widefat striped" style="width:auto">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Frequency', '0-day-analytics' ); ?></th>
+							<th><?php esc_html_e( 'ID', '0-day-analytics' ); ?></th>
+							<th><?php esc_html_e( 'Interval (seconds)', '0-day-analytics' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $schedules as $schedule_id => $schedule ) { ?>
+							<tr>
+								<td><?php echo esc_html( $schedule['display'] ); ?></td>
+								<td><code><?php echo esc_html( $schedule_id ); ?></code></td>
+								<td><?php echo esc_html( $schedule['interval'] ); ?></td>
+							</tr>
+						<?php } ?>
+					</tbody>
+				</table>
+				<?php
+			}
+		}
+
+		/**
+		 * Responsible for sorting the schedule intervals
+		 *
+		 * @param int $a - Timestamp.
+		 * @param int $b - Timestamp.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		private static function sort_schedules( $a, $b ) {
+			if ( $a['interval'] == $b['interval'] ) {
+				return strcmp( $a['display'], $b['display'] );
+			}
+			if ( $a['interval'] ) {
+				if ( $b['interval'] ) {
+					return $a['interval'] - $b['interval'];
+				}
+				return -1;
+			}
+			if ( $b['interval'] ) {
+				return 1;
+			}
+			return 0;
 		}
 
 		/**
