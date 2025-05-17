@@ -154,6 +154,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				'wp_debug_mode'             => ( defined( 'WP_DEBUG' ) && \WP_DEBUG ),
 				'wp_debug_display'          => ( defined( 'WP_DEBUG_DISPLAY' ) && \WP_DEBUG_DISPLAY ),
 				'wp_debug_log'              => ( defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ),
+				'wp_cron_disable'              => ( defined( 'DISABLE_WP_CRON' ) && \DISABLE_WP_CRON ),
 				'language'                  => get_locale(),
 				'server_info'               => $_SERVER['SERVER_SOFTWARE'],
 				'php_version'               => phpversion(),

@@ -513,6 +513,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					strtolower( $events_list::get_table_name() ) . '-find'
 				);
 				echo '</div>';
+
+				$status = WP_Helper::check_cron_status();
+
+				if ( \is_wp_error( $status ) ) {
+					if ( 'cron_info' === $status->get_error_code() ) {
+						?>
+						<div id="cron-status-notice" class="notice notice-info">
+							<p><?php echo esc_html( $status->get_error_message() ); ?></p>
+						</div>
+						<?php
+					}
+				}
+
 				$events_list->display();
 
 				?>
@@ -681,18 +694,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				// 'title' => esc_html__( 'Export/Import', '0-day-analytics' ),
 				// ),
 
-				'head-error-log-list' => esc_html__( 'Error Log', 'awesome-footnotes' ),
+				'head-error-log-list' => esc_html__( 'Error Log', '0-day-analytics' ),
 
 				'error-log-list'      => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
 				),
 
-				'head-advanced'       => esc_html__( 'Advanced', 'awesome-footnotes' ),
+				'head-cron-list' => esc_html__( 'Cron Log', '0-day-analytics' ),
+
+				'cron-list'      => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
+				),
+
+				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),
 
 				'advanced'            => array(
 					'icon'  => 'admin-tools',
-					'title' => esc_html__( 'Advanced', 'awesome-footnotes' ),
+					'title' => esc_html__( 'Advanced', '0-day-analytics' ),
 				),
 
 				'backup'              => array(
@@ -950,7 +970,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : '';
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page  || self::TRANSIENTS_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1054,7 +1074,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function collect_and_sanitize_options( array $post_array ): array {
 			if ( ! \current_user_can( 'manage_options' ) ) {
-				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'awesome-footnotes' ) );
+				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', '0-day-analytics' ) );
 			}
 
 			$advanced_options = array();
@@ -1106,6 +1126,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $file_name, self::$config_args );
 				}
 			}
+
+			$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			Config_Transformer::update( 'constant', 'DISABLE_WP_CRON', $wp_cron_disable, self::$config_args );
 
 			return $advanced_options;
 		}

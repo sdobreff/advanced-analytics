@@ -27,7 +27,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		/**
 		 * Path to the error log file.
 		 *
-		 * @var string
+		 * @var string|null
 		 *
 		 * @since 1.1.0
 		 */
@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		/**
 		 * Stores last error (if exists).
 		 *
-		 * @var string
+		 * @var string|null
 		 *
 		 * @since 1.1.0
 		 */
@@ -52,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		public static function autodetect() {
 			if ( null === self::$log_file ) {
 				$log_errors            = strtolower( strval( ini_get( 'log_errors' ) ) );
-				$error_logging_enabled = ! empty( $log_errors ) && ! in_array( $log_errors, array( 'off', '0', 'false', 'no' ) );
+				$error_logging_enabled = ! empty( $log_errors ) && ! in_array( $log_errors, array( 'off', '0', 'false', 'no' ), true );
 				self::$log_file        = ini_get( 'error_log' );
 
 				// Check for common problems that could prevent us from displaying the error log.
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 							esc_html( self::$log_file )
 						)
 					);
-				} elseif ( ! is_writable( ( self::$log_file ) ) ) {
+				} elseif ( ! is_writable( self::$log_file ) ) {
 					self::$last_error = __( 'Error log file is not writable.', '0-day-analytics' );
 					return new \WP_Error(
 						'error_log_not_writable',
@@ -125,25 +125,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function clear( $filename ) {
-			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-				if ( \is_writable( $filename ) ) {
-					// Truncate the file.
-					$handle = fopen( $filename, 'w' );
+			$filename = self::extract_file_name( $filename );
+			if ( $filename && is_writable( $filename ) ) {
+				$handle = fopen( $filename, 'w' );
 
-					if ( false === $handle ) {
-						return;
-					}
-
+				if ( false !== $handle ) {
 					fclose( $handle );
-
-				} else {
-					return; // ERROR: file not writable.
 				}
 			}
 		}
 
 		/**
-		 * Returns the file size
+		 * Returns the file size.
 		 *
 		 * @param string|resource $filename - The name of the file.
 		 *
@@ -152,11 +145,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function get_file_size( $filename ) {
-			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-				return filesize( $filename );
-			}
-
-			return false;
+			$filename = self::extract_file_name( $filename );
+			return $filename ? filesize( $filename ) : false;
 		}
 
 		/**
@@ -169,15 +159,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function get_modification_time( $filename ) {
-			if ( $filename = self::extract_file_name( $filename ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-				if ( $filename ) {
-					return filemtime( $filename );
-				} else {
-					return false;
-				}
-			}
-
-			return false;
+			$filename = self::extract_file_name( $filename );
+			return $filename ? filemtime( $filename ) : false;
 		}
 
 		/**

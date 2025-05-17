@@ -151,7 +151,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		public static function is_plugin_active( string $plugin_slug ): bool {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-			if ( is_plugin_active( $plugin_slug ) ) {
+			if ( \is_plugin_active( $plugin_slug ) ) {
 				return true;
 			}
 

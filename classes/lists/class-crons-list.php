@@ -999,7 +999,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @param int $a - Timestamp.
 		 * @param int $b - Timestamp.
 		 *
-		 * @return void
+		 * @return int
 		 *
 		 * @since latest
 		 */

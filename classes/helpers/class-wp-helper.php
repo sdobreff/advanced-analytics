@@ -647,5 +647,26 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			return 'UTC' . $formatted_offset;
 		}
+
+		/**
+		 * Checks global WP_Cron constant and its status - returns error if disabled, nothing otherwise.
+		 *
+		 * @return \WP_Error|null
+		 *
+		 * @since latest
+		 */
+		public static function check_cron_status() {
+
+			if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
+				return new \WP_Error(
+					'cron_info',
+					sprintf(
+					/* translators: %s: The name of the PHP constant that is set. */
+						__( 'The %s constant is set to true. WP-Cron spawning is disabled.', '0-day-analytics' ),
+						'DISABLE_WP_CRON'
+					)
+				);
+			}
+		}
 	}
 }

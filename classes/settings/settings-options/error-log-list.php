@@ -33,7 +33,7 @@ Settings::set_current_options( $settings );
 	Settings::build_option(
 		array(
 			'title' => \esc_html__( 'Debugging options', '0-day-analytics' ),
-			'id'    => 'jquery-pretty-tooltips-format-settings',
+			'id'    => 'debugging-settings-options',
 			'type'  => 'header',
 		)
 	);
