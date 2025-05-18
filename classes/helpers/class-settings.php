@@ -340,7 +340,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* Transients end */
 
-				\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) ) {
+					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+				}
 				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
@@ -1121,11 +1123,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						// $file_name = \dirname( $wp_debug_log_filename ) . \DIRECTORY_SEPARATOR . 'debug_' . File_Helper::generate_random_file_name() . '.log';
 
 						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $wp_debug_log_filename, self::$config_args );
-					// } elseif ( \is_string( Error_Log::autodetect() ) ) {
-					// 	Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+						// } elseif ( \is_string( Error_Log::autodetect() ) ) {
+						// Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
 					}
-				// } elseif ( \is_string( Error_Log::autodetect() ) ) {
-				// 	Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
+					// } elseif ( \is_string( Error_Log::autodetect() ) ) {
+					// Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', Error_Log::autodetect(), self::$config_args );
 				}
 
 				if ( $wp_debug_log_generate ) {

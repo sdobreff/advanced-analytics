@@ -385,6 +385,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				return array(
 					array(
 						'message'   => Error_Log::get_last_error()->get_error_message(),
+						'severity'  => 'error',
 						'timestamp' => time(),
 					),
 				);
@@ -947,11 +948,26 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			if ( null !== Error_Log::get_last_error() ) {
 				if ( 'top' === $which ) {
-					?>
-					<div id="cron-status-notice" class="notice notice-info">
-						<p> <?php echo Error_Log::get_last_error()->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-					</div>
-					<?php
+
+					if ( 'wp_debug_off' === Error_Log::get_last_error()->get_error_code() ) {
+						?>
+						<div id="debug-status-error" class="error error-info">
+							<p> <?php echo WP_Helper::check_debug_status()->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+						</div>
+						<?php
+					} elseif ( 'wp_debug_log_off' === Error_Log::get_last_error()->get_error_code() ) {
+						?>
+						<div id="debug-status-error" class="error error-info">
+							<p> <?php echo WP_Helper::check_debug_log_status()->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+						</div>
+						<?php
+					} else {
+						?>
+						<div id="cron-status-notice" class="notice notice-info">
+							<p> <?php echo Error_Log::get_last_error()->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+						</div>
+						<?php
+					}
 				}
 					// echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
 			}

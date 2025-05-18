@@ -11,6 +11,7 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\System_Status;
+use ADVAN\Helpers\WP_Helper;
 
 $settings = Settings::get_current_options();
 
@@ -59,45 +60,56 @@ Settings::set_current_options( $settings );
 			)
 		);
 
-		Settings::build_option(
-			array(
-				'name'    => \esc_html__( 'WP Debug Display Errors in HTML', '0-day-analytics' ),
-				'id'      => 'wp_debug_display_enable',
-				'type'    => 'checkbox',
-				'default' => $env_info['wp_debug_display'],
-			)
-		);
-
-		Settings::build_option(
-			array(
-				'name'    => \esc_html__( 'WP Debug Log Enabled', '0-day-analytics' ),
-				'id'      => 'wp_debug_log_enable',
-				'type'    => 'checkbox',
-				'default' => $env_info['wp_debug_log'],
-			)
-		);
-
-		if ( is_writable( \WP_CONTENT_DIR ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+		if ( $env_info['wp_debug_mode'] ) {
 
 			Settings::build_option(
 				array(
-					'name'    => \esc_html__( 'WP Debug Log File Name', '0-day-analytics' ),
-					'id'      => 'wp_debug_log_filename',
-					'type'    => 'text',
-					'default' => Error_Log::autodetect(),
-					'pattern' => '([a-zA-Z0-9\//\-\.\:])+',
-				)
-			);
-
-			Settings::build_option(
-				array(
-					'name'    => \esc_html__( 'SECURITY: Generate WP Debug Log File Name', '0-day-analytics' ),
-					'id'      => 'wp_debug_log_file_generate',
+					'name'    => \esc_html__( 'WP Debug Log Enabled', '0-day-analytics' ),
+					'id'      => 'wp_debug_log_enable',
 					'type'    => 'checkbox',
-					'default' => false,
-					'hint'    => \esc_html__( 'Check this if you want to generate new randomized filename for storing the error logs. This will always be uncheck if you refresh, check it only if you want new file name to be generated, and press Save Changes button. You are free to set whatever directory and file name you like above, but keep in mind that it needs to be writable from the script otherwise it wont work.', '0-day-analytics' ),
+					'default' => $env_info['wp_debug_log'],
 				)
 			);
+
+			Settings::build_option(
+				array(
+					'name'    => \esc_html__( 'WP Debug Display Errors in HTML', '0-day-analytics' ),
+					'id'      => 'wp_debug_display_enable',
+					'type'    => 'checkbox',
+					'default' => $env_info['wp_debug_display'],
+				)
+			);
+
+			if ( is_writable( \WP_CONTENT_DIR ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+
+				$file_name = Error_Log::autodetect();
+
+				if ( \is_a( $file_name, 'WP_Error' ) ) {
+
+					$file_name = '';
+
+				}
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'WP Debug Log File Name', '0-day-analytics' ),
+						'id'      => 'wp_debug_log_filename',
+						'type'    => 'text',
+						'default' => $file_name,
+						'pattern' => '([a-zA-Z0-9\//\-\.\:])+',
+					)
+				);
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'SECURITY: Generate WP Debug Log File Name', '0-day-analytics' ),
+						'id'      => 'wp_debug_log_file_generate',
+						'type'    => 'checkbox',
+						'default' => false,
+						'hint'    => \esc_html__( 'Check this if you want to generate new randomized filename for storing the error logs. This will always be uncheck if you refresh, check it only if you want new file name to be generated, and press Save Changes button. You are free to set whatever directory and file name you like above, but keep in mind that it needs to be writable from the script otherwise it wont work.', '0-day-analytics' ),
+					)
+				);
+			}
 		}
 	}
 
