@@ -70,6 +70,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 * @param string $wp_config_path Path to a wp-config.php file.
 		 * @param bool   $read_only If the config is set to read-only.
 		 *
+		 * @return \WP_Error|void
+		 *
 		 * @since 1.1.0
 		 */
 		public static function init( $wp_config_path = '', $read_only = false ) {
@@ -81,11 +83,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 			$basename = basename( $wp_config_path );
 
 			if ( ! file_exists( $wp_config_path ) ) {
-				throw new \Exception( "{$basename} does not exist." );
+				return new \WP_Error(
+					'wp_debug_off',
+					__( "{$basename} does not exist.", '0-day-analytics' ) // phpcs:ignore WordPress.WP.I18n.InterpolatedVariableText
+				);
+				// throw new \Exception( "{$basename} does not exist." );
 			}
 
 			if ( ! $read_only && ! is_writable( $wp_config_path ) ) {
-				throw new \Exception( "{$basename} is not writable." );
+				return new \WP_Error(
+					'wp_debug_off',
+					__( "{$basename} is not writable.", '0-day-analytics' ) // phpcs:ignore WordPress.WP.I18n.InterpolatedVariableText
+				);
+				// throw new \Exception( "{$basename} is not writable." );
 			}
 
 			self::$wp_config_path = $wp_config_path;
@@ -99,7 +109,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		 * @since 1.1.0
 		 */
 		private static function auto_init() {
-			if ( is_null( self::$wp_config_path ) ) {
+			if ( \is_null( self::$wp_config_path ) ) {
 				self::init();
 			}
 		}

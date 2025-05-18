@@ -128,7 +128,7 @@ Settings::set_current_options( $settings );
 				'name'    => $severity['name'],
 				'id'      => 'severity_show_' . $name . '_display',
 				'type'    => 'checkbox',
-				'default' => Settings::get_current_options(),
+				'default' => $severity['display'],
 			)
 		);
 	}
