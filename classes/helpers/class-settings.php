@@ -107,6 +107,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		private static $settings_page_link = '';
 
 		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 */
+		private static $settings_crons_link = '';
+
+		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 */
+		private static $settings_transients_link = '';
+
+		/**
 		 * The current version of the plugin
 		 *
 		 * @var string
@@ -683,6 +697,36 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return self::$settings_page_link;
+		}
+
+		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_crons_page_link() {
+			if ( '' === self::$settings_crons_link ) {
+				self::$settings_crons_link = \add_query_arg( 'page', self::CRON_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_crons_link;
+		}
+
+		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_transients_page_link() {
+			if ( '' === self::$settings_transients_link ) {
+				self::$settings_transients_link = \add_query_arg( 'page', self::TRANSIENTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_transients_link;
 		}
 
 		/**
