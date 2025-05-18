@@ -1001,7 +1001,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		private static function sort_schedules( $a, $b ) {
 			if ( $a['interval'] == $b['interval'] ) {

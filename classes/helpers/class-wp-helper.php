@@ -653,7 +653,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @return \WP_Error|null
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function check_cron_status() {
 
@@ -675,7 +675,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @return \WP_Error|null
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function check_debug_status() {
 
@@ -697,7 +697,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @return \WP_Error|null
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function check_debug_log_status() {
 

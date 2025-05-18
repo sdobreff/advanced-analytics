@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced Analytics
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.7.3
+ * Version:         1.7.4
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.7.3' );
+define( 'ADVAN_VERSION', '1.7.4' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );

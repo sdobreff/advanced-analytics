@@ -159,7 +159,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function load_custom_wp_admin_style( $hook ) {
 			// $hook is string value given add_menu_page function.
@@ -715,7 +715,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function get_crons_page_link() {
 			if ( '' === self::$settings_crons_link ) {
@@ -730,7 +730,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 1.7.4
 		 */
 		public static function get_transients_page_link() {
 			if ( '' === self::$settings_transients_link ) {
