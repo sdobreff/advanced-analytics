@@ -144,10 +144,29 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'network_admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin on multisite install panel.
 			}
 
+			\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
+
 			/**
 			 * Draws the save button in the settings
 			 */
 			\add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
+		}
+
+		/**
+		 * Enqueue the custom admin style.
+		 *
+		 * @param string $hook - The current admin page.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function load_custom_wp_admin_style( $hook ) {
+			// $hook is string value given add_menu_page function.
+			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook ) {
+					return;
+			}
+			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 		}
 
 		/**
@@ -478,8 +497,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function render() {
 
-			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
-			\wp_enqueue_media();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -500,8 +517,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			<form id="error-logs-filter" method="get">
 				<?php
 				$events_list->display();
-
-				// self::aadvana_show_options();
 				?>
 				</form>
 			</div>
@@ -517,8 +532,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function analytics_cron_page() {
 
-			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
-			\wp_enqueue_media();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -539,11 +552,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				<form id="crons-filter" method="get">
 				<?php
 
-				$page  = \sanitize_text_field( $_GET['page'] );
-				$paged = filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT );
+				$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+				$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
 
-				printf( '<input type="hidden" name="page" value="%s" />', $page );
-				printf( '<input type="hidden" name="paged" value="%d" />', $paged );
+				printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
+				printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
 
 				echo '<div style="clear:both; float:right">';
 				$events_list->search_box(
@@ -581,8 +594,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function analytics_transients_page() {
 
-			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
-			\wp_enqueue_media();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -603,11 +614,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				<form id="crons-filter" method="get">
 				<?php
 
-				$page  = \sanitize_text_field( $_GET['page'] );
-				$paged = filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT );
+				$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+				$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
 
-				printf( '<input type="hidden" name="page" value="%s" />', $page );
-				printf( '<input type="hidden" name="paged" value="%d" />', $paged );
+				printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
+				printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
 
 				echo '<div style="clear:both; float:right">';
 				$transients->search_box(

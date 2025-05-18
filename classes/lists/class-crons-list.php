@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_crons_list';
 
-		public const PAGE_SLUG = 'toplevel_page_advan_crons';
+		public const PAGE_SLUG = 'analyze_page_advan_cron_jobs';
 
 		public const SEARCH_INPUT = 'sgp';
 

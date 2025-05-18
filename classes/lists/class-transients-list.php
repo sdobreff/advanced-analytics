@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_transients_list';
 
-		public const PAGE_SLUG = 'toplevel_page_advan_transients';
+		public const PAGE_SLUG = 'analyze_page_advan_transients';
 
 		public const SEARCH_INPUT = 'sgp';
 
