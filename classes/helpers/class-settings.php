@@ -503,6 +503,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function analytics_cron_page() {
 
+			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
+			\wp_enqueue_media();
+			?>
+			<script>
+				if( 'undefined' != typeof localStorage ){
+					var skin = localStorage.getItem('aadvana-backend-skin');
+					if( skin == 'dark' ){
+
+						var element = document.getElementsByTagName("html")[0];
+						element.classList.add("aadvana-darkskin");
+					}
+				}
+			</script>
+			<?php
 			$events_list = new Crons_List( array() );
 			$events_list->prepare_items();
 			?>
@@ -553,6 +567,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function analytics_transients_page() {
 
+			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
+			\wp_enqueue_media();
+			?>
+			<script>
+				if( 'undefined' != typeof localStorage ){
+					var skin = localStorage.getItem('aadvana-backend-skin');
+					if( skin == 'dark' ){
+
+						var element = document.getElementsByTagName("html")[0];
+						element.classList.add("aadvana-darkskin");
+					}
+				}
+			</script>
+			<?php
 			$transients = new Transients_List( array() );
 			$transients->prepare_items();
 			?>

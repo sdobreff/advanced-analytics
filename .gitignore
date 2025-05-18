@@ -101,3 +101,5 @@ composer\.lock
 wsal-nofs-license.php
 wp-cli.phar
 /.vscode
+
+/0-day-analytics

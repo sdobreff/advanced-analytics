@@ -1549,6 +1549,10 @@ body:not(.analytics_page_advan_logs_settings) #aadvana-page-overlay {
   color: #fff;
 }
 
+.aadvana-darkskin .wp-heading-inline {
+  color: #fff;
+}
+
 .aadvana-darkskin ol.footnotes li {
   filter: invert(100%);
 }
@@ -2480,8 +2484,8 @@ html.aadvana-darkskin .button-secondary,
 html.aadvana-darkskin .button-secondary:hover,
 html.aadvana-darkskin .button-secondary:focus,
 html.aadvana-darkskin .button-secondary:active {
-  color: #fff;
-  background: #111;
+  color: #fff !important;
+  background: #111 !important;
 }
 
 html.aadvana-darkskin input[type="checkbox"],
@@ -2605,6 +2609,34 @@ html.aadvana-darkskin table.widefat td,
 html.aadvana-darkskin table.widefat td.aadvana-deal-message * {
   color: #fff;
   border-color: #222;
+}
+
+html.aadvana-darkskin .alternate, html.aadvana-darkskin .striped > tbody > :nth-child(2n+1), html.aadvana-darkskin ul.striped > :nth-child(2n+1) {
+  background: #1d456b;
+}
+
+html.aadvana-darkskin .contextual-help-tabs-wrap, html.aadvana-darkskin .contextual-help-tabs .active {
+  background: #1d456b;
+}
+
+html.aadvana-darkskin .contextual-help-tabs .active a {
+  color: #c2d3e7;
+}
+
+html.aadvana-darkskin .contextual-help-tabs a {
+  color: #aec2da;
+}
+
+html.aadvana-darkskin .contextual-help-tabs a:hover {
+  color: #d0d4da;
+}
+
+html.aadvana-darkskin a {
+  color: #95b1c8;
+}
+
+html.aadvana-darkskin a:hover {
+  color: #cad3db;
 }
 
 html.aadvana-darkskin table.widefat tr[style] td.aadvana-deal-message * {

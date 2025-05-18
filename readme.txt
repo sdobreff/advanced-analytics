@@ -64,6 +64,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 
 == Changelog ==
 
+= 1.7.3 =  
+* Lots of bug fixes and UI / UX improvements.
+
 = 1.7.2 =  
 * Deprecation error fix.
 
