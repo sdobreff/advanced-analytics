@@ -382,10 +382,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$file = Error_Log::autodetect();
 
 			if ( \is_a( $file, 'WP_Error' ) ) {
+				$severity = 'error';
+				if ( 'error_log_not_exists' === Error_Log::get_last_error()->get_error_code() ) {
+					$severity = 'notice';
+				}
+
 				return array(
 					array(
 						'message'   => Error_Log::get_last_error()->get_error_message(),
-						'severity'  => 'error',
+						'severity'  => $severity,
 						'timestamp' => time(),
 					),
 				);

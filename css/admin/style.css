@@ -2402,8 +2402,13 @@ html.aadvana-darkskin #adminmenu .wp-has-current-submenu .wp-submenu,
 html.aadvana-darkskin #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
 html.aadvana-darkskin #adminmenu .wp-submenu,
 html.aadvana-darkskin #adminmenu a.wp-has-current-submenu:focus + .wp-submenu,
-html.aadvana-darkskin .folded #adminmenu .wp-has-current-submenu .wp-submenu {
+html.aadvana-darkskin .folded #adminmenu .wp-has-current-submenu .wp-submenu,
+html.aadvana-darkskin .wp-pointer-content {
   background: #153b5e !important;
+}
+
+html.aadvana-darkskin .wp-pointer-left .wp-pointer-arrow-inner {
+  border-right-color: #153b5e !important;
 }
 
 html.aadvana-darkskin .aadvana-panel,

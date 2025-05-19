@@ -118,7 +118,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
 
-	// \register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( '\ADVAN\Advanced_Analytics', 'plugin_activate' ) );
+	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }
 

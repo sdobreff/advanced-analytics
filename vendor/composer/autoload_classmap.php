@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'ADVAN\\Advanced_Analytics' => $baseDir . '/classes/class-advanced-analytics.php',
     'ADVAN\\Controllers\\Error_Log' => $baseDir . '/classes/controllers/class-error-log.php',
+    'ADVAN\\Controllers\\Pointers' => $baseDir . '/classes/controllers/class-pointers.php',
     'ADVAN\\Controllers\\Reverse_Line_Reader' => $baseDir . '/classes/controllers/class-reverse-line-reader.php',
     'ADVAN\\Helpers\\Ajax_Helper' => $baseDir . '/classes/helpers/class-ajax-helper.php',
     'ADVAN\\Helpers\\Config_Transformer' => $baseDir . '/classes/helpers/class-config-transformer.php',

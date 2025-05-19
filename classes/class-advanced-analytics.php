@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace ADVAN;
 
+use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Ajax;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
@@ -36,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 	 */
 	class Advanced_Analytics {
 
-		// public const REDIRECT_OPTION_NAME = 'aadvana_plugin_do_activation_redirect';
+		public const REDIRECT_OPTION_NAME = 'aadvana_plugin_do_activation_redirect';
 
 		/**
 		 * Inits the class and hooks
@@ -51,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				Migration::migrate();
 
-				// \add_action( 'admin_init', array( __CLASS__, 'plugin_redirect' ) );
+				\add_action( 'admin_init', array( __CLASS__, 'plugin_redirect' ) );
 
 				// \add_action( 'current_screen', array( '\AWEF\Helpers\Upgrade_Notice', 'init' ) );
 
@@ -68,7 +69,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Integrations::init();
 				\add_filter( 'init', array( Settings::class, 'init' ) );
 
-				// Pointers::init();
+				Pointers::init();
 
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
@@ -245,7 +246,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( \get_option( self::REDIRECT_OPTION_NAME, false ) ) {
 				\delete_option( self::REDIRECT_OPTION_NAME );
 				if ( ! isset( $_REQUEST['activate-multi'] ) ) {
-					\wp_safe_redirect( add_query_arg( 'page', Settings::MENU_SLUG, get_admin_url( get_current_blog_id(), 'admin.php' ) ) );
+					\wp_safe_redirect( \add_query_arg( 'page', Settings::MENU_SLUG, \network_admin_url( \get_current_blog_id(), 'admin.php' ) ) );
 				}
 			}
 		}

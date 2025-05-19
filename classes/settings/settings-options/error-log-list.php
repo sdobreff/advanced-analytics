@@ -11,7 +11,6 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\System_Status;
-use ADVAN\Helpers\WP_Helper;
 
 $settings = Settings::get_current_options();
 
