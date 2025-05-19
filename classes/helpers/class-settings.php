@@ -610,8 +610,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$transients->prepare_items();
 			?>
 			<div class="wrap">
-				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
-				<form id="crons-filter" method="get">
+				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
+				<form id="transients-filter" method="get">
 				<?php
 
 				$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
@@ -1137,8 +1137,79 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					</style>
 					<?php
 
-					$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-					$time             = \wp_date( $date_time_format, $event['timestamp'] );
+					$time_format = 'g:i a';
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $event['timestamp'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+						$time_format .= ' (P)';
+					}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+					if ( $event_local === $today_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Today at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $tomorrow_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Tomorrow at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $yesterday_local ) {
+						$date = sprintf(
+							/* translators: %s: Time */
+							__( 'Yesterday at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} else {
+						$date = sprintf(
+							/* translators: 1: Date, 2: Time */
+							__( '%1$s at %2$s', '0-day-analytics' ),
+							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+							$event_time_local,
+						);
+					}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $event['timestamp'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $event['timestamp'] - time();
+
+					if ( $until < 0 ) {
+						$ago = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+							__( '%s ago', '0-day-analytics' ),
+							WP_Helper::interval( abs( $until ) )
+						);
+
+						return sprintf(
+							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+							esc_html( $ago ),
+							$time,
+						);
+					} elseif ( 0 === $until ) {
+						$in = __( 'Now', '0-day-analytics' );
+					} else {
+						$in = sprintf(
+							/* translators: %s: Time period, for example "8 minutes" */
+							__( 'In %s', '0-day-analytics' ),
+							WP_Helper::interval( $until ),
+						);
+					}
 
 					$classes = '';
 					if ( isset( $event['severity'] ) && ! empty( $event['severity'] ) ) {
@@ -1147,7 +1218,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					$admin_bar->add_node(
 						array(
 							'id'    => 'aadvan-menu',
-							'title' => ( ( ! empty( $time ) ) ? '<b><i>' . $time . '</i></b>' . ' : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
+							'title' => ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b>' . ' : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
 							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 							'meta'  => array( 'class' => 'aadvan-live-notif-item' . $classes ),
 						)

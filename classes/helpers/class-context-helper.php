@@ -522,16 +522,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 			if ( empty( self::$action_callbacks ) ) {
 				self::$action_callbacks = array(
 					'login_init'        => function (): void {
-						$this->reset_and_force( self::LOGIN );
+						self::reset_and_force( self::LOGIN );
 					},
 					'rest_api_init'     => function (): void {
-						$this->reset_and_force( self::REST );
+						self::reset_and_force( self::REST );
 					},
 					'activate_header'   => function (): void {
-						$this->reset_and_force( self::WP_ACTIVATE );
+						self::reset_and_force( self::WP_ACTIVATE );
 					},
 					'template_redirect' => function (): void {
-						$this->reset_and_force( self::FRONTOFFICE );
+						self::reset_and_force( self::FRONTOFFICE );
 					},
 					'current_screen'    => function ( \WP_Screen $screen ): void {
 						$screen->in_admin() && $this->reset_and_force( self::BACKOFFICE );
@@ -553,7 +553,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 */
 		private static function remove_action_hooks(): void {
 			foreach ( self::$action_callbacks as $action => $callback ) {
-				remove_action( $action, $callback, PHP_INT_MIN );
+				\remove_action( $action, $callback, PHP_INT_MIN );
 			}
 			self::$action_callbacks = array();
 		}

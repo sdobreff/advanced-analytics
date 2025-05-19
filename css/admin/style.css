@@ -2334,7 +2334,45 @@ input:not(:checked) + span.switchery {
   line-height: 40px;
 }
 
+.badge {
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(9, 24, 255, 0.09);
+  color: #50575e;
+}
+
+.green-badge {
+  color: rgb(49, 179, 45);
+}
+
+.red-badge {
+  color: #b32d2e;
+}
+
+
 /* Dark Skin */
+
+html.aadvana-darkskin .badge {
+  background: rgba(30, 26, 26, 0.76);
+  color: #a3acb5;
+}
+
+html.aadvana-darkskin .green-badge {
+  background: rgba(30, 26, 26, 0.76);
+  color: rgb(49, 179, 45);
+}
+
+html.aadvana-darkskin .red-badge {
+  background: rgba(30, 26, 26, 0.76);
+  color: #dd9192;
+}
+
+html.aadvana-darkskin .notice, div.error, div.updated {
+  background: transparent !important;
+}
+
 html.aadvana-darkskin #dashboard-need-help svg *,
 html.aadvana-darkskin .awefpanel-head-elements svg * {
   stroke: #fff !important;

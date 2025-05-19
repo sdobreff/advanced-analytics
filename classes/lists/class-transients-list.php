@@ -637,7 +637,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 							'<span class="status-control-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
 							esc_html( $ago ),
 							$time,
-						) . '<br><span style="color: #b32d2e; background:#ffd6d6;padding:3px;" class="transient-expired badge">' . esc_html__( 'Expired', '0-day-analytics' ) . '</span>';
+						) . '<br><span class="badge red-badge">' . esc_html__( 'Expired', '0-day-analytics' ) . '</span>';
 					}
 
 					if ( $until <= 0 ) {
@@ -651,7 +651,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					}
 
 					return sprintf(
-						'%s<br>%s',
+						'%s<br><span class="badge green-badge">%s</span>',
 						\esc_html( $in ),
 						$time,
 					);

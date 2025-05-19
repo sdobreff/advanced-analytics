@@ -597,7 +597,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							esc_html( $ago ),
 							$time,
 						);
-					} elseif ( $until === 0 ) {
+					} elseif ( 0 === $until ) {
 						$in = __( 'Now', '0-day-analytics' );
 					} else {
 						$in = sprintf(

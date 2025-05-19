@@ -521,7 +521,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					}
 
 					$time = sprintf(
-						'<time datetime="%1$s">%2$s</time>',
+						'<tim datetime="%1$s">%2$s</time>',
 						\esc_attr( gmdate( 'c', $item['schedule'] ) ),
 						\esc_html( $date )
 					);
@@ -538,7 +538,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						);
 
 						return sprintf(
-							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
+							'<span class="badge red-badge status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
 							esc_html( $ago ),
 							$time,
 						);
@@ -555,7 +555,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					}
 
 					return sprintf(
-						'%s<br>%s',
+						'%s<br><span class="badge green-badge">%s</span>',
 						\esc_html( $in ),
 						$time,
 					);

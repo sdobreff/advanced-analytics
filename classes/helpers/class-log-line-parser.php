@@ -1,8 +1,8 @@
 <?php
 /**
- * Class: Determine the context in which the plugin is executed.
+ * Class: Reads line of the PHP error log and parses it.
  *
- * Helper class to determine the proper status of the request.
+ * Helper class to properly extract and determine an error from error log.
  *
  * @package advanced-analytics
  *
@@ -335,7 +335,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			return $lines;
 		}
 
-		public static function get_lines_to_show_interface() {
+		/**
+		 * Checks newer lines stored in the class var, if negative - returns the lines parsed from the log file, last time the log was parsed. If empty - extracts the data from transient, otherwise stores the newly lines in the transient and returns them
+		 *
+		 * @return int
+		 *
+		 * @since latest
+		 */
+		public static function get_lines_to_show_interface(): int {
 			$lines = self::get_newer_lines();
 
 			if ( 0 >= $lines ) {
