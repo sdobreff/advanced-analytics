@@ -236,8 +236,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$default_options ) ) {
 				// Define default options.
 				self::$default_options = array(
-					'menu_admins_only' => true,
-					'severities'       => array(
+					'menu_admins_only'    => true,
+					'slack_notifications' => array(
+						'all' => array(
+							'channel'    => '',
+							'auth_token' => '',
+						),
+					),
+					'severities'          => array(
 						'deprecated' => array(
 							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
@@ -823,6 +829,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				'cron-list'           => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
+				),
+
+				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
+
+				'notifications'       => array(
+					'icon'  => 'bell',
+					'title' => esc_html__( 'Notification options', '0-day-analytics' ),
 				),
 
 				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),

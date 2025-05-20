@@ -645,75 +645,77 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 					return $message;
 				case 'plugin_theme':
+					// if ( isset( $item['source'] ) ) {
+					// return $item['source'];
+					// } else {
+					$message = esc_html( $item['message'] );
+
+					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
+
+					if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+						$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
+
+						$next        = false;
+						$plugin_base = '';
+						foreach ( $split_plugin as $part ) {
+							if ( $next ) {
+								$plugin_base = $part;
+								break;
+							}
+							if ( $plugins_dir_basename === $part ) {
+								$next = true;
+							}
+						}
+
+						$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+						if ( ! empty( $plugin ) ) {
+							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] );
+						}
+					}
+
+					$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
+
+					if ( false !== \mb_strpos( $message, $theme_root . \DIRECTORY_SEPARATOR ) ) {
+
+						$theme_dir_basename = basename( $theme_root );
+
+						$split_theme = explode( \DIRECTORY_SEPARATOR, $message );
+
+						$next       = false;
+						$theme_base = '';
+						foreach ( $split_theme as $part ) {
+							if ( $next ) {
+								$theme_base = $part;
+								break;
+							}
+							if ( $theme_dir_basename === $part ) {
+								$next = true;
+							}
+						}
+
+						$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
+
+						if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
+							$name = $theme->get( 'Name' );
+
+							$name = ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' );
+
+							$parent = $theme->parent(); // ( 'parent_theme' );
+							if ( $parent ) {
+								$parent = $theme->parent()->get( 'Name' );
+
+								$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '</div>' : '';
+							}
+							$name .= (string) $parent;
+
+							return __( 'Theme: ', '0-day-analytics' ) . ( $name );
+						}
+					}
 					if ( isset( $item['source'] ) ) {
 						return $item['source'];
 					} else {
-						$message = esc_html( $item['message'] );
-
-						$plugins_dir_basename = basename( WP_PLUGIN_DIR );
-
-						if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
-
-							$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
-
-							$next        = false;
-							$plugin_base = '';
-							foreach ( $split_plugin as $part ) {
-								if ( $next ) {
-									$plugin_base = $part;
-									break;
-								}
-								if ( $plugins_dir_basename === $part ) {
-									$next = true;
-								}
-							}
-
-							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
-
-							if ( ! empty( $plugin ) ) {
-								return esc_html( $plugin['Name'] );
-							}
-						}
-
-						$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
-
-						if ( false !== \mb_strpos( $message, $theme_root . \DIRECTORY_SEPARATOR ) ) {
-
-							$theme_dir_basename = basename( $theme_root );
-
-							$split_theme = explode( \DIRECTORY_SEPARATOR, $message );
-
-							$next       = false;
-							$theme_base = '';
-							foreach ( $split_theme as $part ) {
-								if ( $next ) {
-									$theme_base = $part;
-									break;
-								}
-								if ( $theme_dir_basename === $part ) {
-									$next = true;
-								}
-							}
-
-							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
-
-							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
-								$name = $theme->get( 'Name' );
-
-								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown thenme', '0-day-analytics' );
-
-								$parent = $theme->parent(); // ( 'parent_theme' );
-								if ( $parent ) {
-									$parent = $theme->parent()->get( 'Name' );
-
-									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent thenme: ', '0-day-analytics' ) . $parent . '</div>' : '';
-								}
-								$name .= (string) $parent;
-
-								return ( $name );
-							}
-						}
-
 						return '';
 					}
 				default:

@@ -25,6 +25,8 @@ class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
         'ADVAN\\Controllers\\Error_Log' => __DIR__ . '/../..' . '/classes/controllers/class-error-log.php',
         'ADVAN\\Controllers\\Pointers' => __DIR__ . '/../..' . '/classes/controllers/class-pointers.php',
         'ADVAN\\Controllers\\Reverse_Line_Reader' => __DIR__ . '/../..' . '/classes/controllers/class-reverse-line-reader.php',
+        'ADVAN\\Controllers\\Slack' => __DIR__ . '/../..' . '/classes/controllers/class-slack.php',
+        'ADVAN\\Controllers\\Slack_API' => __DIR__ . '/../..' . '/classes/controllers/class-slack-api.php',
         'ADVAN\\Helpers\\Ajax_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-ajax-helper.php',
         'ADVAN\\Helpers\\Config_Transformer' => __DIR__ . '/../..' . '/classes/helpers/class-config-transformer.php',
         'ADVAN\\Helpers\\Context_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-context-helper.php',
