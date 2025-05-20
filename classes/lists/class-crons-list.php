@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_crons_list';
 
-		public const PAGE_SLUG = 'analyze_page_advan_cron_jobs';
+		public const PAGE_SLUG = 'wp-control_page_advan_cron_jobs';
 
 		public const SEARCH_INPUT = 'sgp';
 
@@ -272,13 +272,13 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			// usort( $items, [ &$this, 'usort_reorder' ] ); // phpcs:ignore
 
 			// Set the pagination.
-			$this->set_pagination_args(
-				array(
-					'total_items' => $this->count,
-					'per_page'    => $this->get_screen_option_per_page(),
-					'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
-				)
-			);
+			// $this->set_pagination_args(
+			// 	array(
+			// 		'total_items' => $this->count,
+			// 		'per_page'    => $this->get_screen_option_per_page(),
+			// 		'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
+			// 	)
+			// );
 		}
 
 		/**

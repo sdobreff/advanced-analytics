@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_transients_list';
 
-		public const PAGE_SLUG = 'analyze_page_advan_transients';
+		public const PAGE_SLUG = 'wp-control_page_advan_transients';
 
 		public const SEARCH_INPUT = 'sgp';
 
@@ -87,6 +87,15 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 * @since 1.7.0
 		 */
 		protected static $transients_per_page = 10;
+
+		/**
+		 * Current setting (if any) of per_page property - caching value.
+		 *
+		 * @var int
+		 *
+		 * @since 1.7.5
+		 */
+		protected static $per_page = null;
 
 		/**
 		 * Holds the array with all of the column names and their representation in the table header.
@@ -813,26 +822,31 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 * @since 1.7.0
 		 */
 		private static function get_screen_option_per_page() {
-			self::get_wp_screen();
 
-			if ( self::PAGE_SLUG === self::$wp_screen->base ) {
-				$option = self::$wp_screen->get_option( 'per_page', 'option' );
-				if ( ! $option ) {
-					$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
-				}
+			if ( null !== self::$per_page ) {
+				return self::$per_page;
 			} else {
-				$option = 'advanced_analytics_transients_list_per_page';
-			}
+				self::get_wp_screen();
 
-			$per_page = (int) \get_user_option( $option );
-			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
-				if ( ! $per_page ) {
-					$per_page = self::get_default_per_page();
+				if ( self::PAGE_SLUG === self::$wp_screen->base ) {
+					$option = self::$wp_screen->get_option( 'per_page', 'option' );
+					if ( ! $option ) {
+						$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
+					}
+				} else {
+					$option = 'advanced_analytics_transients_list_per_page';
 				}
-			}
 
-			return $per_page;
+				self::$per_page = (int) \get_user_option( $option );
+				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
+					self::$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
+					if ( ! self::$per_page ) {
+						self::$per_page = self::get_default_per_page();
+					}
+				}
+
+				return self::$per_page;
+			}
 		}
 
 		/**

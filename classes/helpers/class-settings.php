@@ -50,6 +50,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public const SETTINGS_VERSION = 'aadvana_plugin_version';
 
+		public const PAGE_SLUG = 'wp-control_page_advan_logs_settings';
+
 		/**
 		 * Holds cache for disabled severity levels
 		 *
@@ -112,6 +114,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @var string
 		 */
 		private static $settings_crons_link = '';
+
+		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 */
+		private static $settings_error_logs_link = '';
 
 		/**
 		 * The link to the WP admin settings page
@@ -308,12 +317,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				self::$hook = \add_menu_page(
 					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
-					\esc_html__( 'Analyze', '0-day-analytics' ) . self::get_updates_count_html(),
+					\esc_html__( 'WP Control', '0-day-analytics' ) . self::get_updates_count_html(),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ),
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
 					'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-					30
+					3
 				);
 
 				\add_filter( 'manage_' . self::$hook . '_columns', array( Logs_List::class, 'manage_columns' ) );
@@ -332,7 +341,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_submenu_page(
 					self::MENU_SLUG,
 					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
-					\esc_html__( 'Log viewer', '0-day-analytics' ),
+					\esc_html__( 'Error Log viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
@@ -723,6 +732,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return self::$settings_crons_link;
+		}
+
+		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
+		 * @since 1.7.5
+		 */
+		public static function get_error_log_page_link() {
+			if ( '' === self::$settings_error_logs_link ) {
+				self::$settings_error_logs_link = \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_error_logs_link;
 		}
 
 		/**
@@ -1319,6 +1343,83 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return self::$disabled_severities;
+		}
+
+
+		/**
+		 * Modifies the admin footer text.
+		 *
+		 * @param   string $text The current admin footer text.
+		 * @return  string
+		 *
+		 * @since 1.7.5
+		 */
+		public static function admin_footer_text( $text ) {
+
+			global $current_screen;
+
+			if ( isset( $current_screen ) && ( in_array( $current_screen->base, self::get_plugin_page_slugs(), true ) ) ) {
+				$our_footer = '';
+
+				$footer_link = 'https://melapress.com/?utm_source=plugin&utm_medium=referral&utm_campaign=wsal&utm_content=footer';
+				$link        = 'https://github.com/sdobreff';
+
+				return $our_footer . \sprintf(
+				/* translators: This text is prepended by a link to Melapress's website, and appended by a link to Melapress's website. */
+					'<a href="%1$s" target="_blank">' . ADVAN_NAME . '</a> ' . __( 'is developed and maintained by', 'wp-security-audit-log' ) . ' <a href="%2$s" target="_blank">Stoil Dobreff</a>.',
+					$link,
+					$footer_link
+				);
+			}
+
+			return $text;
+		}
+
+		/**
+		 * Modifies the admin footer version text.
+		 *
+		 * @param   string $text The current admin footer version text.
+		 *
+		 * @return  string
+		 *
+		 * @since 1.7.5
+		 */
+		public static function admin_footer_version_text( $text ) {
+
+			global $current_screen;
+
+			if ( isset( $current_screen ) && ( in_array( $current_screen->base, self::get_plugin_page_slugs(), true ) ) ) {
+
+				return sprintf(
+					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
+					self::get_error_log_page_link(),
+					__( 'Error Log', 'wp-security-audit-log' ),
+					self::get_crons_page_link(),
+					__( 'Crons', 'wp-security-audit-log' ),
+					self::get_transients_page_link(),
+					__( 'Transients', 'wp-security-audit-log' ),
+					__( 'Version ', 'wp-security-audit-log' ),
+					ADVAN_VERSION
+				);
+			}
+
+			return $text;
+		}
+
+		/**
+		 * Returns all fo the plugin admin pages slugs.
+		 *
+		 * @return array
+		 *
+		 * @since 1.7.5
+		 */
+		private static function get_plugin_page_slugs(): array {
+			return array(
+				self::PAGE_SLUG,
+				Logs_List::PAGE_SLUG,
+				Transients_List::PAGE_SLUG,
+				Crons_List::PAGE_SLUG,
+			);
 		}
 	}
 }

@@ -340,7 +340,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 1.7.5
 		 */
 		public static function get_lines_to_show_interface(): int {
 			$lines = self::get_newer_lines();

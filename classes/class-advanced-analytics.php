@@ -71,6 +71,9 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				Pointers::init();
 
+				\add_filter( 'admin_footer_text', array( Settings::class, 'admin_footer_text' ) );
+				\add_filter( 'update_footer', array( Settings::class, 'admin_footer_version_text' ), PHP_INT_MAX );
+
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
 			}

@@ -129,6 +129,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		private static $read_items = array();
 
 		/**
+		 * Current setting (if any) of per_page property - caching value.
+		 *
+		 * @var int
+		 *
+		 * @since 1.7.5
+		 */
+		protected static $per_page = null;
+
+		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args Events query arguments.
@@ -173,7 +182,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
-				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
+			<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
 
 			<?php
@@ -371,9 +380,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function get_error_items( bool $write_temp = true, $items = false ): array {
 
 			// if ( empty( self::$read_items ) ) { .
-				$collected_items = array();
-				$errors          = array();
-				$position        = null;
+			$collected_items = array();
+			$errors          = array();
+			$position        = null;
 
 			if ( \function_exists( 'set_time_limit' ) ) {
 				\set_time_limit( 0 );
@@ -557,25 +566,25 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 					if ( $event_local === $today_local ) {
 						$date = sprintf(
-							/* translators: %s: Time */
+						/* translators: %s: Time */
 							__( 'Today at %s', '0-day-analytics' ),
 							$event_time_local,
 						);
 					} elseif ( $event_local === $tomorrow_local ) {
 						$date = sprintf(
-							/* translators: %s: Time */
+						/* translators: %s: Time */
 							__( 'Tomorrow at %s', '0-day-analytics' ),
 							$event_time_local,
 						);
 					} elseif ( $event_local === $yesterday_local ) {
 						$date = sprintf(
-							/* translators: %s: Time */
+						/* translators: %s: Time */
 							__( 'Yesterday at %s', '0-day-analytics' ),
 							$event_time_local,
 						);
 					} else {
 						$date = sprintf(
-							/* translators: 1: Date, 2: Time */
+						/* translators: 1: Date, 2: Time */
 							__( '%1$s at %2$s', '0-day-analytics' ),
 							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
 							$event_time_local,
@@ -606,7 +615,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$in = __( 'Now', '0-day-analytics' );
 					} else {
 						$in = sprintf(
-							/* translators: %s: Time period, for example "8 minutes" */
+						/* translators: %s: Time period, for example "8 minutes" */
 							__( 'In %s', '0-day-analytics' ),
 							WP_Helper::interval( $until ),
 						);
@@ -709,8 +718,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 				default:
 					return isset( $item[ $column_name ] )
-						? \esc_html( $item[ $column_name ] )
-						: 'Column "' . \esc_html( $column_name ) . '" not found';
+					? \esc_html( $item[ $column_name ] )
+					: 'Column "' . \esc_html( $column_name ) . '" not found';
 			}
 		}
 
@@ -729,7 +738,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			return;
 			return sprintf(
 				'<label class="screen-reader-text" for="' . self::$table_name . '_' . $item['id'] . '">' . sprintf(
-					// translators: The column name.
+				// translators: The column name.
 					__( 'Select %s' ),
 					'id'
 				) . '</label>'
@@ -844,26 +853,30 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 1.1.0
 		 */
 		private static function get_screen_option_per_page() {
-			self::get_wp_screen();
-
-			if ( self::PAGE_SLUG === self::$wp_screen->base ) {
-				$option = self::$wp_screen->get_option( 'per_page', 'option' );
-				if ( ! $option ) {
-					$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
-				}
+			if ( null !== self::$per_page ) {
+				return self::$per_page;
 			} else {
-				$option = 'advanced_analytics_logs_list_per_page';
-			}
+				self::get_wp_screen();
 
-			$per_page = (int) \get_user_option( $option );
-			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
-				if ( ! $per_page ) {
-					$per_page = self::get_log_errors_to_read();
+				if ( self::PAGE_SLUG === self::$wp_screen->base ) {
+					$option = self::$wp_screen->get_option( 'per_page', 'option' );
+					if ( ! $option ) {
+						$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
+					}
+				} else {
+					$option = 'advanced_analytics_logs_list_per_page';
 				}
-			}
 
-			return $per_page;
+				self::$per_page = (int) \get_user_option( $option );
+				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
+					self::$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
+					if ( ! self::$per_page ) {
+						self::$per_page = self::get_log_errors_to_read();
+					}
+				}
+
+				return self::$per_page;
+			}
 		}
 
 		/**

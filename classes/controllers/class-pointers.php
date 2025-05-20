@@ -4,7 +4,7 @@
  *
  * @package awesome-footnotes
  *
- * @since latest
+ * @since 1.7.5
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 	/**
 	 * Responsible for showing the pointers.
 	 *
-	 * @since latest
+	 * @since 1.7.5
 	 */
 	class Pointers {
 
@@ -33,7 +33,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.7.5
 		 */
 		public static function init() {
 
@@ -47,7 +47,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.7.5
 		 */
 		public static function admin_enqueue_scripts() {
 			// Using Pointers.
@@ -63,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.7.5
 		 */
 		public static function print_footer_scripts() {
 
@@ -119,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.7.5
 		 */
 		public static function is_dismissed( string $pointer ): bool {
 

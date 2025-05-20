@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			// Check if directory exists.
 			$path = \trailingslashit( $path );
 
-			return self::write_to_file( $path . 'index.php', '<?php /*[WP Activity Log plugin: This file was auto-generated to prevent directory listing ]*/ exit;' );
+			return self::write_to_file( $path . 'index.php', '<?php /*[' . ADVAN_NAME . ' plugin: This file was auto-generated to prevent directory listing ]*/ exit;' );
 		}
 
 		/**
@@ -490,7 +490,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		public static function generate_random_file_name() {
 
 			$random_string = uniqid();
-			
+
 			return $random_string;
 		}
 	}
