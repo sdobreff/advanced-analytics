@@ -56,6 +56,15 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		private static $abspath = null;
 
 		/**
+		 * Holds the admin path of the WordPress installation.
+		 *
+		 * @var string|null
+		 *
+		 * @since 1.8.0
+		 */
+		private static $admin_path = null;
+
+		/**
 		 * Holds the content path of the WordPress installation.
 		 *
 		 * @var string|null
@@ -712,6 +721,21 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 					)
 				);
 			}
+		}
+
+		/**
+		 * Extracts the admin path of the WordPress installation.
+		 *
+		 * @return string
+		 *
+		 * @since 1.8.0
+		 */
+		public static function get_admin_path(): string {
+			if ( null === self::$admin_path ) {
+				self::$admin_path = (string) str_replace( \get_home_url( 1 ) . '/', ABSPATH, \network_admin_url() );
+			}
+
+			return self::$admin_path;
 		}
 	}
 }

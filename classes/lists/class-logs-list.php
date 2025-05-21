@@ -735,6 +735,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}
 					}
+					if ( false !== \mb_strpos( $message, ABSPATH . WPINC . \DIRECTORY_SEPARATOR ) ) {
+						return __( 'WP Core', '0-day-analytics' );
+					}
+
+					$admin_path = str_replace( \get_home_url( 1 ) . '/', ABSPATH, \network_admin_url() );
+
+					if ( false !== \mb_strpos( $message, $admin_path ) ) {
+						return __( 'WP Admin Core', '0-day-analytics' );
+					}
 					if ( isset( $item['source'] ) ) {
 						return $item['source'];
 					} else {
