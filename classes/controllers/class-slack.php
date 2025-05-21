@@ -123,9 +123,12 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 * @since 1.8.0
 		 */
 		public static function set_settings( array $options ): void {
+			// Sanitize each setting value.
+			$sanitized_options = array_map( 'sanitize_text_field', $options );
+
 			$current_options = Settings::get_current_options();
 
-			$current_options['slack_notifications']['all'] = $options;
+			$current_options['slack_notifications']['all'] = $sanitized_options;
 
 			Settings::store_options( $current_options );
 		}

@@ -193,8 +193,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 					return false;
 				}
 			}
-
-			// self::read_file_from_end( $handle, $callback, $max_lines, self::$pos, $temp_writer );
 		}
 
 		/**

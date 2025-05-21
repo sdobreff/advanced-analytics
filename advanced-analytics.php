@@ -1,6 +1,6 @@
 <?php
 /**
- * 0-day Amalytics
+ * 0-day Analytics
  *
  * Do WP Advanced Analysis
  *

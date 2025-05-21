@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
 			}
 
-			if ( \WP_DEBUG ) {
+			// if ( \WP_DEBUG ) {
 				// \set_error_handler( '\ADVAN\Helpers\WP_Error_Handler::handle_error' );
 
 				// \register_shutdown_function(
@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// }
 				// }
 				// );
-			}
+			// }
 			Ajax_Helper::init();
 		}
 

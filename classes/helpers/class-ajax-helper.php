@@ -209,12 +209,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.4.0
 		 */
 		private static function validate_hash_param(): string {
-			if ( ! isset( $_REQUEST['hash'] ) || empty( $_REQUEST['hash'] ) ) {
+			if ( ! isset( $_REQUEST['hash'] ) || empty( $_REQUEST['hash'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				\wp_send_json_error( 'Missing or empty hash parameter.', 400 );
 				\wp_die();
 			}
 
-			return \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) );
+			return \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		/**
@@ -225,12 +225,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.7.0
 		 */
 		private static function validate_id_param(): int {
-			if ( ! isset( $_REQUEST['id'] ) || empty( $_REQUEST['id'] ) ) {
+			if ( ! isset( $_REQUEST['id'] ) || empty( $_REQUEST['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				\wp_send_json_error( 'Missing or empty id parameter.', 400 );
 				\wp_die();
 			}
 
-			return (int) \sanitize_text_field( \wp_unslash( $_REQUEST['id'] ) );
+			return (int) \sanitize_text_field( \wp_unslash( $_REQUEST['id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
 		/**

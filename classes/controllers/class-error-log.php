@@ -1,6 +1,6 @@
 <?php
 /**
- * Reads file in reverse order
+ * Responsible for operations related to the error log file.
  *
  * @package advanced-analytics
  *
@@ -107,7 +107,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						)
 					);
 					return self::$last_error;
-				} elseif ( ! is_writable( self::$log_file ) ) {
+				} elseif ( ! is_writable( self::$log_file ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 					self::$last_error = new \WP_Error(
 						'error_log_not_writable',
 						sprintf(
@@ -144,11 +144,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 */
 		public static function clear( $filename ) {
 			$filename = self::extract_file_name( $filename );
-			if ( $filename && is_writable( $filename ) ) {
-				$handle = fopen( $filename, 'w' );
+			if ( $filename && \is_writable( $filename ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
+				$handle = \fopen( $filename, 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
 				if ( false !== $handle ) {
-					fclose( $handle );
+					\fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				}
 			}
 		}

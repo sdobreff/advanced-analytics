@@ -87,15 +87,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 					'wp_debug_off',
 					__( "{$basename} does not exist.", '0-day-analytics' ) // phpcs:ignore WordPress.WP.I18n.InterpolatedVariableText
 				);
-				// throw new \Exception( "{$basename} does not exist." );
 			}
 
-			if ( ! $read_only && ! is_writable( $wp_config_path ) ) {
+			if ( ! $read_only && ! is_writable( $wp_config_path ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 				return new \WP_Error(
 					'wp_debug_off',
 					__( "{$basename} is not writable.", '0-day-analytics' ) // phpcs:ignore WordPress.WP.I18n.InterpolatedVariableText
 				);
-				// throw new \Exception( "{$basename} is not writable." );
 			}
 
 			self::$wp_config_path = $wp_config_path;
@@ -131,7 +129,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 
 			self::auto_init();
 
-			$wp_config_src = file_get_contents( self::$wp_config_path );
+			$wp_config_src = file_get_contents( self::$wp_config_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
 			if ( ! trim( $wp_config_src ) ) {
 				throw new \Exception( 'Config file is empty.' );
@@ -163,7 +161,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		public static function get_value( $type, $name ) {
 			self::auto_init();
 
-			$wp_config_src = file_get_contents( self::$wp_config_path );
+			$wp_config_src = file_get_contents( self::$wp_config_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 
 			if ( ! trim( $wp_config_src ) ) {
 				throw new \Exception( 'Config file is empty.' );
@@ -251,7 +249,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 		public static function update( $type, $name, $value, array $options = array() ) {
 			self::auto_init();
 
-			$value = var_export( $value, true );
+			$value = var_export( $value, true ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 
 			if ( ! is_string( $value ) ) {
 				throw new \Exception( 'Config value must be a string.' );
@@ -334,7 +332,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 				throw new \Exception( 'Raw value for empty string not supported.' );
 			}
 
-			return ( $raw ) ? $value : var_export( $value, true );
+			return ( $raw ) ? $value : var_export( $value, true ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 		}
 
 		/**
@@ -449,7 +447,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Config_Transformer' ) ) {
 				return false;
 			}
 
-			$result = file_put_contents( self::$wp_config_path, $contents, LOCK_EX );
+			$result = file_put_contents( self::$wp_config_path, $contents, LOCK_EX ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 
 			if ( false === $result ) {
 				throw new \Exception( 'Failed to update the config file.' );

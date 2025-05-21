@@ -2,7 +2,7 @@
 /**
  * Class: WP Transients Helper class
  *
- * Helper class to manipulate WP crons.
+ * Helper class to manipulate WP transients.
  *
  * @package advanced-analytics
  *

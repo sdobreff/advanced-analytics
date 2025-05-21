@@ -483,7 +483,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		/**
 		 * Just returns randomized string.
 		 *
-		 * @return void
+		 * @return string
 		 *
 		 * @since 1.1.0
 		 */

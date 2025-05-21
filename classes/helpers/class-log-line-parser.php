@@ -163,7 +163,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				strlen( $matches[0] ),
 				$end_tag_position - strlen( $matches[0] )
 			);
-			$context            = @json_decode( $serialized_context, true );
+			$context            = @json_decode( $serialized_context, true ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
 			if ( ! is_array( $context ) ) {
 				return null;

@@ -46,9 +46,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function schedule_event( $hook, $recurrence, $first_run = null, $args = array() ) {
-			if ( ! wp_next_scheduled( $hook, $args ) ) {
-				$timestamp = $first_run ? $first_run : current_time( 'timestamp' );
-				wp_schedule_event( $timestamp, $recurrence, $hook, $args );
+			if ( ! \wp_next_scheduled( $hook, $args ) ) {
+				$timestamp = $first_run ? $first_run : time();
+				\wp_schedule_event( $timestamp, $recurrence, $hook, $args );
 			}
 		}
 
@@ -82,7 +82,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function is_scheduled( $hook, $args = array() ) {
-			return wp_next_scheduled( $hook, $args ) !== false;
+			return \wp_next_scheduled( $hook, $args ) !== false;
 		}
 
 		/**
@@ -146,7 +146,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function clear_events( $hook ) {
-			wp_clear_scheduled_hook( $hook );
+			\wp_clear_scheduled_hook( $hook );
 		}
 
 		/**
