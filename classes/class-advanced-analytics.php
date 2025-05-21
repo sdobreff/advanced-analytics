@@ -14,19 +14,21 @@ declare(strict_types=1);
 
 namespace ADVAN;
 
-use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Ajax;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
+use ADVAN\Controllers\Slack;
 use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Migration\Migration;
 use ADVAN\Controllers\Pointers;
+use ADVAN\Controllers\Error_Log;
+use ADVAN\Controllers\Slack_API;
 use ADVAN\Helpers\Review_Plugin;
+use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Controllers\Integrations;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
-use ADVAN\Lists\Transients_List;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -81,14 +83,16 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( \WP_DEBUG ) {
 				// \set_error_handler( '\ADVAN\Helpers\WP_Error_Handler::handle_error' );
 
-				\register_shutdown_function(
-					function() {
-						$error = error_get_last();
-						if ( $error && 1 === $error['type'] ) {
-							// Implement notifications here.
-						}
-					}
-				);
+				// \register_shutdown_function(
+				// function() {
+				// $error = error_get_last();
+				// if ( $error && 1 === $error['type'] ) {
+				// Implement notifications here.
+
+				// Advanced_Analytics::shutdown();
+				// }
+				// }
+				// );
 			}
 			Ajax_Helper::init();
 		}
@@ -254,7 +258,13 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			}
 		}
 
-
+		/**
+		 * Shutdown function to handle errors.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return void
+		 */
 		public static function shutdown() {
 			$errfile = 'unknown file';
 			$errstr  = 'shutdown';
@@ -263,13 +273,16 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 			$error = error_get_last();
 
-			if ( $error !== null ) {
+			if ( null !== $error && ( \in_array( $error['type'], array( 1, 4 ) ) ) ) {
 				$errno   = $error['type'];
 				$errfile = $error['file'];
 				$errline = $error['line'];
 				$errstr  = $error['message'];
 
-				// error_mail(format_error( $errno, $errstr, $errfile, $errline));
+				if ( Slack::is_set() ) {
+					// Send error to Slack.
+					Slack_API::send_slack_message_via_api( null, null, ( $errno . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+				}
 			}
 		}
 

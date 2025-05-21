@@ -15,7 +15,9 @@ namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
+use ADVAN\Controllers\Slack;
 use ADVAN\Controllers\Error_Log;
+use ADVAN\Controllers\Slack_API;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Settings\Settings_Builder;
 
@@ -32,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '3'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '4'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -236,8 +238,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$default_options ) ) {
 				// Define default options.
 				self::$default_options = array(
-					'menu_admins_only' => true,
-					'severities'       => array(
+					'menu_admins_only'    => true,
+					'slack_notifications' => array(
+						'all' => array(
+							'channel'    => '',
+							'auth_token' => '',
+						),
+					),
+					'severities'          => array(
 						'deprecated' => array(
 							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
@@ -385,7 +393,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 				}
-				\add_action( 'wp_ajax_wsal_adminbar_events_refresh', array( __CLASS__, 'wsal_adminbar_events_refresh__premium_only' ) );
 
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
 
@@ -825,6 +832,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
 				),
 
+				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
+
+				'notifications'       => array(
+					'icon'  => 'bell',
+					'title' => esc_html__( 'Notification options', '0-day-analytics' ),
+				),
+
 				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),
 
 				'advanced'            => array(
@@ -1220,10 +1234,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							WP_Helper::interval( abs( $until ) )
 						);
 
-						return sprintf(
-							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+						$in = sprintf(
+							' %s ',
 							esc_html( $ago ),
-							$time,
 						);
 					} elseif ( 0 === $until ) {
 						$in = __( 'Now', '0-day-analytics' );
@@ -1275,6 +1288,28 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				$advanced_options['severities'][ $name ]['name'] = self::get_current_options()['severities'][ $name ]['name'];
 			}
+
+			$advanced_options['slack_notifications']['all'] = array();
+
+			if ( array_key_exists( 'slack_notification_auth_token', $post_array ) ) {
+
+				$slack_token = ( array_key_exists( 'slack_notification_auth_token', $post_array ) && ! empty( $post_array['slack_notification_auth_token'] ) ) ? \sanitize_text_field( \wp_unslash( $post_array['slack_notification_auth_token'] ) ) : '';
+
+				if ( ! empty( $slack_token ) ) {
+
+					if ( 'REMOVE' === $slack_token ) {
+						$advanced_options['slack_notifications']['all']['auth_token'] = '';
+					} elseif ( Slack_API::verify_slack_token( $slack_token ) ) {
+						$advanced_options['slack_notifications']['all']['auth_token'] = $slack_token;
+					}
+				} elseif ( Slack::is_set() ) {
+					$advanced_options['slack_notifications']['all']['auth_token'] = Slack::get_slack_auth_key();
+				}
+			} elseif ( Slack::is_set() ) {
+				$advanced_options['slack_notifications']['all']['auth_token'] = Slack::get_slack_auth_key();
+			}
+
+			$advanced_options['slack_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_slack_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_slack_channel'] ) ) : '';
 
 			self::$current_options = $advanced_options;
 
@@ -1361,14 +1396,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( isset( $current_screen ) && ( in_array( $current_screen->base, self::get_plugin_page_slugs(), true ) ) ) {
 				$our_footer = '';
 
-				$footer_link = 'https://melapress.com/?utm_source=plugin&utm_medium=referral&utm_campaign=wsal&utm_content=footer';
 				$link        = 'https://github.com/sdobreff';
+				$footer_link = 'https://wordpress.org/plugins/0-day-analytics/';
 
 				return $our_footer . \sprintf(
 				/* translators: This text is prepended by a link to Melapress's website, and appended by a link to Melapress's website. */
 					'<a href="%1$s" target="_blank">' . ADVAN_NAME . '</a> ' . __( 'is developed and maintained by', 'wp-security-audit-log' ) . ' <a href="%2$s" target="_blank">Stoil Dobreff</a>.',
-					$link,
-					$footer_link
+					$footer_link,
+					$link
 				);
 			}
 

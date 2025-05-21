@@ -276,7 +276,7 @@ $doc.ready(function () {
     });
 
 
-        /* Stikcy Bottom Save Button */
+    /* Stikcy Bottom Save Button */
     var lastScrollTop = 0,
             $topSaveButton = jQuery('.aadvana-panel-content'),
             $bottomSaveButton = jQuery('.aadvana-footer .aadvana-save-button');
@@ -315,6 +315,48 @@ $doc.ready(function () {
 
     $window.scroll(function () {
         stickySaveButton();
+    });
+
+
+    /**
+     * Stores the provided Slack API key
+     * 
+     */
+    $doc.on('click', '#slack_notification_store_settings_ajax', function (e) {
+        const auth = (jQuery('#slack_notification_auth_token').length) ? jQuery('#slack_notification_auth_token').val() : null;
+        const nonceValue = jQuery('#slack_notification_nonce').val();
+
+        if (!auth) {
+            alert('Please fill in all required fields.');
+        } else {
+
+            $figaroBody.addClass('has-overlay');
+            $saveAlert.fadeIn();
+            $saveAlert.removeClass('is-success is-failed');
+
+            jQuery.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'aadvana_store_slack_api_key',
+                    slack_auth: auth,
+                    _wpnonce: nonceValue
+                },
+                success: function (data) {
+                    if (data.success) {
+
+                        $saveAlert.addClass('is-success').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+
+                        location.reload();
+
+                    } else {
+                        $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                        alert(data.data);
+                    }
+                },
+            });
+        }
     });
 
     /* PAGE BUILDER

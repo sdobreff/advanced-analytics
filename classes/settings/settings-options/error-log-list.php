@@ -95,7 +95,7 @@ Settings::set_current_options( $settings );
 						'id'      => 'wp_debug_log_filename',
 						'type'    => 'text',
 						'default' => $file_name,
-						'pattern' => '([a-zA-Z0-9\//\-\.\:])+',
+						'pattern' => '([a-zA-Z0-9\/\/\-\.\:])+',
 					)
 				);
 

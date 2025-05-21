@@ -98,7 +98,6 @@ package-lock.json
 
 composer\.lock
 
-wsal-nofs-license.php
 wp-cli.phar
 /.vscode
 

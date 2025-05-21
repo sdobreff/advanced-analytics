@@ -273,6 +273,10 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 						self::text();
 						break;
 
+					case 'button':
+						self::button();
+						break;
+
 					case 'arrayText':
 						self::text_array();
 						break;
@@ -470,6 +474,33 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			}
 			?>
 			<input <?php echo self::$item_id_attr; ?> <?php echo $title_attr; ?> <?php echo self::$name_attr; ?> <?php echo $type_attr; ?>	value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?><?php echo $pattern; ?><?php echo $max_chars; ?><?php echo ( ( self::$required ) ? ' required' : '' ); ?><?php echo $step; ?>>
+			<?php
+		}
+
+		/**
+		 * Button
+		 *
+		 * @since 5.0.0
+		 */
+		private static function button() {
+			$type_attr = 'type="button"';
+			$pattern   = '';
+			$step      = '';
+			$max_chars = '';
+			if ( ! empty( self::$edit_type ) ) {
+				$type_attr = ' type="' . self::$edit_type . '"';
+			}
+			if ( ! empty( self::$validate_pattern ) ) {
+				$pattern = ' pattern="' . self::$validate_pattern . '"';
+			}
+			if ( ! empty( self::$step ) ) {
+				$step = ' step="' . self::$step . '"';
+			}
+			if ( ! empty( self::$max_chars ) ) {
+				$max_chars = ' maxlength="' . self::$max_chars . '"';
+			}
+			?>
+			<input class="aadvana-primary-button button" <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> <?php echo $type_attr; ?>	value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?><?php echo $pattern; ?><?php echo $max_chars; ?><?php echo ( ( self::$required ) ? ' required' : '' ); ?><?php echo $step; ?>>
 			<?php
 		}
 
@@ -783,7 +814,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 */
 		private static function hidden() {
 			?>
-			<input <?php echo self::$name_attr; ?> type="hidden" value="<?php echo esc_attr( self::$current_value ); ?>">
+			<input <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> type="hidden" value="<?php echo esc_attr( self::$current_value ); ?>">
 			<?php
 		}
 
@@ -814,6 +845,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			if ( ! empty( self::$settings['id'] ) ) {
 				\do_action( 'awef_admin_after_head_title', self::$settings['id'] );
 			}
+			echo self::hint();
 			?>
 			</h3>
 
