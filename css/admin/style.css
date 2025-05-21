@@ -2378,7 +2378,8 @@ html.aadvana-darkskin .awefpanel-head-elements svg * {
   stroke: #fff !important;
 }
 
-html.aadvana-darkskin body {
+html.aadvana-darkskin body,
+html.aadvana-darkskin .aadvana-message-error {
   background-color: #1d456b !important;
 }
 

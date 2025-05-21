@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.8.0
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 	/**
 	 * Responsible for communication with the Slack API.
 	 *
-	 * @since latest
+	 * @since 1.8.0
 	 */
 	class Slack_API {
 
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static $error = null;
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static $valid_message = null;
 
@@ -49,12 +49,16 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		 * @param string $channel_name   - The name of the channel.
 		 * @param string $text   - Text body to send.
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
-		public static function send_slack_message_via_api( ?string $bot_token, string $channel_name, string $text ) {
+		public static function send_slack_message_via_api( ?string $bot_token, ?string $channel_name, string $text ) {
 
 			if ( empty( $bot_token ) ) {
 				$bot_token = Slack::get_slack_auth_key();
+			}
+
+			if ( empty( $channel_name ) ) {
+				$channel_name = Slack::get_slack_channel();
 			}
 
 			$url  = 'https://slack.com/api/chat.postMessage';
@@ -92,7 +96,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function verify_slack_token( $token ) {
 			$url     = 'https://slack.com/api/auth.test';
@@ -133,7 +137,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		/**
 		 * Returns the error stored from Slack.
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function get_slack_error(): string {
 			$error = self::$error;

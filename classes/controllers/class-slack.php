@@ -4,12 +4,15 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.8.0
  */
 
 declare(strict_types=1);
 
 namespace ADVAN\Controllers;
+
+use ADVAN\Helpers\Settings;
+use ADVAN\Controllers\Slack_API;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
@@ -21,22 +24,18 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 	/**
 	 * Responsible for setting different 2FA Slack settings
 	 *
-	 * @since latest
+	 * @since 1.8.0
 	 */
 	class Slack {
 
-		public const SETTINGS_NAME = WSAL_PREFIX . 'slack';
-
-		public const NONCE_NAME = WSAL_PREFIX . 'slack';
-
-		public const POLICY_SETTINGS_NAME = 'enable_slack';
+		public const NONCE_NAME = ADVAN_PREFIX . 'slack';
 
 		/**
 		 * Slack Account AUTH
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		protected static $auth_key = null;
 
@@ -45,7 +44,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		private static $settings = null;
 
@@ -54,75 +53,16 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @var bool
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		private static $is_set = null;
-
-		/**
-		 * Inits the class hooks
-		 *
-		 * @return void
-		 *
-		 * @since latest
-		 */
-		public static function init() {
-
-			// AJAX calls part.
-			\add_action( 'wp_ajax_wsal_store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
-
-			self::$settings = Notifications::get_global_notifications_setting();
-		}
-
-		/**
-		 * Stores the Slack Credentials key via AJAX request
-		 *
-		 * @return void
-		 *
-		 * @since latest
-		 */
-		public static function store_slack_api_key_ajax() {
-			if ( \wp_doing_ajax() ) {
-				if ( isset( $_REQUEST['_wpnonce'] ) ) {
-					$nonce_check = \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) ), self::NONCE_NAME );
-					if ( ! $nonce_check ) {
-						\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Nonce checking failed', '0-day-analytics' ) ), 400 );
-					}
-				} else {
-					\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Nonce is not provided', '0-day-analytics' ) ), 400 );
-				}
-			} else {
-				\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Not allowed', '0-day-analytics' ) ), 400 );
-			}
-
-			if ( \current_user_can( 'manage_options' ) ) {
-
-				if ( isset( $_REQUEST['slack_auth'] ) && ! empty( $_REQUEST['slack_auth'] ) ) {
-					$slack_valid =
-					Slack_API::verify_slack_token(
-						(string) \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ),
-					);
-					if ( $slack_valid ) {
-						$options = Notifications::get_global_notifications_setting();
-
-						$options['slack_notification_auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) );
-
-						Notifications::set_global_notifications_setting( $options );
-
-						\wp_send_json_success();
-					}
-
-					\wp_send_json_error( __( 'SLACK: No token provided or the provided one is invalid. Please check and provide the details again.', '0-day-analytics' ) . Slack_API::get_slack_error() );
-				}
-			}
-			\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Not allowed', '0-day-analytics' ) ), 400 );
-		}
 
 		/**
 		 * Checks if the method is whole set.
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function is_set() {
 			if ( null === self::$is_set ) {
@@ -150,7 +90,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function js_wizard_settings( array $settings ): array {
 			$settings['storeKey'] = true;
@@ -163,14 +103,31 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function get_settings(): array {
 			if ( null === self::$settings ) {
-				self::$settings = Notifications::get_global_notifications_setting();
+				self::$settings = Settings::get_current_options()['slack_notifications']['all'];
 			}
 
 			return self::$settings;
+		}
+
+		/**
+		 * Returns the Slack stored settings
+		 *
+		 * @param array $options - Array with the current Slack settings.
+		 *
+		 * @return void
+		 *
+		 * @since 1.8.0
+		 */
+		public static function set_settings( array $options ): void {
+			$current_options = Settings::get_current_options();
+
+			$current_options['slack_notifications']['all'] = $options;
+
+			Settings::store_options( $current_options );
 		}
 
 		/**
@@ -178,18 +135,28 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @return bool|string
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function get_slack_auth_key() {
 			if ( null === self::$auth_key ) {
 				self::$auth_key = false;
 
-				if ( isset( self::get_settings()['slack_notification_auth_token'] ) ) {
-					self::$auth_key = self::get_settings()['slack_notification_auth_token'];
+				if ( isset( self::get_settings()['auth_token'] ) ) {
+					self::$auth_key = self::get_settings()['auth_token'];
 				}
 			}
 
 			return self::$auth_key;
+		}
+		/**
+		 * Returns the currently stored Slack AUTH key or false if there is none.
+		 *
+		 * @return bool|string
+		 *
+		 * @since 1.8.0
+		 */
+		public static function get_slack_channel() {
+			return self::get_settings()['channel'];
 		}
 
 		/**
@@ -199,7 +166,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since latest
+		 * @since 1.8.0
 		 */
 		public static function get_slack_setting( string $setting ) {
 			if ( ! isset( $setting ) ) {

@@ -92,6 +92,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		private static $columns = array();
 
 		/**
+		 * Holds the array with all of the collected sources.
+		 *
+		 * @var array
+		 *
+		 * @since 1.8.0
+		 */
+		private static $sources = array();
+
+		/**
 		 * Events Query Arguments.
 		 *
 		 * @since 1.1.0
@@ -648,6 +657,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					// if ( isset( $item['source'] ) ) {
 					// return $item['source'];
 					// } else {
+
 					$message = esc_html( $item['message'] );
 
 					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
@@ -668,10 +678,16 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}
 
-						$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+						if ( isset( self::$sources[ $plugin_base ] ) ) {
+							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( self::$sources[ $plugin_base ]['Name'] );
+						} else {
 
-						if ( ! empty( $plugin ) ) {
-							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] );
+							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+							if ( ! empty( $plugin ) ) {
+								self::$sources[ $plugin_base ] = $plugin;
+								return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] );
+							}
 						}
 					}
 
@@ -695,22 +711,28 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}
 
-						$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
+						if ( isset( self::$sources[ $theme_base ] ) ) {
+							return __( 'Theme: ', '0-day-analytics' ) . esc_html( self::$sources[ $theme_base ] );
+						} else {
 
-						if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
-							$name = $theme->get( 'Name' );
+							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
 
-							$name = ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' );
+							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
+								$name = $theme->get( 'Name' );
 
-							$parent = $theme->parent(); // ( 'parent_theme' );
-							if ( $parent ) {
-								$parent = $theme->parent()->get( 'Name' );
+								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' );
 
-								$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '</div>' : '';
+								$parent = $theme->parent(); // ( 'parent_theme' );
+								if ( $parent ) {
+									$parent = $theme->parent()->get( 'Name' );
+
+									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '</div>' : '';
+								}
+								$name .= (string) $parent;
+
+								self::$sources[ $theme_base ] = $name;
+								return __( 'Theme: ', '0-day-analytics' ) . ( $name );
 							}
-							$name .= (string) $parent;
-
-							return __( 'Theme: ', '0-day-analytics' ) . ( $name );
 						}
 					}
 					if ( isset( $item['source'] ) ) {
