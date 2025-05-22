@@ -493,5 +493,35 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 			return $random_string;
 		}
+
+		/**
+		 * Checks if given file is valid PHP file.
+		 *
+		 * @param string $file_name - The name of the file (including path) to check the size of.
+		 *
+		 * @return boolean
+		 *
+		 * @since latest
+		 */
+		public static function is_file_valid_php( string $file_name ): bool {
+
+			if ( ! file_exists( $file_name ) ) {
+				return false;
+			}
+
+			// Define allowed file extensions and MIME types.
+			$allowed_types      = array( 'php' );
+			$allowed_mime_types = array( 'text/x-php' );
+
+			$finfo     = finfo_open( FILEINFO_MIME_TYPE );
+			$mime_type = finfo_file( $finfo, $file_name );
+			$extension = strtolower( pathinfo( $file_name, PATHINFO_EXTENSION ) );
+
+			if ( ! in_array( $extension, $allowed_types, true ) || ! in_array( $mime_type, $allowed_mime_types, true ) ) {
+				return false;
+			}
+
+			return true;
+		}
 	}
 }

@@ -66,22 +66,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function parse_php_error_log_line( string $line ) {
-			$line      = rtrim( $line );
-			$timestamp = null;
-			$message   = $line;
-			$source    = '';
-			$level     = '';
-			$context   = null;
-
-			/*
-			TODO: Attempt to extract the file name and line number from the message.
-			 *
-			 * spprintf(&log_buffer, 0, "PHP %s:  %s in %s on line %" PRIu32, error_type_str, buffer, error_filename, error_lineno);
-			php_log_err_with_severity(log_buffer, syslog_type_int);
-
-			zend_error_va(severity, (file && ZSTR_LEN(file) > 0) ? ZSTR_VAL(file) : NULL, line,
-			"Uncaught %s\n  thrown", ZSTR_VAL(str));
-			 */
+			$line       = rtrim( $line );
+			$timestamp  = null;
+			$message    = $line;
+			$source     = '';
+			$level      = '';
+			$context    = null;
+			$error_line = null;
+			$error_file = null;
 
 			// We expect log entries to be structured like this: "[date-and-time] Optional severity: error message".
 			$pattern = '/
@@ -119,6 +111,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					// Parse the severity level.
 					$source = strtolower( trim( $matches['source'] ) );
 				}
+				/*
+				 Attempt to extract the file name and line number from the message.
+				*
+				* spprintf(&log_buffer, 0, "PHP %s:  %s in %s on line %" PRIu32, error_type_str, buffer, error_filename, error_lineno);
+				php_log_err_with_severity(log_buffer, syslog_type_int);
+
+				zend_error_va(severity, (file && ZSTR_LEN(file) > 0) ? ZSTR_VAL(file) : NULL, line,
+				"Uncaught %s\n  thrown", ZSTR_VAL(str));
+				*/
+				if ( preg_match( '/(?:in\s+([^\s]+(?:[\\\\\/][^\s]+)*)\s+on\s+line\s+(\d+)|([^\s:]+(?:[\\\\\/][^\s:]+)*)[:](\d+))/', $message, $matches ) ) {
+					$error_file = $matches[1] ? $matches[1] : $matches[3];
+
+					$error_line = $matches[2] ? $matches[2] : $matches[4];
+
+				}
 
 				// Does this line contain contextual data for another error?
 				$context_prefix  = '[ELM_context_';
@@ -135,6 +142,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				'source'         => $source,
 				'isContext'      => ( null !== $context ),
 				'contextPayload' => $context,
+				'error_line'     => $error_line,
+				'error_file'     => $error_file,
 			);
 		}
 

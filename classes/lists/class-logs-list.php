@@ -658,6 +658,31 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					// return $item['source'];
 					// } else {
 
+					// $show_source_link = false;
+					$source_link = '';
+
+					$query_array = array(
+						'_wpnonce' => \wp_create_nonce( 'source-view' ),
+						'action'   => 'log_source_view',
+					);
+
+					if ( isset( $item['error_file'] ) && ! empty( $item['error_file'] ) ) {
+						$query_array['error_file'] = $item['error_file'];
+
+						if ( isset( $item['error_line'] ) && ! empty( $item['error_line'] ) ) {
+							$query_array['error_line'] = $item['error_line'];
+						}
+
+						$query_array['TB_iframe'] = 'true';
+
+						$view_url = \esc_url_raw(
+							\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
+						);
+
+						$source_link = '<div> <a href="' . $view_url . '" class="thickbox view-source gray_lab badge">view source</a></div>';
+
+					}
+
 					$message = esc_html( $item['message'] );
 
 					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
@@ -679,14 +704,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 
 						if ( isset( self::$sources[ $plugin_base ] ) ) {
-							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( self::$sources[ $plugin_base ]['Name'] );
+							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( self::$sources[ $plugin_base ]['Name'] ) . $source_link;
 						} else {
 
 							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
 
 							if ( ! empty( $plugin ) ) {
 								self::$sources[ $plugin_base ] = $plugin;
-								return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] );
+								return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] ) . $source_link;
 							}
 						}
 					}
@@ -712,7 +737,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 
 						if ( isset( self::$sources[ $theme_base ] ) ) {
-							return __( 'Theme: ', '0-day-analytics' ) . esc_html( self::$sources[ $theme_base ] );
+							return __( 'Theme: ', '0-day-analytics' ) . esc_html( self::$sources[ $theme_base ] ) . $source_link;
 						} else {
 
 							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
@@ -731,21 +756,21 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 								$name .= (string) $parent;
 
 								self::$sources[ $theme_base ] = $name;
-								return __( 'Theme: ', '0-day-analytics' ) . ( $name );
+								return __( 'Theme: ', '0-day-analytics' ) . ( $name ) . $source_link;
 							}
 						}
 					}
 					if ( false !== \mb_strpos( $message, ABSPATH . WPINC . \DIRECTORY_SEPARATOR ) ) {
-						return __( 'WP Core', '0-day-analytics' );
+						return __( 'WP Core', '0-day-analytics' ) . $source_link;
 					}
 
 					$admin_path = str_replace( \get_home_url( 1 ) . '/', ABSPATH, \network_admin_url() );
 
 					if ( false !== \mb_strpos( $message, $admin_path ) ) {
-						return __( 'WP Admin Core', '0-day-analytics' );
+						return __( 'WP Admin Core', '0-day-analytics' ) . $source_link;
 					}
 					if ( isset( $item['source'] ) ) {
-						return $item['source'];
+						return $item['source'] . $source_link;
 					} else {
 						return '';
 					}

@@ -513,6 +513,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function render() {
 
+			\add_thickbox();
+
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

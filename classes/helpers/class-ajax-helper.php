@@ -74,6 +74,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 * Store Slack API key
 				 */
 				\add_action( 'wp_ajax_aadvana_store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
+
+				/**
+				 * Show the code source
+				 *
+				 * @return void
+				 *
+				 * @since latest
+				 */
+
+				\add_action( 'wp_ajax_log_source_view', array( __CLASS__, 'ajax_view_source' ) );
+
 			}
 		}
 
@@ -275,6 +286,83 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				}
 			}
 			\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Not allowed', '0-day-analytics' ) ), 400 );
+		}
+
+		/**
+		 * Shows the source code.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function ajax_view_source() {
+			WP_Helper::verify_admin_nonce( 'source-view' );
+
+			if ( ! isset( $_REQUEST['error_file'] ) || empty( $_REQUEST['error_file'] ) ) {
+				\wp_send_json_error( 'File not found.', 404 );
+				\wp_die();
+			}
+
+			$file_name = $_REQUEST['error_file']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			if ( ! File_Helper::is_file_valid_php( $file_name ) ) {
+				\wp_send_json_error( 'File not found.', 404 );
+				\wp_die();
+
+			}
+			// Don't show any configurational files for security reasons.
+			if ( strpos( $file_name, 'config' ) !== false || strpos( $file_name, 'settings' ) !== false || strpos( $file_name, 'wp-load' ) !== false ) {
+				\wp_send_json_error( 'File not found.', 404 );
+				\wp_die();
+			}
+
+			$sh_url = ADVAN_PLUGIN_ROOT_URL . 'js/sh/';
+
+			$source = htmlspecialchars( @file_get_contents( $file_name ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+			$lines = isset( $_REQUEST['error_line'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['error_line'] ) ) : 11;
+			if ( \strpos( (string) $lines, '-' ) ) {
+				$source_lines = array_map( 'absint', explode( '-', $lines ) );
+				$scroll_to    = $source_lines[0] - 10;
+				$line         = ' new Array (' . implode( ', ', $source_lines ) . ')';
+			} else {
+				$line      = absint( $lines );
+				$scroll_to = $line - 10;
+			}
+
+			?>
+				<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
+				<head>
+				<script type="text/javascript" src="<?php echo $sh_url; ?>scripts/shCore.js"></script>
+				<script type="text/javascript" src="<?php echo $sh_url; ?>scripts/shBrushPhp.js"></script>
+				<link href="<?php echo $sh_url; ?>styles/shCore.css" rel="stylesheet" type="text/css" />
+				<link href="<?php echo $sh_url; ?>styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+				<style type="text/css" media="all">
+					.syntaxhighlighter{
+						max-height: 80%;
+					}
+				</style>
+				</head>
+
+				<body>
+				<pre class="brush: php; toolbar: false;"><?php echo $source;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></pre>
+
+				<script type="text/javascript">
+					SyntaxHighlighter.defaults["highlight"] = <?php echo $line;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					//SyntaxHighlighter.defaults["first-line"] = '.$line.';
+					SyntaxHighlighter.all();
+					function waitUntilRender(){
+						linex = document.getElementsByClassName("number<?php echo $scroll_to;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>");
+						if (typeof linex === 'undefined') return;
+						linex[0].scrollIntoView();
+						clearInterval(intervalID);
+					}
+					var intervalID  = setInterval(waitUntilRender, 200);
+
+				</script>
+				</body></html>
+			<?php
+			\wp_die();
 		}
 	}
 }

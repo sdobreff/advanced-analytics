@@ -327,16 +327,59 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			}
 
 			$context = $type;
-			$name    = match ($type) {
-				'altis-vendor' => self::get_altis_vendor_name( $file ),
-				'plugin', 'mu-plugin', 'mu-vendor' => self::get_plugin_name( $file, $type ),
-				'go-plugin', 'vip-plugin', 'vip-client-mu-plugin' => self::get_vip_plugin_name( $file, $type ),
-				'stylesheet' => is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' ),
-				'template' => __( 'Parent Theme', '0-day-analytics' ),
-				'other' => self::get_other_name( $file ),
-				'core' => __( 'WordPress Core', '0-day-analytics' ),
-				default => __( 'Unknown', '0-day-analytics' ),
-			};
+
+			// \var_dump( \PHP_VERSION_ID); die();
+
+			// if ( \PHP_VERSION_ID < 80000 ) {
+				switch ( $type ) {
+					case 'altis-vendor':
+						$name = self::get_altis_vendor_name( $file );
+						break;
+
+					case 'plugin':
+					case 'mu-plugin':
+					case 'mu-vendor':
+						$name = self::get_plugin_name( $file, $type );
+						break;
+
+					case 'go-plugin':
+					case 'vip-plugin':
+					case 'vip-client-mu-plugin':
+						$name = self::get_vip_plugin_name( $file, $type );
+						break;
+
+					case 'stylesheet':
+						$name = is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' );
+						break;
+
+					case 'template':
+						$name = __( 'Parent Theme', '0-day-analytics' );
+						break;
+
+					case 'other':
+						$name = self::get_other_name( $file );
+						break;
+
+					case 'core':
+						$name = __( 'WordPress Core', '0-day-analytics' );
+						break;
+
+					default:
+						$name = __( 'Unknown', '0-day-analytics' );
+						break;
+				}
+			// } else {
+			// 	$name = match ($type) {
+			// 		'altis-vendor' => self::get_altis_vendor_name( $file ),
+			// 		'plugin', 'mu-plugin', 'mu-vendor' => self::get_plugin_name( $file, $type ),
+			// 		'go-plugin', 'vip-plugin', 'vip-client-mu-plugin' => self::get_vip_plugin_name( $file, $type ),
+			// 		'stylesheet' => is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' ),
+			// 		'template' => __( 'Parent Theme', '0-day-analytics' ),
+			// 		'other' => self::get_other_name( $file ),
+			// 		'core' => __( 'WordPress Core', '0-day-analytics' ),
+			// 		default => __( 'Unknown', '0-day-analytics' ),
+			// 	};
+			// }
 
 			if ( 'stylesheet' === $type || 'template' === $type ) {
 				$type = 'theme';

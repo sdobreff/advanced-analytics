@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -16,7 +16,7 @@ Advanced Analytics is a powerful plugin designed for WordPress sites with extens
 - Enable or disable error logging directly from the WordPress dashboard.
 - Manage large log files without performance degradation.
 - **Cron manager** at the tip of your fingers
-- **Transient manager** - all (strored in the DB) transients
+- **Transient manager** - all (stored in the DB) transients
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -35,7 +35,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 1. Download the plugin from the WordPress Plugin Directory.
 2. Upload the `0-day-analytics` folder to the `/wp-content/plugins/` directory.
 3. Activate the plugin through the 'Plugins' menu in WordPress.
-4. You will see new menu in adminbar (left hand) called Analyse.
+4. You will see new menu in admin bar (left hand) called `WP Control`.
 
 Voila! It's ready to go.
 
@@ -47,13 +47,13 @@ Voila! It's ready to go.
 == Frequently Asked Questions ==
 
 = How do I enable or disable error logging? =  
-Go to "Analyze > Settings" in your WordPress dashboard and toggle the logging option as needed.
+Go to "WP Control > Settings" in your WordPress dashboard and toggle the logging option as needed.
 
 = Can this plugin handle large error logs? =  
 Yes, Error Log Manager is optimized for gigabyte-sized log files, ensuring smooth performance even with extensive logs.
 
-= Where are the error logs stored? =  
-The plugin autodetects default error log location, usually WordPress defines that in `wp-config.php`. You can customize this path if needed.
+= Where are the error logs are stored? =  
+The plugin autodetects default error log location, usually WordPress defines that in `wp-config.php`. You can customize this path if needed - this is strongly recommended for security reasons, and don't worry - you can do it with one click from plugin settings.
 
 == Screenshots ==
 
@@ -63,6 +63,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 4. **Cron manager** - Build-in is very powerful cron manager.
 
 == Changelog ==
+
+= 1.8.1 =  
+* Source view button in error log, PHP 7 problem fix.
 
 = 1.8.0 =  
 * Logic improvements, menu name change, Slack notifications for fatal errors, speed optimizations.
