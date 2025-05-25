@@ -548,6 +548,19 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
+				case 'severity':
+					if ( isset( $item['severity'] ) && ! empty( $item['severity'] ) ) {
+
+						if ( isset( Settings::get_current_options()['severities'][ $item['severity'] ] ) ) {
+
+							return '<span class="badge green-badge" style="color: ' . Settings::get_current_options()['severities'][ $item['severity'] ]['color'] . ' !important;">' . $item['severity'] . '</span>';
+						} else {
+							return '<span class="badge">' . $item['severity'] . '</span>';
+						}
+					} else {
+						return '<span class="badge">' . __( 'not set', '0-day-analytics' ) . '</span>';
+					}
+					break;
 				case 'timestamp':
 					if ( 1 === $item['timestamp'] ) {
 						return sprintf(

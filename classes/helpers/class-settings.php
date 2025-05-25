@@ -1164,14 +1164,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							height: 30px;
 							width: 400px;
 						}
-						#wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
+						/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
 							background: #d7dce0;
 							color: #42425d !important;
-						}
+						} */
 						<?php
 						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ background: ' . \esc_attr( $properties['color'] ) . ' !important; }';
-							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: #42425d !important; }';
+							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ border-left: 5px solid ' . \esc_attr( $properties['color'] ) . ' !important; }';
+							//echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
 						}
 						?>
 					</style>
