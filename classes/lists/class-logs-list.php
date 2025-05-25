@@ -1110,15 +1110,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<div>
 					<?php
 					if ( \current_user_can( 'manage_options' ) ) {
-						if ( null === Error_Log::get_last_error() ) {
+						if ( '0 B' !== File_Helper::format_file_size( Error_Log::autodetect() ) ) {
 							?>
 
 							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
+							
+							<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
 							<?php
 						}
-						?>
-					<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
-						<?php
 					}
 					?>
 				</div>

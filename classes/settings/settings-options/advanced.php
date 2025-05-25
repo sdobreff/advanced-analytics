@@ -34,6 +34,15 @@ Settings::build_option(
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Show live notifications in admin bar', '0-day-analytics' ),
+			'id'      => 'live_notifications_admin_bar',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options()['live_notifications_admin_bar'],
+		)
+	);
+
 	// Reset the settings options.
 	Settings::build_option(
 		array(

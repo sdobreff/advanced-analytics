@@ -72,5 +72,23 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			Settings::store_options( $settings );
 			Settings::set_current_options( $settings );
 		}
+
+		/**
+		 * Migrates the plugin up-to version 1.8.2
+		 *
+		 * @return void
+		 *
+		 * @since 1.8.2
+		 */
+		public static function migrate_up_to_182() {
+			$settings = Settings::get_current_options();
+
+			if ( ! isset( $settings['live_notifications_admin_bar'] ) ) {
+				$settings['live_notifications_admin_bar'] = true;
+			}
+
+			Settings::store_options( $settings );
+			Settings::set_current_options( $settings );
+		}
 	}
 }

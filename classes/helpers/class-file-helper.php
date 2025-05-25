@@ -146,7 +146,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 				return $formatted_size . ' ' . $units[ $i ];
 			}
 
-			return '0KB';
+			return '0 B';
 		}
 
 		/**
@@ -501,7 +501,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.8.2
 		 */
 		public static function is_file_valid_php( string $file_name ): bool {
 

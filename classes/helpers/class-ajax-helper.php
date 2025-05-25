@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 *
 				 * @return void
 				 *
-				 * @since latest
+				 * @since 1.8.2
 				 */
 
 				\add_action( 'wp_ajax_log_source_view', array( __CLASS__, 'ajax_view_source' ) );
@@ -293,7 +293,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.2
 		 */
 		public static function ajax_view_source() {
 			WP_Helper::verify_admin_nonce( 'source-view' );

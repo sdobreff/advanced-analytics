@@ -34,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '4'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '5'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -238,14 +238,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$default_options ) ) {
 				// Define default options.
 				self::$default_options = array(
-					'menu_admins_only'    => true,
-					'slack_notifications' => array(
+					'menu_admins_only'             => true,
+					'live_notifications_admin_bar' => true,
+					'slack_notifications'          => array(
 						'all' => array(
 							'channel'    => '',
 							'auth_token' => '',
 						),
 					),
-					'severities'          => array(
+					'severities'                   => array(
 						'deprecated' => array(
 							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
@@ -390,7 +391,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* Transients end */
 
-				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) ) {
+				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 				}
 
@@ -1171,7 +1172,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						<?php
 						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
 							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ border-left: 5px solid ' . \esc_attr( $properties['color'] ) . ' !important; }';
-							//echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
+							// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
 						}
 						?>
 					</style>
@@ -1283,6 +1284,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options = array();
 
 			$advanced_options['menu_admins_only'] = ( array_key_exists( 'menu_admins_only', $post_array ) ) ? filter_var( $post_array['menu_admins_only'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['live_notifications_admin_bar'] = ( array_key_exists( 'live_notifications_admin_bar', $post_array ) ) ? filter_var( $post_array['live_notifications_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
 				$advanced_options['severities'][ $name ]['color']   = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severities'][ $name ]['color'] ) ) ? $advanced_options['severities'][ $name ]['color'] : $severity['color'] );
