@@ -45,8 +45,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 			// $errfile  = self::clean_file_path( $errfile );
-			$errname = self::error_code_to_string( $errno );
-			$out     = "$errname ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$php_error_name = self::error_code_to_string( $errno );
+			$out     = "$php_error_name ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -126,8 +126,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 
-			$errname = self::error_code_to_string( $errno );
-			$out     = "PHP $errname: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$php_error_name = self::error_code_to_string( $errno );
+			$out     = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -192,7 +192,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 * @param string $version - Since which WP version given error was added.
 		 * @param int    $errno - The number of the error (type of the error - that probably never get set by WP and always falls to the default which is E_USER_NOTICE).
 		 *
-		 * @return bool
+		 * @return void
 		 *
 		 * @since 1.1.1
 		 */
@@ -205,8 +205,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 
-			$errname = 'DEPRECATED';
-			$out     = "PHP $errname: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$php_error_name = 'DEPRECATED';
+			$out     = "PHP $php_error_name: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -282,23 +282,24 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		private static function error_code_to_string( $code ) {
+		public static function error_code_to_string( $code ) {
 			$errors = array(
-				1     => 'ERROR',
-				2     => 'WARNING',
-				4     => 'PARSE',
-				8     => 'NOTICE',
-				16    => 'CORE ERROR',
-				32    => 'CORE WARNING',
-				64    => 'COMPILE ERROR',
-				128   => 'COMPILE WARNING',
-				256   => 'USER ERROR',
-				512   => 'USER WARNING',
-				1024  => 'USER NOTICE',
-				2048  => 'STRICT',
-				4096  => 'RECOVERABLE ERROR',
-				8192  => 'DEPRECATED',
-				16384 => 'USER DEPRECATED',
+				1     => 'ERROR', // E_ERROR.
+				2     => 'WARNING', // E_WARNING.
+				4     => 'PARSE', // E_PARSE.
+				8     => 'NOTICE', // E_NOTICE.
+				16    => 'CORE ERROR', // E_CORE_ERROR.
+				32    => 'CORE WARNING', // E_CORE_WARNING.
+				64    => 'COMPILE ERROR', // E_COMPILE_ERROR.
+				128   => 'COMPILE WARNING', // E_COMPILE_WARNING.
+				256   => 'USER ERROR', // E_USER_ERROR.
+				512   => 'USER WARNING', // E_USER_WARNING.
+				1024  => 'USER NOTICE', // E_USER_NOTICE.
+				2048  => 'STRICT', // E_STRICT.
+				4096  => 'RECOVERABLE ERROR', // E_RECOVERABLE_ERROR.
+				8192  => 'DEPRECATED', // E_DEPRECATED.
+				16384 => 'USER DEPRECATED', // E_USER_DEPRECATED.
+				32767 => 'ALL ERRORS', // E_ALL.
 			);
 			if ( isset( $errors[ $code ] ) ) {
 				return $errors[ $code ];

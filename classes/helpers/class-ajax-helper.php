@@ -118,7 +118,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
-			echo File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			File_Helper::download( Error_Log::autodetect() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 			\wp_send_json_success( 2 );
 		}

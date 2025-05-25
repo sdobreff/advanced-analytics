@@ -74,6 +74,15 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		private static $contentpath = null;
 
 		/**
+		 * Keeps the value of the multisite install of the WP.
+		 *
+		 * @var bool
+		 *
+		 * @since 1.8.2
+		 */
+		private static $is_multisite = null;
+
+		/**
 		 * Verifies the nonce and user capability.
 		 *
 		 * @param string $action Nonce action.
@@ -328,58 +337,57 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			$context = $type;
 
-			// \var_dump( \PHP_VERSION_ID); die();
+			switch ( $type ) {
+				case 'altis-vendor':
+					$name = self::get_altis_vendor_name( $file );
+					break;
 
-			// if ( \PHP_VERSION_ID < 80000 ) {
-				switch ( $type ) {
-					case 'altis-vendor':
-						$name = self::get_altis_vendor_name( $file );
-						break;
+				case 'plugin':
+				case 'mu-plugin':
+				case 'mu-vendor':
+					$name = self::get_plugin_name( $file, $type );
+					break;
 
-					case 'plugin':
-					case 'mu-plugin':
-					case 'mu-vendor':
-						$name = self::get_plugin_name( $file, $type );
-						break;
+				case 'go-plugin':
+				case 'vip-plugin':
+				case 'vip-client-mu-plugin':
+					$name = self::get_vip_plugin_name( $file, $type );
+					break;
 
-					case 'go-plugin':
-					case 'vip-plugin':
-					case 'vip-client-mu-plugin':
-						$name = self::get_vip_plugin_name( $file, $type );
-						break;
+				case 'stylesheet':
+					$name = is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' );
+					break;
 
-					case 'stylesheet':
-						$name = is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' );
-						break;
+				case 'template':
+					$name = __( 'Parent Theme', '0-day-analytics' );
+					break;
 
-					case 'template':
-						$name = __( 'Parent Theme', '0-day-analytics' );
-						break;
+				case 'other':
+					$name = self::get_other_name( $file );
+					break;
 
-					case 'other':
-						$name = self::get_other_name( $file );
-						break;
+				case 'core':
+					$name = __( 'WordPress Core', '0-day-analytics' );
+					break;
 
-					case 'core':
-						$name = __( 'WordPress Core', '0-day-analytics' );
-						break;
+				default:
+					$name = __( 'Unknown', '0-day-analytics' );
+					break;
+			}
 
-					default:
-						$name = __( 'Unknown', '0-day-analytics' );
-						break;
-				}
-			// } else {
-			// 	$name = match ($type) {
-			// 		'altis-vendor' => self::get_altis_vendor_name( $file ),
-			// 		'plugin', 'mu-plugin', 'mu-vendor' => self::get_plugin_name( $file, $type ),
-			// 		'go-plugin', 'vip-plugin', 'vip-client-mu-plugin' => self::get_vip_plugin_name( $file, $type ),
-			// 		'stylesheet' => is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' ),
-			// 		'template' => __( 'Parent Theme', '0-day-analytics' ),
-			// 		'other' => self::get_other_name( $file ),
-			// 		'core' => __( 'WordPress Core', '0-day-analytics' ),
-			// 		default => __( 'Unknown', '0-day-analytics' ),
-			// 	};
-			// }
+			/*
+				$name = match ($type) {
+					'altis-vendor' => self::get_altis_vendor_name( $file ),
+					'plugin', 'mu-plugin', 'mu-vendor' => self::get_plugin_name( $file, $type ),
+					'go-plugin', 'vip-plugin', 'vip-client-mu-plugin' => self::get_vip_plugin_name( $file, $type ),
+					'stylesheet' => is_child_theme() ? __( 'Child Theme', '0-day-analytics' ) : __( 'Theme', '0-day-analytics' ),
+					'template' => __( 'Parent Theme', '0-day-analytics' ),
+					'other' => self::get_other_name( $file ),
+					'core' => __( 'WordPress Core', '0-day-analytics' ),
+					default => __( 'Unknown', '0-day-analytics' ),
+				};
+			} 
+			*/
 
 			if ( 'stylesheet' === $type || 'template' === $type ) {
 				$type = 'theme';
@@ -779,6 +787,40 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			}
 
 			return self::$admin_path;
+		}
+
+		/**
+		 * Get the blog URL.
+		 *
+		 * @since 1.8.2
+		 *
+		 * @return string
+		 */
+		public static function get_blog_domain(): string {
+			if ( self::is_multisite() ) {
+				$blog_id     = function_exists( 'get_current_blog_id' ) ? \get_current_blog_id() : 0;
+				$blog_domain = \get_blog_option( $blog_id, 'home' );
+			} else {
+				$blog_domain = \get_option( 'home' );
+			}
+
+			// Replace protocols.
+			return str_replace( array( 'http://', 'https://' ), '', $blog_domain );
+		}
+
+		/**
+		 * Check is this is a multisite setup.
+		 *
+		 * @return bool
+		 *
+		 * @since 1.8.2
+		 */
+		public static function is_multisite() {
+			if ( null === self::$is_multisite ) {
+				self::$is_multisite = function_exists( 'is_multisite' ) && is_multisite();
+			}
+
+			return self::$is_multisite;
 		}
 	}
 }

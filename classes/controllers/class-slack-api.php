@@ -64,7 +64,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 			$url  = 'https://slack.com/api/chat.postMessage';
 			$data = array(
 				'channel' => $channel_name,
-				'text'    => $text,
+				'text'    => ':warning: ' . $text,
 			);
 
 			$headers = array(

@@ -273,11 +273,11 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			// Set the pagination.
 			// $this->set_pagination_args(
-			// 	array(
-			// 		'total_items' => $this->count,
-			// 		'per_page'    => $this->get_screen_option_per_page(),
-			// 		'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
-			// 	)
+			// array(
+			// 'total_items' => $this->count,
+			// 'per_page'    => $this->get_screen_option_per_page(),
+			// 'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
+			// )
 			// );
 		}
 
@@ -1097,6 +1097,30 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			$link_line = $line ? $line : 1;
 
+			$source_link = '';
+
+			$query_array = array(
+				'_wpnonce' => \wp_create_nonce( 'source-view' ),
+				'action'   => 'log_source_view',
+			);
+
+			if ( isset( $file ) && ! empty( $file ) ) {
+				$query_array['error_file'] = $file;
+
+				if ( isset( $link_line ) && ! empty( $link_line ) ) {
+					$query_array['error_line'] = $link_line;
+				}
+
+				$query_array['TB_iframe'] = 'true';
+
+				$view_url = \esc_url_raw(
+					\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
+				);
+
+				$source_link = '<div> <a href="' . $view_url . '" class="thickbox view-source gray_lab badge">view source</a></div>';
+
+			}
+
 			if ( ! self::has_clickable_links() ) {
 				$fallback = WP_Helper::standard_dir( $file, '' );
 				if ( $line ) {
@@ -1108,7 +1132,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					$return = '<code>' . esc_html( $text ) . '</code>';
 				}
 				if ( $fallback !== $text ) {
-					$return .= '<br><span class="qm-info qm-supplemental">' . esc_html( $fallback ) . '</span>';
+					$return .= '<br><span>' . esc_html( $fallback ) . '</span>' . $source_link;
 				}
 				return $return;
 			}
@@ -1125,9 +1149,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			$link        = sprintf( $link_format, rawurlencode( $file ), intval( $link_line ) );
 
 			if ( $is_filename ) {
-				$format = '<a href="%1$s" class="qm-edit-link">%2$s%3$s</a>';
+				$format = '<a href="%1$s">%2$s%3$s</a>';
 			} else {
-				$format = '<a href="%1$s" class="qm-edit-link"><code>%2$s</code>%3$s</a>';
+				$format = '<a href="%1$s"><code>%2$s</code>%3$s</a>';
 			}
 
 			return sprintf(

@@ -29,6 +29,7 @@ use ADVAN\Helpers\Context_Helper;
 use ADVAN\Controllers\Integrations;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
+use ADVAN\Helpers\WP_Helper;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -281,7 +282,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				if ( Slack::is_set() ) {
 					// Send error to Slack.
-					Slack_API::send_slack_message_via_api( null, null, ( $errno . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . WP_Error_Handler::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
 				}
 			}
 		}

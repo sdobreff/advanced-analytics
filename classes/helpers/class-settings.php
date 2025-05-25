@@ -550,7 +550,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function analytics_cron_page() {
-
+			\add_thickbox();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

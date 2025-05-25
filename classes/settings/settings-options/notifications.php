@@ -67,6 +67,15 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	if ( Slack::is_set() ) {
+		Settings::build_option(
+			array(
+				'type' => 'message',
+				'text' => esc_html__( 'Your Slack token is set - if you want to remove it - type', '0-day-analytics' ) . ' <strong>REMOVE</strong>' . esc_html__( ' in the edit field below', '0-day-analytics' ),
+			)
+		);
+	}
+
 	Settings::build_option(
 		array(
 			'name' => esc_html__( 'Bot token: ', '0-day-analytics' ),
