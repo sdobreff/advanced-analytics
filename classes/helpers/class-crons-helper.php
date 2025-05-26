@@ -215,6 +215,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.4.0
 		 */
 		public static function is_late( array $event ) {
+			if ( ! isset( $item['schedule'] ) && isset( $item['timestamp'] ) ) {
+				$item['schedule'] = $item['timestamp'];
+			}
+
+			if ( ! isset( $item['schedule'] ) ) {
+				return false;
+			}
+
 			$until = $event['schedule'] - time();
 
 			return ( $until < ( 0 - ( 10 * MINUTE_IN_SECONDS ) ) );

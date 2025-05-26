@@ -83,6 +83,15 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		private static $is_multisite = null;
 
 		/**
+		 * Current screen.
+		 *
+		 * @var \WP_Screen
+		 *
+		 * @since 1.7.0
+		 */
+		protected static $wp_screen;
+
+		/**
 		 * Verifies the nonce and user capability.
 		 *
 		 * @param string $action Nonce action.
@@ -386,7 +395,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 					'core' => __( 'WordPress Core', '0-day-analytics' ),
 					default => __( 'Unknown', '0-day-analytics' ),
 				};
-			} 
+			}
 			*/
 
 			if ( 'stylesheet' === $type || 'template' === $type ) {
@@ -822,5 +831,129 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			return self::$is_multisite;
 		}
+
+		/**
+		 * Returns the the wp_screen property.
+		 *
+		 * @return \WP_Screen|null
+		 *
+		 * @since latest
+		 */
+		public static function get_wp_screen() {
+			if ( empty( self::$wp_screen ) ) {
+				self::$wp_screen = \get_current_screen();
+			}
+
+			return self::$wp_screen;
+		}
+
+		/**
+		 * More unified time formatter for list items table view showing.
+		 *
+		 * @param array  $item - Item data.
+		 * @param string $label_string  - Label string to show in the badge.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function time_formatter( array $item, string $label_string ): string {
+
+			if ( ! isset( $item['schedule'] ) && isset( $item['timestamp'] ) ) {
+				$item['schedule'] = $item['timestamp'];
+			}
+
+			if ( 1 === $item['schedule'] ) {
+				return sprintf(
+					'<span class="status-control-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
+					\esc_html__( 'Immediately', '0-day-analytics' ),
+				);
+			}
+
+					$time_format = 'g:i a';
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['schedule'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+			if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+				$time_format .= ' (P)';
+			}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+			if ( $event_local === $today_local ) {
+				$date = sprintf(
+				/* translators: %s: Time */
+					__( 'Today at %s', '0-day-analytics' ),
+					$event_time_local,
+				);
+			} elseif ( $event_local === $tomorrow_local ) {
+				$date = sprintf(
+				/* translators: %s: Time */
+					__( 'Tomorrow at %s', '0-day-analytics' ),
+					$event_time_local,
+				);
+			} elseif ( $event_local === $yesterday_local ) {
+				$date = sprintf(
+				/* translators: %s: Time */
+					__( 'Yesterday at %s', '0-day-analytics' ),
+					$event_time_local,
+				);
+			} else {
+				$date = sprintf(
+				/* translators: 1: Date, 2: Time */
+					__( '%1$s at %2$s', '0-day-analytics' ),
+					\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+					$event_time_local,
+				);
+			}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $item['schedule'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $item['schedule'] - time();
+					$late  = Crons_Helper::is_late( $item );
+
+			if ( $late ) {
+				// Show a warning for events that are late.
+				$ago = sprintf(
+				/* translators: %s: Time period, for example "8 minutes" */
+					__( '%s ago', '0-day-analytics' ),
+					self::interval( abs( $until ) )
+				);
+
+				return sprintf(
+					'<span class="badge red-badge status-control-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
+					esc_html( $ago ),
+					$time,
+				) . '<br><span class="badge red-badge">' . $label_string . '</span>';
+			}
+
+			if ( $until <= 0 ) {
+				$in = __( 'Now', '0-day-analytics' );
+			} else {
+				$in = sprintf(
+				/* translators: %s: Time period, for example "8 minutes" */
+					__( 'In %s', '0-day-analytics' ),
+					self::interval( $until ),
+				);
+			}
+
+					return sprintf(
+						'%s<br><span class="badge green-badge"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span>',
+						\esc_html( $in ),
+						$time,
+					);
+		}
+
 	}
 }

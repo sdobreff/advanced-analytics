@@ -148,7 +148,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					'singular' => 'generated-cron',
 					'plural'   => 'generated-crons',
 					'ajax'     => true,
-					'screen'   => $this->get_wp_screen(),
+					'screen'   => WP_Helper::get_wp_screen(),
 				)
 			);
 
@@ -233,19 +233,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Returns the the wp_screen property.
-		 *
-		 * @since 1.1.0
-		 */
-		private static function get_wp_screen() {
-			if ( empty( self::$wp_screen ) ) {
-				self::$wp_screen = \get_current_screen();
-			}
-
-			return self::$wp_screen;
-		}
-
-		/**
 		 * Prepares the list of items for displaying.
 		 *
 		 * Query, filter data, handle sorting, and pagination, and any other data-manipulation required prior to rendering
@@ -262,7 +249,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			$this->fetch_table_data();
 
-			$hidden = get_user_option( 'manage' . $this->get_wp_screen()->id . 'columnshidden', false );
+			$hidden = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -469,97 +456,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				case 'args':
 					return ( ! empty( $item['args'] ) ? \print_r( $item['args'], true ) : __( 'NO', '0-day-analytics' ) );
 				case 'schedule':
-					if ( 1 === $item['schedule'] ) {
-						return sprintf(
-							'<span class="status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span>',
-							\esc_html__( 'Immediately', '0-day-analytics' ),
-						);
-					}
-
-					$time_format = 'g:i a';
-
-					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['schedule'] );
-
-					$timezone_local  = \wp_timezone();
-					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
-					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
-					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
-					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
-
-					// If the offset of the date of the event is different from the offset of the site, add a marker.
-					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
-						$time_format .= ' (P)';
-					}
-
-					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
-
-					if ( $event_local === $today_local ) {
-						$date = sprintf(
-							/* translators: %s: Time */
-							__( 'Today at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} elseif ( $event_local === $tomorrow_local ) {
-						$date = sprintf(
-							/* translators: %s: Time */
-							__( 'Tomorrow at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} elseif ( $event_local === $yesterday_local ) {
-						$date = sprintf(
-							/* translators: %s: Time */
-							__( 'Yesterday at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} else {
-						$date = sprintf(
-							/* translators: 1: Date, 2: Time */
-							__( '%1$s at %2$s', '0-day-analytics' ),
-							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
-							$event_time_local,
-						);
-					}
-
-					$time = sprintf(
-						'<tim datetime="%1$s">%2$s</time>',
-						\esc_attr( gmdate( 'c', $item['schedule'] ) ),
-						\esc_html( $date )
-					);
-
-					$until = $item['schedule'] - time();
-					$late  = Crons_Helper::is_late( $item );
-
-					if ( $late ) {
-						// Show a warning for events that are late.
-						$ago = sprintf(
-							/* translators: %s: Time period, for example "8 minutes" */
-							__( '%s ago', '0-day-analytics' ),
-							WP_Helper::interval( abs( $until ) )
-						);
-
-						return sprintf(
-							'<span class="badge red-badge status-crontrol-warning"><span class="dashicons dashicons-warning" aria-hidden="true"></span> %s</span><br>%s',
-							esc_html( $ago ),
-							$time,
-						);
-					}
-
-					if ( $until <= 0 ) {
-						$in = __( 'Now', '0-day-analytics' );
-					} else {
-						$in = sprintf(
-							/* translators: %s: Time period, for example "8 minutes" */
-							__( 'In %s', '0-day-analytics' ),
-							WP_Helper::interval( $until ),
-						);
-					}
-
-					return sprintf(
-						'%s<br><span class="badge green-badge">%s</span>',
-						\esc_html( $in ),
-						$time,
-					);
-
+					return WP_Helper::time_formatter( $item, esc_html__( 'overdue', '0-day-analytics' ) );
 				case 'actions':
 					$hook_callbacks = WP_Helper::get_cron_callbacks( $item['hook'] );
 
@@ -750,12 +647,12 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @since 1.1.0
 		 */
 		private static function get_screen_option_per_page() {
-			self::get_wp_screen();
+			$wp_screen = WP_Helper::get_wp_screen();
 
-			if ( self::PAGE_SLUG === self::$wp_screen->base ) {
-				$option = self::$wp_screen->get_option( 'per_page', 'option' );
+			if ( self::PAGE_SLUG === $wp_screen->base ) {
+				$option = $wp_screen->get_option( 'per_page', 'option' );
 				if ( ! $option ) {
-					$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
+					$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
 				}
 			} else {
 				$option = 'advanced_analytics_crons_list_per_page';
@@ -763,7 +660,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			$per_page = (int) \get_user_option( $option );
 			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
+				$per_page = $wp_screen->get_option( 'per_page', 'default' );
 				if ( ! $per_page ) {
 					$per_page = self::get_log_errors_to_read();
 				}

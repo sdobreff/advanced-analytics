@@ -17,6 +17,7 @@ namespace ADVAN\Lists;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
+use ADVAN\Helpers\Crons_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Helpers\Plugin_Theme_Helper;
@@ -45,15 +46,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public const PAGE_SLUG = 'toplevel_page_advan_logs';
 
 		public const SEARCH_INPUT = 'sgp';
-
-		/**
-		 * Current screen.
-		 *
-		 * @var \WP_Screen
-		 *
-		 * @since 1.1.0
-		 */
-		protected static $wp_screen;
 
 		/**
 		 * Name of the table to show.
@@ -161,7 +153,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					'singular' => 'generated-log',
 					'plural'   => 'generated-logs',
 					'ajax'     => true,
-					'screen'   => $this->get_wp_screen(),
+					'screen'   => WP_Helper::get_wp_screen(),
 				)
 			);
 
@@ -245,19 +237,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Returns the the wp_screen property.
-		 *
-		 * @since 1.1.0
-		 */
-		private static function get_wp_screen() {
-			if ( empty( self::$wp_screen ) ) {
-				self::$wp_screen = \get_current_screen();
-			}
-
-			return self::$wp_screen;
-		}
-
-		/**
 		 * Prepares the list of items for displaying.
 		 *
 		 * Query, filter data, handle sorting, and pagination, and any other data-manipulation required prior to rendering
@@ -275,7 +254,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			$this->fetch_table_data();
 
-			$hidden = get_user_option( 'manage' . $this->get_wp_screen()->id . 'columnshidden', false );
+			$hidden = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -927,12 +906,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			if ( null !== self::$per_page ) {
 				return self::$per_page;
 			} else {
-				self::get_wp_screen();
+				$wp_screen = WP_Helper::get_wp_screen();
 
-				if ( self::PAGE_SLUG === self::$wp_screen->base ) {
-					$option = self::$wp_screen->get_option( 'per_page', 'option' );
+				if ( self::PAGE_SLUG === $wp_screen->base ) {
+					$option = $wp_screen->get_option( 'per_page', 'option' );
 					if ( ! $option ) {
-						$option = str_replace( '-', '_', self::$wp_screen->id . '_per_page' );
+						$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
 					}
 				} else {
 					$option = 'advanced_analytics_logs_list_per_page';
@@ -940,7 +919,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				self::$per_page = (int) \get_user_option( $option );
 				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
-					self::$per_page = self::$wp_screen->get_option( 'per_page', 'default' );
+					self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
 					if ( ! self::$per_page ) {
 						self::$per_page = self::get_log_errors_to_read();
 					}
