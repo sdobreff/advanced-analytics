@@ -299,20 +299,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			WP_Helper::verify_admin_nonce( 'source-view' );
 
 			if ( ! isset( $_REQUEST['error_file'] ) || empty( $_REQUEST['error_file'] ) ) {
-				\wp_send_json_error( 'File not found.', 404 );
+				\wp_send_json_error( \esc_html__( 'File not found.', '0-day-analytics' ), 404 );
 				\wp_die();
 			}
 
 			$file_name = $_REQUEST['error_file']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( ! File_Helper::is_file_valid_php( $file_name ) ) {
-				\wp_send_json_error( 'File not found.', 404 );
+				\wp_send_json_error( \esc_html__( 'File does not exists or it is not valid PHP file.', '0-day-analytics' ), 404 );
 				\wp_die();
 
 			}
 			// Don't show any configurational files for security reasons.
 			if ( strpos( $file_name, 'config' ) !== false || strpos( $file_name, 'settings' ) !== false || strpos( $file_name, 'wp-load' ) !== false ) {
-				\wp_send_json_error( 'File not found.', 404 );
+				\wp_send_json_error( \esc_html__( 'File not found.', '0-day-analytics' ), 404 );
 				\wp_die();
 			}
 
@@ -333,10 +333,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			?>
 				<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">
 				<head>
-				<script type="text/javascript" src="<?php echo $sh_url; ?>scripts/shCore.js"></script>
-				<script type="text/javascript" src="<?php echo $sh_url; ?>scripts/shBrushPhp.js"></script>
-				<link href="<?php echo $sh_url; ?>styles/shCore.css" rel="stylesheet" type="text/css" />
-				<link href="<?php echo $sh_url; ?>styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
+				<script type="text/javascript" src="<?php echo $sh_url;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped , WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>scripts/shCore.js"></script>
+				<script type="text/javascript" src="<?php echo $sh_url;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped , WordPress.WP.EnqueuedResources.NonEnqueuedScript ?>scripts/shBrushPhp.js"></script>
+				<link href="<?php echo $sh_url;  // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet , WordPress.Security.EscapeOutput.OutputNotEscaped ?>styles/shCore.css" rel="stylesheet" type="text/css" />
+				<link href="<?php echo $sh_url;  // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet , WordPress.Security.EscapeOutput.OutputNotEscaped ?>styles/shThemeDefault.css" rel="stylesheet" type="text/css" />
 				<style type="text/css" media="all">
 					.syntaxhighlighter{
 						max-height: 80%;
