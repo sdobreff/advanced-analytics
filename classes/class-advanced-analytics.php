@@ -81,7 +81,9 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
 
-				Display_Environment_Type::init();
+				if ( Settings::get_current_options()['environment_type_admin_bar'] ) {
+					\add_action( 'init', array( Display_Environment_Type::class, 'init' ) );
+				}
 			}
 
 			// if ( \WP_DEBUG ) {

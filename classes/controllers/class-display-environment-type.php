@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Display_Environment_Type' ) ) {
 		public static function init() {
 
 			// Bail if we shouldn't display.
-			if ( ! Settings::get_current_options()['environment_type_admin_bar'] || ! self::should_display() ) {
+			if ( ! self::should_display() ) {
 				return;
 			}
 
