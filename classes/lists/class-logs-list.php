@@ -17,7 +17,6 @@ namespace ADVAN\Lists;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
-use ADVAN\Helpers\Crons_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Helpers\Plugin_Theme_Helper;
@@ -119,15 +118,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 1.1.0
 		 */
 		private static $query_order = array();
-
-		/**
-		 * Holds the read lines from error log.
-		 *
-		 * @var array
-		 *
-		 * @since 1.1.0
-		 */
-		private static $read_items = array();
 
 		/**
 		 * Current setting (if any) of per_page property - caching value.
@@ -478,12 +468,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 				}
 			}
-			self::$read_items = $errors;
+			// self::$read_items = $errors;
 			// }
 
 			Log_Line_Parser::store_last_parsed_timestamp();
 
-			return self::$read_items;
+			return $errors;
 		}
 
 		/**
@@ -534,10 +524,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 							return '<span class="badge green-badge" style="color: ' . Settings::get_current_options()['severities'][ $item['severity'] ]['color'] . ' !important;">' . $item['severity'] . '</span>';
 						} else {
-							return '<span class="badge">' . $item['severity'] . '</span>';
+							return '<span class="badge dark-badge">' . $item['severity'] . '</span>';
 						}
 					} else {
-						return '<span class="badge">' . __( 'not set', '0-day-analytics' ) . '</span>';
+						return '<span class="badge dark-badge">' . __( 'not set', '0-day-analytics' ) . '</span>';
 					}
 					break;
 				case 'timestamp':
@@ -635,10 +625,41 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						$reversed_details = \array_reverse( $item['sub_items'] );
 						$message         .= '<div class="log_details_show" style="display:none"><pre style="background:#07073a; color:#c2c8cd; padding: 5px; overflow-y:auto;">';
-						foreach ( $reversed_details as $key => $val ) {
+
+						$query_array = array(
+							'_wpnonce' => \wp_create_nonce( 'source-view' ),
+							'action'   => 'log_source_view',
+						);
+						foreach ( $reversed_details as $val ) {
+
+							$source_link = '';
+
+							if ( isset( $val['file'] ) && ! empty( $val['file'] ) ) {
+								$query_array['error_file'] = $val['file'];
+								$query_array['error_line'] = 1;
+
+								if ( isset( $val['line'] ) && ! empty( $val['line'] ) ) {
+									$query_array['error_line'] = $val['line'];
+								}
+
+								$query_array['TB_iframe'] = 'true';
+
+								$view_url = \esc_url_raw(
+									\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
+								);
+
+								$source_link = ' <a href="' . $view_url . '" class="thickbox view-source">' . $query_array['error_file'] . ':' . $query_array['error_line'] . '</a><br>';
+
+							}
+
 							$message .= ( isset( $val['call'] ) && ! empty( $val['call'] ) ) ? '<b><i>' . $val['call'] . '</i></b> - ' : '';
-							$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
-							$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
+
+							if ( ! empty( $source_link ) ) {
+								$message .= $source_link;
+							} else {
+								$message .= ( isset( $val['file'] ) && ! empty( $val['file'] ) ) ? $val['file'] . ' ' : '';
+								$message .= ( isset( $val['line'] ) && ! empty( $val['line'] ) ) ? $val['line'] . '<br>' : '';
+							}
 
 							$message = \rtrim( $message, ' - ' );
 						}

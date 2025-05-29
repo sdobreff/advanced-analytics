@@ -90,5 +90,29 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			Settings::store_options( $settings );
 			Settings::set_current_options( $settings );
 		}
+
+		/**
+		 * Migrates the plugin up-to version 1.8.4
+		 *
+		 * @return void
+		 *
+		 * @since 1.8.4
+		 */
+		public static function migrate_up_to_184() {
+			$settings = Settings::get_current_options();
+
+			if ( ! isset( $settings['environment_type_admin_bar'] ) ) {
+				$settings['environment_type_admin_bar'] = true;
+			}
+
+			$settings['severities']['user'] = array(
+				'name'    => __( 'User', '0-day-analytics' ),
+				'color'   => '#0d4c24',
+				'display' => true,
+			);
+
+			Settings::store_options( $settings );
+			Settings::set_current_options( $settings );
+		}
 	}
 }

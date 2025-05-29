@@ -18,6 +18,7 @@ use ADVAN\Helpers\Ajax;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Controllers\Slack;
+use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Migration\Migration;
 use ADVAN\Controllers\Pointers;
@@ -29,7 +30,7 @@ use ADVAN\Helpers\Context_Helper;
 use ADVAN\Controllers\Integrations;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
-use ADVAN\Helpers\WP_Helper;
+use ADVAN\Controllers\Display_Environment_Type;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -65,7 +66,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				\add_filter( 'set-screen-option', array( Transients_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'plugin_action_links', array( __CLASS__, 'add_settings_link' ), 10, 2 );
-				// \add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta' ), 10, 2 );
+				\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta' ), 10, 2 );
 
 				// Review_Plugin::init();
 
@@ -79,6 +80,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
+
+				Display_Environment_Type::init();
 			}
 
 			// if ( \WP_DEBUG ) {
@@ -95,7 +98,9 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// }
 				// );
 			// }
-			Ajax_Helper::init();
+			if ( \is_admin() ) {
+				Ajax_Helper::init();
+			}
 		}
 
 		/**
@@ -134,12 +139,12 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 *
 		 * @return string Links, now with settings added.
 		 *
-		 * @since 2.0.0
+		 * @since 1.8.4
 		 */
 		public static function plugin_meta( $links, $file ) {
 
-			if ( false !== strpos( $file, 'awesome-footnotes.php' ) ) {
-				$links = array_merge( $links, array( '<a href="https://wordpress.org/support/plugin/awesome-footnotes">' . esc_html__( 'Support', '0-day-analytics' ) . '</a>' ) );
+			if ( false !== strpos( $file, 'advanced-analytics.php' ) ) {
+				$links = array_merge( $links, array( '<a target="_blank" href="https://wordpress.org/support/plugin/0-day-analytics">' . esc_html__( 'Support', '0-day-analytics' ) . '</a>' ) );
 			}
 
 			return $links;
@@ -148,11 +153,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Check whether we are on an admin and plugin page.
 		 *
-		 * @since 2.0.0
+		 * @since 1.8.4
 		 *
 		 * @return bool
 		 */
-		public static function is_admin_page() {
+		public static function is_admin_page(): bool {
 
 			return \is_admin() && ( Settings::is_plugin_settings_page() );
 		}
@@ -160,9 +165,9 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Remove all non-WP Mail SMTP plugin notices from our plugin pages.
 		 *
-		 * @since 2.0.0
+		 * @since 1.8.4
 		 */
-		public static function hide_unrelated_notices() {
+		public static function hide_unrelated_notices(): void {
 			// Bail if we're not on our screen or page.
 			if ( ! self::is_admin_page() ) {
 				return;
@@ -177,7 +182,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Remove all notices from the our plugin pages based on the provided action hook.
 		 *
-		 * @since 2.0.0
+		 * @since 1.8.4
 		 *
 		 * @param string $action - The name of the action.
 		 */
@@ -267,10 +272,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 * @return void
 		 */
 		public static function shutdown() {
-			$errfile = 'unknown file';
-			$errstr  = 'shutdown';
-			$errno   = E_CORE_ERROR;
-			$errline = 0;
 
 			$error = error_get_last();
 
@@ -285,6 +286,96 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . WP_Error_Handler::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
 				}
 			}
+		}
+
+		/**
+		 * Uncaught error handler.
+		 *
+		 * @param Throwable $e - The error or exception.
+		 *
+		 * @return void
+		 *
+		 * @since 1.8.4
+		 */
+		public static function exception_handler( $e ) {
+			$error = 'Uncaught Error';
+
+			if ( $e instanceof \Exception ) {
+				$error = 'Uncaught Exception';
+			}
+
+			if ( Slack::is_set() ) {
+				// Send error to Slack.
+				Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+			}
+
+			$main_shown = false;
+
+			$out = sprintf(
+				'PHP FATAL: %s in %s on line %d',
+				$e->getMessage(),
+				$e->getFile(),
+				$e->getLine(),
+			);
+
+			$out .= PHP_EOL . 'Stack trace:' . PHP_EOL;
+
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
+
+			$counter = count( $e->getTrace() );
+			for ( $i = 0; $i < $counter; $i++ ) {
+				$sf    = (object) shortcode_atts( $defaults, $e->getTrace()[ $i ] );
+				$index = $i;
+				$file  = $sf->file;
+				// $file  = self::clean_file_path( $sf->file );
+
+				if ( 1 === $i ) {
+					$thrown_file = $file;
+					$thrown_line = $sf->line;
+				}
+
+				$caller = '';
+				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
+					$caller = $sf->class . '::' . $sf->function . '()';
+				} elseif ( ! empty( $sf->function ) ) {
+					$caller = $sf->function . '()';
+				} else {
+					$main_shown = true;
+					$caller     = '{main}';
+				}
+
+				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
+					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
+				} else {
+					$args = '';
+				}
+
+				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
+
+			}
+			if ( ! $main_shown ) {
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
+			}
+			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
+
+			if ( WP_DEBUG_LOG ) {
+				\error_log( $out );
+			}
+
+			// $message = sprintf(
+			// '%s in %s on line %d trace: %s',
+			// $e->getMessage(),
+			// $e->getFile(),
+			// $e->getLine(),
+			// $e->getTrace()
+			// );
+
+			// \error_log( $message );
 		}
 
 		/**

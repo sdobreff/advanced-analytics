@@ -155,8 +155,12 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				'wp_debug_display'          => ( defined( 'WP_DEBUG_DISPLAY' ) && \WP_DEBUG_DISPLAY ),
 				'wp_debug_log'              => ( defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ),
 				'wp_cron_disable'           => ( defined( 'DISABLE_WP_CRON' ) && \DISABLE_WP_CRON ),
+				'script_debug'              => ( defined( 'SCRIPT_DEBUG' ) && \SCRIPT_DEBUG ),
+				'save_queries'              => ( defined( 'SAVEQUERIES' ) && \SAVEQUERIES ),
+				'wp_environment_type'       => ( defined( 'WP_ENVIRONMENT_TYPE' ) && \WP_ENVIRONMENT_TYPE ) ? \WP_ENVIRONMENT_TYPE : 'production',
+				'wp_development_mode'       => ( defined( 'WP_DEVELOPMENT_MODE' ) && \WP_DEVELOPMENT_MODE ) ? \WP_DEVELOPMENT_MODE : '',
 				'language'                  => get_locale(),
-				'server_info'               => $_SERVER['SERVER_SOFTWARE'],
+				'server_info'               => $_SERVER['SERVER_SOFTWARE'] ?? '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				'php_version'               => phpversion(),
 				'php_post_max_size'         => self::_let_to_num( ini_get( 'post_max_size' ) ),
 				'php_max_execution_time'    => ini_get( 'max_execution_time' ),

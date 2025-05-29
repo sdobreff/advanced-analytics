@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced Analytics
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.8.3
+ * Version:         1.8.4
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.8.3' );
+define( 'ADVAN_VERSION', '1.8.4' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -105,7 +105,10 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 	return;
 }
 
-$plugin_name_libraries = require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
+require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
+
+\register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );
+\set_exception_handler( array( Advanced_Analytics::class, 'exception_handler' ) );
 
 if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
@@ -122,8 +125,6 @@ if ( ! Context_Helper::is_installing() ) {
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 }
-
-register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );
 
 // Polyfill for str_starts_with (PHP < 8.0).
 if ( ! function_exists( 'str_starts_with' ) ) {

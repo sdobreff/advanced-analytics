@@ -311,7 +311,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			}
 			// Don't show any configurational files for security reasons.
-			if ( strpos( $file_name, 'config' ) !== false || strpos( $file_name, 'settings' ) !== false || strpos( $file_name, 'wp-load' ) !== false ) {
+			if ( strpos( \basename( $file_name ), 'config' ) !== false || strpos( \basename( $file_name ), 'settings' ) !== false || strpos( \basename( $file_name ), 'wp-load' ) !== false ) {
 				\wp_send_json_error( \esc_html__( 'File not found.', '0-day-analytics' ), 404 );
 				\wp_die();
 			}

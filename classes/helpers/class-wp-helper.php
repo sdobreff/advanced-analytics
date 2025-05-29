@@ -837,7 +837,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @return \WP_Screen|null
 		 *
-		 * @since latest
+		 * @since 1.8.4
 		 */
 		public static function get_wp_screen() {
 			if ( empty( self::$wp_screen ) ) {
@@ -855,7 +855,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 1.8.4
 		 */
 		public static function time_formatter( array $item, string $label_string ): string {
 

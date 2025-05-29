@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'ADVAN\\Advanced_Analytics' => $baseDir . '/classes/class-advanced-analytics.php',
+    'ADVAN\\Controllers\\Display_Environment_Type' => $baseDir . '/classes/controllers/class-display-environment-type.php',
     'ADVAN\\Controllers\\Error_Log' => $baseDir . '/classes/controllers/class-error-log.php',
     'ADVAN\\Controllers\\Pointers' => $baseDir . '/classes/controllers/class-pointers.php',
     'ADVAN\\Controllers\\Reverse_Line_Reader' => $baseDir . '/classes/controllers/class-reverse-line-reader.php',

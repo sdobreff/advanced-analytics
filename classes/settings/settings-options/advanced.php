@@ -43,6 +43,15 @@ Settings::build_option(
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Show WP environment type in admin bar', '0-day-analytics' ),
+			'id'      => 'environment_type_admin_bar',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options()['environment_type_admin_bar'],
+		)
+	);
+
 	// Reset the settings options.
 	Settings::build_option(
 		array(

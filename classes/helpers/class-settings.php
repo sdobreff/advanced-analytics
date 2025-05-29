@@ -34,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '5'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '6'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -175,7 +175,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function load_custom_wp_admin_style( $hook ) {
 			// $hook is string value given add_menu_page function.
 			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook ) {
-					return;
+				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 		}
@@ -240,6 +240,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				self::$default_options = array(
 					'menu_admins_only'             => true,
 					'live_notifications_admin_bar' => true,
+					'environment_type_admin_bar'   => true,
 					'slack_notifications'          => array(
 						'all' => array(
 							'channel'    => '',
@@ -285,6 +286,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						'parse'      => array(
 							'name'    => __( 'Parse', '0-day-analytics' ),
 							'color'   => '#b9762a',
+							'display' => true,
+						),
+						'user'       => array(
+							'name'    => __( 'User', '0-day-analytics' ),
+							'color'   => '#0d4c24',
 							'display' => true,
 						),
 					),
@@ -805,60 +811,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 			\wp_enqueue_media();
 
-			$settings_tabs = array(
-
-				// 'head-general' => esc_html__( 'General Settings', '0-day-analytics' ),
-
-				// 'general'      => array(
-				// 'icon'  => 'admin-generic',
-				// 'title' => esc_html__( 'General', '0-day-analytics' ),
-				// ),
-
-				// 'head-global'  => esc_html__( 'Global Settings', '0-day-analytics' ),
-
-				// 'backup'       => array(
-				// 'icon'  => 'migrate',
-				// 'title' => esc_html__( 'Export/Import', '0-day-analytics' ),
-				// ),
-
-				'head-error-log-list' => esc_html__( 'Error Log', '0-day-analytics' ),
-
-				'error-log-list'      => array(
-					'icon'  => 'list-view',
-					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
-				),
-
-				'head-cron-list'      => esc_html__( 'Cron Log', '0-day-analytics' ),
-
-				'cron-list'           => array(
-					'icon'  => 'list-view',
-					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
-				),
-
-				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
-
-				'notifications'       => array(
-					'icon'  => 'bell',
-					'title' => esc_html__( 'Notification options', '0-day-analytics' ),
-				),
-
-				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),
-
-				'advanced'            => array(
-					'icon'  => 'admin-tools',
-					'title' => esc_html__( 'Advanced', '0-day-analytics' ),
-				),
-
-				'backup'              => array(
-					'icon'  => 'migrate',
-					'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
-				),
-
-				'system-info'         => array(
-					'icon'  => 'wordpress-alt',
-					'title' => esc_html__( 'System Info', '0-day-analytics' ),
-				),
-			);
+			$settings_tabs = self::build_options_tabs();
 
 			?>
 
@@ -1013,45 +966,57 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$settings_tabs = array(
 
-				'general'       => array(
-					'icon'  => 'admin-generic',
-					'title' => \esc_html__( 'General', '0-day-analytics' ),
+				// 'head-general' => esc_html__( 'General Settings', '0-day-analytics' ),
+
+				// 'general'      => array(
+				// 'icon'  => 'admin-generic',
+				// 'title' => esc_html__( 'General', '0-day-analytics' ),
+				// ),
+
+				// 'head-global'  => esc_html__( 'Global Settings', '0-day-analytics' ),
+
+				// 'backup'       => array(
+				// 'icon'  => 'migrate',
+				// 'title' => esc_html__( 'Export/Import', '0-day-analytics' ),
+				// ),
+
+				'head-error-log-list' => esc_html__( 'Error Log', '0-day-analytics' ),
+
+				'error-log-list'      => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
 				),
 
-				'logo'          => array(
-					'icon'  => 'lightbulb',
-					'title' => \esc_html__( 'Logo', '0-day-analytics' ),
+				'head-cron-list'      => esc_html__( 'Cron Log', '0-day-analytics' ),
+
+				'cron-list'           => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
 				),
 
-				'posts'         => array(
-					'icon'  => 'media-text',
-					'title' => \esc_html__( 'Article types', '0-day-analytics' ),
+				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
+
+				'notifications'       => array(
+					'icon'  => 'bell',
+					'title' => esc_html__( 'Notification options', '0-day-analytics' ),
 				),
 
-				'footer'        => array(
-					'icon'  => 'editor-insertmore',
-					'title' => \esc_html__( 'Footer', '0-day-analytics' ),
+				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),
+
+				'advanced'            => array(
+					'icon'  => 'admin-tools',
+					'title' => esc_html__( 'Advanced', '0-day-analytics' ),
 				),
 
-				'seo'           => array(
-					'icon'  => 'google',
-					'title' => \esc_html__( 'SEO', '0-day-analytics' ),
+				'backup'              => array(
+					'icon'  => 'migrate',
+					'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
 				),
 
-				'optimization'  => array(
-					'icon'  => 'dashboard',
-					'title' => \esc_html__( 'Optimization', '0-day-analytics' ),
+				'system-info'         => array(
+					'icon'  => 'wordpress-alt',
+					'title' => esc_html__( 'System Info', '0-day-analytics' ),
 				),
-
-				'miscellaneous' => array(
-					'icon'  => 'shortcode',
-					'title' => \esc_html__( 'Miscellaneous', '0-day-analytics' ),
-				),
-			);
-
-			$settings_tabs['backup'] = array(
-				'icon'  => 'migrate',
-				'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
 			);
 
 			return $settings_tabs;
@@ -1102,7 +1067,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function is_plugin_settings_page() {
 
-			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : '';
+			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
 		}
@@ -1149,9 +1114,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				$logs = Logs_List::get_error_items( false );
+				$events = Logs_List::get_error_items( false );
 
-				$event = ( isset( $logs[0] ) ) ? $logs[0] : null;
+				$event = reset( $events );
 
 				if ( $event && ! empty( $event ) ) {
 
@@ -1258,7 +1223,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					$admin_bar->add_node(
 						array(
 							'id'    => 'aadvan-menu',
-							'title' => ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b>' . ' : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
+							'title' => ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b> : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
 							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 							'meta'  => array( 'class' => 'aadvan-live-notif-item' . $classes ),
 						)
@@ -1286,6 +1251,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['menu_admins_only'] = ( array_key_exists( 'menu_admins_only', $post_array ) ) ? filter_var( $post_array['menu_admins_only'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['live_notifications_admin_bar'] = ( array_key_exists( 'live_notifications_admin_bar', $post_array ) ) ? filter_var( $post_array['live_notifications_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['environment_type_admin_bar'] = ( array_key_exists( 'environment_type_admin_bar', $post_array ) ) ? filter_var( $post_array['environment_type_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
 				$advanced_options['severities'][ $name ]['color']   = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severities'][ $name ]['color'] ) ) ? $advanced_options['severities'][ $name ]['color'] : $severity['color'] );
@@ -1327,6 +1294,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$wp_debug_display_enable = ( array_key_exists( 'wp_debug_display_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_display_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 				Config_Transformer::update( 'constant', 'WP_DEBUG_DISPLAY', $wp_debug_display_enable, self::$config_args );
+
+				$wp_script_debug = ( array_key_exists( 'wp_script_debug', $post_array ) ) ? filter_var( $post_array['wp_script_debug'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+				Config_Transformer::update( 'constant', 'SCRIPT_DEBUG', $wp_script_debug, self::$config_args );
+
+				$wp_save_queries = ( array_key_exists( 'wp_save_queries', $post_array ) ) ? filter_var( $post_array['wp_save_queries'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+				Config_Transformer::update( 'constant', 'SAVEQUERIES', $wp_save_queries, self::$config_args );
+
+				$wp_environment_type = ( array_key_exists( 'wp_environment_type', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['wp_environment_type'] ) ) : false;
+
+				if ( false !== $wp_environment_type && ! in_array( $wp_environment_type, array( 'production', 'development', 'staging', 'local' ), true ) ) {
+					$wp_environment_type = 'production';
+				}
+
+				Config_Transformer::update( 'constant', 'WP_ENVIRONMENT_TYPE', $wp_environment_type, self::$config_args );
+
+				$wp_development_mode = ( array_key_exists( 'wp_development_mode', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['wp_development_mode'] ) ) : false;
+
+				if ( false !== $wp_development_mode && ! in_array( $wp_development_mode, array( '', 'all', 'core', 'plugin', 'theme' ), true ) ) {
+					$wp_development_mode = '';
+				}
+
+				Config_Transformer::update( 'constant', 'WP_DEVELOPMENT_MODE', $wp_development_mode, self::$config_args );
 
 				$wp_debug_log_enable = ( array_key_exists( 'wp_debug_log_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_log_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
 

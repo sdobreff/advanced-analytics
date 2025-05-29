@@ -108,6 +108,57 @@ Settings::set_current_options( $settings );
 						'hint'    => \esc_html__( 'Check this if you want to generate new randomized filename for storing the error logs. This will always be uncheck if you refresh, check it only if you want new file name to be generated, and press Save Changes button. You are free to set whatever directory and file name you like above, but keep in mind that it needs to be writable from the script otherwise it wont work.', '0-day-analytics' ),
 					)
 				);
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'WP Script Debug', '0-day-analytics' ),
+						'id'      => 'wp_script_debug',
+						'type'    => 'checkbox',
+						'default' => $env_info['script_debug'],
+					)
+				);
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'WP Save Queries', '0-day-analytics' ),
+						'id'      => 'wp_save_queries',
+						'type'    => 'checkbox',
+						'default' => $env_info['save_queries'],
+					)
+				);
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'WP Environment Type', '0-day-analytics' ),
+						'id'      => 'wp_environment_type',
+						'type'    => 'select',
+						'default' => $env_info['wp_environment_type'],
+						'options' => array(
+							'production'  => \esc_html__( 'Production', '0-day-analytics' ),
+							'local'       => \esc_html__( 'Local', '0-day-analytics' ),
+							'development' => \esc_html__( 'Development', '0-day-analytics' ),
+							'staging'     => \esc_html__( 'Staging', '0-day-analytics' ),
+
+						),
+					)
+				);
+
+				Settings::build_option(
+					array(
+						'name'    => \esc_html__( 'WP Development Mode', '0-day-analytics' ),
+						'id'      => 'wp_development_mode',
+						'type'    => 'select',
+						'default' => $env_info['wp_development_mode'],
+						'options' => array(
+							''       => \esc_html__( 'Disabled', '0-day-analytics' ),
+							'core'   => \esc_html__( 'Core', '0-day-analytics' ),
+							'plugin' => \esc_html__( 'Plugin', '0-day-analytics' ),
+							'theme'  => \esc_html__( 'Theme', '0-day-analytics' ),
+							'all'    => \esc_html__( 'Staging', '0-day-analytics' ),
+
+						),
+					)
+				);
 			}
 		}
 	}

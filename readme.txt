@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.8.3
+Stable tag: 1.8.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -63,6 +63,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 4. **Cron manager** - Build-in is very powerful cron manager.
 
 == Changelog ==
+
+= 1.8.4 =  
+* Added control for more WP core constants as WP_DEVELOPMENT_MODE, SCRIPT_DEBUG, SAVEQUERIES etc. Added evnironment type show in the Admin bar (WP_ENVIRONMENT_TYPE). Added code viewer optins in the details section of error log. UI fixes and code optimizations.
 
 = 1.8.3 =  
 * Lots of UI fixes and code showing optimizations.
