@@ -97,13 +97,13 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 * @param string $action Nonce action.
 		 * @param string $nonce_name Nonce name.
 		 *
-		 * @return void
+		 * @return bool|void
 		 *
 		 * @throws \Exception If the nonce is invalid or the user does not have the required capability.
 		 *
 		 * @since 1.4.0
 		 */
-		public static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ): void {
+		public static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ) {
 			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
 				\wp_send_json_error( 'Insufficient permissions.', 403 );
 				\wp_die();
@@ -113,6 +113,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				\wp_send_json_error( 'Insufficient permissions or invalid nonce.', 403 );
 				\wp_die();
 			}
+
+			return \true;
 		}
 
 		/**

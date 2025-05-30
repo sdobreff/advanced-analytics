@@ -127,5 +127,31 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			return substr( $transient, $pos, strlen( $transient ) );
 		}
+
+		/**
+		 * Retrieve a transient by its ID
+		 *
+		 * @param  int $id - The ID of the transient to retrieve.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function get_transient_by_id( $id = 0 ) {
+			global $wpdb;
+
+			$id = \absint( $id );
+
+			// Bail if empty ID.
+			if ( empty( $id ) ) {
+				return false;
+			}
+
+			// Prepare.
+			$prepared = $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_id = %d", $id );
+
+			// Query
+			return $wpdb->get_row( $prepared, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+		}
 	}
 }

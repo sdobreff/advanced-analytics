@@ -159,6 +159,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
 
+			// \add_action( 'admin_print_styles', array( __CLASS__, 'print_styles' ) );
+			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
+
 			/**
 			 * Draws the save button in the settings
 			 */
@@ -180,6 +183,54 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
+		}
+
+		public static function print_styles() {
+			$action = ! empty( $_REQUEST['action'] )
+			? sanitize_key( $_REQUEST['action'] )
+			: '';
+
+			if ( 'edit_transient' === $action ) {
+				// Try to enqueue the code editor.
+				$settings = \wp_enqueue_code_editor(
+					array(
+						'type'       => 'text/plain',
+						'codemirror' => array(
+							'indentUnit' => 4,
+							'tabSize'    => 4,
+						),
+					)
+				);
+
+				// Bail if user disabled CodeMirror.
+				if ( false === $settings ) {
+					return;
+				}
+
+				// Target the textarea.
+				\wp_add_inline_script(
+					'code-editor',
+					sprintf(
+						'jQuery( function() { wp.codeEditor.initialize( "transient-editor", %s ); } );',
+						wp_json_encode( $settings )
+					)
+				);
+
+				// Custom styling.
+				\wp_add_inline_style(
+					'code-editor',
+					'.CodeMirror-wrap {
+                    width: 99%;
+                    border: 1px solid #8c8f94;
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+                .CodeMirror-gutters {
+                    background: transparent;
+                }'
+				);
+
+			}
 		}
 
 		/**
@@ -639,32 +690,87 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				}
 			</script>
 			<?php
-			$transients = new Transients_List( array() );
-			$transients->prepare_items();
-			?>
-			<div class="wrap">
-				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
-				<form id="transients-filter" method="get">
-				<?php
 
-				$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-				$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+			$action = ! empty( $_REQUEST['action'] )
+			? sanitize_key( $_REQUEST['action'] )
+			: '';
 
-				printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-				printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
-
-				echo '<div style="clear:both; float:right">';
-				$transients->search_box(
-					__( 'Search', '0-day-analytics' ),
-					strtolower( $transients::get_table_name() ) . '-find'
-				);
-				echo '</div>';
-				$transients->display();
+			if ( ! empty( $action ) && ( 'edit_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
+			) {
+				$transient_id = ! empty( $_REQUEST['trans_id'] )
+				? absint( $_REQUEST['trans_id'] )
+				: 0;
+				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
+				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
+				$expiration   = Transients_List::get_transient_expiration_time( $transient['option_value'] );
 
 				?>
-				</form>
-			</div>
-			<?php
+				<div class="wrap">
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
+					<hr class="wp-header-end">
+
+					<form method="post">
+						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
+						<input type="hidden" name="action" value="update_transient" />
+						<?php \wp_nonce_field( 'transients_manager' ); ?>
+
+						<table class="form-table">
+							<tbody>
+								<tr>
+									<th><?php esc_html_e( 'Option ID', '0-day-analytics' ); ?></th>
+									<td><input type="text" disabled class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_id'] ); ?>" /></td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
+									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_name'] ); ?>" /></td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
+									<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" />
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
+									<td>
+										<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $transient['option_value'] ); ?></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<p class="submit">
+							<?php \submit_button( '', 'primary', '', false ); ?>
+						</p>
+					</form>
+				</div>
+				<?php
+			} else {
+				$transients = new Transients_List( array() );
+				$transients->prepare_items();
+				?>
+				<div class="wrap">
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
+					<form id="transients-filter" method="get">
+					<?php
+
+					$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+					$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+
+					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
+					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+
+					echo '<div style="clear:both; float:right">';
+					$transients->search_box(
+						__( 'Search', '0-day-analytics' ),
+						strtolower( $transients::get_table_name() ) . '-find'
+					);
+					echo '</div>';
+					$transients->display();
+
+					?>
+					</form>
+				</div>
+				<?php
+			}
 		}
 
 		/**

@@ -544,7 +544,18 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 					$actions['delete'] = '<a class="aadvana-transient-delete" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-id="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
-					// $actions['run'] = '<a class="aadvana-transient-run" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Run', '0-day-analytics' ) . '</a>';
+					$edit_url = remove_query_arg(
+						array( 'updated', 'deleted' ),
+						add_query_arg(
+							array(
+								'action'   => 'edit_transient',
+								'trans_id' => $item['id'],
+								'_wpnonce' => $query_args_view_data['_wpnonce'],
+							)
+						)
+					);
+
+					$actions['edit'] = '<a class="aadvana-transient-run" href="' . $edit_url . '">' . \esc_html__( 'Edit', '0-day-analytics' ) . '</a>';
 
 					return '<span><b>' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'schedule':
@@ -836,7 +847,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 */
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {
-				wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+				\wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 
 				?>
 				<script>
@@ -987,7 +998,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 *
 		 * @since 1.7.0
 		 */
-		private static function get_transient_expiration_time( $transient ): int {
+		public static function get_transient_expiration_time( $transient ): int {
 
 			// Get the same to use in the option key.
 			$name = Transients_Helper::get_transient_name( $transient );
