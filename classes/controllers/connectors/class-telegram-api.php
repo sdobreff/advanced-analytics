@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.8.5
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 	/**
 	 * Responsible for communication with the Telegram API.
 	 *
-	 * @since latest
+	 * @since 1.8.5
 	 */
 	class Telegram_API {
 
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static $error = null;
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static $valid_message = null;
 
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		 * @param string $channel_id - The ID of the channel.
 		 * @param string $text   - Text body to send.
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function send_telegram_message_via_api( ?string $bot_token, ?string $channel_id, string $text ) {
 
@@ -96,7 +96,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function verify_telegram_token( $token ) {
 			if ( empty( $token ) ) {
@@ -134,7 +134,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		/**
 		 * Returns the error stored from Telegram.
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_telegram_error(): string {
 			$error = self::$error;
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function send_with_button( $text, $button_text, $url ) {
 			$args['body']['reply_markup'] = json_encode(

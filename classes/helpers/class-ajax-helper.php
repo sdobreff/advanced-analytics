@@ -283,7 +283,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function store_telegram_api_key_ajax() {
 			WP_Helper::verify_admin_nonce( Telegram::NONCE_NAME );

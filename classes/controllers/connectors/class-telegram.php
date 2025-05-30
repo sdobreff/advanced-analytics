@@ -4,7 +4,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.8.5
  */
 
 declare(strict_types=1);
@@ -24,7 +24,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 	/**
 	 * Responsible for setting different Telegram settings
 	 *
-	 * @since latest
+	 * @since 1.8.5
 	 */
 	class Telegram {
 
@@ -35,7 +35,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		protected static $auth_key = null;
 
@@ -44,7 +44,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		private static $settings = null;
 
@@ -53,7 +53,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @var bool
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		private static $is_set = null;
 
@@ -62,7 +62,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function is_set() {
 			if ( null === self::$is_set ) {
@@ -90,7 +90,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function js_wizard_settings( array $settings ): array {
 			$settings['storeKey'] = true;
@@ -103,7 +103,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_settings(): array {
 			if ( null === self::$settings ) {
@@ -120,7 +120,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function set_settings( array $options ): void {
 			// Sanitize each setting value.
@@ -138,7 +138,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return bool|string
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_telegram_auth_key() {
 			if ( null === self::$auth_key ) {
@@ -156,7 +156,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return bool|string
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_telegram_channel() {
 			return self::get_settings()['channel'];
@@ -169,7 +169,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_telegram_setting( string $setting ) {
 			if ( ! isset( $setting ) ) {
