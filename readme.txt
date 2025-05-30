@@ -1,5 +1,5 @@
 === Advanced Analytics ===
-Tags: log, error log, 0-day, analytics, cron, crons, transients
+Tags: log, error log, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
