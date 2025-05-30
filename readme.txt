@@ -3,7 +3,7 @@ Tags: log, error log, 0-day, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.8.4.1
+Stable tag: 1.8.5
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -61,8 +61,12 @@ The plugin autodetects default error log location, usually WordPress defines tha
 2. **Settings Page** - Toggle logging options and configure advanced settings.
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 4. **Cron manager** - Build-in is very powerful cron manager.
+5. **Transients manager** - Build-in is very powerful transients manager.
 
 == Changelog ==
+
+= 1.8.5 =  
+* Bug fixes and code optimizations. Telegram notifications support.
 
 = 1.8.4.1 =  
 * Fixed problem with init hook called too early.
