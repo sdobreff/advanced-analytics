@@ -22,12 +22,14 @@ use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Migration\Migration;
 use ADVAN\Controllers\Pointers;
+use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Helpers\Review_Plugin;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Controllers\Integrations;
+use ADVAN\Controllers\Telegram_API;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
 use ADVAN\Controllers\Display_Environment_Type;
@@ -50,8 +52,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function init() {
 			if ( \is_admin() && ! \wp_doing_ajax() ) {
-				// \add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 0, 3 );
-				// \add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 20, 3 );
+				\add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 0, 3 );
+				\add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 20, 3 );
 				// \add_filter( 'doing_it_wrong_trigger_error', array( __CLASS__, 'filter_doing_it_wrong_trigger_error' ), 10, 4 );
 
 				Migration::migrate();
@@ -60,7 +62,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// \add_action( 'current_screen', array( '\AWEF\Helpers\Upgrade_Notice', 'init' ) );
 
-				// Setup screen options. Needs to be here as admin_init hook it too late.
+				// Setup screen options. Needs to be here as admin_init hook is too late.
 				\add_filter( 'set-screen-option', array( Logs_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'set-screen-option', array( Transients_List::class, 'set_screen_option' ), 10, 3 );
@@ -287,6 +289,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 					// Send error to Slack.
 					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . WP_Error_Handler::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
 				}
+
+				if ( Telegram::is_set() ) {
+					// Send error to \Telegram.
+					Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . WP_Error_Handler::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+				}
 			}
 		}
 
@@ -309,6 +316,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( Slack::is_set() ) {
 				// Send error to Slack.
 				Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+			}
+
+			if ( Telegram::is_set() ) {
+				// Send error to \Telegram.
+				Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
 			}
 
 			$main_shown = false;

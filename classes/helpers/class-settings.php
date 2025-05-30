@@ -16,9 +16,11 @@ namespace ADVAN\Helpers;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Controllers\Slack;
+use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Lists\Transients_List;
+use ADVAN\Controllers\Telegram_API;
 use ADVAN\Settings\Settings_Builder;
 
 // Exit if accessed directly.
@@ -34,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '6'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '7'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -242,6 +244,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'live_notifications_admin_bar' => true,
 					'environment_type_admin_bar'   => true,
 					'slack_notifications'          => array(
+						'all' => array(
+							'channel'    => '',
+							'auth_token' => '',
+						),
+					),
+					'telegram_notifications'       => array(
 						'all' => array(
 							'channel'    => '',
 							'auth_token' => '',
@@ -1114,7 +1122,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				$events = Logs_List::get_error_items( false );
+				$events = Logs_List::get_error_items( false, false, true );
 
 				$event = reset( $events );
 
@@ -1283,6 +1291,28 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['slack_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_slack_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_slack_channel'] ) ) : '';
 
+			$advanced_options['telegram_notifications']['all'] = array();
+
+			if ( array_key_exists( 'telegram_notification_auth_token', $post_array ) ) {
+
+				$telegram_token = ( array_key_exists( 'telegram_notification_auth_token', $post_array ) && ! empty( $post_array['telegram_notification_auth_token'] ) ) ? \sanitize_text_field( \wp_unslash( $post_array['telegram_notification_auth_token'] ) ) : '';
+
+				if ( ! empty( $telegram_token ) ) {
+
+					if ( 'REMOVE' === $telegram_token ) {
+						$advanced_options['telegram_notifications']['all']['auth_token'] = '';
+					} elseif ( Telegram_API::verify_telegram_token( $telegram_token ) ) {
+						$advanced_options['telegram_notifications']['all']['auth_token'] = $telegram_token;
+					}
+				} elseif ( Telegram::is_set() ) {
+					$advanced_options['telegram_notifications']['all']['auth_token'] = Telegram::get_telegram_auth_key();
+				}
+			} elseif ( Telegram::is_set() ) {
+				$advanced_options['telegram_notifications']['all']['auth_token'] = Telegram::get_telegram_auth_key();
+			}
+
+			$advanced_options['telegram_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_telegram_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_telegram_channel'] ) ) : '';
+
 			self::$current_options = $advanced_options;
 
 			if ( ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
@@ -1326,7 +1356,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( $wp_debug_log_enable ) {
 					$wp_debug_log_generate = ( array_key_exists( 'wp_debug_log_file_generate', $post_array ) ) ? filter_var( $post_array['wp_debug_log_file_generate'], FILTER_VALIDATE_BOOLEAN ) : false;
 
-					$wp_debug_log_filename = ( array_key_exists( 'wp_debug_log_filename', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['wp_debug_log_filename'] ) ) : '';
+					$wp_debug_log_filename = ( array_key_exists( 'wp_debug_log_filename', $post_array ) ) ? \sanitize_text_field( $post_array['wp_debug_log_filename'] ) : '';
 
 					if ( ! empty( $wp_debug_log_filename ) && Error_Log::autodetect() !== $wp_debug_log_filename ) {
 

@@ -12,7 +12,7 @@
  *
  * Plugin Name:     Advanced Analytics
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.8.4.1
+ * Version:         1.8.5
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.8.4.1' );
+define( 'ADVAN_VERSION', '1.8.5' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'Advanced Analysis' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -48,7 +48,7 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 	\add_action(
 		'admin_init',
 		static function () {
-			\deactivate_plugins( plugin_basename( __FILE__ ) );
+			\deactivate_plugins( \plugin_basename( __FILE__ ) );
 		}
 	);
 	\add_action(
@@ -65,36 +65,6 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 						),
 						ADVAN_NAME,
 						ADVAN_MIN_PHP_VERSION
-					)
-				)
-			);
-		}
-	);
-
-	// Return early to prevent loading the plugin.
-	return;
-}
-
-// Check mbstring extension.
-if ( ! extension_loaded( 'mbstring' ) ) {
-	\add_action(
-		'admin_init',
-		static function () {
-			\deactivate_plugins( \plugin_basename( __FILE__ ) );
-		}
-	);
-	\add_action(
-		'admin_notices',
-		static function () {
-			echo \wp_kses_post(
-				sprintf(
-					'<div class="notice notice-error"><p>%s</p></div>',
-					sprintf(
-						// translators: the mbstring extensions is required by the plugin.
-						__(
-							'"%1$s" requires multi byte string extension loaded. Plugin is automatically deactivated.',
-							'0-day-analytics'
-						)
 					)
 				)
 			);

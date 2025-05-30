@@ -64,7 +64,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 			$url  = 'https://slack.com/api/chat.postMessage';
 			$data = array(
 				'channel' => $channel_name,
-				'text'    => ':warning: ' . $text,
+				'text'    => ':warning: ' . \wp_kses_post( $text ),
 			);
 
 			$headers = array(
@@ -78,7 +78,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 				'body'    => json_encode( $data ),
 			);
 
-			$response = \wp_remote_post( $url, $args );
+			$response = \wp_remote_post( \esc_url_raw( $url ), $args );
 
 			if ( \is_wp_error( $response ) ) {
 				self::$error = $response->get_error_message();
@@ -99,6 +99,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 		 * @since 1.8.0
 		 */
 		public static function verify_slack_token( $token ) {
+			if ( empty( $token ) ) {
+				return new \WP_Error( 'slack_config', 'Bot token not configured' );
+			}
+
 			$url     = 'https://slack.com/api/auth.test';
 			$headers = array(
 				'Content-Type'  => 'application/x-www-form-urlencoded',
@@ -110,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 				'headers' => $headers,
 			);
 
-			$response = \wp_remote_post( $url, $args );
+			$response = \wp_remote_post( \esc_url_raw( $url ), $args );
 
 			if ( \is_wp_error( $response ) ) {
 				self::$error = $response->get_error_message();

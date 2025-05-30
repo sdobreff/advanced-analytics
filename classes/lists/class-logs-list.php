@@ -350,12 +350,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?.
 		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
+		 * @param bool $first_only - If true, only the first item will be returned.
 		 *
 		 * @return array
 		 *
 		 * @since 1.1.0
 		 */
-		public static function get_error_items( bool $write_temp = true, $items = false ): array {
+		public static function get_error_items( bool $write_temp = true, $items = false, bool $first_only = false ): array {
 
 			// if ( empty( self::$read_items ) ) { .
 			$collected_items = array();
@@ -386,6 +387,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$items = ( ! $items ) ? self::get_screen_option_per_page() : $items;
 
 			while ( empty( $errors ) ) {
+
+				$disabled = Settings::get_disabled_severities();
 
 				while ( $items > 0 ) {
 					$result = Reverse_Line_Reader::read_file_from_end(
@@ -452,22 +455,37 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$write_temp
 					);
 
+					if ( ! empty( $disabled ) ) {
+
+						$last_error = end( $errors );
+
+						if ( isset( $last_error['severity'] ) && \in_array( $last_error['severity'], $disabled, true ) ) {
+							// Remove the last error if it is disabled.
+							array_pop( $errors );
+						}
+					}
+
+					if ( $first_only && ! empty( $errors ) ) {
+						// If we only want the first item, return it.
+						return array( reset( $errors ) );
+					}
+
+					// if ( ! empty( $disabled ) ) {
+					// 	foreach ( $disabled as $severity ) {
+					// 		foreach ( $errors as $key => $error ) {
+					// 			if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
+					// 				unset( $errors[ $key ] );
+					// 			}
+					// 		}
+					// 	}
+					// }
+
 					if ( false === $result ) {
 						break 2;
 					}
 				}
 			}
 
-			$disabled = Settings::get_disabled_severities();
-			if ( ! empty( $disabled ) ) {
-				foreach ( $disabled as $severity ) {
-					foreach ( $errors as $key => $error ) {
-						if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
-							unset( $errors[ $key ] );
-						}
-					}
-				}
-			}
 			// self::$read_items = $errors;
 			// }
 

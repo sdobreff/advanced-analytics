@@ -112,7 +112,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					$source = strtolower( trim( $matches['source'] ) );
 				}
 				/*
-				 Attempt to extract the file name and line number from the message.
+				Attempt to extract the file name and line number from the message.
 				*
 				* spprintf(&log_buffer, 0, "PHP %s:  %s in %s on line %" PRIu32, error_type_str, buffer, error_filename, error_lineno);
 				php_log_err_with_severity(log_buffer, syslog_type_int);
@@ -120,11 +120,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 				zend_error_va(severity, (file && ZSTR_LEN(file) > 0) ? ZSTR_VAL(file) : NULL, line,
 				"Uncaught %s\n  thrown", ZSTR_VAL(str));
 				*/
-				if ( preg_match( '/(?:in\s+([^\s]+(?:[\\\\\/][^\s]+)*)\s+on\s+line\s+(\d+)|([^\s:]+(?:[\\\\\/][^\s:]+)*)[:](\d+))/', $message, $matches ) ) {
+				if ( preg_match( '/(?:in\s+([^\s]+(?:[\\\\\/][^\s]+)*)\s+on\s+line\s+(\d+)|([^\s]+(?:[\\\\\/][^\s:]+)*)[:](\d+))/', $message, $matches ) ) {
+
 					$error_file = $matches[1] ? $matches[1] : $matches[3];
 
-					$error_line = $matches[2] ? $matches[2] : $matches[4];
+					if ( \is_file( $error_file ) ) {
+						// If the file exists, we can use it.
 
+						$error_line = $matches[2] ? $matches[2] : $matches[4];
+					} else {
+						$error_file = null;
+					}
 				}
 
 				// Does this line contain contextual data for another error?

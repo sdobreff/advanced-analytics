@@ -14,8 +14,10 @@ namespace ADVAN\Helpers;
 use ADVAN\Helpers\Settings;
 use ADVAN\Controllers\Slack;
 use ADVAN\Helpers\WP_Helper;
+use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
+use ADVAN\Controllers\Telegram_API;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,6 +78,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\add_action( 'wp_ajax_aadvana_store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
 
 				/**
+				 * Store Telegram API key
+				 */
+				\add_action( 'wp_ajax_aadvana_store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
+
+				/**
 				 * Show the code source
 				 *
 				 * @return void
@@ -112,9 +119,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function download_log_file() {
-			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
-				\wp_send_json_error( 'Insufficient permissions.', 403 );
-			}
 
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
@@ -252,40 +256,55 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 * @since 1.8.0
 		 */
 		public static function store_slack_api_key_ajax() {
-			if ( \wp_doing_ajax() ) {
-				if ( isset( $_REQUEST['_wpnonce'] ) ) {
-					$nonce_check = \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) ), Slack::NONCE_NAME );
-					if ( ! $nonce_check ) {
-						\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Nonce checking failed', '0-day-analytics' ) ), 400 );
-					}
-				} else {
-					\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Nonce is not provided', '0-day-analytics' ) ), 400 );
+
+			WP_Helper::verify_admin_nonce( Slack::NONCE_NAME );
+
+			if ( isset( $_REQUEST['slack_auth'] ) && ! empty( $_REQUEST['slack_auth'] ) ) {
+				$slack_valid =
+				Slack_API::verify_slack_token(
+					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ),
+				);
+				if ( $slack_valid ) {
+					$options = Slack::get_settings();
+
+					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) );
+
+					Slack::set_settings( $options );
+
+					\wp_send_json_success();
 				}
-			} else {
-				\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Not allowed', '0-day-analytics' ) ), 400 );
+
+				\wp_send_json_error( __( 'SLACK: No token provided or the provided one is invalid. Please check and provide the details again.', '0-day-analytics' ) . Slack_API::get_slack_error() );
 			}
+		}
 
-			if ( \current_user_can( 'manage_options' ) ) {
+		/**
+		 * Stores the Slack Credentials key via AJAX request
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function store_telegram_api_key_ajax() {
+			WP_Helper::verify_admin_nonce( Telegram::NONCE_NAME );
 
-				if ( isset( $_REQUEST['slack_auth'] ) && ! empty( $_REQUEST['slack_auth'] ) ) {
-					$slack_valid =
-					Slack_API::verify_slack_token(
-						(string) \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ),
-					);
-					if ( $slack_valid ) {
-						$options = Slack::get_settings();
+			if ( isset( $_REQUEST['telegram_auth'] ) && ! empty( $_REQUEST['telegram_auth'] ) ) {
+				$telegram_valid =
+				Telegram_API::verify_telegram_token(
+					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) ),
+				);
+				if ( $telegram_valid ) {
+					$options = Telegram::get_settings();
 
-						$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) );
+					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) );
 
-						Slack::set_settings( $options );
+					Telegram::set_settings( $options );
 
-						\wp_send_json_success();
-					}
-
-					\wp_send_json_error( __( 'SLACK: No token provided or the provided one is invalid. Please check and provide the details again.', '0-day-analytics' ) . Slack_API::get_slack_error() );
+					\wp_send_json_success();
 				}
+
+				\wp_send_json_error( __( 'TELEGRAM: No token provided or the provided one is invalid. Please check and provide the details again.', '0-day-analytics' ) . Telegram_API::get_telegram_error() );
 			}
-			\wp_send_json_error( new \WP_Error( 500, \esc_html__( 'Not allowed', '0-day-analytics' ) ), 400 );
 		}
 
 		/**
