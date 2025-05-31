@@ -699,7 +699,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$transient = \sanitize_key( $_REQUEST['transient'] );
 
 			// Site wide.
-			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field(\wp_unslash( $_REQUEST['name']) ) );
+			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field( \wp_unslash( $_REQUEST['name'] ) ) );
 
 			Transients_Helper::update_transient( $transient, $site_wide );
 
