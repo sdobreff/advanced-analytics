@@ -162,6 +162,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// \add_action( 'admin_print_styles', array( __CLASS__, 'print_styles' ) );
 			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 
+			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( __CLASS__, 'update_transient' ) );
+
 			/**
 			 * Draws the save button in the settings
 			 */
@@ -185,6 +187,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 		}
 
+		/**
+		 * Responsible for printing the styles for the CodeMirror editor.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function print_styles() {
 			$action = ! empty( $_REQUEST['action'] )
 			? sanitize_key( $_REQUEST['action'] )
@@ -669,6 +678,47 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			<?php
 		}
 
+		public static function update_transient() {
+
+			// Bail if malformed Transient request.
+			if ( empty( $_REQUEST['transient'] ) ) {
+				return;
+			}
+
+			// Bail if nonce fails.
+			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( 'advana_transients_manager' ) ) {
+				return;
+			}
+
+			// Encode search string.
+			$search = ! empty( $_REQUEST['s'] )
+			? urlencode( $_REQUEST['s'] )
+			: '';
+
+			// Sanitize transient.
+			$transient = \sanitize_key( $_REQUEST['transient'] );
+
+			// Site wide.
+			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field(\wp_unslash( $_REQUEST['name']) ) );
+
+			Transients_Helper::update_transient( $transient, $site_wide );
+
+			\wp_safe_redirect(
+				\remove_query_arg(
+					array( 'deleted' ),
+					add_query_arg(
+						array(
+							'page'    => $this->page_id,
+							's'       => $search,
+							'updated' => true,
+						),
+						\admin_url( 'tools.php' )
+					)
+				)
+			);
+			exit;
+		}
+
 		/**
 		 * Displays the transients page.
 		 *
@@ -702,17 +752,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				: 0;
 				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
 				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
-				$expiration   = Transients_List::get_transient_expiration_time( $transient['option_value'] );
+				$expiration   = Transients_List::get_transient_expiration_time( $transient['option_name'] );
 
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
 
-					<form method="post">
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
-						<input type="hidden" name="action" value="update_transient" />
-						<?php \wp_nonce_field( 'transients_manager' ); ?>
+						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::UPDATE_ACTION ); ?>" />
+						<?php \wp_nonce_field( 'advana_transients_manager' ); ?>
 
 						<table class="form-table">
 							<tbody>

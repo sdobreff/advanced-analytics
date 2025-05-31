@@ -150,8 +150,44 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			// Prepare.
 			$prepared = $wpdb->prepare( "SELECT * FROM {$wpdb->options} WHERE option_id = %d", $id );
 
-			// Query
+			// Query.
 			return $wpdb->get_row( $prepared, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
+		}
+
+		/**
+		 * Update an existing transient
+		 *
+		 * @param  array   $transient - The transient to update.
+		 * @param  boolean $site_wide - Is the transient site-wide?.
+		 *
+		 * @return boolean
+		 *
+		 * @since latest
+		 */
+		public static function update_transient( $transient = '', $site_wide = false ) {
+
+			// Bail if no Transient.
+			if ( empty( $transient ) ) {
+				return false;
+			}
+
+			if ( ! isset( $_POST['value'], $_POST['expires'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return false;
+			}
+
+			// Values.
+			$value      = stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+			// Subtract now.
+			$expiration = ( $expiration - time() );
+
+			// Transient type.
+			$retval = ( false !== $site_wide )
+			? \set_site_transient( $transient, $value, $expiration )
+			: \set_transient( $transient, $value, $expiration );
+
+			return $retval;
 		}
 	}
 }

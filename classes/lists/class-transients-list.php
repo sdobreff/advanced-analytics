@@ -41,6 +41,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 		public const PAGE_SLUG = 'wp-control_page_advan_transients';
 
+		public const UPDATE_ACTION = 'advan_transients_update';
+
 		public const SEARCH_INPUT = 'sgp';
 
 		/**
