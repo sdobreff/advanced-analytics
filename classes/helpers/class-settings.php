@@ -159,10 +159,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
 
-			// \add_action( 'admin_print_styles', array( __CLASS__, 'print_styles' ) );
 			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
+			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 
 			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( __CLASS__, 'update_transient' ) );
+			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( __CLASS__, 'update_cron' ) );
 
 			/**
 			 * Draws the save button in the settings
@@ -199,7 +200,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			? sanitize_key( $_REQUEST['action'] )
 			: '';
 
-			if ( 'edit_transient' === $action ) {
+			if ( \in_array( $action, array( 'edit_transient', 'edit_cron' ), true ) ) {
 				// Try to enqueue the code editor.
 				$settings = \wp_enqueue_code_editor(
 					array(
@@ -637,47 +638,141 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				}
 			</script>
 			<?php
-			$events_list = new Crons_List( array() );
-			$events_list->prepare_items();
-			?>
-			<div class="wrap">
-				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
-				<form id="crons-filter" method="get">
-				<?php
 
-				$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-				$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+			$action = ! empty( $_REQUEST['action'] )
+			? sanitize_key( $_REQUEST['action'] )
+			: '';
 
-				printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-				printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+			if ( ! empty( $action ) && ( 'edit_cron' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
+						) {
+				$cron_hash = ! empty( $_REQUEST['hash'] )
+				? \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) )
+				: false;
+				if ( ! $cron_hash ) {
+					\wp_die( \esc_html__( 'Invalid cron hash.', '0-day-analytics' ) );
+				}
+				$cron = Crons_Helper::get_event( $cron_hash );
 
-				echo '<div style="clear:both; float:right">';
-				$events_list->search_box(
-					__( 'Search', '0-day-analytics' ),
-					strtolower( $events_list::get_table_name() ) . '-find'
-				);
-				echo '</div>';
-
-				$status = WP_Helper::check_cron_status();
-
-				if ( \is_wp_error( $status ) ) {
-					if ( 'cron_info' === $status->get_error_code() ) {
-						?>
-						<div id="cron-status-notice" class="notice notice-info">
-							<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-						</div>
-						<?php
-					}
+				if ( $cron ) {
+					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $cron['schedule'] );
+					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+				} else {
+					$suggestion          = strtotime( '+1 hour' );
+					$next_run_date_local = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $suggestion ), 'Y-m-d' );
+					$next_run_time_local = get_date_from_gmt( gmdate( 'Y-m-d H:\0\0:\0\0', $suggestion ), 'H:i:s' );
 				}
 
-				$events_list->display();
+				$arguments = \wp_json_encode( (array) $cron['args'] );
 
 				?>
-				</form>
-			</div>
-			<?php
+				<div class="wrap">
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Cron', '0-day-analytics' ); ?></h1>
+					<hr class="wp-header-end">
+	
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+						<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
+						<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
+						<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::UPDATE_ACTION ); ?>" />
+						<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
+
+						<table class="form-table">
+							<tbody>
+								<tr>
+									<th><?php esc_html_e( 'Hook', '0-day-analytics' ); ?></th>
+									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $cron['hook'] ); ?>" /></td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Next Run', '0-day-analytics' ); ?></th>
+									<td>
+										<?php
+										printf(
+											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
+											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
+											esc_attr( $next_run_date_local ),
+											esc_attr( $next_run_time_local )
+										);
+										?>
+									</td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Arguments', '0-day-analytics' ); ?></th>
+									<td>
+										<textarea class="large-text code" name="cron_args" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $arguments ); ?></textarea>
+										<?php
+										printf(
+										/* translators: 1, 2, and 3: Example values for an input field. */
+											esc_html__( 'Use a JSON encoded array, e.g. %1$s, %2$s, or %3$s', 'wp-crontrol' ),
+											'<code>[25]</code>',
+											'<code>["asdf"]</code>',
+											'<code>["i","want",25,"cakes"]</code>'
+										);
+										?>
+									</td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Schedule', '0-day-analytics' ); ?></th>
+									<td><?php Crons_Helper::schedule_drop_down( $cron['recurrence'] ); ?></td>
+								</tr>
+							</tbody>
+						</table>
+	
+						<p class="submit">
+							<?php \submit_button( '', 'primary', '', false ); ?>
+						</p>
+					</form>
+				</div>
+				<?php
+			} else {
+				$events_list = new Crons_List( array() );
+				$events_list->prepare_items();
+				?>
+				<div class="wrap">
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
+					<form id="crons-filter" method="get">
+					<?php
+
+								$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+								$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+
+								printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
+								printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+
+								echo '<div style="clear:both; float:right">';
+								$events_list->search_box(
+									__( 'Search', '0-day-analytics' ),
+									strtolower( $events_list::get_table_name() ) . '-find'
+								);
+					echo '</div>';
+
+					$status = WP_Helper::check_cron_status();
+
+					if ( \is_wp_error( $status ) ) {
+						if ( 'cron_info' === $status->get_error_code() ) {
+							?>
+							<div id="cron-status-notice" class="notice notice-info">
+								<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+							</div>
+							<?php
+						}
+					}
+
+					$events_list->display();
+
+					?>
+					</form>
+				</div>
+				<?php
+			}
 		}
 
+		/**
+		 * Collects all the data from the form and updates the transient.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function update_transient() {
 
 			// Bail if malformed Transient request.
@@ -689,11 +784,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Transients_List::NONCE_NAME ) ) {
 				return;
 			}
-
-			// Encode search string.
-			$search = ! empty( $_REQUEST[ Transients_List::SEARCH_INPUT ] )
-			? urlencode( $_REQUEST[ Transients_List::SEARCH_INPUT ] )
-			: '';
 
 			// Sanitize transient.
 			$transient = \sanitize_key( $_REQUEST['transient'] );
@@ -709,8 +799,48 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					add_query_arg(
 						array(
 							'page'                        => self::TRANSIENTS_MENU_SLUG,
-							Transients_List::SEARCH_INPUT => $search,
+							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
 							'updated'                     => true,
+						),
+						\admin_url( 'admin.php' )
+					)
+				)
+			);
+			exit;
+		}
+
+		/**
+		 * Collects all the data from the form and updates the transient.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function update_cron() {
+
+			// Bail if malformed Transient request.
+			if ( empty( $_REQUEST['hash'] ) ) {
+				return;
+			}
+
+			// Bail if nonce fails.
+			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Crons_List::NONCE_NAME ) ) {
+				return;
+			}
+
+			// Sanitize transient.
+			$cron_hash = \sanitize_key( $_REQUEST['hash'] );
+
+			Crons_Helper::update_cron( $cron_hash );
+
+			\wp_safe_redirect(
+				\remove_query_arg(
+					array( 'deleted' ),
+					add_query_arg(
+						array(
+							'page'                   => self::CRON_MENU_SLUG,
+							Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
+							'updated'                => true,
 						),
 						\admin_url( 'admin.php' )
 					)
@@ -777,7 +907,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 								</tr>
 								<tr>
 									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" />
+									<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" /></td>
 								</tr>
 								<tr>
 									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>

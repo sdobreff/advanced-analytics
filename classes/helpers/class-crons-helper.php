@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Lists\Crons_List;
+use ADVAN\Helpers\Settings;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -139,6 +142,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		}
 
 		/**
+		 * Returns a cron event by its hash
+		 *
+		 * @param string $hash - The hash of the event to retrieve.
+		 *
+		 * @return array|bool
+		 *
+		 * @since latest
+		 */
+		public static function get_event( string $hash ) {
+			$events = self::get_events();
+			if ( isset( $events[ $hash ] ) ) {
+				return $events[ $hash ];
+			}
+
+			return false;
+		}
+
+		/**
 		 * Removes all cron events for a specific hook
 		 *
 		 * @param string $hook The action hook name.
@@ -227,5 +248,124 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 
 			return ( $until < ( 0 - ( 10 * MINUTE_IN_SECONDS ) ) );
 		}
+
+		/**
+		 * Shows select drop-down for cron schedules.
+		 *
+		 * @param boolean $current - Currently selected schedule.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function schedule_drop_down( $current = false ) {
+			$schedules = \wp_get_schedules();
+			uasort( $schedules, array( Crons_List::class, 'sort_schedules' ) );
+			?>
+			<select class="postform" name="cron_schedule" id="cron_schedule" required>
+			<option <?php selected( $current, '_oneoff' ); ?> value="_oneoff"><?php esc_html_e( 'Non-repeating', 'wp-crontrol' ); ?></option>
+				<?php foreach ( $schedules as $sched_name => $sched_data ) { ?>
+				<option <?php selected( $current, $sched_name ); ?> value="<?php echo esc_attr( $sched_name ); ?>">
+					<?php
+					printf(
+						'%s (%s)',
+						esc_html( isset( $sched_data['display'] ) ? $sched_data['display'] : $sched_data['name'] ),
+						esc_html( $sched_name )
+					);
+					?>
+				</option>
+			<?php } ?>
+			</select>
+			<?php
+		}
+
+		/**
+		 * Updates a cron event by its hash.
+		 *
+		 * @param string $hash - The hash of the event to update.
+		 *
+		 * @return void|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function update_cron( string $hash ) {
+			$cron = self::get_event( $hash );
+			if ( ! $cron ) {
+				return false;
+			}
+
+			$deleted = self::delete_event( $hash );
+
+			if ( ! $deleted || \is_wp_error( $deleted ) ) {
+
+				\wp_safe_redirect(
+					\remove_query_arg(
+						array( 'deleted' ),
+						add_query_arg(
+							array(
+								'page'                   => Settings::CRON_MENU_SLUG,
+								Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
+								'updated'                => false,
+								'cron_name'              => rawurlencode( $cron['hook'] ),
+							),
+							\admin_url( 'admin.php' )
+						)
+					)
+				);
+				exit;
+			}
+
+			$current_time = time();
+
+			$date = ( ( isset( $_REQUEST['cron_next_run_custom_date'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_date'] ) ) : '' );
+
+			$time = ( ( isset( $_REQUEST['cron_next_run_custom_time'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_time'] ) ) : '' );
+
+			$next_run_local = $date . ' ' . $time;
+
+			$next_run_local = strtotime( $next_run_local, $current_time );
+
+			if ( false === $next_run_local ) {
+				return new \WP_Error(
+					'invalid_timestamp',
+					__( 'Invalid timestamp provided.', 'wp-crontrol' )
+				);
+			}
+
+			$next_run_utc = (int) \get_gmt_from_date( \gmdate( 'Y-m-d H:i:s', $next_run_local ), 'U' );
+
+			$schedule = ( isset( $_REQUEST['cron_schedule'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_schedule'] ) ) : '' );
+
+			if ( '_oneoff' === $schedule ) {
+				$schedule = '';
+			} elseif ( ! isset( \wp_get_schedules()[ $schedule ] ) ) {
+				return new \WP_Error(
+					'invalid_schedule',
+					__( 'Invalid schedule provided.', 'wp-crontrol' )
+				);
+			}
+
+			$args = ( isset( $_REQUEST['cron_args'] ) ? \sanitize_textarea_field( \wp_unslash( $_REQUEST['cron_args'] ) ) : '' );
+
+			$args = \json_decode( $args, true );
+
+			if ( empty( $args ) || ! is_array( $args ) ) {
+				$args = array();
+			}
+
+			if ( '_oneoff' === $schedule || '' === $schedule ) {
+				$result = wp_schedule_single_event( $next_run_utc, $cron['hook'], $args, true );
+			} else {
+				$result = wp_schedule_event( $next_run_utc, $schedule, $cron['hook'], $args, true );
+			}
+
+			if ( \is_wp_error( $result ) ) {
+				return new \WP_Error(
+					'invalid_cron_parameters',
+					__( 'Cron job can not be added.', 'wp-crontrol' )
+				);
+			}
+		}
 	}
 }
+

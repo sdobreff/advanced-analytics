@@ -40,6 +40,10 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 		public const PAGE_SLUG = 'wp-control_page_advan_cron_jobs';
 
+		public const UPDATE_ACTION = 'advan_crons_update';
+
+		public const NONCE_NAME = 'advana_crons_manager';
+
 		public const SEARCH_INPUT = 'sgp';
 
 		/**
@@ -449,6 +453,20 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					$actions['delete'] = '<a class="aadvana-cron-delete" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
 					$actions['run'] = '<a class="aadvana-cron-run" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-hash="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Run', '0-day-analytics' ) . '</a>';
+
+					$edit_url = \remove_query_arg(
+						array( 'updated', 'deleted' ),
+						\add_query_arg(
+							array(
+								'action'           => 'edit_cron',
+								'hash'         => $item['hash'],
+								self::SEARCH_INPUT => self::escaped_search_input(),
+								'_wpnonce'         => $query_args_view_data['_wpnonce'],
+							)
+						)
+					);
+
+					$actions['edit'] = '<a class="aadvana-transient-run" href="' . $edit_url . '">' . \esc_html__( 'Edit', '0-day-analytics' ) . '</a>';
 
 					return '<span><b>' . $item['hook'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'recurrence':
@@ -878,7 +896,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				$this->extra_tablenav( $which );
 
 			if ( 'bottom' === $which ) {
-				$schedules = wp_get_schedules();
+				$schedules = \wp_get_schedules();
 				uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
 				?>
 				<h2><?php esc_html_e( 'Available schedules', '0-day-analytics' ); ?></h2>
@@ -914,7 +932,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @since 1.7.4
 		 */
-		private static function sort_schedules( $a, $b ) {
+		public static function sort_schedules( $a, $b ) {
 			if ( $a['interval'] == $b['interval'] ) {
 				return strcmp( $a['display'], $b['display'] );
 			}
