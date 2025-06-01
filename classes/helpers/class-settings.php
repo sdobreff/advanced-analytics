@@ -686,13 +686,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			// Bail if nonce fails.
-			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( 'advana_transients_manager' ) ) {
+			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Transients_List::NONCE_NAME ) ) {
 				return;
 			}
 
 			// Encode search string.
-			$search = ! empty( $_REQUEST['s'] )
-			? urlencode( $_REQUEST['s'] )
+			$search = ! empty( $_REQUEST[ Transients_List::SEARCH_INPUT ] )
+			? urlencode( $_REQUEST[ Transients_List::SEARCH_INPUT ] )
 			: '';
 
 			// Sanitize transient.
@@ -708,11 +708,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array( 'deleted' ),
 					add_query_arg(
 						array(
-							'page'    => $this->page_id,
-							's'       => $search,
-							'updated' => true,
+							'page'                        => self::TRANSIENTS_MENU_SLUG,
+							Transients_List::SEARCH_INPUT => $search,
+							'updated'                     => true,
 						),
-						\admin_url( 'tools.php' )
+						\admin_url( 'admin.php' )
 					)
 				)
 			);
@@ -761,8 +761,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
+						<input type="hidden" name="<?php echo \esc_attr( Transients_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Transients_List::escaped_search_input() ); ?>" />
 						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::UPDATE_ACTION ); ?>" />
-						<?php \wp_nonce_field( 'advana_transients_manager' ); ?>
+						<?php \wp_nonce_field( Transients_List::NONCE_NAME ); ?>
 
 						<table class="form-table">
 							<tbody>

@@ -100,7 +100,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Display_Environment_Type' ) ) {
 			$env_type_name = self::get_env_type_name( $env_type );
 
 			if ( ! empty( $env_type ) ) {
-				$items[] = '<span class="' . \esc_attr( 'det-env-type det-' . $env_type ) . '" title="' . \esc_attr__( 'Environment Type', '0-dsay-analytics' ) . '">' . \esc_html( $env_type_name ) . '</span>';
+				$items[] = '<span class="' . \esc_attr( 'det-env-type det-' . $env_type ) . '" title="' . \esc_attr__( 'Environment Type', '0-day-analytics' ) . '">' . \esc_html( $env_type_name ) . '</span>';
 			}
 
 			return $items;

@@ -43,6 +43,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 		public const UPDATE_ACTION = 'advan_transients_update';
 
+		public const NONCE_NAME = 'advana_transients_manager';
+
 		public const SEARCH_INPUT = 'sgp';
 
 		/**
@@ -546,20 +548,21 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 					$actions['delete'] = '<a class="aadvana-transient-delete" href="#" data-nonce="' . $query_args_view_data['_wpnonce'] . '" data-id="' . $query_args_view_data['hash'] . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
-					$edit_url = remove_query_arg(
+					$edit_url = \remove_query_arg(
 						array( 'updated', 'deleted' ),
-						add_query_arg(
+						\add_query_arg(
 							array(
-								'action'   => 'edit_transient',
-								'trans_id' => $item['id'],
-								'_wpnonce' => $query_args_view_data['_wpnonce'],
+								'action'           => 'edit_transient',
+								'trans_id'         => $item['id'],
+								self::SEARCH_INPUT => self::escaped_search_input(),
+								'_wpnonce'         => $query_args_view_data['_wpnonce'],
 							)
 						)
 					);
 
 					$actions['edit'] = '<a class="aadvana-transient-run" href="' . $edit_url . '">' . \esc_html__( 'Edit', '0-day-analytics' ) . '</a>';
 
-					return '<span><b>' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
+					return '<span><b title="' . sprintf( esc_attr__( 'Option ID: %d', '0-day-analytics' ), (int) $item['id'] ) . '">' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'schedule':
 					if ( 0 === $item['schedule'] ) {
 						return '&mdash;<br><span class="badge">' . esc_html__( 'Persistent', '0-day-analytics' ) . '</span>';
