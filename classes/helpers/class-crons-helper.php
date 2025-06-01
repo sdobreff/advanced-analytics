@@ -29,6 +29,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 	 */
 	class Crons_Helper {
 
+		public const TRANSIENT_NAME = 'advana-cron-test-ok';
+
 		/**
 		 * Hold all cron events collected and formatted for inner use.
 		 *
@@ -263,7 +265,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			uasort( $schedules, array( Crons_List::class, 'sort_schedules' ) );
 			?>
 			<select class="postform" name="cron_schedule" id="cron_schedule" required>
-			<option <?php selected( $current, '_oneoff' ); ?> value="_oneoff"><?php esc_html_e( 'Non-repeating', 'wp-crontrol' ); ?></option>
+			<option <?php selected( $current, '_oneoff' ); ?> value="_oneoff"><?php esc_html_e( 'Non-repeating', '0-day-analytics' ); ?></option>
 				<?php foreach ( $schedules as $sched_name => $sched_data ) { ?>
 				<option <?php selected( $current, $sched_name ); ?> value="<?php echo esc_attr( $sched_name ); ?>">
 					<?php
@@ -328,7 +330,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			if ( false === $next_run_local ) {
 				return new \WP_Error(
 					'invalid_timestamp',
-					__( 'Invalid timestamp provided.', 'wp-crontrol' )
+					__( 'Invalid timestamp provided.', '0-day-analytics' )
 				);
 			}
 
@@ -341,7 +343,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			} elseif ( ! isset( \wp_get_schedules()[ $schedule ] ) ) {
 				return new \WP_Error(
 					'invalid_schedule',
-					__( 'Invalid schedule provided.', 'wp-crontrol' )
+					__( 'Invalid schedule provided.', '0-day-analytics' )
 				);
 			}
 
@@ -353,17 +355,117 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 				$args = array();
 			}
 
-			if ( '_oneoff' === $schedule || '' === $schedule ) {
-				$result = wp_schedule_single_event( $next_run_utc, $cron['hook'], $args, true );
-			} else {
-				$result = wp_schedule_event( $next_run_utc, $schedule, $cron['hook'], $args, true );
+			$new_hook_name = ( isset( $_REQUEST['name'] ) ) ? $_REQUEST['name'] : '';
+			if ( empty( $new_hook_name ) ) {
+				$new_hook_name = $cron['hook'];
 			}
 
+			if ( '_oneoff' === $schedule || '' === $schedule ) {
+				$result = wp_schedule_single_event( $next_run_utc, $new_hook_name, $args, true );
+			} else {
+				$result = wp_schedule_event( $next_run_utc, $schedule, $new_hook_name, $args, true );
+			}
 			if ( \is_wp_error( $result ) ) {
 				return new \WP_Error(
 					'invalid_cron_parameters',
-					__( 'Cron job can not be added.', 'wp-crontrol' )
+					__( 'Cron job can not be added.', '0-day-analytics' )
 				);
+			}
+		}
+
+		/**
+		 * Tests the proper spawning of the WP Cron
+		 *
+		 * @param boolean $cache - Flag - should only use the cached results from previous calls.
+		 *
+		 * @return bool|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function test_cron_spawn( $cache = true ) {
+			global $wp_version;
+
+			$cron_runner_plugins = array(
+				'\HM\Cavalcade\Plugin\Job'         => 'Cavalcade',
+				'\Automattic\WP\Cron_Control\Main' => 'Cron Control',
+			);
+
+			foreach ( $cron_runner_plugins as $class => $plugin ) {
+				if ( class_exists( $class ) ) {
+					return new \WP_Error(
+						'advana_cron_info',
+						sprintf(
+						/* translators: %s: The name of the plugin that controls the running of cron events. */
+							__( 'WP-Cron spawning is being managed by the %s plugin.', '0-day-analytics' ),
+							$plugin
+						)
+					);
+				}
+			}
+
+			if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
+				return new \WP_Error(
+					'advana_cron_info',
+					sprintf(
+					/* translators: %s: The name of the PHP constant that is set. */
+						__( 'The %s constant is set to true. WP-Cron spawning is disabled.', '0-day-analytics' ),
+						'DISABLE_WP_CRON'
+					)
+				);
+			}
+
+			if ( defined( 'ALTERNATE_WP_CRON' ) && ALTERNATE_WP_CRON ) {
+				return new \WP_Error(
+					'advana_cron_info',
+					sprintf(
+					/* translators: %s: The name of the PHP constant that is set. */
+						__( 'The %s constant is set to true.', '0-day-analytics' ),
+						'ALTERNATE_WP_CRON'
+					)
+				);
+			}
+
+			$cached_status = \get_transient( self::TRANSIENT_NAME );
+
+			if ( $cache && $cached_status ) {
+				return true;
+			}
+
+			$sslverify     = version_compare( $wp_version, '4.0', '<' );
+			$doing_wp_cron = sprintf( '%.22F', microtime( true ) );
+
+			$cron_request = apply_filters(
+				'cron_request',
+				array(
+					'url'  => \add_query_arg( 'doing_wp_cron', $doing_wp_cron, site_url( 'wp-cron.php' ) ),
+					'key'  => $doing_wp_cron,
+					'args' => array(
+						'timeout'   => 3,
+						'blocking'  => true,
+						'sslverify' => apply_filters( 'https_local_ssl_verify', $sslverify ),
+					),
+				),
+				$doing_wp_cron
+			);
+
+			$cron_request['args']['blocking'] = true;
+
+			$result = \wp_remote_post( $cron_request['url'], $cron_request['args'] );
+
+			if ( \is_wp_error( $result ) ) {
+				return $result;
+			} elseif ( \wp_remote_retrieve_response_code( $result ) >= 300 ) {
+				return new \WP_Error(
+					'unexpected_http_response_code',
+					sprintf(
+					/* translators: %s: The HTTP response code. */
+						__( 'Unexpected HTTP response code: %s', '0-day-analytics' ),
+						intval( \wp_remote_retrieve_response_code( $result ) )
+					)
+				);
+			} else {
+				\set_transient( self::TRANSIENT_NAME, 1, 3600 );
+				return true;
 			}
 		}
 	}

@@ -732,34 +732,61 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					<form id="crons-filter" method="get">
 					<?php
 
-								$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-								$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
-
-								printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-								printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
-
-								echo '<div style="clear:both; float:right">';
-								$events_list->search_box(
-									__( 'Search', '0-day-analytics' ),
-									strtolower( $events_list::get_table_name() ) . '-find'
-								);
-					echo '</div>';
-
-					$status = WP_Helper::check_cron_status();
+					$status = Crons_Helper::test_cron_spawn();
 
 					if ( \is_wp_error( $status ) ) {
-						if ( 'cron_info' === $status->get_error_code() ) {
+						if ( 'advana_cron_info' === $status->get_error_code() ) {
 							?>
-							<div id="cron-status-notice" class="notice notice-info">
-								<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+							<div id="advaa-status-notice" class="notice notice-info">
+								<p><?php echo esc_html( $status->get_error_message() ); ?></p>
+							</div>
+							<?php
+						} else {
+							?>
+							<div id="advana-status-error" class="notice notice-error">
+								<?php
+								printf(
+									'<p>%1$s</p>',
+									sprintf(
+										/* translators: %s: Error message text. */
+										esc_html__( 'There was a problem spawning a call to the WP-Cron system on your site. This means WP-Cron events on your site may not work. The problem was: %s', 'w0-day-analytics' ),
+										'</p><p><strong>' . esc_html( $status->get_error_message() ) . '</strong>'
+									)
+								);
+								?>
 							</div>
 							<?php
 						}
 					}
 
+					$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+					$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+
+					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
+					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+
+					echo '<div style="clear:both; float:right">';
+					$events_list->search_box(
+						__( 'Search', '0-day-analytics' ),
+						strtolower( $events_list::get_table_name() ) . '-find'
+					);
+					echo '</div>';
+
+					$status = WP_Helper::check_cron_status();
+
+				if ( \is_wp_error( $status ) ) {
+					if ( 'cron_info' === $status->get_error_code() ) {
+						?>
+							<div id="cron-status-notice" class="notice notice-info">
+								<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+							</div>
+							<?php
+					}
+				}
+
 					$events_list->display();
 
-					?>
+				?>
 					</form>
 				</div>
 				<?php
@@ -884,6 +911,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
 				$expiration   = Transients_List::get_transient_expiration_time( $transient['option_name'] );
 
+				$next_run_gmt            = gmdate( 'Y-m-d H:i:s', $expiration );
+				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
@@ -907,7 +938,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 								</tr>
 								<tr>
 									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text" name="expires" value="<?php echo esc_attr( $expiration ); ?>" /></td>
+									<td>
+									<?php
+										printf(
+											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
+											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
+											esc_attr( $next_run_date_local ),
+											esc_attr( $next_run_time_local )
+										);
+									?>
+										</td>
 								</tr>
 								<tr>
 									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>

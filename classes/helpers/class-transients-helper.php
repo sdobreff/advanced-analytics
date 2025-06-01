@@ -171,15 +171,36 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 				return false;
 			}
 
-			if ( ! isset( $_POST['value'], $_POST['expires'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			if ( ! isset( $_POST['value'], $_REQUEST['cron_next_run_custom_date'], $_REQUEST['cron_next_run_custom_time'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				return false;
 			}
 
 			// Values.
-			$value      = stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$value = \stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			// $expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 			// Subtract now.
+			// $expiration = ( $expiration - time() );
+
+			$current_time = time();
+
+			$date = ( ( isset( $_REQUEST['cron_next_run_custom_date'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_date'] ) ) : '' );
+
+			$time = ( ( isset( $_REQUEST['cron_next_run_custom_time'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_time'] ) ) : '' );
+
+			$next_run_local = $date . ' ' . $time;
+
+			$next_run_local = strtotime( $next_run_local, $current_time );
+
+			if ( false === $next_run_local ) {
+				return new \WP_Error(
+					'invalid_timestamp',
+					__( 'Invalid timestamp provided.', '0-day-analytics' )
+				);
+			}
+
+			$expiration = (int) \get_gmt_from_date( \gmdate( 'Y-m-d H:i:s', $next_run_local ), 'U' );
+
 			$expiration = ( $expiration - time() );
 
 			// Transient type.
