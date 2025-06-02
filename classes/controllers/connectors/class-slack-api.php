@@ -1,6 +1,6 @@
 <?php
 /**
- * Slack API  class
+ * Slack API class
  *
  * @package advanced-analytics
  *

@@ -111,6 +111,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					// Parse the severity level.
 					$source = strtolower( trim( $matches['source'] ) );
 				}
+
 				/*
 				Attempt to extract the file name and line number from the message.
 				*

@@ -62,7 +62,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		}
 
 		/**
-		 * post_request
+		 * Makes Post Request check
 		 *
 		 * Test POST requests
 		 *
@@ -114,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		}
 
 		/**
-		 * environment_info
+		 * Environment_info collector
 		 *
 		 * All environment info
 		 *

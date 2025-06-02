@@ -231,7 +231,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * An event which has missed its schedule by more than 10 minutes is considered late.
 		 *
-		 * @param array $event The event.
+		 * @param array $item - The item array which will be used for checking the time.
 		 *
 		 * @return bool Whether the event is late.
 		 *
@@ -361,9 +361,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			}
 
 			if ( '_oneoff' === $schedule || '' === $schedule ) {
-				$result = wp_schedule_single_event( $next_run_utc, $new_hook_name, $args, true );
+				$result = \wp_schedule_single_event( $next_run_utc, $new_hook_name, $args, true );
 			} else {
-				$result = wp_schedule_event( $next_run_utc, $schedule, $new_hook_name, $args, true );
+				$result = \wp_schedule_event( $next_run_utc, $schedule, $new_hook_name, $args, true );
 			}
 			if ( \is_wp_error( $result ) ) {
 				return new \WP_Error(

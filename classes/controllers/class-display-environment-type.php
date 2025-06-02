@@ -1,18 +1,17 @@
 <?php
 /**
- * Responsible for plugin initialization.
+ * Responsible for showing the proper environment type set.
  *
  * @package    det
  * @license    GPL v3
  * @copyright  %%YEAR%%
+ *
  * @since 1.8.4
  */
 
 declare(strict_types=1);
 
 namespace ADVAN\Controllers;
-
-use ADVAN\Helpers\Settings;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -31,9 +31,9 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	class WP_Error_Handler {
 		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null ) {
 			// if ( ! ( error_reporting(E_ERROR) & $errno ) ) {
-			// 	// This error code is not included in error_reporting, so let it fall.
-			// 	// through to the standard PHP error handler.
-			// 	return false;
+			// This error code is not included in error_reporting, so let it fall.
+			// through to the standard PHP error handler.
+			// return false;
 			// }
 
 			// These are default values for a single trace.
@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			);
 			// $errfile  = self::clean_file_path( $errfile );
 			$php_error_name = self::error_code_to_string( $errno );
-			$out     = "$php_error_name ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "$php_error_name ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -127,7 +127,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			);
 
 			$php_error_name = self::error_code_to_string( $errno );
-			$out     = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -206,7 +206,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			);
 
 			$php_error_name = 'DEPRECATED';
-			$out     = "PHP $php_error_name: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;

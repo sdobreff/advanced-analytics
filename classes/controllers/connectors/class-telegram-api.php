@@ -1,6 +1,6 @@
 <?php
 /**
- * Telegram API  class
+ * Telegram API class
  *
  * @package advanced-analytics
  *

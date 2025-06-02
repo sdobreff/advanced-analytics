@@ -88,7 +88,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 * @since 1.7.0
 		 */
 		public static function clear_events( $hook ) {
-			wp_clear_scheduled_hook( $hook );
+			\wp_clear_scheduled_hook( $hook );
 		}
 
 		/**

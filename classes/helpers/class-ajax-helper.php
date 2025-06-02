@@ -89,7 +89,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 *
 				 * @since 1.8.2
 				 */
-
 				\add_action( 'wp_ajax_log_source_view', array( __CLASS__, 'ajax_view_source' ) );
 
 			}
@@ -259,15 +258,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			WP_Helper::verify_admin_nonce( Slack::NONCE_NAME );
 
-			if ( isset( $_REQUEST['slack_auth'] ) && ! empty( $_REQUEST['slack_auth'] ) ) {
+			if ( isset( $_REQUEST['slack_auth'] ) && ! empty( $_REQUEST['slack_auth'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$slack_valid =
 				Slack_API::verify_slack_token(
-					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ),
+					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				);
 				if ( $slack_valid ) {
 					$options = Slack::get_settings();
 
-					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) );
+					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['slack_auth'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 					Slack::set_settings( $options );
 
@@ -288,15 +287,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		public static function store_telegram_api_key_ajax() {
 			WP_Helper::verify_admin_nonce( Telegram::NONCE_NAME );
 
-			if ( isset( $_REQUEST['telegram_auth'] ) && ! empty( $_REQUEST['telegram_auth'] ) ) {
+			if ( isset( $_REQUEST['telegram_auth'] ) && ! empty( $_REQUEST['telegram_auth'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$telegram_valid =
 				Telegram_API::verify_telegram_token(
-					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) ),
+					(string) \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				);
 				if ( $telegram_valid ) {
 					$options = Telegram::get_settings();
 
-					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) );
+					$options['auth_token'] = \sanitize_text_field( \wp_unslash( $_REQUEST['telegram_auth'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 					Telegram::set_settings( $options );
 
@@ -317,7 +316,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		public static function ajax_view_source() {
 			WP_Helper::verify_admin_nonce( 'source-view' );
 
-			if ( ! isset( $_REQUEST['error_file'] ) || empty( $_REQUEST['error_file'] ) ) {
+			if ( ! isset( $_REQUEST['error_file'] ) || empty( $_REQUEST['error_file'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				\wp_send_json_error( \esc_html__( 'File not found.', '0-day-analytics' ), 404 );
 				\wp_die();
 			}
@@ -339,7 +338,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			$source = htmlspecialchars( @file_get_contents( $file_name ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
-			$lines = isset( $_REQUEST['error_line'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['error_line'] ) ) : 11;
+			$lines = isset( $_REQUEST['error_line'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['error_line'] ) ) : 11; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( \strpos( (string) $lines, '-' ) ) {
 				$source_lines = array_map( 'absint', explode( '-', $lines ) );
 				$scroll_to    = $source_lines[0] - 10;

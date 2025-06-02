@@ -5,6 +5,8 @@
  * Helper class used for extraction / loading classes.
  *
  * @package advanced-analytics
+ *
+ * @since 1.1.0
  */
 
 declare(strict_types=1);
@@ -86,7 +88,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			$result = false;
 
 			if ( ! is_dir( $logging_dir ) ) {
-				if ( false === wp_mkdir_p( $logging_dir ) ) {
+				if ( false === \wp_mkdir_p( $logging_dir ) ) {
 					self::$last_error = 'Unable to create directory';
 					return $result;
 				}

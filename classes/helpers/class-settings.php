@@ -196,8 +196,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 1.8.5
 		 */
 		public static function print_styles() {
-			$action = ! empty( $_REQUEST['action'] )
-			? sanitize_key( $_REQUEST['action'] )
+			$action = ! empty( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			? sanitize_key( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: '';
 
 			if ( \in_array( $action, array( 'edit_transient', 'edit_cron' ), true ) ) {
@@ -239,7 +239,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
                     background: transparent;
                 }'
 				);
-
 			}
 		}
 
@@ -639,8 +638,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			</script>
 			<?php
 
-			$action = ! empty( $_REQUEST['action'] )
-			? sanitize_key( $_REQUEST['action'] )
+			$action = ! empty( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			? sanitize_key( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: '';
 
 			if ( ! empty( $action ) && ( 'edit_cron' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
