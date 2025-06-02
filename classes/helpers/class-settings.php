@@ -193,7 +193,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function print_styles() {
 			$action = ! empty( $_REQUEST['action'] )
@@ -798,7 +798,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function update_transient() {
 
@@ -841,7 +841,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function update_cron() {
 

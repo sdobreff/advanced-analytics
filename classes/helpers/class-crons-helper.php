@@ -150,7 +150,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return array|bool
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_event( string $hash ) {
 			$events = self::get_events();
@@ -237,7 +237,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @since 1.4.0
 		 */
-		public static function is_late( array $event ) {
+		public static function is_late( array $item ) {
 			if ( ! isset( $item['schedule'] ) && isset( $item['timestamp'] ) ) {
 				$item['schedule'] = $item['timestamp'];
 			}
@@ -246,7 +246,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 				return false;
 			}
 
-			$until = $event['schedule'] - time();
+			$until = $item['schedule'] - time();
 
 			return ( $until < ( 0 - ( 10 * MINUTE_IN_SECONDS ) ) );
 		}
@@ -258,7 +258,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function schedule_drop_down( $current = false ) {
 			$schedules = \wp_get_schedules();
@@ -288,7 +288,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return void|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function update_cron( string $hash ) {
 			$cron = self::get_event( $hash );
@@ -380,7 +380,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function test_cron_spawn( $cache = true ) {
 			global $wp_version;

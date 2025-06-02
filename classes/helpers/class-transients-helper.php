@@ -135,7 +135,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function get_transient_by_id( $id = 0 ) {
 			global $wpdb;
@@ -162,7 +162,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.8.5
 		 */
 		public static function update_transient( $transient = '', $site_wide = false ) {
 

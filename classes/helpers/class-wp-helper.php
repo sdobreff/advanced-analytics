@@ -877,22 +877,22 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				);
 			}
 
-					$time_format = 'g:i a';
+			$time_format = 'g:i a';
 
-					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['schedule'] );
+			$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['schedule'] );
 
-					$timezone_local  = \wp_timezone();
-					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
-					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
-					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
-					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+			$timezone_local  = \wp_timezone();
+			$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+			$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+			$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+			$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
 
 					// If the offset of the date of the event is different from the offset of the site, add a marker.
 			if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
 				$time_format .= ' (P)';
 			}
 
-					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+			$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
 
 			if ( $event_local === $today_local ) {
 				$date = sprintf(
@@ -921,14 +921,14 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				);
 			}
 
-					$time = sprintf(
-						'<time datetime="%1$s">%2$s</time>',
-						\esc_attr( gmdate( 'c', $item['schedule'] ) ),
-						\esc_html( $date )
-					);
+			$time = sprintf(
+				'<time datetime="%1$s">%2$s</time>',
+				\esc_attr( gmdate( 'c', $item['schedule'] ) ),
+				\esc_html( $date )
+			);
 
-					$until = $item['schedule'] - time();
-					$late  = Crons_Helper::is_late( $item );
+			$until = $item['schedule'] - time();
+			$late  = Crons_Helper::is_late( $item );
 
 			if ( $late ) {
 				// Show a warning for events that are late.
@@ -955,11 +955,11 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 				);
 			}
 
-					return sprintf(
-						'%s<br><span class="badge green-badge"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span>',
-						\esc_html( $in ),
-						$time,
-					);
+			return sprintf(
+				'%s<br><span class="badge green-badge"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span>',
+				\esc_html( $in ),
+				$time,
+			);
 		}
 
 	}
