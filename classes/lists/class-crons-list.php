@@ -459,7 +459,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						\add_query_arg(
 							array(
 								'action'           => 'edit_cron',
-								'hash'         => $item['hash'],
+								'hash'             => $item['hash'],
 								self::SEARCH_INPUT => self::escaped_search_input(),
 								'_wpnonce'         => $query_args_view_data['_wpnonce'],
 							)
@@ -494,6 +494,10 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 									$callback['callback']['file'],
 									$callback['callback']['line']
 								);
+							}
+
+							if ( isset( $callback['callback']['component'] ) && ! empty( $callback['callback']['component'] ) && isset( $callback['callback']['component']['name'] ) && ! empty( $callback['callback']['component']['name'] ) ) {
+								$callbacks[] = '<span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> ' . esc_html( $callback['callback']['component']['name'] ) . '</span>';
 							}
 						}
 

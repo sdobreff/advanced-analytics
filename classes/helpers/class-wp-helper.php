@@ -345,7 +345,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			$type = '';
 			foreach ( self::get_file_dirs() as $current_type => $dir ) {
-				if ( $dir && ( 0 === strpos( $file, trailingslashit( $dir ) ) ) ) {
+				if ( $dir && ( false !== strpos( $file, trailingslashit( $dir ) ) ) ) {
 					$type = $current_type;
 					break;
 				}
@@ -384,6 +384,10 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 				case 'core':
 					$name = __( 'WordPress Core', '0-day-analytics' );
+					break;
+
+				case 'core-includes':
+					$name = __( 'WordPress Core Includes', '0-day-analytics' );
 					break;
 
 				default:
@@ -557,16 +561,17 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			}
 
 			self::$file_dirs = array(
-				'plugin'               => WP_PLUGIN_DIR,
-				'mu-vendor'            => WPMU_PLUGIN_DIR . '/vendor',
-				'go-plugin'            => WPMU_PLUGIN_DIR . '/shared-plugins',
-				'mu-plugin'            => WPMU_PLUGIN_DIR,
-				'vip-plugin'           => get_theme_root() . '/vip/plugins',
+				'core-includes'        => WPINC,
+				'plugin'               => basename( WP_PLUGIN_DIR ),
+				'mu-vendor'            => basename( WPMU_PLUGIN_DIR ) . '/vendor',
+				'go-plugin'            => basename( WPMU_PLUGIN_DIR ) . '/shared-plugins',
+				'mu-plugin'            => basename( WPMU_PLUGIN_DIR ),
+				'vip-plugin'           => basename( get_theme_root() ) . '/vip/plugins',
 				'vip-client-mu-plugin' => defined( 'WPCOM_VIP_CLIENT_MU_PLUGIN_DIR' ) ? \WPCOM_VIP_CLIENT_MU_PLUGIN_DIR : null,
 				'altis-vendor'         => defined( '\Altis\ROOT_DIR' ) ? \Altis\ROOT_DIR . '/vendor' : null,
 				'theme'                => null,
-				'stylesheet'           => get_stylesheet_directory(),
-				'template'             => get_template_directory(),
+				'stylesheet'           => basename( get_stylesheet_directory() ),
+				'template'             => basename( get_template_directory() ),
 				'other'                => WP_CONTENT_DIR,
 				'core'                 => ABSPATH,
 				'unknown'              => null,

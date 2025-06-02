@@ -908,7 +908,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				: 0;
 				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
 				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
-				$expiration   = Transients_List::get_transient_expiration_time( $transient['option_name'] );
+				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
 
 				$next_run_gmt            = gmdate( 'Y-m-d H:i:s', $expiration );
 				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
