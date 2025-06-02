@@ -506,14 +506,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					global $wpdb;
 
 					$stored_options = $wpdb->get_results(
-						$wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \ADVAN_SETTINGS_NAME )
+						$wpdb->prepare( 'SELECT option_name, option_value FROM ' . $wpdb->options . ' WHERE option_name = %s', \ADVAN_SETTINGS_NAME ),
+						ARRAY_A
 					);
 
 					header( 'Cache-Control: public, must-revalidate' );
 					header( 'Pragma: hack' );
 					header( 'Content-Type: text/plain' );
 					header( 'Content-Disposition: attachment; filename="' . ADVAN_TEXTDOMAIN . '-options-' . gmdate( 'dMy' ) . '.dat"' );
-					echo \wp_json_encode( unserialize( $stored_options[0]->option_value ), array( 'allowed_classes' => false ) );
+
+					echo \wp_json_encode( unserialize( $stored_options[0]['option_value'], array( 'allowed_classes' => false ) ) );
 					die();
 				} elseif ( isset( $_FILES[ self::SETTINGS_FILE_FIELD ] ) && \check_admin_referer( 'aadvana-plugin-data', 'aadvana-security' ) ) { // Import the settings.
 					if ( isset( $_FILES ) &&
@@ -532,7 +534,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 
 						if ( ! empty( $options ) && is_array( $options ) ) {
-							\update_option( ADVAN_SETTINGS_NAME, self::collect_and_sanitize_options( $options ) );
+							\remove_filter( 'sanitize_option_' . ADVAN_SETTINGS_NAME, array( self::class, 'collect_and_sanitize_options' ) );
+							\update_option( ADVAN_SETTINGS_NAME, self::collect_and_sanitize_options( $options, true ) );
 						}
 					}
 
@@ -910,7 +913,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
 				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
 
-				$next_run_gmt            = gmdate( 'Y-m-d H:i:s', $expiration );
+				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
 				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
 				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
 
@@ -1570,12 +1573,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * Collects the passed options, validates them and stores them.
 		 *
 		 * @param array $post_array - The collected settings array.
+		 * @param bool  $import - The settings store comes from the imported file.
 		 *
 		 * @return array
 		 *
 		 * @since 1.1.0
+		 * @since latest - Added $import parameter to allow importing settings, without interfering with the current options (everything related to wp-config manipulation is not stored in the settings).
 		 */
-		public static function collect_and_sanitize_options( array $post_array ): array {
+		public static function collect_and_sanitize_options( array $post_array, bool $import = false ): array {
 			if ( ! \current_user_can( 'manage_options' ) ) {
 				\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', '0-day-analytics' ) );
 			}
@@ -1589,8 +1594,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['environment_type_admin_bar'] = ( array_key_exists( 'environment_type_admin_bar', $post_array ) ) ? filter_var( $post_array['environment_type_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
-				$advanced_options['severities'][ $name ]['color']   = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $advanced_options['severities'][ $name ]['color'] ) ) ? $advanced_options['severities'][ $name ]['color'] : $severity['color'] );
-				$advanced_options['severities'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : false;
+				$advanced_options['severities'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $post_array['severities'][ $name ]['color'] ) ) ? \sanitize_text_field( $post_array['severities'][ $name ]['color'] ) : $severity['color'] );
+
+				$advanced_options['severities'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : ( ( isset( $post_array['severities'][ $name ]['display'] ) ) ? (bool) $post_array['severities'][ $name ]['display'] : false );
 
 				$advanced_options['severities'][ $name ]['name'] = self::get_current_options()['severities'][ $name ]['name'];
 			}
@@ -1641,7 +1647,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			self::$current_options = $advanced_options;
 
-			if ( ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
+			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 
 				$wp_debug_enable = ( array_key_exists( 'wp_debug_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
 
