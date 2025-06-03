@@ -350,7 +350,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?.
 		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
-		 * @param bool $first_only - If true, only the first item will be returned.
+		 * @param bool    $first_only - If true, only the first item will be returned.
 		 *
 		 * @return array
 		 *
@@ -471,13 +471,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 
 					// if ( ! empty( $disabled ) ) {
-					// 	foreach ( $disabled as $severity ) {
-					// 		foreach ( $errors as $key => $error ) {
-					// 			if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
-					// 				unset( $errors[ $key ] );
-					// 			}
-					// 		}
-					// 	}
+					// foreach ( $disabled as $severity ) {
+					// foreach ( $errors as $key => $error ) {
+					// if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
+					// unset( $errors[ $key ] );
+					// }
+					// }
+					// }
 					// }
 
 					if ( false === $result ) {
@@ -1141,6 +1141,35 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				</div>
 				<?php
 			}
+
+			if ( ! empty( Settings::get_disabled_severities() ) ) {
+				?>
+				<style>
+					.filtered-severities {
+						background:#fff; 
+						border:1px solid rgb(228, 144, 18); 
+						border-left-width:4px; 
+						box-shadow:0 1px 1px rgba (0,0,0,.04); 
+						margin:10px 0; 
+						padding:1px 5px;
+					}
+
+					html.aadvana-darkskin .filtered-severities {
+						background: transparent !important;
+					}
+				</style>
+				<div class="filtered-severities">
+					<p>
+					<?php
+					esc_html_e( 'Following types are filtered and not showing: ', '0-day-analytics' );
+					foreach ( Settings::get_disabled_severities() as $severity ) {
+						echo '<span class="badge dark-badge">' . esc_html( $severity ) . '</span> ';
+					}
+					?>
+					</p>
+				</div>
+				<?php
+			}
 		}
 
 		/**
@@ -1190,7 +1219,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				?>
 				<style>
 					.toplevel_page_advan_logs #debug-log {
-						max-width: 95%;
+						max-width: 100%;
 						padding: 10px;
 						word-wrap: break-word;
 						background: black;

@@ -914,9 +914,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
 				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
 
-				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
-				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+				if ( 0 !== $expiration ) {
+
+					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
+					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+				}
 
 				?>
 				<div class="wrap">
@@ -929,6 +932,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::UPDATE_ACTION ); ?>" />
 						<?php \wp_nonce_field( Transients_List::NONCE_NAME ); ?>
 
+						<?php
+						if ( in_array( $name, Transients_Helper::WP_CORE_TRANSIENTS ) ) {
+							?>
+							<div id="advaa-status-notice" class="notice notice-warning">
+								<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
+							</div>
+							<?php
+
+						}
+						?>
+
 						<table class="form-table">
 							<tbody>
 								<tr>
@@ -939,6 +953,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
 									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_name'] ); ?>" /></td>
 								</tr>
+								<?php
+								if ( 0 !== $expiration ) {
+									?>
 								<tr>
 									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
 									<td>
@@ -950,8 +967,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 											esc_attr( $next_run_time_local )
 										);
 									?>
-										</td>
+									</td>
 								</tr>
+									<?php
+								} else {
+
+										printf(
+											'<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s"" />
+											<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s"  />',
+											'',
+											''
+										);
+								}
+
+								?>
 								<tr>
 									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
 									<td>

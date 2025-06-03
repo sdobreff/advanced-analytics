@@ -28,6 +28,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 	 */
 	class Transients_Helper {
 
+		public const WP_CORE_TRANSIENTS = array(
+			'update_themes',
+			'update_plugins',
+			'update_core',
+		);
+
 		/**
 		 * Deletes a cron event
 		 *
