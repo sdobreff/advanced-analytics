@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '7'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '8'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -303,6 +303,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'menu_admins_only'             => true,
 					'live_notifications_admin_bar' => true,
 					'environment_type_admin_bar'   => true,
+					'protected_config_source'      => true,
 					'slack_notifications'          => array(
 						'all' => array(
 							'channel'    => '',
@@ -1592,6 +1593,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['live_notifications_admin_bar'] = ( array_key_exists( 'live_notifications_admin_bar', $post_array ) ) ? filter_var( $post_array['live_notifications_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['environment_type_admin_bar'] = ( array_key_exists( 'environment_type_admin_bar', $post_array ) ) ? filter_var( $post_array['environment_type_admin_bar'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['protected_config_source'] = ( array_key_exists( 'protected_config_source', $post_array ) ) ? filter_var( $post_array['protected_config_source'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
 				$advanced_options['severities'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $post_array['severities'][ $name ]['color'] ) ) ? \sanitize_text_field( $post_array['severities'][ $name ]['color'] ) : $severity['color'] );

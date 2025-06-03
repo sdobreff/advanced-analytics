@@ -52,6 +52,15 @@ Settings::build_option(
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Do not show the source of the config and settings files', '0-day-analytics' ),
+			'id'      => 'protected_config_source',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options()['protected_config_source'],
+		)
+	);
+
 	// Reset the settings options.
 	Settings::build_option(
 		array(
