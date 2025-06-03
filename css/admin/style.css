@@ -1539,6 +1539,10 @@ body:not(.analytics_page_advan_logs_settings) #aadvana-page-overlay {
   height: 20px;
 }
 
+.aadvana-darkskin .form-table th, .form-wrap label {
+  color: #c2d3e7 !important;
+}
+
 .aadvana-darkskin .aadvana-footer-notice img, .aadvana-darkskin
 .aadvana-footer-notice svg {
   filter: invert(100%);
