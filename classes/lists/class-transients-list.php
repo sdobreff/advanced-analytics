@@ -688,7 +688,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 * @since 1.7.0
 		 */
 		public static function add_screen_options( $hook ) {
-			$screen_options = array( 'per_page' => __( 'Number of transients to read', '0-day-analytics' ) );
+			$screen_options = array( 'per_page' => __( 'Number of transients to show', '0-day-analytics' ) );
 
 			$result = array();
 
