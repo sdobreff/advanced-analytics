@@ -1,4 +1,4 @@
-=== Advanced Analytics ===
+=== WP Control ===
 Tags: log, error log, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
@@ -7,16 +7,17 @@ Stable tag: 1.8.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-**Advanced Analytics** is a WordPress plugin which purpose is to manage all kinds on error logs (large or small), providing options to enable or disable logging and optimized for gigabyte-sized log files. It is specially designed and optimized to work on production sites without slowing them. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
+**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs (large or small), providing options to enable or disable logging and optimized for gigabyte-sized log files. It is specially designed and optimized to work on production sites without slowing them. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
 
 == Description ==
 
-Advanced Analytics is a powerful plugin designed for WordPress sites with extensive error logs. It allows administrators to:
-- Read and analyze gigabytes of error logs efficiently.
+**WP Control** is a powerful plugin designed for WordPress sites with extensive error logs. It allows administrators to:
+- Read and analyze error logs even if the error log is gigabytes of size. (Only up to last 100 records are shown) Filtering by type is supported. The limitation is necessary for two reasons - first if there are more errors they are either not relevant or repeating ones, and second - that way your server will continue operate without any interruptions even if your log is few gigs of data.
 - Enable or disable error logging directly from the WordPress dashboard.
 - Manage large log files without performance degradation.
-- **Cron manager** at the tip of your fingers
-- **Transient manager** - all (stored in the DB) transients
+- **Cron manager** at the tip of your fingers (edit / delete / run)
+- **Transient manager** - all (stored in the DB) transients (edit / delete)
+- **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -27,8 +28,9 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Option to enable or disable logging via the admin interface.
 - Optimized for high-performance even with large log files.
 - Provides insights into logged errors for efficient troubleshooting.
-- Build-id fully functional Cron manager
-- Build-id fully functional Transients manager
+- Build-in fully functional Cron manager
+- Build-in fully functional Transients manager
+- Build-in badge that shows you current environment type
 
 == Installation ==
 
