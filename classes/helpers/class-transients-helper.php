@@ -345,7 +345,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 *
 		 * @return array|int
 		 *
-		 * @since latest
+		 * @since 1.9.0
 		 */
 		public static function get_transient_items( $args = array() ) {
 

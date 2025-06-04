@@ -739,17 +739,21 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		/**
 		 * Generates content for a single row of the table.
 		 *
-		 * @param object|array $item - The current item.
+		 * @param array $item - The current item.
 		 *
 		 * @since 1.7.0
 		 */
 		public function single_row( $item ) {
-			$late = Crons_Helper::is_late( $item );
-
-			if ( $late ) {
-				$classes = ' late';
+			if ( 0 === $item['schedule'] ) {
+				$classes = ' persistent';
 			} else {
-				$classes = ' on-time';
+				$late = Crons_Helper::is_late( $item );
+
+				if ( $late ) {
+					$classes = ' late';
+				} else {
+					$classes = ' on-time';
+				}
 			}
 
 			echo '<tr class="' . \esc_attr( $classes ) . '">';
@@ -800,6 +804,9 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					});
 				</script>
 				<style>
+					.wp-control_page_advan_transients .generated-transients .persistent th:nth-child(1) {
+						border-left: 7px solid #d2ab0e !important;
+					}
 					.wp-control_page_advan_transients .generated-transients .late th:nth-child(1) {
 						border-left: 7px solid #dd9192 !important;
 					}

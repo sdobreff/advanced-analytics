@@ -125,7 +125,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 
 					$error_file = $matches[1] ? $matches[1] : $matches[3];
 
-					if ( \is_file( $error_file ) ) {
+					/**
+					 * If file is outside web root or somewhere where restrictions are in place, that will trigger warnings in PHP, so lets suppress it.
+					 */
+					if ( @\is_file( $error_file ) ) {
 						// If the file exists, we can use it.
 
 						$error_line = $matches[2] ? $matches[2] : $matches[4];
