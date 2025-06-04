@@ -1608,7 +1608,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @return array
 		 *
 		 * @since 1.1.0
-		 * @since latest - Added $import parameter to allow importing settings, without interfering with the current options (everything related to wp-config manipulation is not stored in the settings).
+		 * @since 1.9.0 - Added $import parameter to allow importing settings, without interfering with the current options (everything related to wp-config manipulation is not stored in the settings).
 		 */
 		public static function collect_and_sanitize_options( array $post_array, bool $import = false ): array {
 			if ( ! \current_user_can( 'manage_options' ) ) {
