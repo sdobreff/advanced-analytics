@@ -3,7 +3,7 @@ Tags: log, error log, analytics, cron, crons, transients
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -66,6 +66,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 5. **Transients manager** - Build-in is very powerful transients manager.
 
 == Changelog ==
+
+= 1.9.1 =  
+* Silencing warnings coming from \is_file where restrictions / permissions are in place.
 
 = 1.9.0 =  
 * Code optimizations. UI improvements. Bug fixes. Better source reporting.
