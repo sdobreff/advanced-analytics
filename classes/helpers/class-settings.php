@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '8'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '9'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -304,6 +304,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'live_notifications_admin_bar' => true,
 					'environment_type_admin_bar'   => true,
 					'protected_config_source'      => true,
+					'keep_reading_error_log'       => false,
 					'slack_notifications'          => array(
 						'all' => array(
 							'channel'    => '',
@@ -1677,7 +1678,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['telegram_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_telegram_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_telegram_channel'] ) ) : '';
 
-			self::$current_options = $advanced_options;
+			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 
@@ -1740,12 +1741,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 						Config_Transformer::update( 'constant', 'WP_DEBUG_LOG', $file_name, self::$config_args );
 					}
+
+					// Clear the flag for keep reading the error log if WP settings are disabled (because at this point they are enabled).
+					$advanced_options['keep_reading_error_log'] = false;
 				}
 
 				$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 				Config_Transformer::update( 'constant', 'DISABLE_WP_CRON', $wp_cron_disable, self::$config_args );
 			}
+
+			self::$current_options = $advanced_options;
 
 			return $advanced_options;
 		}

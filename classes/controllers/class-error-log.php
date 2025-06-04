@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Helpers\Settings;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -55,22 +57,28 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 				$error_logging_enabled = ! empty( $log_errors ) && ! \in_array( $log_errors, array( 'off', '0', 'false', 'no' ), true );
 				self::$log_file        = \ini_get( 'error_log' );
 
-				// First check if the WP Debug is enabled.
-				if ( ! \defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
-					self::$last_error = new \WP_Error(
-						'wp_debug_off',
-						__( 'WP Debug is disabled.', '0-day-analytics' )
-					);
-					return self::$last_error;
-				}
+				/**
+				 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
+				 */
+				if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
 
-				// Second check if the WP Debug Log is enabled.
-				if ( ! \defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG ) {
-					self::$last_error = new \WP_Error(
-						'wp_debug_log_off',
-						__( 'WP Debug Log is disabled.', '0-day-analytics' )
-					);
-					return self::$last_error;
+					// First check if the WP Debug is enabled.
+					if ( ! \defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+						self::$last_error = new \WP_Error(
+							'wp_debug_off',
+							__( 'WP Debug is disabled.', '0-day-analytics' )
+						);
+						return self::$last_error;
+					}
+
+					// Second check if the WP Debug Log is enabled.
+					if ( ! \defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG ) {
+						self::$last_error = new \WP_Error(
+							'wp_debug_log_off',
+							__( 'WP Debug Log is disabled.', '0-day-analytics' )
+						);
+						return self::$last_error;
+					}
 				}
 
 				// Check for common problems that could prevent us from displaying the error log.

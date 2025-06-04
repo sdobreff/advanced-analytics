@@ -96,7 +96,7 @@ Settings::set_current_options( $settings );
 						'type'    => 'text',
 						'default' => $file_name,
 						// 'pattern' => '(?:(?:[^<>:\"\|\?\*\n])+)',
-						//'pattern' => '^(?!.*[\\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$',
+						// 'pattern' => '^(?!.*[\\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$',
 						'pattern' => '^(?!.*[\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:\|\?\*\n])+(?:\/\/|\/|\\|\\\)?)+$',
 					)
 				);
@@ -162,6 +162,17 @@ Settings::set_current_options( $settings );
 					)
 				);
 			}
+		} else {
+
+			Settings::build_option(
+				array(
+					'name'    => \esc_html__( 'Keep monitoring', '0-day-analytics' ),
+					'id'      => 'keep_reading_error_log',
+					'type'    => 'checkbox',
+					'hint'    => \esc_html__( 'Check this if you want to keep reading the error log file, even if WP Debug is not enabled. This will allow you to see the errors in the error log list view, if your system keeps logging errors using some other methods (php ini sets for example). Plugin will automatically try to detect that.', '0-day-analytics' ),
+					'default' => Settings::get_current_options(),
+				)
+			);
 		}
 	}
 
@@ -204,5 +215,4 @@ Settings::set_current_options( $settings );
 				'default' => Settings::get_current_options(),
 			)
 		);
-
 	}

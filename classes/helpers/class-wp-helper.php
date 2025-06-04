@@ -760,16 +760,21 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 */
 		public static function check_debug_status() {
 
-			if ( ! defined( 'WP_DEBUG' ) || ! \WP_DEBUG ) {
-				return new \WP_Error(
-					'debug_off',
-					sprintf(
-					/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
-						__( 'The %1$s constant is not set or it is set to false. WP Debug is disabled. Try to enable it in settings - %2$s', '0-day-analytics' ),
-						'WP_DEBUG',
-						'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-error-log-list">' . __( 'here', '0-day-analytics' ) . '</a>',
-					)
-				);
+			/**
+			 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
+			 */
+			if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
+				if ( ! defined( 'WP_DEBUG' ) || ! \WP_DEBUG ) {
+					return new \WP_Error(
+						'debug_off',
+						sprintf(
+						/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
+							__( 'The %1$s constant is not set or it is set to false. WP Debug is disabled. Try to enable it in settings - %2$s. If you want plugin to still monitoring errors from error log set outside WP system (php ini), select "Keep monitoring" in settings.', '0-day-analytics' ),
+							'WP_DEBUG',
+							'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-error-log-list">' . __( 'here', '0-day-analytics' ) . '</a>',
+						)
+					);
+				}
 			}
 		}
 
@@ -782,16 +787,22 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 */
 		public static function check_debug_log_status() {
 
-			if ( ! defined( 'WP_DEBUG_LOG' ) || ! \WP_DEBUG_LOG ) {
-				return new \WP_Error(
-					'debug_log_off',
-					sprintf(
-					/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
-						__( 'The %1$s constant is not set or it is set to false. WP Debug Log is disabled. Try to enable it in settings - %2$s', '0-day-analytics' ),
-						'WP_DEBUG_LOG',
-						'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-error-log-list">' . __( 'here', '0-day-analytics' ) . '</a>',
-					)
-				);
+			/**
+			 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
+			 */
+			if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
+
+				if ( ! defined( 'WP_DEBUG_LOG' ) || ! \WP_DEBUG_LOG ) {
+					return new \WP_Error(
+						'debug_log_off',
+						sprintf(
+						/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
+							__( 'The %1$s constant is not set or it is set to false. WP Debug Log is disabled. Try to enable it in settings - %2$s.', '0-day-analytics' ),
+							'WP_DEBUG_LOG',
+							'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-error-log-list">' . __( 'here', '0-day-analytics' ) . '</a>',
+						)
+					);
+				}
 			}
 		}
 
