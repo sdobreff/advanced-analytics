@@ -6,11 +6,11 @@
  *
  * @package   0-day-analytics
  * @author    sdobreff
- * @copyright Copyright (C) 2023-%%YEAR%%, Advanced analytics
+ * @copyright Copyright (C) 2023-%%YEAR%%, WP Control
  * @license   GPL v3
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
- * Plugin Name:     Advanced Analytics
+ * Plugin Name:     WP Control
  * Description:     Provides WordPress analytics with a focus on performance and security.
  * Version:         1.9.1
  * Author:          Stoil Dobrev

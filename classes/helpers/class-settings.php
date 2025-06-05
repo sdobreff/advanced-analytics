@@ -401,7 +401,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$base .= 'code';
 
 				self::$hook = \add_menu_page(
-					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'WP Control', '0-day-analytics' ) . self::get_updates_count_html(),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ),
 					self::MENU_SLUG,
@@ -425,7 +425,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				\add_submenu_page(
 					self::MENU_SLUG,
-					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Error Log viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::MENU_SLUG,
@@ -436,7 +436,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				/* Crons */
 				$cron_hook = \add_submenu_page(
 					self::MENU_SLUG,
-					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Cron viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::CRON_MENU_SLUG,
@@ -453,7 +453,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				/* Transients */
 				$transients_hook = \add_submenu_page(
 					self::MENU_SLUG,
-					\esc_html__( 'Advanced Analytics', '0-day-analytics' ),
+					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Transients viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::TRANSIENTS_MENU_SLUG,
@@ -1063,7 +1063,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_help_content() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to specify the options for the Advanced Analytics plugin.', '0-day-analytics' ) . '</p>';
+			$help_text  = '<p>' . __( 'This screen allows you to specify the options for the WP Control plugin.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Here you can set how many errors to be shown (maximum is 100), create new debug log, or enebale / disable WP logging..', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Remember to click the Save Changes button when on sexttings page for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
 

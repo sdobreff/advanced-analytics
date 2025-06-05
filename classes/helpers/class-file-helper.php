@@ -89,7 +89,16 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 			if ( ! is_dir( $logging_dir ) ) {
 				if ( false === \wp_mkdir_p( $logging_dir ) ) {
-					self::$last_error = 'Unable to create directory';
+					// self::$last_error = 'Unable to create directory';
+					self::$last_error = new \WP_Error(
+						'mkdir_failed',
+						sprintf(
+								/* translators: %s: Directory path. */
+							__( 'Unable to create directory %s. Is its parent directory writable by the server?' ),
+							esc_html( $result )
+						)
+					);
+
 					return $result;
 				}
 			}
@@ -103,7 +112,14 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			}
 
 			if ( false === $result ) {
-				self::$last_error = 'Trying to write to the file failed';
+				self::$last_error = new \WP_Error(
+					'write_failed',
+					sprintf(
+								/* translators: %s: Directory path. */
+						__( 'Trying to write to the file %s failed.' ),
+						esc_html( $file_path )
+					)
+				);
 			}
 
 			return (bool) $result;
@@ -524,6 +540,34 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 			}
 
 			return true;
+		}
+
+		/**
+		 * Checks if the file is writable.
+		 *
+		 * @param string $file_path - The full path to the file.
+		 *
+		 * @return boolean
+		 *
+		 * @since latest
+		 */
+		public static function is_writable( string $file_path ): bool {
+			// Check if the file exists.
+			if ( ! file_exists( $file_path ) ) {
+				return false;
+			}
+
+			// Check if the file is writable.
+			if ( is_writable( $file_path ) ) {
+				return true;
+			}
+
+			return false;
+
+			// // If not writable, check if the parent directory is writable.
+			// $parent_dir = dirname( $file_path );
+
+			// return is_writable( $parent_dir );
 		}
 	}
 }

@@ -1,7 +1,7 @@
 === WP Control ===
 Tags: log, error log, analytics, cron, crons, transients
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 6.8.1
 Requires PHP: 7.4
 Stable tag: 1.9.1
 License: GPLv3 or later
@@ -31,6 +31,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Build-in fully functional Cron manager
 - Build-in fully functional Transients manager
 - Build-in badge that shows you current environment type
+- Option to randomize the name of the error log file (security)
 
 == Installation ==
 

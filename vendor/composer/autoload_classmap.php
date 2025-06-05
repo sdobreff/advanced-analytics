@@ -25,6 +25,7 @@ return array(
     'ADVAN\\Helpers\\Settings' => $baseDir . '/classes/helpers/class-settings.php',
     'ADVAN\\Helpers\\System_Status' => $baseDir . '/classes/helpers/class-system-status.php',
     'ADVAN\\Helpers\\Transients_Helper' => $baseDir . '/classes/helpers/class-transients-helper.php',
+    'ADVAN\\Helpers\\Upgrade_Notice' => $baseDir . '/classes/helpers/class-upgrade-notice.php',
     'ADVAN\\Helpers\\WP_Error_Handler' => $baseDir . '/classes/helpers/class-wp-error-handler.php',
     'ADVAN\\Helpers\\WP_Helper' => $baseDir . '/classes/helpers/class-wp-helper.php',
     'ADVAN\\Lists\\Crons_List' => $baseDir . '/classes/lists/class-crons-list.php',

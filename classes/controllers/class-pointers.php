@@ -76,7 +76,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 						jQuery('#<?php echo \esc_attr( $element_id ); ?>').pointer( 
 							{
 								content:
-									"<h3>" + __( 'Advanced Analytics', '0-day-analytics' ) + "<\/h3>" +
+									"<h3>" + __( 'WP Control', '0-day-analytics' ) + "<\/h3>" +
 									"<h4>" + __( 'Here is the home for your', '0-day-analytics' ) + "<\/h4>" +
 									"<p>" + __( ' - Error Logs', '0-day-analytics' ) + "</p>" +
 									"<p>" + __( ' - Cron Jobs', '0-day-analytics' ) + "</p>" +

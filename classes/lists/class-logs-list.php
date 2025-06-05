@@ -1128,7 +1128,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<div>
 					<?php
 					if ( \current_user_can( 'manage_options' ) ) {
-						if ( '0 B' !== File_Helper::format_file_size( Error_Log::autodetect() ) ) {
+						if ( '0 B' !== File_Helper::format_file_size( Error_Log::autodetect() ) && File_Helper::is_writable( Error_Log::autodetect() ) ) {
 							?>
 
 							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />

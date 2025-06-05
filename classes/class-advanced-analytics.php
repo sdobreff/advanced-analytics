@@ -3,7 +3,7 @@
  * Responsible for plugin initialization.
  *
  * @package    advanced-analytics
- * @copyright  %%YEAR%% ADvanced Analytics
+ * @copyright  %%YEAR%% WP Control
  * @license    https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link       https://wordpress.org/plugins/advanced-analytics/
  *
@@ -28,6 +28,7 @@ use ADVAN\Controllers\Slack_API;
 use ADVAN\Helpers\Review_Plugin;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Integrations;
 use ADVAN\Controllers\Telegram_API;
 use ADVAN\Helpers\WP_Error_Handler;
@@ -73,6 +74,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Review_Plugin::init();
 
 				// Integrations::init();
+
 				\add_filter( 'init', array( Settings::class, 'init' ) );
 
 				Pointers::init();
@@ -82,6 +84,9 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				// Hide all unrelated to the plugin notices on the plugin admin pages.
 				\add_action( 'admin_print_scripts', array( __CLASS__, 'hide_unrelated_notices' ) );
+
+				// Check for urgent upgrades.
+				\add_action( 'current_screen', array( Upgrade_Notice::class, 'init' ) );
 
 				if ( Settings::get_current_options()['environment_type_admin_bar'] ) {
 					\add_action( 'init', array( Display_Environment_Type::class, 'init' ) );

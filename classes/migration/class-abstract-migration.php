@@ -4,7 +4,7 @@
  *
  * @package    advanced-analytics
  * @subpackage migration
- * @copyright  %%YEAR%% Advanced Analytics
+ * @copyright  %%YEAR%% WP Control
  * @license    https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  */
 

@@ -2363,6 +2363,7 @@ input:not(:checked) + span.switchery {
 /* Dark Skin */
 
 html.aadvana-darkskin .badge {
+  margin: 5px 0;
   background: rgba(30, 26, 26, 0.76);
   color: #a3acb5;
 }
