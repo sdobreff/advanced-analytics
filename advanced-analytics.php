@@ -2,7 +2,7 @@
 /**
  * 0-day Analytics
  *
- * Do WP Advanced Analysis
+ * Do WP Control
  *
  * @package   0-day-analytics
  * @author    sdobreff
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Constants.
 define( 'ADVAN_VERSION', '1.9.1' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
-define( 'ADVAN_NAME', 'Advanced Analysis' );
+define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
 define( 'ADVAN_PLUGIN_ROOT_URL', \plugin_dir_url( __FILE__ ) );
 define( 'ADVAN_PLUGIN_BASENAME', \plugin_basename( __FILE__ ) );

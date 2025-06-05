@@ -52,13 +52,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 */
 		public static function schedule_event( $hook, $recurrence, $first_run = null, $args = array() ) {
 			if ( ! \wp_next_scheduled( $hook, $args ) ) {
-				$timestamp = $first_run ? $first_run : time();
+				$timestamp = $first_run ? (int) $first_run : time();
 				\wp_schedule_event( $timestamp, $recurrence, $hook, $args );
 			}
 		}
 
 		/**
-		 * Unschedules a cron event
+		 * Unschedule a cron event
 		 *
 		 * @param string $hook The action hook name.
 		 * @param array  $args Arguments used when scheduling.
@@ -68,7 +68,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function unschedule_event( $hook, $args = array() ) {
-			$timestamp = \wp_next_scheduled( $hook, $args );
+			$timestamp = self::is_scheduled( $hook, $args );
 			if ( $timestamp ) {
 				return \wp_unschedule_event( $timestamp, $hook, $args );
 			}
@@ -86,7 +86,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @since 1.3.0
 		 */
-		public static function is_scheduled( $hook, $args = array() ) {
+		public static function is_scheduled( $hook, $args = array() ): bool {
 			return \wp_next_scheduled( $hook, $args ) !== false;
 		}
 
