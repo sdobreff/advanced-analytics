@@ -220,6 +220,63 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		}
 
 		/**
+		 * Creates transient using values in $_POST array
+		 *
+		 * @param string  $transient - The name of the transient.
+		 * @param boolean $site_wide - Is this a site-wide transient or not.
+		 *
+		 * @return boolean
+		 *
+		 * @since latest
+		 */
+		public static function create_transient( $transient = '', $site_wide = false ) {
+
+			// Bail if no Transient.
+			if ( empty( $transient ) ) {
+				return false;
+			}
+
+			if ( ! isset( $_POST['value'], $_REQUEST['cron_next_run_custom_date'], $_REQUEST['cron_next_run_custom_time'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				return false;
+			}
+
+			// Values.
+			$value = \stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			// $expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+			// Subtract now.
+			// $expiration = ( $expiration - time() );
+
+			$current_time = time();
+
+			$date = ( ( isset( $_REQUEST['cron_next_run_custom_date'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_date'] ) ) : '' );
+
+			$time = ( ( isset( $_REQUEST['cron_next_run_custom_time'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_time'] ) ) : '' );
+
+			$next_run_local = $date . ' ' . $time;
+
+			$next_run_local = strtotime( $next_run_local, $current_time );
+
+			if ( false === $next_run_local ) {
+				return new \WP_Error(
+					'invalid_timestamp',
+					__( 'Invalid timestamp provided.', '0-day-analytics' )
+				);
+			}
+
+			$expiration = (int) \get_gmt_from_date( \gmdate( 'Y-m-d H:i:s', $next_run_local ), 'U' );
+
+			$expiration = ( $expiration - time() );
+
+			// Transient type.
+			$retval = ( false !== $site_wide )
+			? \set_site_transient( $transient, $value, $expiration )
+			: \set_transient( $transient, $value, $expiration );
+
+			return $retval;
+		}
+
+		/**
 		 * Retrieve the human-friendly transient value from the transient object
 		 *
 		 * @param  string $transient - The transient value.
@@ -418,9 +475,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 				$normalized_data = array();
 				foreach ( $transients as $transient ) {
 					$normalized_data[] = array(
-						'transient_name' => Transients_Helper::get_transient_name( $transient['option_name'] ),
-						'value'          => Transients_Helper::get_transient_value( $transient['option_value'] ),
-						'schedule'       => Transients_Helper::get_transient_expiration_time( $transient['option_name'] ),
+						'transient_name' => self::get_transient_name( $transient['option_name'] ),
+						'value'          => self::get_transient_value( $transient['option_value'] ),
+						'schedule'       => self::get_transient_expiration_time( $transient['option_name'] ),
 						'id'             => $transient['option_id'],
 
 					);

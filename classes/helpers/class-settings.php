@@ -163,6 +163,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 
 			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( __CLASS__, 'update_transient' ) );
+			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( __CLASS__, 'new_transient' ) );
 			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( __CLASS__, 'update_cron' ) );
 
 			/**
@@ -841,6 +842,44 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		}
 
 		/**
+		 * Collects all the data from the form and creates new transient.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function new_transient() {
+
+			// Bail if nonce fails.
+			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Transients_List::NONCE_NAME ) ) {
+				return;
+			}
+
+			// Sanitize transient.
+			$transient = \sanitize_key( $_REQUEST['name'] );
+
+			// Site wide.
+			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field( \wp_unslash( $_REQUEST['name'] ) ) );
+
+			Transients_Helper::create_transient( $transient, $site_wide );
+
+			\wp_safe_redirect(
+				\remove_query_arg(
+					array( 'deleted' ),
+					add_query_arg(
+						array(
+							'page'                        => self::TRANSIENTS_MENU_SLUG,
+							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
+							'updated'                     => true,
+						),
+						\admin_url( 'admin.php' )
+					)
+				)
+			);
+			exit;
+		}
+
+		/**
 		 * Collects all the data from the form and updates the transient.
 		 *
 		 * @return void
@@ -997,12 +1036,64 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					</form>
 				</div>
 				<?php
+			} elseif ( ! empty( $action ) && ( 'new_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
+			) {
+				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', time() );
+				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+				?>
+				<div class="wrap">
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'New Transient', '0-day-analytics' ); ?></h1>
+					<hr class="wp-header-end">
+
+					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+						<input type="hidden" name="<?php echo \esc_attr( Transients_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Transients_List::escaped_search_input() ); ?>" />
+						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::NEW_ACTION ); ?>" />
+						<?php \wp_nonce_field( Transients_List::NONCE_NAME ); ?>
+
+						<table class="form-table">
+							<tbody>
+								<tr>
+									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
+									<td><input type="text" class="large-text code" name="name" value="" /></td>
+								</tr>
+								
+								<tr>
+									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
+									<td>
+									<?php
+										printf(
+											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
+											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
+											esc_attr( $next_run_date_local ),
+											esc_attr( $next_run_time_local )
+										);
+									?>
+									</td>
+								</tr>
+								<tr>
+									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
+									<td>
+										<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"></textarea>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<p class="submit">
+							<?php \submit_button( '', 'primary', '', false ); ?>
+						</p>
+					</form>
+				</div>
+				<?php
 			} else {
 				$transients = new Transients_List( array() );
 				$transients->prepare_items();
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
+					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . self::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
+					<hr class="wp-header-end">
 					<form id="transients-filter" method="get">
 					<?php
 

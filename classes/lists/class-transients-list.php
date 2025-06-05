@@ -43,6 +43,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 		public const UPDATE_ACTION = 'advan_transients_update';
 
+		public const NEW_ACTION = 'advan_transients_new';
+
 		public const NONCE_NAME = 'advana_transients_manager';
 
 		public const SEARCH_INPUT = 'sgp';
