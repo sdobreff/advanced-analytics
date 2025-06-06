@@ -16,8 +16,10 @@ use ADVAN\Controllers\Slack;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
+use ADVAN\Controllers\Reverse_Line_Reader;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Lists\Logs_List;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -46,6 +48,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 * Truncate file
 				 */
 				\add_action( 'wp_ajax_advanced_analytics_truncate_log_file', array( __CLASS__, 'truncate_log_file' ) );
+
+				/**
+				 * Truncate file
+				 */
+				\add_action( 'wp_ajax_advanced_analytics_truncate_and_keep_log_file', array( __CLASS__, 'truncate_and_keep_log_file' ) );
 
 				/**
 				 * Download file
@@ -106,6 +113,35 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			Error_Log::clear( Error_Log::autodetect() );
 			Log_Line_Parser::delete_last_parsed_timestamp();
+
+			\wp_send_json_success( 2 );
+		}
+
+		/**
+		 * Truncates the error log file, but keeps the last records.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function truncate_and_keep_log_file() {
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+			$file_and_path = Error_Log::autodetect();
+
+			$dirname = pathinfo( $file_and_path, PATHINFO_DIRNAME );
+			$dirname = realpath( $dirname );
+
+			$temp_file = File_Helper::generate_random_file_name() . '.log';
+
+			Reverse_Line_Reader::set_temp_handle_from_file_path( \trailingslashit( $dirname ) . $temp_file );
+
+			$items = Logs_List::get_error_items( true, 5 );
+
+			Error_Log::clear( $file_and_patch );
+			Log_Line_Parser::delete_last_parsed_timestamp();
+
+			rename(\trailingslashit( $dirname ) . $temp_file, $file_and_path);
 
 			\wp_send_json_success( 2 );
 		}

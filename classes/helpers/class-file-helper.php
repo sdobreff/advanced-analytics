@@ -80,6 +80,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 */
 		public static function write_to_file( string $filename, string $content, bool $append = false ): bool {
 			global $wp_filesystem;
+
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 			WP_Filesystem();
 

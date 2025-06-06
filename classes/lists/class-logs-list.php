@@ -348,9 +348,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Collect error items.
 		 *
-		 * @param boolean $write_temp - Bool option responsible for should we write the temp error log or not?.
-		 * @param int     $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
-		 * @param bool    $first_only - If true, only the first item will be returned.
+		 * @param boolean  $write_temp - Bool option responsible for should we write the temp error log or not?.
+		 * @param int|bool $items - Number of items to read from the error log. If false or not set, the items per page for that object will be used. @see method get_screen_option_per_page.
+		 * @param bool     $first_only - If true, only the first item will be returned.
 		 *
 		 * @return array
 		 *
@@ -1107,6 +1107,19 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}, 'json');
 					});
+					jQuery( document ).on( 'click', '#top-truncate-and-keep, #bottom-truncate-and-keep', function ( e ) {
+						var data = {
+							'action': 'advanced_analytics_truncate_and_keep_log_file',
+							'post_type': 'GET',
+							'_wpnonce': jQuery('#advanced-analytics-security').val(),
+						};
+
+						jQuery.post(ajaxurl, data, function(response) {
+							if( 2 === response['data'] ) {
+								window.location.reload();
+							}
+						}, 'json');
+					});
 					jQuery( document ).on( 'click', '#top-downloadlog, #bottom-downloadlog', function ( e ) {
 						
 						const a = document.createElement('a');
@@ -1132,6 +1145,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							?>
 
 							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
+
+							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate-and-keep" type="button" value="<?php echo esc_html__( 'Truncate file (keep last records)', '0-day-analytics' ); ?>" />
 							
 							<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
 							<?php

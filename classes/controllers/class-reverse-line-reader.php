@@ -390,5 +390,30 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			self::$pos              = null;
 			self::$error_log_handle = null;
 		}
+
+		public static function set_temp_handle_from_file_path( string $file_path ) {
+
+			$mode = 'w';
+
+			if ( empty( $file_path ) ) {
+				self::$temp_handle = null;
+			} else {
+				$dir = dirname( $file_path );
+				if ( ! is_dir( $dir ) ) {
+					return new \WP_Error( 'directory_not_found', 'The directory does not exist: ' . $dir );
+				}
+				if ( ! is_writable( $dir ) ) {
+					return new \WP_Error( 'directory_not_writable', 'The directory is not writable: ' . $dir );
+				}
+
+				// Attempt to open the file.
+				$handle = @fopen( $file_path, $mode );
+				if ( false === $handle ) {
+					return new \WP_Error( 'file_open_error', 'Unable to open or create the file: ' . $file_path );
+				}
+
+				self::$temp_handle = $handle;
+			}
+		}
 	}
 }
