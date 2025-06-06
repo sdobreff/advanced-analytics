@@ -201,7 +201,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			? sanitize_key( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: '';
 
-			if ( \in_array( $action, array( 'edit_transient', 'edit_cron' ), true ) ) {
+			if ( \in_array( $action, array( 'edit_transient', 'edit_cron', 'new_transient' ), true ) ) {
 				// Try to enqueue the code editor.
 				$settings = \wp_enqueue_code_editor(
 					array(
@@ -856,10 +856,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			// Sanitize transient.
-			$transient = \sanitize_key( $_REQUEST['name'] );
+			$transient = ( isset( $_REQUEST['name'] ) ) ? \sanitize_key( $_REQUEST['name'] ) : null;
 
 			// Site wide.
-			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field( \wp_unslash( $_REQUEST['name'] ) ) );
+			$site_wide = ! empty( $_REQUEST['side-wide'] ) ? filter_var( $_REQUEST['side-wide'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			Transients_Helper::create_transient( $transient, $site_wide );
 
@@ -1057,7 +1057,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
 									<td><input type="text" class="large-text code" name="name" value="" /></td>
 								</tr>
-								
+								<tr>
+									<th><?php esc_html_e( 'Side Wide', '0-day-analytics' ); ?></th>
+									<td><input type="checkbox" name="side-wide" value="1" /></td>
+								</tr>
 								<tr>
 									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
 									<td>

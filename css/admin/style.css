@@ -2362,6 +2362,16 @@ input:not(:checked) + span.switchery {
 
 /* Dark Skin */
 
+html.aadvana-darkskin .wrap .add-new-h2:hover, .wrap .page-title-action:hover {
+  background: #140a47;
+  color: #abadaf;
+}
+
+html.aadvana-darkskin .wrap .add-new-h2, .wrap .add-new-h2:active, .wrap .page-title-action, .wrap .page-title-action:active {
+  background: #03010f;
+  color: #abadaf;
+}
+
 html.aadvana-darkskin .badge {
   margin: 5px 0;
   background: rgba(30, 26, 26, 0.76);
