@@ -570,5 +570,42 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 			// return is_writable( $parent_dir );
 		}
+
+		/**
+		 * Removes empty lines from file using as less memory as possible.
+		 *
+		 * @param string $file_path - The file (absolute) to remove empty lines from.
+		 *
+		 * @return bool
+		 *
+		 * @since latest
+		 */
+		public static function remove_empty_lines_low_memory( string $file_path ): bool {
+			// Open the input file and a temporary output file.
+			$in = @fopen( $file_path, 'r' );
+			if ( ! $in ) {
+				return false;
+			}
+
+			$temp_path = tempnam( sys_get_temp_dir(), 'php_' );
+			$out       = @fopen( $temp_path, 'w' );
+			if ( ! $out ) {
+				fclose( $in );
+				return false;
+			}
+
+			// Process file line by line.
+			while ( ( $line = fgets( $in ) ) !== false ) {
+				if ( trim( $line ) !== '' ) {
+					fwrite( $out, $line );
+				}
+			}
+
+			fclose( $in );
+			fclose( $out );
+
+			// Replace the original file with the filtered one.
+			return rename( $temp_path, $file_path );
+		}
 	}
 }

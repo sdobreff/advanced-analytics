@@ -221,5 +221,32 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		public static function get_last_error() {
 			return self::$last_error;
 		}
+
+		/**
+		 * Suppress error logging.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function suppress_error_logging() {
+
+			if ( null === self::$log_file ) {
+				self::autodetect();
+			}
+			ini_set( 'log_errors', false ); // phpcs:ignore WordPress.PHP.IniSet.log_errors_Disallowed
+		}
+
+		/**
+		 * Enables error logging.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function enable_error_logging() {
+			ini_set( 'log_errors', 1 ); // phpcs:ignore WordPress.PHP.IniSet.log_errors_Disallowed
+			ini_set( 'error_log', self::$log_file );
+		}
 	}
 }

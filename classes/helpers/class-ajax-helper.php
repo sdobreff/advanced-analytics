@@ -127,6 +127,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		public static function truncate_and_keep_log_file() {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
+			\ob_start();
+
+			Error_Log::suppress_error_logging();
+
 			$file_and_path = Error_Log::autodetect();
 
 			$dirname = pathinfo( $file_and_path, PATHINFO_DIRNAME );
@@ -134,16 +138,37 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			$temp_file = File_Helper::generate_random_file_name() . '.log';
 
-			Reverse_Line_Reader::set_temp_handle_from_file_path( \trailingslashit( $dirname ) . $temp_file );
+			$new_log_file = trailingslashit( $dirname ) . $temp_file;
+
+			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
 			$items = Logs_List::get_error_items( true, 5 );
 
-			Error_Log::clear( $file_and_patch );
+			Error_Log::clear( $file_and_path );
 			Log_Line_Parser::delete_last_parsed_timestamp();
 
-			rename(\trailingslashit( $dirname ) . $temp_file, $file_and_path);
+			File_Helper::remove_empty_lines_low_memory( $new_log_file );
+
+			rename( $new_log_file, $file_and_path );
+
+			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
+
+			$items = Logs_List::get_error_items( true, 5 );
+
+			Error_Log::clear( $file_and_path );
+			Log_Line_Parser::delete_last_parsed_timestamp();
+
+			File_Helper::remove_empty_lines_low_memory( $new_log_file );
+
+			rename( $new_log_file, $file_and_path );
+
+			Error_Log::enable_error_logging();
+
+			\ob_clean();
 
 			\wp_send_json_success( 2 );
+
+			\wp_die();
 		}
 
 		/**

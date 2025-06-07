@@ -1110,11 +1110,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					jQuery( document ).on( 'click', '#top-truncate-and-keep, #bottom-truncate-and-keep', function ( e ) {
 						var data = {
 							'action': 'advanced_analytics_truncate_and_keep_log_file',
-							'post_type': 'GET',
 							'_wpnonce': jQuery('#advanced-analytics-security').val(),
 						};
 
-						jQuery.post(ajaxurl, data, function(response) {
+						jQuery.get(ajaxurl, data, function(response) {
 							if( 2 === response['data'] ) {
 								window.location.reload();
 							}
