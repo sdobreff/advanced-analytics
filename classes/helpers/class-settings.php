@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '9'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '10'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -301,24 +301,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( empty( self::$default_options ) ) {
 				// Define default options.
 				self::$default_options = array(
-					'menu_admins_only'             => true,
-					'live_notifications_admin_bar' => true,
-					'environment_type_admin_bar'   => true,
-					'protected_config_source'      => true,
-					'keep_reading_error_log'       => false,
-					'slack_notifications'          => array(
+					'menu_admins_only'                => true,
+					'live_notifications_admin_bar'    => true,
+					'environment_type_admin_bar'      => true,
+					'protected_config_source'         => true,
+					'keep_reading_error_log'          => false,
+					'keep_error_log_records_truncate' => 10,
+					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
 							'auth_token' => '',
 						),
 					),
-					'telegram_notifications'       => array(
+					'telegram_notifications'          => array(
 						'all' => array(
 							'channel'    => '',
 							'auth_token' => '',
 						),
 					),
-					'severities'                   => array(
+					'severities'                      => array(
 						'deprecated' => array(
 							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
@@ -470,6 +471,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
+					\add_action( 'shutdown', array( __CLASS__, 'live_notifications_update' ), 1000 );
 				}
 
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
@@ -846,7 +848,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function new_transient() {
 
@@ -1576,13 +1578,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				$events = Logs_List::get_error_items( false, false, true );
-
-				$event = reset( $events );
-
-				if ( $event && ! empty( $event ) ) {
-
-					?>
+				?>
 					<style>
 						#wp-admin-bar-aadvan-menu {
 							overflow: auto;
@@ -1603,7 +1599,37 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 						?>
 					</style>
-					<?php
+				<?php
+				$admin_bar->add_node(
+					array(
+						'id'    => 'aadvan-menu',
+						'title' => '',
+						'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
+						'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
+					)
+				);
+			}
+		}
+
+		/**
+		 * Shows live notifications in the admin bar if there are candidates.
+		 *
+		 * @param \WP_Admin_Bar $admin_bar - Current admin bar object.
+		 *
+		 * @return void
+		 *
+		 * @since 1.1.0
+		 */
+		public static function live_notifications_update( $admin_bar ) {
+			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
+
+				\ob_start();
+
+				$events = Logs_List::get_error_items( false, false, true );
+
+				$event = reset( $events );
+
+				if ( $event && ! empty( $event ) ) {
 
 					$time_format = 'g:i a';
 
@@ -1630,13 +1656,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						);
 					} elseif ( $event_local === $tomorrow_local ) {
 						$date = sprintf(
-							/* translators: %s: Time */
+						/* translators: %s: Time */
 							__( 'Tomorrow at %s', '0-day-analytics' ),
 							$event_time_local,
 						);
 					} elseif ( $event_local === $yesterday_local ) {
 						$date = sprintf(
-							/* translators: %s: Time */
+						/* translators: %s: Time */
 							__( 'Yesterday at %s', '0-day-analytics' ),
 							$event_time_local,
 						);
@@ -1672,7 +1698,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						$in = __( 'Now', '0-day-analytics' );
 					} else {
 						$in = sprintf(
-							/* translators: %s: Time period, for example "8 minutes" */
+						/* translators: %s: Time period, for example "8 minutes" */
 							__( 'In %s', '0-day-analytics' ),
 							WP_Helper::interval( $until ),
 						);
@@ -1682,14 +1708,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					if ( isset( $event['severity'] ) && ! empty( $event['severity'] ) ) {
 						$classes .= ' ' . $event['severity'];
 					}
-					$admin_bar->add_node(
-						array(
-							'id'    => 'aadvan-menu',
-							'title' => ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b> : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message'],
-							'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
-							'meta'  => array( 'class' => 'aadvan-live-notif-item' . $classes ),
-						)
-					);
+
+					?>
+					<script>
+						jQuery('.aadvan-live-notif-item').addClass('<?php echo $classes; ?>');
+						jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<?php echo ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b> : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message']; ?>');
+					</script>
+					<?php
 				}
 			}
 		}
@@ -1772,7 +1797,18 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['telegram_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_telegram_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_telegram_channel'] ) ) : '';
 
-			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['keep_error_log_records_truncate'] = ( array_key_exists( 'keep_error_log_records_truncate', $post_array ) ) ? filter_var(
+				$post_array['keep_error_log_records_truncate'],
+				\FILTER_VALIDATE_INT,
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 100,
+					),
+				)
+			) : 10;
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 

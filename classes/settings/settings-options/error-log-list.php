@@ -176,11 +176,32 @@ Settings::set_current_options( $settings );
 		}
 	}
 
+	// Error log file options.
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Error log file options', '0-day-analytics' ),
+			'id'    => 'error-log-file-settings',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'How many records to keep when "Truncate file (keep last records)" button is pressed', '0-day-analytics' ),
+			'id'      => 'keep_error_log_records_truncate',
+			'type'    => 'number',
+			'min'     => 1,
+			'max'     => 100,
+			'hint'    => \esc_html__( 'Set how many records to keep if you want to truncate file (reduce the size) but keep the last records. Maximum allowed number is 100, minimum is 1.', '0-day-analytics' ),
+			'default' => Settings::get_current_options(),
+		)
+	);
+
 	// Columns of types of errors showing.
 	Settings::build_option(
 		array(
 			'title' => \esc_html__( 'Display these types of errors in the view', '0-day-analytics' ),
-			'id'    => 'jquery-pretty-tooltips-format-settings',
+			'id'    => 'errors-view-settings',
 			'type'  => 'header',
 		)
 	);

@@ -227,7 +227,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function create_transient( $transient = '', $site_wide = false ) {
 			return self::update_transient( $transient, $site_wide );

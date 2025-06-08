@@ -227,7 +227,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function suppress_error_logging() {
 
@@ -242,7 +242,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function enable_error_logging() {
 			ini_set( 'log_errors', 1 ); // phpcs:ignore WordPress.PHP.IniSet.log_errors_Disallowed

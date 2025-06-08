@@ -550,7 +550,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function is_writable( string $file_path ): bool {
 			// Check if the file exists.
@@ -578,7 +578,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function remove_empty_lines_low_memory( string $file_path ): bool {
 			// Open the input file and a temporary output file.

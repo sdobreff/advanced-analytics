@@ -2,7 +2,7 @@
 /**
  * Controller: Cron Jobs.
  *
- * @since latest
+ * @since 1.9.2
  *
  * @package   advan
  * @subpackage helpers
@@ -23,7 +23,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 	/**
 	 * Provides cron jobs functionality for the plugin.
 	 *
-	 * @since latest
+	 * @since 1.9.2
 	 */
 	class Cron_Jobs {
 
@@ -32,7 +32,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		/**
 		 * The name of the option where plugin stores the cron jobs names (related to the plugin itself).
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public const CRON_JOBS_SETTINGS_NAME = 'cron_jobs_options';
 		/**
@@ -40,7 +40,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function init() {
 			// Add custom schedules for WSAL early otherwise they won't work.
@@ -53,7 +53,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @param array $crons - The list of cron jobs to add.
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function settings_hooks( array $crons ): array {
 			// $available_cron_jobs = Settings_Helper::get_option_value( self::CRON_JOBS_SETTINGS_NAME, array() );
@@ -72,7 +72,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function recurring_schedules( $schedules ) {
 			$schedules = array();
@@ -98,7 +98,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @throws \InvalidArgumentException When cron job information passed not contains required keys.
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function store_cron_option( array $cron_job ) {
 			// if ( empty( $cron_job ) || 1 < count( $cron_job ) ) {
@@ -135,7 +135,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function remove_cron_option( string $cron_name ) {
 			// $available_cron_jobs = Settings_Helper::get_option_value( self::CRON_JOBS_SETTINGS_NAME, array() );
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function initialize_hooks() {
 			$hooks_array = self::CRON_JOBS_NAMES;
@@ -164,7 +164,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 			 *
 			 * @var array - The current hooks.
 			 *
-			 * @since latest
+			 * @since 1.9.2
 			 */
 			$hooks_array = \apply_filters( 'advan_cron_hooks', $hooks_array );
 

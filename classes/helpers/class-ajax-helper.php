@@ -50,7 +50,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\add_action( 'wp_ajax_advanced_analytics_truncate_log_file', array( __CLASS__, 'truncate_log_file' ) );
 
 				/**
-				 * Truncate file
+				 * Truncate file keep last records
 				 */
 				\add_action( 'wp_ajax_advanced_analytics_truncate_and_keep_log_file', array( __CLASS__, 'truncate_and_keep_log_file' ) );
 
@@ -122,7 +122,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function truncate_and_keep_log_file() {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
@@ -142,7 +142,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
-			$items = Logs_List::get_error_items( true, 5 );
+			$items = Logs_List::get_error_items( true, Settings::get_current_options()['keep_error_log_records_truncate'] );
 
 			Error_Log::clear( $file_and_path );
 			Log_Line_Parser::delete_last_parsed_timestamp();
@@ -153,7 +153,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
-			$items = Logs_List::get_error_items( true, 5 );
+			$items = Logs_List::get_error_items( true, Settings::get_current_options()['keep_error_log_records_truncate'] );
 
 			Error_Log::clear( $file_and_path );
 			Log_Line_Parser::delete_last_parsed_timestamp();

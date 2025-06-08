@@ -824,8 +824,12 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 		 * @since 1.1.0
 		 */
 		private static function number() {
+
+			$min = ! empty( self::$min ) ? self::$min : -1000;
+			$max = ! empty( self::$max ) ? self::$max : 1000000;
+
 			?>
-			<input style="width:60px" min="-1000" max="1000000" <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> type="number" value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?>>
+			<input style="width:100px" min="<?php echo $min; ?>" max="<?php echo $max; ?>" <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> type="number" value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?>>
 			<?php
 		}
 

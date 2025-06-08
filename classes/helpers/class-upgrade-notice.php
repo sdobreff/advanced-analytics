@@ -6,7 +6,7 @@
  *
  * @package awesome-footnotes
  *
- * @since latest
+ * @since 1.9.2
  */
 
 declare(strict_types=1);
@@ -27,7 +27,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 	 *
 	 * @package awe
 	 *
-	 * @since latest
+	 * @since 1.9.2
 	 */
 	class Upgrade_Notice {
 		/**
@@ -35,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function init() {
 			global $current_screen;
@@ -57,7 +57,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		public static function prefix_plugin_update_message( $data, $response ) {
 
@@ -86,7 +86,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		private static function get_upgrade_notice( $version ) {
 			$transient_name = 'advan_upgrade_notice_' . $version;
@@ -119,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 * Description
 		 * ...
 		 *
-		 * @since latest
+		 * @since 1.9.2
 		 */
 		private static function parse_update_notice( $content, $new_version ) {
 			$version_parts     = explode( '.', $new_version );
