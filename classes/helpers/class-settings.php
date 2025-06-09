@@ -1614,13 +1614,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		/**
 		 * Shows live notifications in the admin bar if there are candidates.
 		 *
-		 * @param \WP_Admin_Bar $admin_bar - Current admin bar object.
-		 *
 		 * @return void
 		 *
 		 * @since 1.1.0
 		 */
-		public static function live_notifications_update( $admin_bar ) {
+		public static function live_notifications_update() {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
 				\ob_start();

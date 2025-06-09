@@ -947,7 +947,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			} else {
 				$wp_screen = WP_Helper::get_wp_screen();
 
-				if ( self::PAGE_SLUG === $wp_screen->base ) {
+				if ( is_a( $wp_screen, '\WP_Screen' ) && self::PAGE_SLUG === $wp_screen->base ) {
 					$option = $wp_screen->get_option( 'per_page', 'option' );
 					if ( ! $option ) {
 						$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
@@ -958,7 +958,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				self::$per_page = (int) \get_user_option( $option );
 				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
-					self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
+					self::$per_page = false;
+					if ( is_a( $wp_screen, '\WP_Screen' ) ) {
+						self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
+					}
 					if ( ! self::$per_page ) {
 						self::$per_page = self::get_log_errors_to_read();
 					}
