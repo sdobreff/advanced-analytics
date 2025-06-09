@@ -477,5 +477,34 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 			return '_load_textdomain_just_in_time' === $function_name && strpos( $message, '<code>' . ADVAN_TEXTDOMAIN ) !== false;
 		}
+
+		/**
+		 * Log REST API errors
+		 *
+		 * @param WP_REST_Response $result  Result that will be sent to the client.
+		 * @param WP_REST_Server   $server  The API server instance.
+		 * @param WP_REST_Request  $request The request used to generate the response.
+		 *
+		 * @since latest
+		 */
+		public static function log_rest_api_errors( $result, $server, $request ) {
+			if ( $result->is_error() ) {
+				error_log(
+					sprintf(
+						'PHP REST request: %s:',
+						$request->get_route(),
+					) . \PHP_EOL .
+					print_r( $request->get_params(), true )
+				);
+				error_log(
+					sprintf(
+						'PHP REST result: %s:',
+						$result->get_matched_route(),
+					) . \PHP_EOL .
+					print_r( $result->get_data(), true )
+				);
+			}
+			return $result;
+		}
 	}
 }

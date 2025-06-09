@@ -94,6 +94,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
+	\add_filter( 'rest_post_dispatch', array( Advanced_Analytics::class, 'log_rest_api_errors' ), 10, 3 );
 }
 
 // Polyfill for str_starts_with (PHP < 8.0).
@@ -116,3 +117,7 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
+function disable_rest($access) {
+	return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
+}
+add_filter('rest_authentication_errors', 'disable_rest');

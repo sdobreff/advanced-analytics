@@ -1578,28 +1578,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function live_notifications( $admin_bar ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 
-				?>
-					<style>
-						#wp-admin-bar-aadvan-menu {
-							overflow: auto;
-							overflow-x: hidden;
-							text-overflow: ellipsis;
-							max-width: 50%;
-							height: 30px;
-							width: 400px;
-						}
-						/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
-							background: #d7dce0;
-							color: #42425d !important;
-						} */
-						<?php
-						foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-							echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . '{ border-left: 5px solid ' . \esc_attr( $properties['color'] ) . ' !important; }';
-							// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
-						}
-						?>
-					</style>
-				<?php
 				$admin_bar->add_node(
 					array(
 						'id'    => 'aadvan-menu',
@@ -1708,6 +1686,28 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					}
 
 					?>
+					<style>
+						#wp-admin-bar-aadvan-menu {
+							overflow: auto;
+							overflow-x: hidden;
+							text-overflow: ellipsis;
+							max-width: 50%;
+							height: 30px;
+							width: 400px;
+						}
+						/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
+							background: #d7dce0;
+							color: #42425d !important;
+						} */
+						<?php
+						// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
+						if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
+							echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
+						}
+							// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
+						// }
+						?>
+					</style>
 					<script>
 						jQuery('.aadvan-live-notif-item').addClass('<?php echo $classes; ?>');
 						jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<?php echo ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b> : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message']; ?>');
