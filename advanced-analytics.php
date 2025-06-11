@@ -22,6 +22,7 @@
  * Network:         true
  */
 
+use ADVAN\Helpers\Settings;
 use ADVAN\Advanced_Analytics;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\WP_Error_Handler;
@@ -82,6 +83,8 @@ require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
 if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
+	\add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 0, 3 );
+	\add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 20, 3 );
 
 	// All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.
 	\add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
@@ -94,7 +97,9 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
-	\add_filter( 'rest_post_dispatch', array( Advanced_Analytics::class, 'log_rest_api_errors' ), 10, 3 );
+	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
+		\add_filter( 'rest_post_dispatch', array( Advanced_Analytics::class, 'log_rest_api_errors' ), 10, 3 );
+	}
 }
 
 // Polyfill for str_starts_with (PHP < 8.0).
@@ -118,6 +123,6 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 	}
 }
 // function disable_rest($access) {
-// 	return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
+// return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
 // }
 // add_filter('rest_authentication_errors', 'disable_rest');

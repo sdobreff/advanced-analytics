@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '10'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '11'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -306,6 +306,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'environment_type_admin_bar'      => true,
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
+					'no_rest_api_monitor'             => false,
 					'keep_error_log_records_truncate' => 10,
 					'slack_notifications'             => array(
 						'all' => array(
@@ -1387,8 +1388,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						foreach ( $settings_tabs as $tab => $settings ) {
 							if ( ! empty( $settings['title'] ) ) {
 								?>
-						<!-- <?php echo \esc_attr( $tab ); ?> Settings -->
-						<div id="aadvana-options-tab-<?php echo \esc_attr( $tab ); ?>" class="tabs-wrap">
+							<!-- <?php echo \esc_attr( $tab ); ?> Settings -->
+							<div id="aadvana-options-tab-<?php echo \esc_attr( $tab ); ?>" class="tabs-wrap">
 
 								<?php
 								include_once \ADVAN_PLUGIN_ROOT . 'classes/settings/settings-options/' . $tab . '.php';
@@ -1396,7 +1397,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 								\do_action( 'aadvana_plugin_options_tab_' . $tab );
 								?>
 
-						</div>
+							</div>
 								<?php
 							}
 						}
@@ -1796,6 +1797,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['telegram_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_telegram_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_telegram_channel'] ) ) : '';
 
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['no_rest_api_monitor'] = ( array_key_exists( 'no_rest_api_monitor', $post_array ) ) ? filter_var( $post_array['no_rest_api_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['keep_error_log_records_truncate'] = ( array_key_exists( 'keep_error_log_records_truncate', $post_array ) ) ? filter_var(
 				$post_array['keep_error_log_records_truncate'],

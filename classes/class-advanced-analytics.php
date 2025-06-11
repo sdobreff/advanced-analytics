@@ -53,8 +53,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function init() {
 			if ( \is_admin() && ! \wp_doing_ajax() ) {
-				\add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 0, 3 );
-				\add_action( 'doing_it_wrong_run', array( __CLASS__, 'action_doing_it_wrong_run' ), 20, 3 );
 				// \add_filter( 'doing_it_wrong_trigger_error', array( __CLASS__, 'filter_doing_it_wrong_trigger_error' ), 10, 4 );
 
 				Migration::migrate();

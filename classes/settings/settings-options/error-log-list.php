@@ -170,7 +170,7 @@ Settings::set_current_options( $settings );
 					'id'      => 'keep_reading_error_log',
 					'type'    => 'checkbox',
 					'hint'    => \esc_html__( 'Check this if you want to keep reading the error log file, even if WP Debug is not enabled. This will allow you to see the errors in the error log list view, if your system keeps logging errors using some other methods (direct php ini_set). Plugin will automatically try to detect that.', '0-day-analytics' ),
-					'default' => Settings::get_current_options(),
+					'default' => Settings::get_current_options()['keep_reading_error_log'],
 				)
 			);
 		}
@@ -193,7 +193,17 @@ Settings::set_current_options( $settings );
 			'min'     => 1,
 			'max'     => 100,
 			'hint'    => \esc_html__( 'Set how many records to keep if you want to truncate file (reduce the size) but keep the last records. Maximum allowed number is 100, minimum is 1.', '0-day-analytics' ),
-			'default' => Settings::get_current_options(),
+			'default' => Settings::get_current_options()['keep_error_log_records_truncate'],
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Do not monitor REST API for errors', '0-day-analytics' ),
+			'id'      => 'no_rest_api_monitor',
+			'type'    => 'checkbox',
+			'hint'    => \esc_html__( 'By default, plugin tries to monitor WP REST API for errors and logs problems related to it. Check this if you want to disable this functionality.', '0-day-analytics' ),
+			'default' => Settings::get_current_options()['no_rest_api_monitor'],
 		)
 	);
 
@@ -233,7 +243,7 @@ Settings::set_current_options( $settings );
 				'name'    => $severity['name'],
 				'id'      => 'severity_colors_' . $name . '_color',
 				'type'    => 'color',
-				'default' => Settings::get_current_options(),
+				'default' => $severity['color'],
 			)
 		);
 	}

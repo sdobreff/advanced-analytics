@@ -2367,7 +2367,10 @@ html.aadvana-darkskin .wrap .add-new-h2:hover, .wrap .page-title-action:hover {
   color: #abadaf;
 }
 
-html.aadvana-darkskin .wrap .add-new-h2, .wrap .add-new-h2:active, .wrap .page-title-action, .wrap .page-title-action:active {
+html.aadvana-darkskin .wrap .add-new-h2, 
+html.aadvana-darkskin .wrap .add-new-h2:active, 
+html.aadvana-darkskin .wrap .page-title-action, 
+html.aadvana-darkskin .wrap .page-title-action:active {
   background: #03010f;
   color: #abadaf;
 }
