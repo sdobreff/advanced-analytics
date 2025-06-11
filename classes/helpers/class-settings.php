@@ -56,6 +56,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public const PAGE_SLUG = 'wp-control_page_advan_logs_settings';
 
+		public const LIVE_NOTIF_JS_MODULE = 'wp-control-live-notifications-js';
+
 		/**
 		 * Holds cache for disabled severity levels
 		 *
@@ -473,6 +475,18 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 					\add_action( 'shutdown', array( __CLASS__, 'live_notifications_update' ), 1000 );
+					\add_action(
+						'admin_enqueue_scripts',
+						function() {
+							\wp_enqueue_script(
+								self::LIVE_NOTIF_JS_MODULE,
+								\ADVAN_PLUGIN_ROOT_URL . 'js/admin/endpoints.js',
+								array( 'wp-api-fetch', 'wp-dom-ready', 'wp-i18n' ),
+								\ADVAN_VERSION,
+								array( 'in_footer' => true )
+							);
+						}
+					);
 				}
 
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
@@ -1599,8 +1613,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function live_notifications_update() {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
-
-				\ob_start();
 
 				$events = Logs_List::get_error_items( false, false, true );
 

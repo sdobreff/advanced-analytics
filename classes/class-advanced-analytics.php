@@ -34,6 +34,7 @@ use ADVAN\Controllers\Telegram_API;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Controllers\Footnotes_Formatter;
 use ADVAN\Controllers\Display_Environment_Type;
+use ADVAN\ControllersApi\Endpoints;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 

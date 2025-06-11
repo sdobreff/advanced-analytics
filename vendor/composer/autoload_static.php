@@ -22,6 +22,8 @@ class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
 
     public static $classMap = array (
         'ADVAN\\Advanced_Analytics' => __DIR__ . '/../..' . '/classes/class-advanced-analytics.php',
+        'ADVAN\\ControllersApi\\Endpoints' => __DIR__ . '/../..' . '/classes/controllers/class-endpoints.php',
+        'ADVAN\\Controllers\\Cron_Jobs' => __DIR__ . '/../..' . '/classes/helpers/class-cron-jobs.php',
         'ADVAN\\Controllers\\Display_Environment_Type' => __DIR__ . '/../..' . '/classes/controllers/class-display-environment-type.php',
         'ADVAN\\Controllers\\Error_Log' => __DIR__ . '/../..' . '/classes/controllers/class-error-log.php',
         'ADVAN\\Controllers\\Pointers' => __DIR__ . '/../..' . '/classes/controllers/class-pointers.php',

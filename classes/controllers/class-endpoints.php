@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace ADVAN\ControllersApi;
 
+use ADVAN\Lists\Logs_List;
+
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
 /**
@@ -38,39 +40,19 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'login' => array(
-					'class'     => API_Login::class,
-					'namespace' => 'wp-2fa-methods/v1',
+				'live' => array(
+					'class'     => Logs_List::class,
+					'namespace' => 'wp-control/v1',
 
 					'endpoints' => array(
 						array(
-							'(?P<user_id>\d+)(?:/(?P<token>\w+))(?:/(?P<remember_device>\w+))?' => array(
+							'get_last_item' => array(
 								'methods'          => array(
 									'method'   => \WP_REST_Server::READABLE,
-									'callback' => 'validate_provider',
+									'callback' => 'extract_last_item',
 								),
-								'args'             => array(
-									'user_id'         => array(
-										'required'    => true,
-										'type'        => 'integer',
-										'description' => 'User ID',
-										'minimum'     => 1,
-										'sanitize_callback' => 'absint',
-									),
-									'token'           => array(
-										'required'    => false,
-										'type'        => 'string',
-										'description' => 'Provider token',
-										'minimum'     => 3,
-									),
-									'remember_device' => array(
-										'required'    => false,
-										'type'        => 'boolean',
-										'description' => 'Remember device',
-									),
-								),
-								'checkPermissions' => '__return_true',
-								'showInIndex'      => false,
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => true,
 							),
 						),
 					),
@@ -89,14 +71,14 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 
 			\add_action( 'rest_api_init', array( __CLASS__, 'init_endpoints' ) );
 
-			//$api_classes = Classes_Helper::get_classes_by_namespace( 'WP2FA\Admin\Controllers\API' );
+			// $api_classes = Classes_Helper::get_classes_by_namespace( 'WP2FA\Admin\Controllers\API' );
 
 			// if ( \is_array( $api_classes ) && ! empty( $api_classes ) ) {
-			// 	foreach ( $api_classes as $class ) {
-			// 		if ( \method_exists( $class, 'init' ) ) {
-			// 			$class::init();
-			// 		}
-			// 	}
+			// foreach ( $api_classes as $class ) {
+			// if ( \method_exists( $class, 'init' ) ) {
+			// $class::init();
+			// }
+			// }
 			// }
 		}
 
@@ -108,8 +90,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function init_endpoints() {
-			self::$endpoints = \apply_filters( WP_2FA_PREFIX . 'api_endpoints', self::$endpoints );
-
 			foreach ( self::$endpoints as $endpoint_provider ) {
 				foreach ( $endpoint_provider as $root_endpoint => $settings ) {
 					$class     = $settings['class'];
@@ -154,7 +134,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function check_permissions() {
-			return \current_user_can( 'read' );
+			$usr = \is_user_logged_in();
+			$can = \current_user_can( 'manage_options' );
+			return \current_user_can( 'manage_options' );
 		}
 	}
 }

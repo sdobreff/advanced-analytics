@@ -25,6 +25,7 @@
 use ADVAN\Helpers\Settings;
 use ADVAN\Advanced_Analytics;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Helpers\WP_Error_Handler;
 
 // If this file is called directly, abort.
@@ -100,6 +101,8 @@ if ( ! Context_Helper::is_installing() ) {
 	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
 		\add_filter( 'rest_post_dispatch', array( Advanced_Analytics::class, 'log_rest_api_errors' ), 10, 3 );
 	}
+
+	Endpoints::init();
 }
 
 // Polyfill for str_starts_with (PHP < 8.0).

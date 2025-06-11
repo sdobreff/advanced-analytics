@@ -1268,5 +1268,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					<?php
 			}
 		}
+
+		public static function extract_last_item() {
+			echo 'kur';
+		}
 	}
 }
