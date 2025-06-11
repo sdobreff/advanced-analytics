@@ -117,7 +117,7 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
-function disable_rest($access) {
-	return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
-}
-add_filter('rest_authentication_errors', 'disable_rest');
+// function disable_rest($access) {
+// 	return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
+// }
+// add_filter('rest_authentication_errors', 'disable_rest');

@@ -21,13 +21,13 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  */
 if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 
+
 	/**
-	 * Creates and registers all the API endpoints for the proxytron
+	 * Creates and registers all the API endpoints for the plugin
 	 *
 	 * @since 1.9.2
 	 */
 	class Endpoints {
-		const NAMESPACE = 'wp-control/v1';
 
 		/**
 		 * All of the endpoints supported by the plugin.
@@ -37,65 +37,68 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 * @since 1.9.2
 		 */
 		public static $endpoints = array(
-			'site' => array(
-				'class'     => __CLASS__,
-				'endpoints' => array(
-					array(
-						/**
-						 * Extracts record from the database.
-						 * Expected result:
-						 *
-						 * [
-						 *  {
-						 *      "id": "338",
-						 *      "plugin_id": "8257",
-						 *      "site_id": "9901982",
-						 *      "site_url": "https:\/\/www.scanbit.se",
-						 *      "license_id": "966913",
-						 *      "user_count": "80",
-						 *      "quota": "-1",
-						 *      "type": "",
-						 *      "created": "2022-07-10 23:05:58",
-						 *      "last_changed": "0000-00-00 00:00:00",
-						 *      "last_contacted": "2022-07-21 23:59:59"
-						 *  }
-						 *  ]
-						 */
-						'customers/(?P<plugin_id>\d+)/(?P<site_id>\d+)/(?P<license_id>\d+)' => array(
-							'methods'          => array(
-								'method'   => \WP_REST_Server::READABLE,
-								'callback' => 'get_action',
-							),
-							'args'             => array(
-								'plugin_id'  => array(
-									'required'    => true,
-									'type'        => 'integer',
-									'description' => 'Plugin ID',
-									'minimum'     => 1,
+			self::class => array(
+				'login' => array(
+					'class'     => API_Login::class,
+					'namespace' => 'wp-2fa-methods/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<user_id>\d+)(?:/(?P<token>\w+))(?:/(?P<remember_device>\w+))?' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'validate_provider',
 								),
-								'site_id'    => array(
-									'required'    => true,
-									'type'        => 'integer',
-									'description' => 'Site ID',
-									'minimum'     => 1,
+								'args'             => array(
+									'user_id'         => array(
+										'required'    => true,
+										'type'        => 'integer',
+										'description' => 'User ID',
+										'minimum'     => 1,
+										'sanitize_callback' => 'absint',
+									),
+									'token'           => array(
+										'required'    => false,
+										'type'        => 'string',
+										'description' => 'Provider token',
+										'minimum'     => 3,
+									),
+									'remember_device' => array(
+										'required'    => false,
+										'type'        => 'boolean',
+										'description' => 'Remember device',
+									),
 								),
-								'license_id' => array(
-									'required'    => true,
-									'type'        => 'integer',
-									'description' => 'License ID',
-									'minimum'     => 1,
-								),
+								'checkPermissions' => '__return_true',
+								'showInIndex'      => false,
 							),
-							'checkPermissions' => array(
-								__CLASS__,
-								'authorize_request',
-							),
-							'showInIndex'      => false,
 						),
 					),
 				),
 			),
 		);
+
+		/**
+		 * Inits the class
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.2
+		 */
+		public static function init() {
+
+			\add_action( 'rest_api_init', array( __CLASS__, 'init_endpoints' ) );
+
+			//$api_classes = Classes_Helper::get_classes_by_namespace( 'WP2FA\Admin\Controllers\API' );
+
+			// if ( \is_array( $api_classes ) && ! empty( $api_classes ) ) {
+			// 	foreach ( $api_classes as $class ) {
+			// 		if ( \method_exists( $class, 'init' ) ) {
+			// 			$class::init();
+			// 		}
+			// 	}
+			// }
+		}
 
 		/**
 		 * Inits all the endpoints from given structure
@@ -104,38 +107,54 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 *
 		 * @since 1.9.2
 		 */
-		public static function init() {
-			foreach ( self::$endpoints as $settings ) {
-				$class = $settings['class'];
+		public static function init_endpoints() {
+			self::$endpoints = \apply_filters( WP_2FA_PREFIX . 'api_endpoints', self::$endpoints );
 
-				foreach ( $settings['endpoints'] as $routes ) {
-					foreach ( $routes as $route => $endpoint ) {
-						$args = array();
-						if ( isset( $endpoint['args'] ) ) {
-							$args = $endpoint['args'];
-						}
-						$check_permissions = array();
-						if ( isset( $endpoint['checkPermissions'] ) ) {
-							$check_permissions = $endpoint['checkPermissions'];
-						}
-						$show_in_index = $endpoint['showInIndex'];
-						\register_rest_route(
-							self::NAMESPACE,
-							'/' . $route,
-							array(
+			foreach ( self::$endpoints as $endpoint_provider ) {
+				foreach ( $endpoint_provider as $root_endpoint => $settings ) {
+					$class     = $settings['class'];
+					$namespace = $settings['namespace'];
+
+					foreach ( $settings['endpoints'] as $routes ) {
+						foreach ( $routes as $route => $endpoint ) {
+							$args = array();
+							if ( isset( $endpoint['args'] ) ) {
+								$args = $endpoint['args'];
+							}
+							$check_permissions = array();
+							if ( isset( $endpoint['checkPermissions'] ) ) {
+								$check_permissions = $endpoint['checkPermissions'];
+							}
+							$show_in_index = $endpoint['showInIndex'];
+							\register_rest_route(
+								$namespace,
+								'/' . $root_endpoint . '/' . $route,
 								array(
-									'methods'             => $endpoint['methods']['method'],
-									'callback'            => array( $class, $endpoint['methods']['callback'] ),
-									'args'                => $args,
-									'permission_callback' => $check_permissions,
-									'show_in_index'       => $show_in_index,
+									array(
+										'methods'       => $endpoint['methods']['method'],
+										'callback'      => array( $class, $endpoint['methods']['callback'] ),
+										'args'          => $args,
+										'permission_callback' => $check_permissions,
+										'show_in_index' => $show_in_index,
+									),
 								),
-							),
-							false
-						);
+								false
+							);
+						}
 					}
 				}
 			}
+		}
+
+		/**
+		 * Global method to check permissions for API endpoints - this one checks if the user has read capability.
+		 *
+		 * @return bool
+		 *
+		 * @since 1.9.2
+		 */
+		public static function check_permissions() {
+			return \current_user_can( 'read' );
 		}
 	}
 }

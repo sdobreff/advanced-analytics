@@ -491,17 +491,18 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( $result->is_error() ) {
 				error_log(
 					sprintf(
-						'PHP REST request: %s:',
+						'REST API request: %s:',
 						$request->get_route(),
 					) . \PHP_EOL .
-					print_r( $request->get_params(), true )
+					var_export( $request->get_params(), true )
 				);
 				error_log(
 					sprintf(
-						'PHP REST result: %s:',
-						$result->get_matched_route(),
+						'REST API %s: %s.',
+						$result->get_data()['code'],
+						$result->get_data()['message'],
 					) . \PHP_EOL .
-					print_r( $result->get_data(), true )
+					var_export( $result->get_data(), true )
 				);
 			}
 			return $result;

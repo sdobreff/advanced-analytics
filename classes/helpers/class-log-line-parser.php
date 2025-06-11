@@ -79,7 +79,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			$pattern = '/
                 ^(?:\[(?P<timestamp>[\w \-+:\/]{6,50}?)\]\ )?
                 (?P<message>
-                    (?:(?:(?P<source>PHP|WordPress\ database)\ )?(?P<severity>[a-zA-Z][a-zA-Z ]{3,40}?):?\ )?
+                    (?:(?:(?P<source>PHP|WordPress\ database|REST\ API)\ )?(?P<severity>[a-zA-Z][a-zA-Z ]{3,40}?):?\ )?
                 .+)$
             /x';
 
