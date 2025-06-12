@@ -34,6 +34,25 @@ $window.on('load', function () {
         }
     });
 
+    if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
+        // Notifications are enabled, we don't need that anymore.
+        jQuery('#enable_push_notifications-item').hide();
+    } else if ( ( "Notification" in window ) ) {
+        const button = document.querySelector("#enable_push_notifications");
+
+        button.addEventListener("click", () => {
+            if ( Notification.permission !== "granted" ) {
+                Notification.requestPermission().then((status) => {
+                    
+                    // If the user said okay
+                    if (status === "granted") {
+
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
 });
 
 function attachAllDynamicSelects() {

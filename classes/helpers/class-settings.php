@@ -184,11 +184,74 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 1.7.4
 		 */
 		public static function load_custom_wp_admin_style( $hook ) {
+			?>
+				<script>
+					window.onload= ( () => {
+
+						if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
+							// following makes an AJAX call to PHP to get notification every 10 secs
+							setInterval(function() { pushNotify(); }, 10000);
+						}
+
+						function pushNotify() {
+							if (Notification.permission !== "granted")
+								Notification.requestPermission();
+							else {
+							
+								createNotification('kur', '', 'BODY', '');
+								// $.ajax({
+								// 	url: "push-notify.php",
+								// 	type: "POST",
+								// 	success: function(data, textStatus, jqXHR) {
+								// 		// if PHP call returns data process it and show notification
+								// 		// if nothing returns then it means no notification available for now
+								// 		if ($.trim(data)) {
+								// 			var data = jQuery.parseJSON(data);
+								// 			console.log(data);
+								// 			notification = createNotification(data.title, data.icon, data.body, data.url);
+
+								// 			// closes the web browser notification automatically after 5 secs
+								// 			setTimeout(function() {
+								// 				notification.close();
+								// 			}, 5000);
+								// 		}
+								// 	},
+								// 	error: function(jqXHR, textStatus, errorThrown) { }
+								// });
+							}
+						};
+
+						function createNotification(title, icon, body, url) {
+							var notification = new Notification(title, {
+								icon: icon,
+								body: body,
+							});
+							// url that needs to be opened on clicking the notification
+							// finally everything boils down to click and visits right
+							notification.onclick = function() {
+								window.open(url);
+							};
+							return notification;
+						}
+					});
+				</script>
+
+			<?php
 			// $hook is string value given add_menu_page function.
 			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook ) {
 				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
+
+			?>
+			<script>
+				window.onload= ( () => {
+					jQuery('a.view-source').on('click', function(e) {
+						this.href += '&width=' + ( window.innerWidth - 100 ) + '&height=' + ( window.innerHeight - 100 ) ;
+					});
+				});
+			</script>
+			<?php
 		}
 
 		/**
@@ -474,7 +537,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
-					\add_action( 'shutdown', array( __CLASS__, 'live_notifications_update' ), 1000 );
+					\add_action( 'shutdown', array( __CLASS__, 'live_notifications_update' ), \PHP_INT_MAX );
 					\add_action(
 						'admin_enqueue_scripts',
 						function() {
@@ -1431,7 +1494,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			</div><!-- .aadvana-panel -->
 
-						<?php
+			<?php
 		}
 
 		/**
@@ -1615,28 +1678,28 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
 				?>
 				<style>
-				#wp-admin-bar-aadvan-menu {
-					overflow: auto;
-					overflow-x: hidden;
-					text-overflow: ellipsis;
-					max-width: 50%;
-					height: 30px;
-					width: 400px;
-				}
-				/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
-					background: #d7dce0;
-					color: #42425d !important;
-				} */
+					#wp-admin-bar-aadvan-menu {
+						overflow: auto;
+						overflow-x: hidden;
+						text-overflow: ellipsis;
+						max-width: 50%;
+						height: 30px;
+						width: 400px;
+					}
+					/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
+						background: #d7dce0;
+						color: #42425d !important;
+					} */
+					<?php
+					// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
+					// if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
+					// echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
+					// }
+						// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
+					// }
+					?>
+				</style>
 				<?php
-				// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-				// if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
-				// 	echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
-				// }
-					// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
-				// }
-				?>
-			</style>
-			<?php
 			}
 		}
 

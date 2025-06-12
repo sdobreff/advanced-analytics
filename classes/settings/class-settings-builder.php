@@ -500,7 +500,7 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 				$max_chars = ' maxlength="' . self::$max_chars . '"';
 			}
 			?>
-			<input class="aadvana-primary-button button" <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> <?php echo $type_attr; ?>	value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?><?php echo $pattern; ?><?php echo $max_chars; ?><?php echo ( ( self::$required ) ? ' required' : '' ); ?><?php echo $step; ?>>
+			<input class="aadvana-primary-button button" <?php echo self::$item_id_attr; ?> <?php echo self::$name_attr; ?> <?php echo $type_attr; ?> value="<?php echo esc_attr( self::$current_value ); ?>" <?php echo self::$placeholder_attr; ?><?php echo $pattern; ?><?php echo $max_chars; ?><?php echo ( ( self::$required ) ? ' required' : '' ); ?><?php echo $step; ?>>
 			<?php
 		}
 
