@@ -134,8 +134,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function check_permissions() {
-			$usr = \is_user_logged_in();
-			$can = \current_user_can( 'manage_options' );
 			return \current_user_can( 'manage_options' );
 		}
 	}

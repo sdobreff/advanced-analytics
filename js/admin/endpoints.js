@@ -5,15 +5,21 @@ async function fetchSingleItem() {
 	let attResp;
 
 	try {
-        const nonce = 'nonce value';
-        const apiFetch = wp.apiFetch.use( wp.apiFetch.createNonceMiddleware( nonce ) );
-		const response = await apiFetch( {
+		attResp = await wp.apiFetch({
 			path: '/wp-control/v1/live/get_last_item',
-			method: 'POST',
-		} );
+			method: 'GET',
+			cache: 'no-cache'
+		});
 
-		attResp = await startRegistration( response );
-	} catch ( error ) {
+		if (attResp.event) {
+			
+			jQuery("style").append( attResp.style );
+
+			jQuery('.aadvan-live-notif-item').addClass(attResp.classes);
+			jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.in + '</i></b> ' + attResp.event.message);
+		}
+
+	} catch (error) {
 		throw error;
 	}
 
@@ -22,6 +28,6 @@ async function fetchSingleItem() {
 /**
  * Passkey Registration Handler.
  */
-wp.domReady( () => {
+wp.domReady(() => {
 	fetchSingleItem();
-} );
+});

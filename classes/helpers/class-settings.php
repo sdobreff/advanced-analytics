@@ -1613,120 +1613,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function live_notifications_update() {
 			if ( \current_user_can( 'manage_options' ) && \is_admin() ) {
-
-				$events = Logs_List::get_error_items( false, false, true );
-
-				$event = reset( $events );
-
-				if ( $event && ! empty( $event ) ) {
-
-					$time_format = 'g:i a';
-
-					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $event['timestamp'] );
-
-					$timezone_local  = \wp_timezone();
-					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
-					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
-					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
-					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
-
-					// If the offset of the date of the event is different from the offset of the site, add a marker.
-					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
-						$time_format .= ' (P)';
-					}
-
-					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
-
-					if ( $event_local === $today_local ) {
-						$date = sprintf(
-							/* translators: %s: Time */
-							__( 'Today at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} elseif ( $event_local === $tomorrow_local ) {
-						$date = sprintf(
-						/* translators: %s: Time */
-							__( 'Tomorrow at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} elseif ( $event_local === $yesterday_local ) {
-						$date = sprintf(
-						/* translators: %s: Time */
-							__( 'Yesterday at %s', '0-day-analytics' ),
-							$event_time_local,
-						);
-					} else {
-						$date = sprintf(
-							/* translators: 1: Date, 2: Time */
-							__( '%1$s at %2$s', '0-day-analytics' ),
-							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
-							$event_time_local,
-						);
-					}
-
-					$time = sprintf(
-						'<time datetime="%1$s">%2$s</time>',
-						\esc_attr( gmdate( 'c', $event['timestamp'] ) ),
-						\esc_html( $date )
-					);
-
-					$until = $event['timestamp'] - time();
-
-					if ( $until < 0 ) {
-						$ago = sprintf(
-						/* translators: %s: Time period, for example "8 minutes" */
-							__( '%s ago', '0-day-analytics' ),
-							WP_Helper::interval( abs( $until ) )
-						);
-
-						$in = sprintf(
-							' %s ',
-							esc_html( $ago ),
-						);
-					} elseif ( 0 === $until ) {
-						$in = __( 'Now', '0-day-analytics' );
-					} else {
-						$in = sprintf(
-						/* translators: %s: Time period, for example "8 minutes" */
-							__( 'In %s', '0-day-analytics' ),
-							WP_Helper::interval( $until ),
-						);
-					}
-
-					$classes = '';
-					if ( isset( $event['severity'] ) && ! empty( $event['severity'] ) ) {
-						$classes .= ' ' . $event['severity'];
-					}
-
-					?>
-					<style>
-						#wp-admin-bar-aadvan-menu {
-							overflow: auto;
-							overflow-x: hidden;
-							text-overflow: ellipsis;
-							max-width: 50%;
-							height: 30px;
-							width: 400px;
-						}
-						/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
-							background: #d7dce0;
-							color: #42425d !important;
-						} */
-						<?php
-						// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-						if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
-							echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
-						}
-							// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
-						// }
-						?>
-					</style>
-					<script>
-						jQuery('.aadvan-live-notif-item').addClass('<?php echo $classes; ?>');
-						jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<?php echo ( ( ! empty( $in ) ) ? '<b><i>' . $in . '</i></b> : ' : '' ) . ( ( ! empty( $event['severity'] ) ) ? $event['severity'] . ' : ' : '' ) . $event['message']; ?>');
-					</script>
-					<?php
+				?>
+				<style>
+				#wp-admin-bar-aadvan-menu {
+					overflow: auto;
+					overflow-x: hidden;
+					text-overflow: ellipsis;
+					max-width: 50%;
+					height: 30px;
+					width: 400px;
 				}
+				/* #wpadminbar:not(.mobile) .ab-top-menu > li#wp-admin-bar-aadvan-menu:hover > .ab-item {
+					background: #d7dce0;
+					color: #42425d !important;
+				} */
+				<?php
+				// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
+				// if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
+				// 	echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
+				// }
+					// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
+				// }
+				?>
+			</style>
+			<?php
 			}
 		}
 

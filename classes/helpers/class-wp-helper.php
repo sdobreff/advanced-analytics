@@ -864,7 +864,9 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 */
 		public static function get_wp_screen() {
 			if ( empty( self::$wp_screen ) ) {
-				self::$wp_screen = \get_current_screen();
+				if ( \function_exists( 'get_current_screen' ) ) {
+					self::$wp_screen = \get_current_screen();
+				}
 			}
 
 			return self::$wp_screen;

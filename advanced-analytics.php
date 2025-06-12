@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.9.2.1
+ * Version:         1.9.3
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.9.2.1' );
+define( 'ADVAN_VERSION', '1.9.3' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -125,7 +125,3 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
-// function disable_rest($access) {
-// return new \WP_Error('access denied', 'REST API Disabled', ['status' => 403]);
-// }
-// add_filter('rest_authentication_errors', 'disable_rest');
