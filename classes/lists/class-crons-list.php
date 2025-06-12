@@ -1050,7 +1050,9 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
 				);
 
-				$source_link = '<div> <a href="' . $view_url . '" class="thickbox view-source gray_lab badge">view source</a></div>';
+				$title = __( 'Viewing: ', '0-day-analytics' ) . $query_array['error_file'];
+
+				$source_link = '<div> <a href="' . $view_url . '" title="' . $title . '" class="thickbox view-source gray_lab badge">' . __( 'view source', '0-day-analytics' ) . '</a></div>';
 
 			}
 
