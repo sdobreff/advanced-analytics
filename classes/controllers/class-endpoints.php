@@ -52,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 									'callback' => 'extract_last_item',
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
-								'showInIndex'      => true,
+								'showInIndex'      => false,
 							),
 						),
 					),
