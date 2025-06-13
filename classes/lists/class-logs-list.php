@@ -46,6 +46,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 		public const SEARCH_INPUT = 'sgp';
 
+		public const NOTIFICATION_TRANSIENT = 'aadvan_notification';
+
 		/**
 		 * Name of the table to show.
 		 *
@@ -1085,16 +1087,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				// echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
 			}
 
-			if ( false !== $log_file ) {
-
-				$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
-				$time             = \wp_date( $date_time_format, Error_Log::get_modification_time( Error_Log::autodetect() ) );
-
-				echo '<div><b>' . \esc_html__( 'Log file: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ) . '</div>';
-				echo '<div><b>' . \esc_html__( 'File size: ', '0-day-analytics' ) . '</b> ' . \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ) . '</div>';
-				echo '<div><b>' . \esc_html__( 'Last modified: ', '0-day-analytics' ) . '</b> ' . \esc_attr( $time ) . '</div>';
-			}
-
 			if ( 'top' === $which ) {
 				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security' );
 
@@ -1190,6 +1182,51 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				</div>
 				<?php
 			}
+			if ( false !== $log_file ) {
+
+				$date_time_format = \get_option( 'date_format' ) . ' ' . \get_option( 'time_format' );
+				$time             = \wp_date( $date_time_format, Error_Log::get_modification_time( Error_Log::autodetect() ) );
+
+				?>
+				<style>
+					.flex {
+						display:flex;
+					}
+					.flex-row {
+						flex-direction:row;
+					}
+					.grow-0 {
+						flex-grow:0;
+					}
+					.p-2 {
+						padding:8px;
+					}
+					.w-full {
+						width:auto;
+					}
+					.border-t {
+						border-bottom-width:1px;
+					}
+					.justify-between {
+						justify-content:space-between;
+					}
+					.italic {
+						font-style: italic;
+					}
+					.text-lg {
+						font-size: 1.1em;
+						font-weight: bold;
+					}
+				</style>
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					<div>
+						<b><?php \esc_html_e( 'Log file: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ); ?></span></div>
+						<div class=""> <?php echo \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ); ?> <span class="text-lg leading-none">|</span> <?php \esc_html_e( 'Last modified: ', '0-day-analytics' ); ?> <?php echo \esc_attr( $time ); ?>
+					</div>
+				</div>
+				<?php
+
+			}
 		}
 
 		/**
@@ -1277,7 +1314,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.9.3
 		 */
 		public static function extract_last_item() {
 
@@ -1386,6 +1423,118 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					'message' => 'No Events.',
 				)
 			);
+		}
+
+		/**
+		 * Extracts data and send it to Notification if there is something to report
+		 *
+		 * @return array
+		 *
+		 * @since 1.9.3
+		 */
+		public static function get_notification_data(): array {
+			$events = self::get_error_items( false, false, true );
+
+			$event = reset( $events );
+
+			$data = array();
+
+			if ( $event && ! empty( $event ) ) {
+				$last_transient_reported_data = (int) \get_site_transient( self::NOTIFICATION_TRANSIENT );
+
+				if ( $last_transient_reported_data < $event['timestamp'] ) {
+
+					\set_site_transient( self::NOTIFICATION_TRANSIENT, $event['timestamp'] );
+					$time_format = 'g:i a';
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $event['timestamp'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+						$time_format .= ' (P)';
+					}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+					if ( $event_local === $today_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Today at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $tomorrow_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Tomorrow at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $yesterday_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Yesterday at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} else {
+						$date = sprintf(
+						/* translators: 1: Date, 2: Time */
+							__( '%1$s at %2$s', '0-day-analytics' ),
+							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+							$event_time_local,
+						);
+					}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $event['timestamp'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $event['timestamp'] - time();
+
+					if ( $until < 0 ) {
+						$ago = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+							__( '%s ago', '0-day-analytics' ),
+							WP_Helper::interval( abs( $until ) )
+						);
+
+						$in = sprintf(
+							' %s ',
+							esc_html( $ago ),
+						);
+					} elseif ( 0 === $until ) {
+						$in = __( 'Now', '0-day-analytics' );
+					} else {
+						$in = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+							__( 'In %s', '0-day-analytics' ),
+							WP_Helper::interval( $until ),
+						);
+					}
+
+					$base = 'base';
+
+					$base .= '64_en';
+
+					$base .= 'code';
+
+					$data['body']  = $event['severity'] . ' ' . $event['message'];
+					$data['title'] = $in;
+					$data['icon']  = 'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+					$data['url']   = Settings::get_error_log_page_link();
+
+				}
+			} else {
+				\set_site_transient( self::NOTIFICATION_TRANSIENT, time() );
+			}
+
+			return $data;
 		}
 	}
 }

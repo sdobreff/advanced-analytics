@@ -10,7 +10,6 @@
 use ADVAN\Helpers\Settings;
 use ADVAN\Controllers\Slack;
 use ADVAN\Controllers\Telegram;
-use ADVAN\Controllers\Telegram_API;
 
 $settings = Settings::get_current_options();
 
@@ -47,6 +46,18 @@ Settings::set_current_options( $settings );
 				'placeholder' => esc_html__( 'Channel name', '0-day-analytics' ),
 			)
 		);
+
+		if ( isset( Settings::get_current_options()['notification_default_slack_channel'] ) && ! empty( Settings::get_current_options()['notification_default_slack_channel'] ) ) {
+
+			Settings::build_option(
+				array(
+					'add_label' => true,
+					'id'        => 'slack_send_test_notification_ajax',
+					'type'      => 'button',
+					'default'   => esc_html__( 'Send test notification', '0-day-analytics' ),
+				)
+			);
+		}
 	} else {
 		Settings::build_option(
 			array(
@@ -124,12 +135,23 @@ Settings::set_current_options( $settings );
 			array(
 				'name'        => esc_html__( 'Default channel ID', '0-day-analytics' ),
 				'type'        => 'text',
-				'hint'        => esc_html__( 'There you must provide the channel ID.', '0-day-analytics' ),
 				'id'          => 'notification_default_telegram_channel',
 				'hint'        => esc_html__( 'By default Telegram messages will be sent to this channel.', '0-day-analytics' ),
 				'placeholder' => esc_html__( 'Channel name', '0-day-analytics' ),
 			)
 		);
+
+		if ( isset( Settings::get_current_options()['notification_default_telegram_channel'] ) && ! empty( Settings::get_current_options()['notification_default_telegram_channel'] ) ) {
+
+			Settings::build_option(
+				array(
+					'add_label' => true,
+					'id'        => 'telegram_send_test_notification_ajax',
+					'type'      => 'button',
+					'default'   => esc_html__( 'Send test notification', '0-day-analytics' ),
+				)
+			);
+		}
 	} else {
 		Settings::build_option(
 			array(
@@ -192,3 +214,42 @@ Settings::set_current_options( $settings );
 		);
 	}
 	// Telegram settings part end.
+
+	// Push notifications start.
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Push notifications', '0-day-analytics' ),
+			'id'    => 'push-notifications-settings-options',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Enable Push notifications', '0-day-analytics' ),
+			'id'      => 'enable_push_notifications',
+			'type'    => 'button',
+			'hint'    => \esc_html__( 'Enable browser push notifications and plugin will start checking for new errors and send you a notification. Fatal errors may not trigger this. It does not report every error - just the last one after 10 seconds, which means that there may be errors with higher severity before the shown one. This is not recommended for production sites as it will use lots of resources.', '0-day-analytics' ),
+			'default' => \esc_html__( 'Enable push notifications', '0-day-analytics' ),
+		)
+	);
+
+	?>
+	<div id="push-is-enabled" style="display: none;">
+	<?php
+		Settings::build_option(
+			array(
+				'name'    => \esc_html__( 'Push notifications info', '0-day-analytics' ),
+				'id'      => 'info_push_notifications',
+				'type'    => 'message',
+				'text'    => \esc_html__( 'Push notifications are enabled for this browser, if you want to disable them, refer to the browser documentation.', '0-day-analytics' ),
+				'default' => \esc_html__( 'Enable push notifications', '0-day-analytics' ),
+			)
+		);
+
+		?>
+	</div>
+	<?php
+
+	// Push notifications end.
+

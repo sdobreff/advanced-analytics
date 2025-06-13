@@ -37,6 +37,7 @@ $window.on('load', function () {
     if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
         // Notifications are enabled, we don't need that anymore.
         jQuery('#enable_push_notifications-item').hide();
+        jQuery('#push-is-enabled').show();
     } else if ( ( "Notification" in window ) ) {
         const button = document.querySelector("#enable_push_notifications");
 
@@ -336,6 +337,65 @@ $doc.ready(function () {
         stickySaveButton();
     });
 
+    /**
+     * Sends test notification to Slack
+     */
+    $doc.on('click', '#slack_send_test_notification_ajax', function (e) {
+        const nonceValue = jQuery('#slack_notification_nonce').val();
+
+        jQuery.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'aadvana_send_test_slack',
+                    _wpnonce: nonceValue
+                },
+                success: function (data) {
+                    if (data.success) {
+
+                        $saveAlert.addClass('is-success').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                        var { __ } = wp.i18n;
+                        alert( __('Notification sent - check your Slack channel', '0-day-analytics') );
+
+                    } else {
+                        $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                        alert(__('Something went wrong', '0-day-analytics'));
+                    }
+                },
+            });
+    });
+
+    /**
+     * Sends test notification to Telegram
+     */
+    $doc.on('click', '#telegram_send_test_notification_ajax', function (e) {
+        const nonceValue = jQuery('#telegram_notification_nonce').val();
+
+        jQuery.ajax({
+                url: ajaxurl,
+                data: {
+                    action: 'aadvana_send_test_telegram',
+                    _wpnonce: nonceValue
+                },
+                success: function (data) {
+                    if (data.success) {
+
+                        $saveAlert.addClass('is-success').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                        var { __ } = wp.i18n;
+                        alert( __('Notification sent - check your Telegram channel', '0-day-analytics') );
+
+                    } else {
+                        $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
+                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                        alert(__('Something went wrong', '0-day-analytics'));
+                    }
+                },
+            });
+    });
+
+    
     /**
      * Stores the provided Slack API key
      * 

@@ -484,7 +484,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 * @param WP_REST_Server   $server  The API server instance.
 		 * @param WP_REST_Request  $request The request used to generate the response.
 		 *
-		 * @since latest
+		 * @since 1.9.3
 		 */
 		public static function log_rest_api_errors( $result, $server, $request ) {
 			if ( $result->is_error() ) {

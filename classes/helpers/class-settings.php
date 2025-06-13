@@ -186,7 +186,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function load_custom_wp_admin_style( $hook ) {
 			?>
 				<script>
-					window.onload= ( () => {
+					window.addEventListener("load", () => {
 
 						if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
 							// following makes an AJAX call to PHP to get notification every 10 secs
@@ -197,27 +197,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							if (Notification.permission !== "granted")
 								Notification.requestPermission();
 							else {
-							
-								createNotification('kur', '', 'BODY', '');
-								// $.ajax({
-								// 	url: "push-notify.php",
-								// 	type: "POST",
-								// 	success: function(data, textStatus, jqXHR) {
-								// 		// if PHP call returns data process it and show notification
-								// 		// if nothing returns then it means no notification available for now
-								// 		if ($.trim(data)) {
-								// 			var data = jQuery.parseJSON(data);
-								// 			console.log(data);
-								// 			notification = createNotification(data.title, data.icon, data.body, data.url);
 
-								// 			// closes the web browser notification automatically after 5 secs
-								// 			setTimeout(function() {
-								// 				notification.close();
-								// 			}, 5000);
-								// 		}
-								// 	},
-								// 	error: function(jqXHR, textStatus, errorThrown) { }
-								// });
+								var data = {
+									'action': 'aadvana_get_notification_data',
+									'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' ); ?>',
+								};
+
+								jQuery.get({
+									url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+									data,
+									success: function(data, textStatus, jqXHR) {
+										// if PHP call returns data process it and show notification
+										// if nothing returns then it means no notification available for now
+										if (jQuery.trim(data.data)) {
+											
+											notification = createNotification(data.data.title, data.data.icon, data.data.body, data.data.url);
+
+											// closes the web browser notification automatically after 5 secs
+											setTimeout(function() {
+												notification.close();
+											}, 5000);
+										}
+									},
+									error: function(jqXHR, textStatus, errorThrown) { }
+								});
 							}
 						};
 

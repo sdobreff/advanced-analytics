@@ -391,6 +391,15 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			self::$error_log_handle = null;
 		}
 
+		/**
+		 * Sets temporary error log file in order to extract / set some data.
+		 *
+		 * @param string $file_path - The full path for the temp file.
+		 *
+		 * @return \WP_Error|resource
+		 *
+		 * @since 1.9.3
+		 */
 		public static function set_temp_handle_from_file_path( string $file_path ) {
 
 			$mode = 'w';

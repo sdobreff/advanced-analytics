@@ -85,6 +85,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\add_action( 'wp_ajax_aadvana_store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
 
 				/**
+				 * Send Slack test message
+				 */
+				\add_action( 'wp_ajax_aadvana_send_test_slack', array( __CLASS__, 'slack_test_message_ajax' ) );
+
+				/**
+				 * Send telegram test message
+				 */
+				\add_action( 'wp_ajax_aadvana_send_test_telegram', array( __CLASS__, 'telegram_test_message_ajax' ) );
+
+				/**
 				 * Store Telegram API key
 				 */
 				\add_action( 'wp_ajax_aadvana_store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
@@ -97,6 +107,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 * @since 1.8.2
 				 */
 				\add_action( 'wp_ajax_log_source_view', array( __CLASS__, 'ajax_view_source' ) );
+
+				/**
+				 * Extract notification
+				 *
+				 * @return void
+				 *
+				 * @since 1.9.3
+				 */
+				\add_action( 'wp_ajax_aadvana_get_notification_data', array( __CLASS__, 'get_notification_data' ) );
 
 			}
 		}
@@ -309,6 +328,44 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		}
 
 		/**
+		 * Sends test message to Telegram channel
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function telegram_test_message_ajax() {
+			WP_Helper::verify_admin_nonce( Telegram::NONCE_NAME );
+
+			if ( Telegram::is_set() ) {
+				Telegram_API::send_telegram_message_via_api( null, null, __( 'TEST MESSAGE', '0-day-analytics' ) );
+
+				\wp_send_json_success();
+			}
+
+			\wp_send_json_error( __( 'TELEGRAM: Something is wrong with your configuration.', '0-day-analytics' ) . Slack_API::get_slack_error() );
+		}
+
+		/**
+		 * Sends test message to Slack channel
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function slack_test_message_ajax() {
+			WP_Helper::verify_admin_nonce( Slack::NONCE_NAME );
+
+			if ( Slack::is_set() ) {
+				Slack_API::send_slack_message_via_api( null, null, __( 'TEST MESSAGE', '0-day-analytics' ) );
+
+				\wp_send_json_success();
+			}
+
+			\wp_send_json_error( __( 'SLACK: Something is wrong with your configuration.', '0-day-analytics' ) . Slack_API::get_slack_error() );
+		}
+
+		/**
 		 * Stores the Slack Credentials key via AJAX request
 		 *
 		 * @return void
@@ -364,6 +421,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				}
 
 				\wp_send_json_error( __( 'TELEGRAM: No token provided or the provided one is invalid. Please check and provide the details again.', '0-day-analytics' ) . Telegram_API::get_telegram_error() );
+			}
+		}
+
+		/**
+		 * Returns the data used to show notification (if any)
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.3
+		 */
+		public static function get_notification_data() {
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+			$data = Logs_List::get_notification_data();
+
+			if ( empty( $data ) ) {
+				\wp_send_json_success();
+			} else {
+				\wp_send_json_success( $data );
 			}
 		}
 
