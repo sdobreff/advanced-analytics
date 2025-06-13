@@ -584,32 +584,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 				</script>
 				<?php
 			}
-			if ( ( ( isset( $_REQUEST['action'] ) && 'run' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'run' === $_REQUEST['action2'] ) ) ) {
-				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
-				}
-				/**
-				 * Note: the nonce field is set by the parent class
-				 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );.
-				 */
-				WP_Helper::verify_admin_nonce( 'bulk-' . $this->_args['plural'] );
-
-				if ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
-					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-						$id = \sanitize_text_field( $id );
-						if ( ! empty( $id ) ) {
-							// Delete the transient.
-							// Crons_Helper::execute_event( $id );
-						}
-					}
-				}
-				?>
-				<script>
-					jQuery('body').addClass('has-overlay');
-					
-				</script>
-				<?php
-			}
 		}
 
 		/**

@@ -90,7 +90,6 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 			if ( ! is_dir( $logging_dir ) ) {
 				if ( false === \wp_mkdir_p( $logging_dir ) ) {
-					// self::$last_error = 'Unable to create directory';
 					self::$last_error = new \WP_Error(
 						'mkdir_failed',
 						sprintf(
@@ -198,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 */
 		public static function download( $file_path ) {
 			set_time_limit( 0 );
-			ini_set( 'memory_limit', '512M' );
+			@ini_set( 'memory_limit', '512M' );
 			if ( ! empty( $file_path ) ) {
 				$file_info            = pathinfo( $file_path );
 				$file_name            = $file_info['basename'];
@@ -217,7 +216,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 					$length = $size;
 					// HEADERS FOR PARTIAL DOWNLOAD FACILITY BEGINS.
 					if ( isset( $_SERVER['HTTP_RANGE'] ) ) {
-						preg_match( '/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches );
+						preg_match( '/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 						$offset  = intval( $matches[1] );
 						$length  = intval( $matches[2] ) - $offset;
 						$fhandle = fopen( $file_path, 'r' );
@@ -242,7 +241,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 						$buffer = '';
 						while ( ! feof( $handle ) && ( connection_status() === CONNECTION_NORMAL ) ) {
 							$buffer = fread( $handle, $chunksize );
-							print $buffer;
+							print $buffer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							ob_flush();
 							flush();
 						}
@@ -565,10 +564,12 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 			return false;
 
+			/*
 			// // If not writable, check if the parent directory is writable.
 			// $parent_dir = dirname( $file_path );
 
 			// return is_writable( $parent_dir );
+			*/
 		}
 
 		/**

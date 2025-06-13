@@ -248,5 +248,17 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 			ini_set( 'log_errors', 1 ); // phpcs:ignore WordPress.PHP.IniSet.log_errors_Disallowed
 			ini_set( 'error_log', self::$log_file ); // phpcs:ignore WordPress.PHP.IniSet.Risky
 		}
+
+		/**
+		 * Returns the stored value in the internal class var (name of the error log file). Return empty string if that variable is null.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_error_log_file(): string {
+
+			return (string) self::$log_file;
+		}
 	}
 }

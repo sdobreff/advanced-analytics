@@ -29,12 +29,29 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	 * @since 1.1.0
 	 */
 	class WP_Error_Handler {
+
+		/**
+		 * Catches errors which come from the doing_it_wrong() function, WP core does not provide much information about what is really going on and where, this method adds some more information to the error log.
+		 *
+		 * @param bool   $errno - Whether to trigger the error for _doing_it_wrong() calls. Default true.
+		 * @param string $errstr - The WP error string (message).
+		 * @param string $errfile - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
+
+		 * @param string $errline - Since which WP version given error was added.
+		 * @param int    $errcontext - The number of the error (type of the error - that probably never get set by WP and always falls to the default which is E_USER_NOTICE).
+		 *
+		 * @return bool
+		 *
+		 * @since 1.1.1
+		 */
 		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null ) {
+			/*
 			// if ( ! ( error_reporting(E_ERROR) & $errno ) ) {
 			// This error code is not included in error_reporting, so let it fall.
 			// through to the standard PHP error handler.
 			// return false;
 			// }
+			*/
 
 			// These are default values for a single trace.
 			// To prevent errors when a trace ommits some values.
@@ -85,7 +102,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out );
+				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
@@ -174,7 +191,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out );
+				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
@@ -186,11 +203,9 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		/**
 		 * Catches errors which come from the doing_it_wrong() function, WP core does not provide much information about what is really going on and where, this method adds some more information to the error log.
 		 *
-		 * @param bool   $status - Whether to trigger the error for _doing_it_wrong() calls. Default true.
-		 * @param string $function_name - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
-		 * @param string $errstr - The WP error string (message).
+		 * @param string $deprecated_name - Name of the deprecated.
+		 * @param string $replacement - What can be used as replacement.
 		 * @param string $version - Since which WP version given error was added.
-		 * @param int    $errno - The number of the error (type of the error - that probably never get set by WP and always falls to the default which is E_USER_NOTICE).
 		 *
 		 * @return void
 		 *
@@ -253,7 +268,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out );
+				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );

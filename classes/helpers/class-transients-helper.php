@@ -185,10 +185,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			// Values.
 			$value = \stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			/*
 			// $expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 			// Subtract now.
 			// $expiration = ( $expiration - time() );
+			*/
 
 			$current_time = time();
 

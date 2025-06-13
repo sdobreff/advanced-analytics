@@ -359,8 +359,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function get_error_items( bool $write_temp = true, $items = false, bool $first_only = false ): array {
-
-			// if ( empty( self::$read_items ) ) { .
 			$collected_items = array();
 			$errors          = array();
 			$position        = null;
@@ -472,24 +470,11 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						return array( reset( $errors ) );
 					}
 
-					// if ( ! empty( $disabled ) ) {
-					// foreach ( $disabled as $severity ) {
-					// foreach ( $errors as $key => $error ) {
-					// if ( isset( $error['severity'] ) && $error['severity'] === $severity ) {
-					// unset( $errors[ $key ] );
-					// }
-					// }
-					// }
-					// }
-
 					if ( false === $result ) {
 						break 2;
 					}
 				}
 			}
-
-			// self::$read_items = $errors;
-			// }
 
 			Log_Line_Parser::store_last_parsed_timestamp();
 
@@ -689,11 +674,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 					return $message;
 				case 'plugin_theme':
-					// if ( isset( $item['source'] ) ) {
-					// return $item['source'];
-					// } else {
-
-					// $show_source_link = false;
 					$source_link = '';
 
 					$query_array = array(
@@ -868,35 +848,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			 * Action - is set if checkbox from top-most select-all is set, otherwise returns -1
 			 * Action2 - is set if checkbox the bottom-most select-all checkbox is set, otherwise returns -1
 			 */
-
-			// check for individual row actions.
-			$the_table_action = $this->current_action();
-
-			// check for table bulk actions.
-			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) && Settings_Helper::current_user_can( 'view' ) ) {
-				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
-				}
-				$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
-				// verify the nonce.
-				/**
-				 * Note: the nonce field is set by the parent class
-				 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );.
-				 */
-				if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
-					$this->invalid_nonce_redirect();
-				} elseif ( isset( $_REQUEST[ self::$table_name ] ) && \is_array( $_REQUEST[ self::$table_name ] ) ) {
-					foreach ( \wp_unslash( $_REQUEST[ self::$table_name ] ) as $id ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-					}
-				}
-				?>
-				<script>
-					jQuery('body').addClass('has-overlay');
-					
-				</script>
-				<?php
-			}
 		}
 
 		/**
@@ -1084,7 +1035,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						<?php
 					}
 				}
-				// echo '<div><b style="color: red">' . \esc_html__( 'Log file Problem: ', '0-day-analytics' ) . '</b> ' . \esc_attr( Error_Log::get_last_error() ) . '</div>';
 			}
 
 			if ( 'top' === $which ) {
@@ -1120,7 +1070,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					jQuery( document ).on( 'click', '#top-downloadlog, #bottom-downloadlog', function ( e ) {
 						
 						const a = document.createElement('a');
-						a.href = '<?php echo File_Helper::download_link(); ?>';
+						a.href = '<?php echo \esc_url_raw( File_Helper::download_link() ); ?>';
 
 						document.body.appendChild(a);
 						a.click();
@@ -1141,11 +1091,11 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					if ( '0 B' !== File_Helper::format_file_size( Error_Log::autodetect() ) && File_Helper::is_writable( Error_Log::autodetect() ) ) {
 						?>
 
-							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
+							<input class="button" id="<?php echo \esc_attr( $which ); ?>-truncate" type="button" value="<?php echo esc_html__( 'Truncate file', '0-day-analytics' ); ?>" />
 
-							<input class="button button-primary" id="<?php echo \esc_attr( $which ); ?>-truncate-and-keep" type="button" value="<?php echo esc_html__( 'Truncate file (keep last records)', '0-day-analytics' ); ?>" />
+							<input class="button" id="<?php echo \esc_attr( $which ); ?>-truncate-and-keep" type="button" value="<?php echo esc_html__( 'Truncate file (keep last records)', '0-day-analytics' ); ?>" />
 							
-							<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button button-primary" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
+							<input type="submit" name="downloadlog" id="<?php echo \esc_attr( $which ); ?>-downloadlog" class="button" value="<?php echo esc_html__( 'Download Log', '0-day-analytics' ); ?>">
 							<?php
 					}
 				}

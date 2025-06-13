@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		}
 
 		/**
-		 * get_request
+		 * Get_request
 		 *
 		 * Test GET requests
 		 *

@@ -85,7 +85,7 @@ Settings::set_current_options( $settings );
 
 				if ( \is_a( $file_name, 'WP_Error' ) ) {
 
-					$file_name = '';
+					$file_name = Error_Log::get_error_log_file();
 
 				}
 

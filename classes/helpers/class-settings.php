@@ -1863,6 +1863,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					// Clear the flag for keep reading the error log if WP settings are disabled (because at this point they are enabled).
 					$advanced_options['keep_reading_error_log'] = false;
+
+					@clearstatcache( false, File_Helper::get_wp_config_file_path() );
 				}
 
 				$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;
