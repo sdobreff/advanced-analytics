@@ -247,6 +247,14 @@ Settings::set_current_options( $settings );
 			)
 		);
 
+		Settings::build_option(
+			array(
+				'add_label' => true,
+				'id'        => 'push_send_test_notification_ajax',
+				'type'      => 'button',
+				'default'   => esc_html__( 'Send test notification', '0-day-analytics' ),
+			)
+		);
 		?>
 	</div>
 	<?php

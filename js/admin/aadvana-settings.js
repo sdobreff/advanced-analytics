@@ -373,26 +373,50 @@ $doc.ready(function () {
         const nonceValue = jQuery('#telegram_notification_nonce').val();
 
         jQuery.ajax({
-                url: ajaxurl,
-                data: {
-                    action: 'aadvana_send_test_telegram',
-                    _wpnonce: nonceValue
-                },
-                success: function (data) {
-                    if (data.success) {
+            url: ajaxurl,
+            data: {
+                action: 'aadvana_send_test_telegram',
+                _wpnonce: nonceValue
+            },
+            success: function (data) {
+                if (data.success) {
 
-                        $saveAlert.addClass('is-success').delay(900).fadeOut(700);
-                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
-                        var { __ } = wp.i18n;
-                        alert( __('Notification sent - check your Telegram channel', '0-day-analytics') );
+                    $saveAlert.addClass('is-success').delay(900).fadeOut(700);
+                    setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                    var { __ } = wp.i18n;
+                    alert( __('Notification sent - check your Telegram channel', '0-day-analytics') );
 
-                    } else {
-                        $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
-                        setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
-                        alert(__('Something went wrong', '0-day-analytics'));
-                    }
-                },
-            });
+                } else {
+                    $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
+                    setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                    alert(__('Something went wrong', '0-day-analytics'));
+                }
+            },
+        });
+    });
+
+    /**
+     * Sends test Push  notification
+     */
+    $doc.on('click', '#push_send_test_notification_ajax', function (e) {
+
+        if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
+            var { __ } = wp.i18n;
+            createNotification(__('Test Push Notification', '0-day-analytics'), '', __('This is a test notification', '0-day-analytics'));
+
+            function createNotification(title, icon, body, url) {
+                var notification = new Notification(title, {
+                    icon: icon,
+                    body: body,
+                });
+                // url that needs to be opened on clicking the notification
+                // finally everything boils down to click and visits right
+                notification.onclick = function() {
+                    window.open(url);
+                };
+                return notification;
+            }
+        }
     });
 
     
