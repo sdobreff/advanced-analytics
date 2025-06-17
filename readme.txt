@@ -1,5 +1,5 @@
 === WP Control ===
-Tags: log, error log, analytics, cron, crons, transients
+Tags: log, error log, analytics, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
@@ -7,7 +7,7 @@ Stable tag: 1.9.4.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs (large or small), providing options to enable or disable logging and optimized for gigabyte-sized log files. It is specially designed and optimized to work on production sites without slowing them. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
+**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
 
 == Description ==
 
