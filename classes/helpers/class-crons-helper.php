@@ -122,7 +122,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 
 				self::clear_inner_events();
 
-				return self::unschedule_event( $event['hook'], $event['args'] );
+				// When collecting cron event data we are encoding the hook name, so we need to decode it here. For whatever reason there is no specific name convention for crons and some plugins use HTML entities in the hook names.
+				// This is not a good practice, but we need to handle it.
+				return self::unschedule_event( \html_entity_decode( $event['hook'] ), $event['args'] );
 			}
 
 			return false;
