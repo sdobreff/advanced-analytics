@@ -2393,6 +2393,7 @@ html.aadvana-darkskin .red-badge {
 
 html.aadvana-darkskin .notice, div.error, div.updated {
   background: transparent !important;
+  color: #eee !important;
 }
 
 html.aadvana-darkskin #dashboard-need-help svg *,

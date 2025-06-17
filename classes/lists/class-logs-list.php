@@ -1370,7 +1370,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			return rest_ensure_response(
 				array(
-					'message' => 'No Events.',
+					'message' => ADVAN_NAME . __( ': Error log - no logs to report.', '0-day-analytics' ),
 				)
 			);
 		}

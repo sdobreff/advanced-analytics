@@ -17,6 +17,8 @@ async function fetchSingleItem() {
 
 			jQuery('.aadvan-live-notif-item').addClass(attResp.classes);
 			jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.in + '</i></b> ' + attResp.event.message);
+		} else if (attResp.message) {
+			jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
 		}
 
 	} catch (error) {

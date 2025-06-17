@@ -757,6 +757,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Cron', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
+
+					<?php
+
+					if ( false === $cron ) {
+						?>
+					<div id="advaa-status-notice" class="notice notice-info">
+						<p><?php esc_html_e( 'Cron job does not exists or it has been executed', '0-day-analytics' ); ?></p>
+					</div>
+						<?php
+					} else {
+						?>
 	
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
@@ -809,6 +820,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							<?php \submit_button( '', 'primary', '', false ); ?>
 						</p>
 					</form>
+						<?php
+					}
+					?>
 				</div>
 				<?php
 			} else {

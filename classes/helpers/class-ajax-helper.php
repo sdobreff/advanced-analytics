@@ -247,7 +247,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			} elseif ( \is_wp_error( $result ) ) {
 				\wp_send_json_error( $result->get_error_message(), 500 );
 			} else {
-				\wp_send_json_error( 'Unable to delete cron.', 500 );
+				\wp_send_json_error( __( 'Unable to delete cron.', '0-day-analytics' ), 500 );
 			}
 		}
 
@@ -270,7 +270,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			} elseif ( \is_wp_error( $result ) ) {
 				\wp_send_json_error( $result->get_error_message(), 500 );
 			} else {
-				\wp_send_json_error( 'Unable to delete cron.', 500 );
+				\wp_send_json_error( __( 'Unable to delete transient.', '0-day-analytics' ), 500 );
 			}
 		}
 
@@ -290,9 +290,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				define( 'DOING_CRON', true );
 			}
 
-			Crons_Helper::execute_event( $hash );
+			$result = Crons_Helper::execute_event( $hash );
 
-			\wp_send_json_success( 2 );
+			if ( $result && ! \is_wp_error( $result ) ) {
+				\wp_send_json_success( 2 );
+			} elseif ( \is_wp_error( $result ) ) {
+				\wp_send_json_error( $result->get_error_message(), 500 );
+			} else {
+				\wp_send_json_error( __( 'Unable to run cron.', '0-day-analytics' ), 500 );
+			}
 		}
 
 		/**

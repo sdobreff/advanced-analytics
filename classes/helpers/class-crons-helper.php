@@ -68,8 +68,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.3.0
 		 */
 		public static function unschedule_event( $hook, $args = array() ) {
-			$timestamp = self::is_scheduled( $hook, $args );
-			if ( $timestamp ) {
+
+			if ( self::is_scheduled( $hook, $args ) ) {
+				$timestamp = \wp_next_scheduled( $hook, $args );
 				return \wp_unschedule_event( $timestamp, $hook, $args );
 			}
 
@@ -95,10 +96,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @param array $event - The action hook.
 		 *
+		 * @return bool
+		 *
 		 * @since 1.3.0
 		 */
 		public static function run_event( $event ) {
 			\do_action_ref_array( $event['hook'], $event['args'] );
+
+			return true;
 		}
 
 		/**
