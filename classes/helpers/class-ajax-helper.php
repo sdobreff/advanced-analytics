@@ -186,8 +186,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			\ob_clean();
 
 			\wp_send_json_success( 2 );
-
-			\wp_die();
 		}
 
 		/**
@@ -225,7 +223,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 				\wp_send_json_success( 2 );
 			}
-			\wp_die();
+			\wp_send_json_error( __( 'Something went wrong.', '0-day-analytics' ), 400 );
 		}
 
 		/**
@@ -310,8 +308,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 */
 		private static function validate_hash_param(): string {
 			if ( ! isset( $_REQUEST['hash'] ) || empty( $_REQUEST['hash'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				\wp_send_json_error( 'Missing or empty hash parameter.', 400 );
-				\wp_die();
+				\wp_send_json_error( __( 'Missing or empty hash parameter.', '0-day-analytics' ), 400 );
 			}
 
 			return \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -327,7 +324,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		private static function validate_id_param(): int {
 			if ( ! isset( $_REQUEST['id'] ) || empty( $_REQUEST['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				\wp_send_json_error( 'Missing or empty id parameter.', 400 );
-				\wp_die();
 			}
 
 			return (int) \sanitize_text_field( \wp_unslash( $_REQUEST['id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -461,20 +457,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			if ( ! isset( $_REQUEST['error_file'] ) || empty( $_REQUEST['error_file'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				\wp_send_json_error( \esc_html__( 'File not found.', '0-day-analytics' ), 404 );
-				\wp_die();
 			}
 
 			$file_name = $_REQUEST['error_file']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( ! File_Helper::is_file_valid_php( $file_name ) ) {
 				\wp_send_json_error( \esc_html__( 'File does not exists or it is not valid PHP file.', '0-day-analytics' ), 404 );
-				\wp_die();
 
 			}
 			// Don't show any configurational files for security reasons.
 			if ( Settings::get_current_options()['protected_config_source'] && ( strpos( \basename( $file_name ), 'config' ) !== false || strpos( \basename( $file_name ), 'settings' ) !== false || strpos( \basename( $file_name ), 'wp-load' ) !== false ) ) {
 				\wp_send_json_error( \esc_html__( 'File source view is protected. You can change this in Advanced Settings', '0-day-analytics' ), 404 );
-				\wp_die();
 			}
 
 			$sh_url = ADVAN_PLUGIN_ROOT_URL . 'js/sh/';
@@ -523,7 +516,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				</script>
 				</body></html>
 			<?php
-			\wp_die();
 		}
 	}
 }

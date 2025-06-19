@@ -96,6 +96,13 @@ if ( ! Context_Helper::is_installing() ) {
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
 
+	\add_filter( 'wp_die_ajax_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+	\add_filter( 'wp_die_json_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+	\add_filter( 'wp_die_jsonp_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+	\add_filter( 'wp_die_xmlrpc_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+	\add_filter( 'wp_die_xml_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+	\add_filter( 'wp_die_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
+
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {

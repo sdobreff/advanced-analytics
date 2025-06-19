@@ -106,12 +106,10 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		public static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ) {
 			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
 				\wp_send_json_error( 'Insufficient permissions.', 403 );
-				\wp_die();
 			}
 
 			if ( ! \current_user_can( 'manage_options' ) || ! \check_ajax_referer( $action, $nonce_name, false ) ) {
 				\wp_send_json_error( 'Insufficient permissions or invalid nonce.', 403 );
-				\wp_die();
 			}
 
 			return \true;

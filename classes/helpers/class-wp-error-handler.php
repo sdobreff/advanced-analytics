@@ -31,6 +31,62 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	class WP_Error_Handler {
 
 		/**
+		 * Stores the original wp_die handles.
+		 *
+		 * @var callable|null
+		 *
+		 * @since latest
+		 */
+		public static $original_wp_die_handler = null;
+
+		/**
+		 * WP wp_die handler callback.
+		 *
+		 * @param callable $handler
+		 *
+		 * @return callable
+		 *
+		 * @since latest
+		 */
+		public static function wp_die_handler( $handler ) {
+			self::$original_wp_die_handler = $handler;
+
+			return array( __CLASS__, 'wp_die_handler_callback' );
+		}
+
+		/**
+		 * Custom wp_die handler callback
+		 *
+		 * @param string $message - The message to display.
+		 * @param string $title - The title of the error.
+		 * @param array  $args - Additional arguments for the error.
+		 *
+		 * @return callable|null
+		 *
+		 * @since latest
+		 */
+		public static function wp_die_handler_callback( $message, $title = '', $args = array() ) {
+			list( $get_message, $get_title, $parsed_args ) = _wp_die_process_input( $message, $title, $args );
+
+			if ( is_string( $get_message ) && ! empty( $get_message ) ) {
+				if ( ! empty( $parsed_args['additional_errors'] ) ) {
+					$get_message = array_merge(
+						array( $get_message ),
+						\wp_list_pluck( $parsed_args['additional_errors'], 'message' )
+					);
+					$get_message = implode( ', ', $message );
+				}
+
+				self::handle_error( \E_USER_NOTICE, $get_message, '', '', null, 2, 0 );
+			}
+
+			// If the original handler is set, call it.
+			if ( self::$original_wp_die_handler ) {
+				return call_user_func( self::$original_wp_die_handler, $message, $title, $args );
+			}
+		}
+
+		/**
 		 * Catches errors which come from the doing_it_wrong() function, WP core does not provide much information about what is really going on and where, this method adds some more information to the error log.
 		 *
 		 * @param bool   $errno - Whether to trigger the error for _doing_it_wrong() calls. Default true.
@@ -44,7 +100,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @since 1.1.1
 		 */
-		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null ) {
+		public static function handle_error( $errno, $errstr, $errfile, $errline, $errcontext = null, int $remove_from = 1, int $count_to = 1 ) {
 			/*
 			// if ( ! ( error_reporting(E_ERROR) & $errno ) ) {
 			// This error code is not included in error_reporting, so let it fall.
@@ -63,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			);
 			// $errfile  = self::clean_file_path( $errfile );
 			$php_error_name = self::error_code_to_string( $errno );
-			$out            = "$php_error_name ($errno): $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;
@@ -72,14 +128,14 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			$thrown_line = '';
 
 			// skip current function and require() in /index.php .
-			$counter = count( $trace ) - 1;
-			for ( $i = 1; $i < $counter; $i++ ) {
+			$counter = count( $trace ) - $count_to;
+			for ( $i = $remove_from; $i < $counter; $i++ ) {
 				$sf    = (object) shortcode_atts( $defaults, $trace[ $i ] );
 				$index = $i - 1;
 				$file  = $sf->file;
 				// $file  = self::clean_file_path( $sf->file );
 
-				if ( 1 === $i ) {
+				if ( $remove_from === $i ) {
 					$thrown_file = $file;
 					$thrown_line = $sf->line;
 				}
@@ -98,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 
 			}
 			if ( ! $main_shown ) {
-				$out .= '#' . ( $index++ ) . ' {main}' . PHP_EOL;
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_DISPLAY ) {

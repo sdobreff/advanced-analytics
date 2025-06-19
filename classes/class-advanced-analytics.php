@@ -504,6 +504,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 					var_export( $result->get_data(), true )
 				);
 			}
+
 			return $result;
 		}
 	}
