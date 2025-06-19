@@ -375,6 +375,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
 					'no_rest_api_monitor'             => false,
+					'no_wp_die_monitor'             => false,
 					'keep_error_log_records_truncate' => 10,
 					'slack_notifications'             => array(
 						'all' => array(
@@ -1801,6 +1802,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['no_rest_api_monitor'] = ( array_key_exists( 'no_rest_api_monitor', $post_array ) ) ? filter_var( $post_array['no_rest_api_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['no_wp_die_monitor'] = ( array_key_exists( 'no_wp_die_monitor', $post_array ) ) ? filter_var( $post_array['no_wp_die_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['keep_error_log_records_truncate'] = ( array_key_exists( 'keep_error_log_records_truncate', $post_array ) ) ? filter_var(
 				$post_array['keep_error_log_records_truncate'],

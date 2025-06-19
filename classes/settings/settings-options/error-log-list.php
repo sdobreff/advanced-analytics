@@ -207,6 +207,16 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Do not monitor WP_DIE', '0-day-analytics' ),
+			'id'      => 'no_wp_die_monitor',
+			'type'    => 'checkbox',
+			'hint'    => \esc_html__( 'By default, plugin tries to monitor wp_die for errors and logs problems related to it. It will record in debug log only if the wp_die is called with parameters.', '0-day-analytics' ),
+			'default' => Settings::get_current_options()['no_wp_die_monitor'],
+		)
+	);
+
 	// Columns of types of errors showing.
 	Settings::build_option(
 		array(
