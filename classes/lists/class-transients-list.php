@@ -478,7 +478,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 						$core_trans = '<span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ';
 					}
 
-					return '<span>' . $core_trans . '<b title="' . sprintf( esc_attr__( 'Option ID: %d', '0-day-analytics' ), (int) $item['id'] ) . '">' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
+					// translators: %s is the transient.
+					return '<span>' . $core_trans . '<b title="' . sprintf( \esc_attr__( 'Option ID: %d', '0-day-analytics' ), (int) $item['id'] ) . '">' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'schedule':
 					if ( 0 === $item['schedule'] ) {
 						return '&mdash;<br><span class="badge">' . esc_html__( 'Persistent', '0-day-analytics' ) . '</span>';

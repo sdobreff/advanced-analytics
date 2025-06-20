@@ -254,7 +254,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static function get_error_log_file(): string {
 

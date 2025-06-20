@@ -1247,10 +1247,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$color = ( \in_array( $class, array( 'parse', 'fatal' ), true ) ) ? '#fff' : $color;
 
 						echo '.generated-logs .' . \esc_attr( $class ) . ' td:nth-child(1) { border-left: 7px solid ' . \esc_attr( $properties['color'] ) . ' !important;}';
-						// echo '#the-list .' . \esc_attr( $class ) . ' td { color: ' . \esc_attr( $color ) . ' !important;}';
-						// echo '#the-list td { color: #fff !important; }';
-						// echo '#the-list tr { background: #1d456b;}';
-
 					}
 					?>
 				</style>

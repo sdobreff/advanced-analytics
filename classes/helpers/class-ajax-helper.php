@@ -334,7 +334,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static function telegram_test_message_ajax() {
 			WP_Helper::verify_admin_nonce( Telegram::NONCE_NAME );
@@ -353,7 +353,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static function slack_test_message_ajax() {
 			WP_Helper::verify_admin_nonce( Slack::NONCE_NAME );

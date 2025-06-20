@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.9.5
+ * Version:         1.9.5.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.9.5' );
+define( 'ADVAN_VERSION', '1.9.5.1' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -95,7 +95,7 @@ if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
-	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
+	if ( ! Settings::get_current_options()['no_wp_die_monitor'] ) {
 		\add_filter( 'wp_die_ajax_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
 		\add_filter( 'wp_die_json_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
 		\add_filter( 'wp_die_jsonp_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );

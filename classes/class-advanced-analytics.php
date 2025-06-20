@@ -450,8 +450,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 * @param string     $version       The version of WordPress where the message was added.
 		 *
 		 * @return bool
-		 * @noinspection PhpMissingParamTypeInspection
-		 * @noinspection PhpUnusedParameterInspection
 		 */
 		public static function filter_doing_it_wrong_trigger_error( $trigger, $function_name, $message, $version ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 

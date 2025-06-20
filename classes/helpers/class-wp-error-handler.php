@@ -35,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @var callable|null
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static $original_wp_die_handler = null;
 
@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return callable
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static function wp_die_handler( $handler ) {
 			self::$original_wp_die_handler = $handler;
@@ -63,21 +63,24 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return callable|null
 		 *
-		 * @since latest
+		 * @since 1.9.5
 		 */
 		public static function wp_die_handler_callback( $message, $title = '', $args = array() ) {
-			list( $get_message, $get_title, $parsed_args ) = _wp_die_process_input( $message, $title, $args );
 
-			if ( is_string( $get_message ) && ! empty( $get_message ) ) {
-				if ( ! empty( $parsed_args['additional_errors'] ) ) {
-					$get_message = array_merge(
-						array( $get_message ),
-						\wp_list_pluck( $parsed_args['additional_errors'], 'message' )
-					);
-					$get_message = implode( ', ', $message );
+			if ( ! empty( $message ) ) {
+				list( $get_message, $get_title, $parsed_args ) = _wp_die_process_input( $message, $title, $args );
+
+				if ( is_string( $get_message ) && ! empty( $get_message ) ) {
+					if ( ! empty( $parsed_args['additional_errors'] ) ) {
+						$get_message = array_merge(
+							array( $get_message ),
+							\wp_list_pluck( $parsed_args['additional_errors'], 'message' )
+						);
+						$get_message = implode( ', ', $get_message );
+					}
+
+					self::handle_error( \E_USER_NOTICE, $get_message, '', '', null, 2, 0 );
 				}
-
-				self::handle_error( \E_USER_NOTICE, $get_message, '', '', null, 2, 0 );
 			}
 
 			// If the original handler is set, call it.
