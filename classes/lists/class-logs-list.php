@@ -1175,7 +1175,62 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					</div>
 				</div>
 				<?php
+				if ( 'top' === $which ) {
+					?>
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					<div>
+						<?php
+						foreach ( Settings::get_current_options()['severities'] as $name => $severity ) {
+							?>
+							<label for="severity_filter_<?php echo \esc_attr( $name ); ?>" class="badge dark-badge" style="color: <?php echo \esc_attr( $severity['color'] ); ?> !important;">
+								<input type="checkbox" class="severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
+								<?php echo \esc_html( $name ); ?>
+							</label>
+							<?php
+						}
+						?>
+					</div>
+				</div>
+				<script>
+					let severities = document.getElementsByClassName("severity-filter");
 
+					let len = severities.length;
+
+					// call updateCost() function to onclick event on every checkbox
+					for (var i = 0; i < len; i++) {
+						if (severities[i].type === 'checkbox') {
+							severities[i].onclick = setSeverity;
+						}
+					}
+
+					async function setSeverity(e) {
+
+						let severityName = e.target.value;
+						let severityStatus = e.target.checked;
+						let attResp;
+
+						try {
+							attResp = await wp.apiFetch({
+								path: '/wp-control/v1/severity/' + severityName + '/' + ( severityStatus ? 'enable' : 'disable' ),
+								method: 'GET',
+								cache: 'no-cache'
+							});
+
+							if (attResp.success) {
+								
+								location.reload();
+							} else if (attResp.message) {
+								jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+							}
+
+						} catch (error) {
+							throw error;
+						}
+					}
+
+				</script>
+					<?php
+				}
 			}
 		}
 
@@ -1364,9 +1419,47 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				return \rest_ensure_response( $response );
 			}
 
-			return rest_ensure_response(
+			return \rest_ensure_response(
 				array(
 					'message' => ADVAN_NAME . __( ': Error log - no logs to report.', '0-day-analytics' ),
+				)
+			);
+		}
+
+		/**
+		 * Returns result by ID or GET parameters
+		 *
+		 * @return \WP_REST_Response|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function set_severity_status(\WP_REST_Request $request) {
+			$severity = $request->get_param( 'severity_name' );
+			$status   = $request->get_param( 'status' );
+
+			if ( ! in_array( $severity, array_keys(Settings::get_current_options()['severities']) , true ) ) {
+				return new \WP_Error(
+					'invalid_severity',
+					__( 'Invalid severity name.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( 'enable' === $status ) {
+				Settings::enable_severity( $severity );
+			} elseif ( 'disable' === $status ) {
+				Settings::disable_severity( $severity );
+			} else {
+				return new \WP_Error(
+					'invalid_status',
+					__( 'Invalid status.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			return rest_ensure_response(
+				array(
+					'success' => true,
 				)
 			);
 		}

@@ -24,7 +24,6 @@ async function fetchSingleItem() {
 	} catch (error) {
 		throw error;
 	}
-
 }
 
 /**

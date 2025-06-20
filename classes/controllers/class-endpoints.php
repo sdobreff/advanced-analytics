@@ -40,7 +40,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'live' => array(
+				'live'     => array(
 					'class'     => Logs_List::class,
 					'namespace' => 'wp-control/v1',
 
@@ -53,6 +53,35 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
 								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'severity' => array(
+					'class'     => Logs_List::class,
+					'namespace' => 'wp-control/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<severity_name>\w+)/(?P<status>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'set_severity_status',
+								),
+								'args'             => array(
+									'severity_name' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Severity name',
+									),
+									'status'        => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Severity status',
+									),
+								),
+								'checkPermissions' => '__return_true', //array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => true,
 							),
 						),
 					),

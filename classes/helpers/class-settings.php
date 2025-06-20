@@ -246,6 +246,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
 
+			\wp_enqueue_script(
+				'wp-api-fetch'
+			);
+
 			?>
 			<script>
 				window.onload= ( () => {
@@ -375,7 +379,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
 					'no_rest_api_monitor'             => false,
-					'no_wp_die_monitor'             => false,
+					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
 					'slack_notifications'             => array(
 						'all' => array(
@@ -1989,6 +1993,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				Transients_List::PAGE_SLUG,
 				Crons_List::PAGE_SLUG,
 			);
+		}
+
+		public static function enable_severity( string $severity ): void {
+			if ( ! isset( self::$current_options['severities'][ $severity ] ) ) {
+				return;
+			}
+
+			self::$current_options['severities'][ $severity ]['display'] = true;
+
+			self::store_options( self::$current_options );
+		}
+
+		public static function disable_severity( string $severity ): void {
+			if ( ! isset( self::$current_options['severities'][ $severity ] ) ) {
+				return;
+			}
+
+			self::$current_options['severities'][ $severity ]['display'] = false;
+
+			self::store_options( self::$current_options );
 		}
 	}
 }
