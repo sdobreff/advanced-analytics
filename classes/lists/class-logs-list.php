@@ -1177,13 +1177,90 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<?php
 				if ( 'top' === $which ) {
 					?>
+
+				<style>
+				.checkbox-wrapper-2 label{
+					margin-right: 7px !important;
+					cursor: pointer !important;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC {
+					appearance: none;
+					background-color: #dfe1e4;
+					border-radius: 72px;
+					border-style: none;
+					flex-shrink: 0;
+					height: 20px;
+					margin: 0;
+					position: relative;
+					width: 30px;
+					cursor: pointer !important;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC::before {
+					bottom: -6px !important;
+					content: "" !important;
+					left: -6px !important;
+					position: absolute !important;
+					right: -6px !important;
+					top: -6px !important;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC,
+				.checkbox-wrapper-2 .ikxBAC::after {
+					transition: all 100ms ease-out;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC::after {
+					background-color: #17c622;
+					border-radius: 50%;
+					content: "";
+					height: 14px;
+					left: 3px;
+					position: absolute;
+					top: 3px;
+					width: 14px;
+				}
+
+				.checkbox-wrapper-2 input[type=checkbox] {
+					cursor: default;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC:hover {
+					background-color: #c9cbcd;
+					transition-duration: 0s;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC:checked {
+					background-color: #6e79d6;
+				}
+
+				html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
+					background-color:rgb(27, 27, 28) !important;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC:checked::after {
+					background-color: #fff;
+					left: 13px;
+				}
+
+				.checkbox-wrapper-2 :focus:not(.focus-visible) {
+					outline: 0;
+				}
+
+				.checkbox-wrapper-2 .ikxBAC:checked:hover {
+					background-color: #535db3;
+				}
+				</style>
+
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
-					<div>
+					<div class="checkbox-wrapper-2">
 						<?php
 						foreach ( Settings::get_current_options()['severities'] as $name => $severity ) {
 							?>
+							<input type="checkbox"  class="sc-gJwTLC ikxBAC severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
+								
 							<label for="severity_filter_<?php echo \esc_attr( $name ); ?>" class="badge dark-badge" style="color: <?php echo \esc_attr( $severity['color'] ); ?> !important;">
-								<input type="checkbox" class="severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
 								<?php echo \esc_html( $name ); ?>
 							</label>
 							<?php
@@ -1427,17 +1504,19 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Returns result by ID or GET parameters
-		 *
+		 * Sets teh severity status.
+		 * 
+		 * @param \WP_REST_Request $request - The request object.
+		 * 
 		 * @return \WP_REST_Response|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.9.5.1
 		 */
-		public static function set_severity_status(\WP_REST_Request $request) {
+		public static function set_severity_status( \WP_REST_Request $request ) {
 			$severity = $request->get_param( 'severity_name' );
 			$status   = $request->get_param( 'status' );
 
-			if ( ! in_array( $severity, array_keys(Settings::get_current_options()['severities']) , true ) ) {
+			if ( ! in_array( $severity, array_keys( Settings::get_current_options()['severities'] ), true ) ) {
 				return new \WP_Error(
 					'invalid_severity',
 					__( 'Invalid severity name.', '0-day-analytics' ),

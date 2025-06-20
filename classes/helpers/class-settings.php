@@ -1995,6 +1995,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			);
 		}
 
+		/**
+		 * Sets severity as enabled
+		 *
+		 * @param string $severity - The name of the severity to enable.
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.5.1
+		 */
 		public static function enable_severity( string $severity ): void {
 			if ( ! isset( self::$current_options['severities'][ $severity ] ) ) {
 				return;
@@ -2005,6 +2014,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			self::store_options( self::$current_options );
 		}
 
+		/**
+		 * Sets severity as disabled
+		 *
+		 * @param string $severity - The name of the severity to disable.
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.5.1
+		 */
 		public static function disable_severity( string $severity ): void {
 			if ( ! isset( self::$current_options['severities'][ $severity ] ) ) {
 				return;
