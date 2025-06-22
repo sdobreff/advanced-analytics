@@ -2362,7 +2362,7 @@ input:not(:checked) + span.switchery {
 .dark-badge {
     margin: 5px 0;
     background: rgba(30, 26, 26, 0.76);
-    color: rgb(3, 3, 34);
+    color: rgb(229, 229, 236);
 }
 
 /* Dark Skin */
