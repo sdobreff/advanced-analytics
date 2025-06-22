@@ -411,7 +411,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						),
 						'info'       => array(
 							'name'    => __( 'Info', '0-day-analytics' ),
-							'color'   => '#0000ff',
+							'color'   => '#aeaeec',
 							'display' => true,
 						),
 						'notice'     => array(
@@ -426,17 +426,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						),
 						'fatal'      => array(
 							'name'    => __( 'Fatal', '0-day-analytics' ),
-							'color'   => '#b92a2a',
+							'color'   => '#f09595',
 							'display' => true,
 						),
 						'parse'      => array(
 							'name'    => __( 'Parse', '0-day-analytics' ),
-							'color'   => '#b9762a',
+							'color'   => '#e3bb8d',
 							'display' => true,
 						),
 						'user'       => array(
 							'name'    => __( 'User', '0-day-analytics' ),
-							'color'   => '#0d4c24',
+							'color'   => '#85b395',
 							'display' => true,
 						),
 					),

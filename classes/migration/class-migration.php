@@ -115,11 +115,31 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			Settings::set_current_options( $settings );
 		}
 
+		/**
+		 * Migrates the plugin up-to version 1.9.6
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.6
+		 */
 		public static function migrate_up_to_196() {
 
-			# User - 0b933c.
-			# Info - 7a7afb.
+			$settings = Settings::get_current_options();
+			if ( isset( $settings['severities']['user'] ) && isset( $settings['severities']['user']['color'] ) && '#0d4c24' === $settings['severities']['user']['color'] ) {
+				$settings['severities']['user']['color'] = '#85b395';
+			}
+			if ( isset( $settings['severities']['info'] ) && isset( $settings['severities']['info']['color'] ) && '#0000ff' === $settings['severities']['info']['color'] ) {
+				$settings['severities']['info']['color'] = '#aeaeec';
+			}
+			if ( isset( $settings['severities']['fatal'] ) && isset( $settings['severities']['fatal']['color'] ) && '#b92a2a' === $settings['severities']['fatal']['color'] ) {
+				$settings['severities']['fatal']['color'] = '#f09595';
+			}
+			if ( isset( $settings['severities']['parse'] ) && isset( $settings['severities']['parse']['color'] ) && '#b9762a' === $settings['severities']['parse']['color'] ) {
+				$settings['severities']['parse']['color'] = '#e3bb8d';
+			}
 
+			Settings::store_options( $settings );
+			Settings::set_current_options( $settings );
 		}
 	}
 }

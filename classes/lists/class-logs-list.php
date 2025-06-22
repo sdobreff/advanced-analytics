@@ -527,9 +527,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						if ( isset( Settings::get_current_options()['severities'][ $item['severity'] ] ) ) {
 
-							return '<span class="badge green-badge" style="color: ' . Settings::get_current_options()['severities'][ $item['severity'] ]['color'] . ' !important;">' . $item['severity'] . '</span>';
+							return '<span class="badge dark-badge" style="color: ' . Settings::get_current_options()['severities'][ $item['severity'] ]['color'] . ' !important;">' . \esc_html( $item['severity'] ) . '</span>';
 						} else {
-							return '<span class="badge dark-badge">' . $item['severity'] . '</span>';
+							return '<span class="badge dark-badge">' . \esc_html( $item['severity'] ) . '</span>';
 						}
 					} else {
 						return '<span class="badge dark-badge">' . __( 'not set', '0-day-analytics' ) . '</span>';
@@ -1123,9 +1123,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<div class="filtered-severities">
 					<p>
 				<?php
-				esc_html_e( 'Following types are filtered and not showing: ', '0-day-analytics' );
+				\esc_html_e( 'Following types are filtered and not showing: ', '0-day-analytics' );
 				foreach ( Settings::get_disabled_severities() as $severity ) {
-					echo '<span class="badge dark-badge">' . esc_html( $severity ) . '</span> ';
+					echo '<label for="severity_filter_'. \esc_attr( $severity ) .'" class="badge dark-badge" style="cursor: pointer; color: ' . \esc_html( Settings::get_current_options()['severities'][ $severity ]['color'] ) . ' !important;">' . \esc_html( $severity ) . '</label> ';
 				}
 				?>
 					</p>
@@ -1233,7 +1233,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				.checkbox-wrapper-2 .ikxBAC:checked {
-					background-color: #dfe1e4;
+					background-color: #d3f9d6;
 				}
 
 				html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
@@ -1506,9 +1506,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 		/**
 		 * Sets teh severity status.
-		 * 
+		 *
 		 * @param \WP_REST_Request $request - The request object.
-		 * 
+		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
 		 * @since 1.9.5.1

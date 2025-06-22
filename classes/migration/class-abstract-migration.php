@@ -74,7 +74,7 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		protected static $pad_length = 3;
+		protected static $pad_length = 4;
 
 		/**
 		 * Collects all the migration methods which needs to be executed in order and executes them
@@ -87,15 +87,15 @@ if ( ! class_exists( '\ADVAN\Migration\Abstract_Migration' ) ) {
 
 			if ( version_compare( static::get_stored_version(), ADVAN_VERSION, '<' ) ) {
 
-				$stored_version_as_number  = static::normalize_version( static::get_stored_version() );
-				$target_version_as_number  = static::normalize_version( ADVAN_VERSION );
+				$stored_version_as_number  = static::normalize_version( (string) static::get_stored_version() );
+				$target_version_as_number  = static::normalize_version( (string) ADVAN_VERSION );
 				$method_as_version_numbers = static::get_all_migration_methods_as_numbers();
 
 				$migrate_methods = array_filter(
 					$method_as_version_numbers,
 					function ( $method, $key ) use ( &$stored_version_as_number, &$target_version_as_number ) {
 						if ( $target_version_as_number > $stored_version_as_number ) {
-							return ( in_array( $key, range( $stored_version_as_number, $target_version_as_number ), true ) );
+							return ( in_array( (int) self::normalize_version( (string) $key ), range( $stored_version_as_number, (int) $target_version_as_number ), true ) );
 						}
 
 						return false;
