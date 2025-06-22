@@ -1195,6 +1195,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					position: relative;
 					width: 30px;
 					cursor: pointer !important;
+					border: 1px solid #cec6c6;
 				}
 
 				.checkbox-wrapper-2 .ikxBAC::before {
@@ -1212,7 +1213,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				.checkbox-wrapper-2 .ikxBAC::after {
-					background-color: #17c622;
+					background-color: #e68a6e;
 					border-radius: 50%;
 					content: "";
 					height: 14px;
@@ -1232,7 +1233,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				.checkbox-wrapper-2 .ikxBAC:checked {
-					background-color: #6e79d6;
+					background-color: #dfe1e4;
 				}
 
 				html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
@@ -1240,7 +1241,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				.checkbox-wrapper-2 .ikxBAC:checked::after {
-					background-color: #fff;
+					background-color: #17c622;
 					left: 13px;
 				}
 
@@ -1249,7 +1250,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				}
 
 				.checkbox-wrapper-2 .ikxBAC:checked:hover {
-					background-color: #535db3;
+					background-color: #dfe1e4;
 				}
 				</style>
 

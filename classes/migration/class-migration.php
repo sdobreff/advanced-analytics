@@ -114,5 +114,12 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			Settings::store_options( $settings );
 			Settings::set_current_options( $settings );
 		}
+
+		public static function migrate_up_to_196() {
+
+			# User - 0b933c.
+			# Info - 7a7afb.
+
+		}
 	}
 }
