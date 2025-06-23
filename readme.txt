@@ -66,6 +66,7 @@ The plugin autodetects default error log location, usually WordPress defines tha
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 4. **Cron manager** - Build-in is very powerful cron manager.
 5. **Transients manager** - Build-in is very powerful transients manager.
+6. **Plugin Version Switcher** - Build-in plugin version switcher.
 
 == Changelog ==
 
