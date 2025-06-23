@@ -46,6 +46,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 
 			if ( 'plugins' === $current_screen->id ) {
 				\add_action( 'in_plugin_update_message-' . \ADVAN_PLUGIN_BASENAME, array( __CLASS__, 'prefix_plugin_update_message' ), 10, 2 );
+				\add_action( 'after_plugin_row_meta', array( __CLASS__, 'after_plugin_row_meta' ), 10, 2 );
+
+				if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
+					\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
+				}
 			}
 		}
 
@@ -182,6 +187,242 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 			}
 
 			return $style . ( $upgrade_notice );
+		}
+
+		/**
+		 * Adds the file path after the plugin meta.
+		 *
+		 * @param string $plugin_file Refer to {@see 'plugin_row_meta'} filter.
+		 * @param array  $plugin_data Refer to {@see 'plugin_row_meta'} filter.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function after_plugin_row_meta( $plugin_file, $plugin_data ) {
+			if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
+				if ( isset( $plugin_data['slug'] ) && ! empty( $plugin_data['slug'] ) ) {
+					echo '<div style="margin-top:10px;"><input type="button" class="button button-primary switch_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch plugin version', '0-day-analytics' ) . '"><select id="aadvana_' . \esc_attr( $plugin_data['slug'] ) . '" style="display:none" required></select><input id="aadvana_switch_plugin_to_version_' . \esc_attr( $plugin_data['slug'] ) . '" style="display:none" type="button" class="button button-primary switch_to_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch version', '0-day-analytics' ) . '"></div>';
+				}
+			}
+			echo '<div style="margin-top:10px;">' . \esc_attr( \trailingslashit( WP_PLUGIN_DIR ) ) . '<b>' . \esc_attr( $plugin_file ) . '</b></div>';
+		}
+
+		/**
+		 * Extracts the plugin versions from WordPress.org.
+		 *
+		 * @param string $plugin_slug - The plugin slug to collect versions for.
+		 *
+		 * @return \WP_Error|string
+		 *
+		 * @since latest
+		 */
+		public static function extract_plugin_versions( string $plugin_slug ) {
+
+			if ( ! function_exists( 'plugins_api' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+			}
+			$plugin_information = plugins_api(
+				'plugin_information',
+				array(
+					'slug'   => esc_html( $plugin_slug ),
+					'fields' => array(
+						'version'           => true,
+						'versions'          => true,
+						'contributors'      => false,
+						'short_description' => false,
+						'description'       => false,
+						'sections'          => false,
+						'screenshots'       => false,
+						'tags'              => false,
+						'donate_link'       => false,
+						'ratings'           => false,
+					),
+				)
+			);
+
+			if ( ! empty( $plugin_information->versions ) || is_array( $plugin_information->versions ) ) {
+
+				$versions = $plugin_information->versions;
+
+				usort( $versions, 'version_compare' );
+
+				$versions = array_slice( $versions, -3, 3, true );
+
+				$rollback_versions = array();
+
+				foreach ( $plugin_information->versions as $version => $download_link ) {
+					$key = array_search( $download_link, $versions );
+					if ( false !== $key && 'trunk' !== $version && ! empty( $version ) ) {
+						$rollback_versions[] = $version;
+					}
+				}
+			}
+			$versions = $rollback_versions;
+
+			$result = null;
+
+			if ( is_array( $versions ) && ! array_key_exists( 'errors', $versions ) ) {
+				$result = true;
+			}
+
+			if ( is_object( $versions ) && property_exists( $versions, 'error_data' ) && ! empty( $versions->error_data ) ) {
+				$result = false;
+			}
+
+			if ( ! $result ) {
+				return new \WP_Error( 'plugin_versions_not_found', __( 'No Versions Found', '0-day-analytics' ) );
+			}
+
+			$versions = $versions ? $versions : array();
+
+			if ( ! empty( $versions ) ) {
+				if ( ! array_key_exists( 'errors', $versions ) ) {
+					$option_html = "<option value='' >" . esc_html__( 'Select Version', '0-day-analytic' ) . '</option>';
+					foreach ( $versions as $version ) {
+						$option_html .= "<option value='{$version}'>$version</option>";
+					}
+					return $option_html;
+				} else {
+					return new \WP_Error( 'plugin_not_found', __( 'Plugin is not found in WordPress ORG', '0-day-analytics' ) );
+
+				}
+			} else {
+				return new \WP_Error( 'plugin_version_not_found', __( 'No Version Found', '0-day-analytics' ) );
+			}
+		}
+
+		/**
+		 * Switch to selected plugin version.
+		 *
+		 * @param string $plugin_slug - The plugin slug.
+		 * @param string $version - The version to switch to.
+		 *
+		 * @return \WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function version_switch( $plugin_slug, $version ) {
+
+			if ( empty( $version ) ) {
+				return new \WP_Error( 'plugin_version_invalid', __( 'Error occurred, The version selected is invalid. Try selecting different version.', '0-day-analytics' ) );
+			}
+
+			return self::upgrade( $plugin_slug, $version );
+		}
+
+		/**
+		 * Upgrades the plugin to a specific version.
+		 *
+		 * @param string $plugin_name - The plugin slug.
+		 * @param string $version - The version to switch to.
+		 *
+		 * @return bool|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function upgrade( string $plugin_name, $version ) {
+
+			$update_plugins = \get_site_transient( 'update_plugins' );
+			if ( ! is_object( $update_plugins ) ) {
+				$update_plugins = new \stdClass();
+			}
+
+			$plugin_info              = new \stdClass();
+			$plugin_info->new_version = $version;
+			$plugin_info->slug        = $plugin_name;
+			$plugin_info->package     = sprintf( 'https://downloads.wordpress.org/plugin/%s.%s.zip', $plugin_name, $version );
+
+			$update_plugins->response[ $plugin_name ] = $plugin_info;
+
+			\set_site_transient( 'update_plugins', $update_plugins );
+
+			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+			$title = __( 'Version Switching : - ', '0-day-analytics' );
+			$title = $title . str_replace( '-', ' ', $plugin_name ) . ' v' . $version;
+
+			$upgrader_args = array(
+				'url'    => 'update.php?action=upgrade-plugin&plugin=' . rawurlencode( $plugin_name ),
+				'plugin' => $plugin_name,
+				'nonce'  => 'upgrade-plugin_' . $plugin_name,
+				'title'  => $title,
+			);
+
+			$upgrader = new \Plugin_Upgrader( new \Plugin_Upgrader_Skin( $upgrader_args ) );
+
+			return $upgrader->upgrade( $plugin_name );
+		}
+
+		/**
+		 * Enqueue the custom admin style.
+		 *
+		 * @param string $hook - The current admin page.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function load_custom_wp_admin_style( $hook ) {
+			?>
+				<script>
+					window.addEventListener("load", () => {
+						jQuery( '.switch_plugin_version' ).on( 'click', function(e) {
+							var data = {
+								'action': 'aadvana_extract_plugin_versions',
+								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
+								'plugin_slug': jQuery(this).data('plugin-slug')
+							};
+
+							let that = this;
+
+							jQuery.get({
+								url: "<?php echo \esc_url( \admin_url( 'admin-ajax.php' ) ); ?>",
+								data,
+								success: function(data, textStatus, jqXHR) {
+									// if PHP call returns data process it and show notification
+									// if nothing returns then it means no notification available for now
+									if (jQuery.trim(data.data)) {
+										
+										jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										jQuery('#aadvana_switch_plugin_to_version_' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										that.remove();
+									}
+								},
+								error: function(jqXHR, textStatus, errorThrown) { }
+							});
+						});
+
+						jQuery( '.switch_to_plugin_version' ).on( 'click', function(e) {
+							let that = this;
+
+							var selectedVersion = jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).find(":selected").val();
+
+							if ( ! selectedVersion ) {
+								alert('<?php echo esc_js( __( 'Please select a version to switch.', '0-day-analytics' ) ); ?>');
+								return;
+							}
+					
+							var data = {
+								'action': 'aadvana_switch_plugin_version',
+								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
+								'plugin_slug': jQuery(this).data('plugin-slug'),
+								'version': selectedVersion
+							};
+
+							jQuery.get({
+								url: "<?php echo \esc_url( \admin_url( 'admin-ajax.php' ) ); ?>",
+								data,
+								success: function(data, textStatus, jqXHR) {
+									location.reload();
+								},
+								error: function(jqXHR, textStatus, errorThrown) { }
+							});
+						});
+					});
+				</script>
+
+			<?php
 		}
 	}
 }

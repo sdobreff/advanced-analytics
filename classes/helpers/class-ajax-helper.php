@@ -117,6 +117,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 */
 				\add_action( 'wp_ajax_aadvana_get_notification_data', array( __CLASS__, 'get_notification_data' ) );
 
+				if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
+					/**
+					 * Extract plugin versions
+					 *
+					 * @return void
+					 *
+					 * @since latest
+					 */
+					\add_action( 'wp_ajax_aadvana_extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
+
+					/**
+					 * Switch plugin versions
+					 *
+					 * @return void
+					 *
+					 * @since latest
+					 */
+					\add_action( 'wp_ajax_aadvana_switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
+				}
 			}
 		}
 
@@ -443,6 +462,56 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			} else {
 				\wp_send_json_success( $data );
 			}
+		}
+
+		/**
+		 * Extracts the plugin versions.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function extract_plugin_versions() {
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+			if ( ! isset( $_REQUEST['plugin_slug'] ) || empty( $_REQUEST['plugin_slug'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				\wp_send_json_error( \esc_html__( 'Plugin slug is not provided.', '0-day-analytics' ), 404 );
+			}
+
+			$plugin_versions = Upgrade_Notice::extract_plugin_versions( \sanitize_title( \wp_unslash( $_REQUEST['plugin_slug'] ) ) );
+
+			if ( \is_wp_error( $plugin_versions ) ) {
+				\wp_send_json_error( $plugin_versions->get_error_message(), 500 );
+			}
+
+			\wp_send_json_success( $plugin_versions );
+		}
+
+		/**
+		 * Switch the plugin to desired version.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function switch_plugin_version() {
+			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+			if ( ! isset( $_REQUEST['plugin_slug'] ) || empty( $_REQUEST['plugin_slug'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				\wp_send_json_error( \esc_html__( 'Plugin slug is not provided.', '0-day-analytics' ), 404 );
+			}
+
+			if ( ! isset( $_REQUEST['version'] ) || empty( $_REQUEST['version'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				\wp_send_json_error( \esc_html__( 'Plugin slug is not provided.', '0-day-analytics' ), 404 );
+			}
+
+			$switch_versions = Upgrade_Notice::version_switch( \sanitize_title( \wp_unslash( $_REQUEST['plugin_slug'] ) ), \wp_unslash( ( $_REQUEST['version'] ) ) );
+
+			if ( \is_wp_error( $switch_versions ) ) {
+				\wp_send_json_error( $switch_versions->get_error_message(), 500 );
+			}
+
+			\wp_send_json_success();
 		}
 
 		/**
