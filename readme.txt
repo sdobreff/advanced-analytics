@@ -7,7 +7,7 @@ Stable tag: 1.9.6
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. It has build in fully functional **Cron** and **Transients** management system, so everything you need to get best inner insight of your site is one plugin built for speed.
+**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. It has build in fully functional **Cron** and **Transients** management system and plugin version switcher.
 
 == Description ==
 
@@ -18,6 +18,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - **Cron manager** at the tip of your fingers (edit / delete / run)
 - **Transient manager** - all (stored in the DB) transients (edit / delete)
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
+- **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -67,6 +68,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 5. **Transients manager** - Build-in is very powerful transients manager.
 
 == Changelog ==
+
+= 1.9.7 =
+Extended default admin Plugins page - gives thee option to switch to older version directly from the page and shows information about the plugin main file location.
 
 = 1.9.6 =
 Lots of UI changes both light and dark skin. Filtering the severities directly from the error log list view.

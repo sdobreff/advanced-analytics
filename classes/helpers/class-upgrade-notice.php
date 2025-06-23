@@ -197,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function after_plugin_row_meta( $plugin_file, $plugin_data ) {
 			if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
@@ -215,7 +215,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return \WP_Error|string
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function extract_plugin_versions( string $plugin_slug ) {
 
@@ -247,7 +247,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 
 				usort( $versions, 'version_compare' );
 
-				$versions = array_slice( $versions, -3, 3, true );
+				$versions = array_slice( $versions, -( Settings::get_current_options()['plugin_version_switch_count'] ), Settings::get_current_options()['plugin_version_switch_count'], true );
 
 				$rollback_versions = array();
 
@@ -300,7 +300,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return \WP_Error
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function version_switch( $plugin_slug, $version ) {
 
@@ -319,7 +319,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function upgrade( string $plugin_name, $version ) {
 
@@ -361,7 +361,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function load_custom_wp_admin_style( $hook ) {
 			?>
@@ -376,6 +376,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 
 							let that = this;
 
+							jQuery( that ).addClass( 'disabled' );
+
 							jQuery.get({
 								url: "<?php echo \esc_url( \admin_url( 'admin-ajax.php' ) ); ?>",
 								data,
@@ -389,7 +391,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 										that.remove();
 									}
 								},
-								error: function(jqXHR, textStatus, errorThrown) { }
+								error: function(jqXHR, textStatus, errorThrown) { 
+									jQuery( that ).removeClass( 'disabled' );
+								}
 							});
 						});
 
@@ -402,6 +406,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 								alert('<?php echo esc_js( __( 'Please select a version to switch.', '0-day-analytics' ) ); ?>');
 								return;
 							}
+
+							jQuery( that ).addClass( 'disabled' );
+							jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).addClass( 'disabled' );
 					
 							var data = {
 								'action': 'aadvana_switch_plugin_version',
@@ -416,7 +423,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 								success: function(data, textStatus, jqXHR) {
 									location.reload();
 								},
-								error: function(jqXHR, textStatus, errorThrown) { }
+								error: function(jqXHR, textStatus, errorThrown) { 
+									jQuery( that ).removeClass( 'disabled' );
+									jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).removeClass( 'disabled' );
+								}
 							});
 						});
 					});

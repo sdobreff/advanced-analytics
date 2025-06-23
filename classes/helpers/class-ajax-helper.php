@@ -123,7 +123,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @return void
 					 *
-					 * @since latest
+					 * @since 1.9.7
 					 */
 					\add_action( 'wp_ajax_aadvana_extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
 
@@ -132,7 +132,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @return void
 					 *
-					 * @since latest
+					 * @since 1.9.7
 					 */
 					\add_action( 'wp_ajax_aadvana_switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
 				}
@@ -469,7 +469,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function extract_plugin_versions() {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
@@ -492,7 +492,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.7
 		 */
 		public static function switch_plugin_version() {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );

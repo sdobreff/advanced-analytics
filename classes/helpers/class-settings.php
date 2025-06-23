@@ -36,7 +36,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '12'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '13'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -381,6 +381,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'no_rest_api_monitor'             => false,
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
+					'plugin_version_switch_count' => 3,
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -1819,6 +1820,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					),
 				)
 			) : 10;
+
+			$advanced_options['plugin_version_switch_count'] = ( array_key_exists( 'plugin_version_switch_count', $post_array ) ) ? filter_var(
+				$post_array['plugin_version_switch_count'],
+				\FILTER_VALIDATE_INT,
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 10,
+					),
+				)
+			) : 3;
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 

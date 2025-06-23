@@ -61,6 +61,18 @@ Settings::build_option(
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'How many versions to show in options for plugin version switch', '0-day-analytics' ),
+			'id'      => 'plugin_version_switch_count',
+			'type'    => 'number',
+			'min'     => 1,
+			'max'     => 10,
+			'hint'    => \esc_html__( 'Set how many version to show in the drop down to choose from when Plugin version switching. Maximum allowed number is 10, minimum is 1.', '0-day-analytics' ),
+			'default' => Settings::get_current_options()['plugin_version_switch_count'],
+		)
+	);
+
 	// Reset the settings options.
 	Settings::build_option(
 		array(
