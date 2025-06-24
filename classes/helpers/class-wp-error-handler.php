@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Controllers\Slack;
 use ADVAN\Advanced_Analytics;
+use ADVAN\Controllers\Telegram;
+use ADVAN\Controllers\Slack_API;
+use ADVAN\Controllers\Telegram_API;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -380,6 +384,161 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			} else {
 				return 'UNKNOWN ERROR';
 			}
+		}
+
+		/**
+		 * Log REST API errors
+		 *
+		 * @param WP_REST_Response $result  Result that will be sent to the client.
+		 * @param WP_REST_Server   $server  The API server instance.
+		 * @param WP_REST_Request  $request The request used to generate the response.
+		 *
+		 * @since 1.9.3
+		 */
+		public static function log_rest_api_errors( $result, $server, $request ) {
+			if ( $result->is_error() ) {
+				error_log(
+					sprintf(
+						'REST API request: %s:',
+						$request->get_route(),
+					) . \PHP_EOL .
+					var_export( $request->get_params(), true )
+				);
+				error_log(
+					sprintf(
+						'REST API %s: %s.',
+						$result->get_data()['code'],
+						$result->get_data()['message'],
+					) . \PHP_EOL .
+					var_export( $result->get_data(), true )
+				);
+			}
+
+			return $result;
+		}
+
+		/**
+		 * Shutdown function to handle errors.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return void
+		 */
+		public static function shutdown() {
+
+			$error = error_get_last();
+
+			if ( null !== $error && ( \in_array( $error['type'], array( 1, 4 ) ) ) ) {
+				$errno   = $error['type'];
+				$errfile = $error['file'];
+				$errline = $error['line'];
+				$errstr  = $error['message'];
+
+				if ( Slack::is_set() ) {
+					// Send error to Slack.
+					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+				}
+
+				if ( Telegram::is_set() ) {
+					// Send error to \Telegram.
+					Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+				}
+			}
+		}
+
+		/**
+		 * Uncaught error handler.
+		 *
+		 * @param Throwable $e - The error or exception.
+		 *
+		 * @return void
+		 *
+		 * @since 1.8.4
+		 */
+		public static function exception_handler( $e ) {
+			$error = 'Uncaught Error';
+
+			if ( $e instanceof \Exception ) {
+				$error = 'Uncaught Exception';
+			}
+
+			if ( Slack::is_set() ) {
+				// Send error to Slack.
+				Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+			}
+
+			if ( Telegram::is_set() ) {
+				// Send error to \Telegram.
+				Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+			}
+
+			$main_shown = false;
+
+			$out = sprintf(
+				'PHP FATAL: %s in %s on line %d',
+				$e->getMessage(),
+				$e->getFile(),
+				$e->getLine(),
+			);
+
+			$out .= PHP_EOL . 'Stack trace:' . PHP_EOL;
+
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
+
+			$counter = count( $e->getTrace() );
+			for ( $i = 0; $i < $counter; $i++ ) {
+				$sf    = (object) shortcode_atts( $defaults, $e->getTrace()[ $i ] );
+				$index = $i;
+				$file  = $sf->file;
+				// $file  = self::clean_file_path( $sf->file );
+
+				if ( 1 === $i ) {
+					$thrown_file = $file;
+					$thrown_line = $sf->line;
+				}
+
+				$caller = '';
+				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
+					$caller = $sf->class . '::' . $sf->function . '()';
+				} elseif ( ! empty( $sf->function ) ) {
+					$caller = $sf->function . '()';
+				} else {
+					$main_shown = true;
+					$caller     = '{main}';
+				}
+
+				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
+					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
+				} else {
+					$args = '';
+				}
+
+				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
+
+			}
+			if ( ! $main_shown ) {
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
+			}
+			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
+
+			if ( WP_DEBUG_LOG ) {
+				\error_log( $out );
+			}
+
+			// $message = sprintf(
+			// '%s in %s on line %d trace: %s',
+			// $e->getMessage(),
+			// $e->getFile(),
+			// $e->getLine(),
+			// $e->getTrace()
+			// );
+
+			// \error_log( $message );
 		}
 	}
 }

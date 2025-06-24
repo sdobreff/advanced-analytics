@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 *
 		 * @since 1.7.0
 		 */
-		protected static $wp_screen;
+		protected static $wp_screen = null;
 
 		/**
 		 * Verifies the nonce and user capability.
@@ -113,133 +113,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			}
 
 			return \true;
-		}
-
-		/**
-		 * Returns an array of the callback functions that are attached to the given hook name.
-		 *
-		 * @param string $name The hook name.
-		 * @return array<int,array<string,mixed>> Array of callbacks attached to the hook.
-		 * @phpstan-return array<int,array{
-		 *   priority: int,
-		 *   callback: array<string,mixed>,
-		 * }>
-		 *
-		 * @since 1.4.0
-		 */
-		public static function get_cron_callbacks( $name ) {
-			global $wp_filter;
-
-			if ( ! isset( $wp_filter[ $name ] ) ) {
-				return array();
-			}
-
-			$actions = array();
-			foreach ( $wp_filter[ $name ] as $priority => $callbacks ) {
-				foreach ( $callbacks as $callback ) {
-					$callback = self::populate_callback( $callback['function'] );
-
-					if ( __NAMESPACE__ . '\\pauser()' === $callback['name'] ) {
-						continue;
-					}
-
-					$actions[] = array(
-						'priority' => $priority,
-						'callback' => $callback,
-					);
-				}
-			}
-
-			return $actions;
-		}
-
-		/**
-		 * Tries to extract as much information as possible from a callback.
-		 *
-		 * @param array|string $callback - The callback to populate.
-		 *
-		 * @return array
-		 * @phpstan-return array{
-		 *   name?: string,
-		 *   file?: string|false,
-		 *   line?: string|false,
-		 *   error?: WP_Error,
-		 *   component?: QM_Component,
-		 * }
-		 *
-		 * @since 1.4.0
-		 */
-		public static function populate_callback( $callback ): array {
-			$result = array();
-
-			try {
-				if ( is_array( $callback ) ) {
-					if ( is_object( $callback[0] ) ) {
-						$class  = get_class( $callback[0] );
-						$access = '->';
-					} else {
-						$class  = $callback[0];
-						$access = '::';
-					}
-
-					$result['name'] = self::shorten_fqn( $class . $access . $callback[1] ) . '()';
-					$ref            = new \ReflectionMethod( $class, $callback[1] );
-				} elseif ( is_object( $callback ) && method_exists( $callback, '__invoke' ) ) {
-					$class          = get_class( $callback );
-					$result['name'] = self::shorten_fqn( $class ) . '->__invoke()';
-					$ref            = new \ReflectionMethod( $class, '__invoke' );
-				} else {
-					$function_name  = is_string( $callback ) ? $callback : spl_object_hash( $callback );
-					$result['name'] = self::shorten_fqn( $function_name ) . '()';
-					try {
-						$ref = new \ReflectionFunction( $callback );
-						// Class as string ?
-					} catch ( \ReflectionException $e ) {
-						if ( PHP_VERSION_ID >= 80400 ) {
-							$ref = \ReflectionMethod::createFromMethodName( $callback );
-						} else {
-							$ref = new \ReflectionMethod( $callback );
-						}
-					}
-				}
-
-				$result['file'] = $ref->getFileName();
-				$result['line'] = $ref->getStartLine();
-
-				$name = trim( $ref->getName() );
-
-				if ( '__lambda_func' === $name || 0 === strpos( $name, 'lambda_' ) ) {
-					if ( $result['file'] && preg_match( '|(?P<file>.*)\((?P<line>[0-9]+)\)|', $result['file'], $matches ) ) {
-						$result['file'] = $matches['file'];
-						$result['line'] = $matches['line'];
-						$file           = trim( self::standard_dir( $result['file'], '' ), '/' );
-						$result['name'] = sprintf(
-							// translators: %1$d is the line number, %2$s is the file name.
-							__( 'Anonymous function on line %1$d of %2$s', '0-day-analytics' ),
-							$result['line'],
-							$file
-						);
-					} else {
-						unset( $result['line'], $result['file'] );
-						$result['name']  = $name . '()';
-						$result['error'] = new \WP_Error( 'unknown_lambda', __( 'Unable to determine source of lambda function', '0-day-analytics' ) );
-					}
-				}
-
-				if ( ! empty( $result['file'] ) ) {
-					$result['component'] = self::get_file_component( $result['file'] );
-				} else {
-					$result['component'] = array(
-						'type'    => 'php',
-						'name'    => 'PHP',
-						'context' => '',
-					);
-				}
-			} catch ( \ReflectionException $e ) {
-				$result['error'] = new \WP_Error( 'reflection_exception', $e->getMessage() );
-			}
-
-			return $result;
 		}
 
 		/**
@@ -479,7 +352,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 */
 		private static function get_plugin_name( string $file, string $type ): string {
 			$file = str_replace( '/vendor/', '/', $file );
-			$plug = plugin_basename( $file );
+			$plug = \plugin_basename( $file );
 			if ( strpos( $plug, '/' ) ) {
 				$plug = explode( '/', $plug )[0];
 			} else {
@@ -608,7 +481,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			return str_replace( '_', ' ', end( $parts ) );
 		}
-
 
 		/**
 		 * Converts a period of time in seconds into a human-readable format representing the interval.
@@ -978,5 +850,16 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			);
 		}
 
+		/**
+		 * Check whether we are on an admin and plugin page.
+		 *
+		 * @since 1.8.4
+		 *
+		 * @return bool
+		 */
+		public static function is_admin_page(): bool {
+
+			return \is_admin() && ( Settings::is_plugin_settings_page() );
+		}
 	}
 }

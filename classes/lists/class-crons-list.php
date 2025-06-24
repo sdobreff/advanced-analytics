@@ -253,7 +253,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			$this->fetch_table_data();
 
-			$hidden = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
+			$hidden = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -476,7 +476,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				case 'schedule':
 					return WP_Helper::time_formatter( $item, esc_html__( 'overdue', '0-day-analytics' ) );
 				case 'actions':
-					$hook_callbacks = WP_Helper::get_cron_callbacks( $item['hook'] );
+					$hook_callbacks = Crons_Helper::get_cron_callbacks( $item['hook'] );
 
 					if ( ! empty( $hook_callbacks ) ) {
 						$callbacks = array();

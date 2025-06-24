@@ -38,13 +38,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function init() {
-			global $current_screen;
 
-			if ( ! isset( $current_screen ) ) {
+			if ( ! WP_Helper::get_wp_screen() ) {
 				return;
 			}
 
-			if ( 'plugins' === $current_screen->id ) {
+			if ( 'plugins' === WP_Helper::get_wp_screen()->id ) {
 				\add_action( 'in_plugin_update_message-' . \ADVAN_PLUGIN_BASENAME, array( __CLASS__, 'prefix_plugin_update_message' ), 10, 2 );
 				\add_action( 'after_plugin_row_meta', array( __CLASS__, 'after_plugin_row_meta' ), 10, 2 );
 

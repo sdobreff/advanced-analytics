@@ -241,7 +241,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Display_Environment_Type' ) ) {
 			}
 
 			// If the admin bar is not showing there is no place to display the environment type.
-			if ( ! is_admin_bar_showing() ) {
+			if ( ! \is_admin_bar_showing() ) {
 				return false;
 			}
 
@@ -250,13 +250,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Display_Environment_Type' ) ) {
 				if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 					$display = true;
 				}
-			} elseif ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+			} elseif ( \is_user_logged_in() && \current_user_can( 'manage_options' ) ) {
 				// Display on the front-end only if user has the manage_options capability.
 				$display = true;
 			}
 
 			/**
-			 * Filter whether or not the environent type should be displayed.
+			 * Filter whether or not the environment type should be displayed.
 			 *
 			 * Allows you to perform checks like user capabilities or is_admin()
 			 * and return true to display the environment type, or false to not.
@@ -265,7 +265,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Display_Environment_Type' ) ) {
 			 *
 			 * @param boolean $display Whether the environment type should be displayed.
 			 */
-			$display = (bool) apply_filters( 'det_display_environment_type', $display );
+			$display = (bool) apply_filters( 'aadvan_display_environment_type', $display );
 
 			return $display;
 		}

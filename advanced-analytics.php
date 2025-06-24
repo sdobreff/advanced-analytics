@@ -79,8 +79,8 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 
 require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
-\register_shutdown_function( array( Advanced_Analytics::class, 'shutdown' ) );
-\set_exception_handler( array( Advanced_Analytics::class, 'exception_handler' ) );
+\register_shutdown_function( array( WP_Error_Handler::class, 'shutdown' ) );
+\set_exception_handler( array( WP_Error_Handler::class, 'exception_handler' ) );
 
 if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
@@ -107,7 +107,7 @@ if ( ! Context_Helper::is_installing() ) {
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
 	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
-		\add_filter( 'rest_post_dispatch', array( Advanced_Analytics::class, 'log_rest_api_errors' ), 10, 3 );
+		\add_filter( 'rest_post_dispatch', array( WP_Error_Handler::class, 'log_rest_api_errors' ), 10, 3 );
 	}
 
 	Endpoints::init();

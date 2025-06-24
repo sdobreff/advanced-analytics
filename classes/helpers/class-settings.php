@@ -1941,9 +1941,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function admin_footer_text( $text ) {
 
-			global $current_screen;
-
-			if ( isset( $current_screen ) && ( in_array( $current_screen->base, self::get_plugin_page_slugs(), true ) ) ) {
+			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
 				$our_footer = '';
 
 				$link        = 'https://github.com/sdobreff';
@@ -1971,9 +1969,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function admin_footer_version_text( $text ) {
 
-			global $current_screen;
-
-			if ( isset( $current_screen ) && ( in_array( $current_screen->base, self::get_plugin_page_slugs(), true ) ) ) {
+			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
 
 				return sprintf(
 					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
