@@ -1125,7 +1125,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<?php
 				\esc_html_e( 'Following types are filtered and not showing: ', '0-day-analytics' );
 				foreach ( Settings::get_disabled_severities() as $severity ) {
-					echo '<label for="severity_filter_'. \esc_attr( $severity ) .'" class="badge dark-badge" style="cursor: pointer; color: ' . \esc_html( Settings::get_current_options()['severities'][ $severity ]['color'] ) . ' !important;">' . \esc_html( $severity ) . '</label> ';
+					echo '<label for="severity_filter_' . \esc_attr( $severity ) . '" class="badge dark-badge" style="cursor: pointer; color: ' . \esc_html( Settings::get_current_options()['severities'][ $severity ]['color'] ) . ' !important;">' . \esc_html( $severity ) . '</label> ';
 				}
 				?>
 					</p>
@@ -1382,8 +1382,107 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						echo '.generated-logs .' . \esc_attr( $class ) . ' td:nth-child(1) { border-left: 7px solid ' . \esc_attr( $properties['color'] ) . ' !important;}';
 					}
 					?>
+					
+.container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 95vh;
+	width: 100%;
+}
+
+.img-block {
+	max-height: 80%;
+	width: auto;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	position: relative;
+}
+
+.image {
+	max-height: 100%;
+	width: auto;
+	max-width: 100%
+}
+
+.tooltip {
+	position: fixed;
+	height: fit-content;
+	width: fit-content;
+	background-color: white;
+	padding: 5px 12px;
+	box-shadow: 0 0 2px rgba(0,0,0,0.2);
+	border-radius: 5px;
+	display: none;
+}
+
+.img-block:hover #tooltip {
+	display: block;
+}
+
+.shadow-effect {
+	position:relative;
+	-webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+		-moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+			box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+}
+.shadow-effect:before, .shadow-effect:after {
+	content:"";
+	position:absolute;
+	z-index:-1;
+	-webkit-box-shadow:0 0 20px rgba(0,0,0,0.8);
+	-moz-box-shadow:0 0 20px rgba(0,0,0,0.8);
+	box-shadow:0 0 20px rgba(0,0,0,0.8);
+	top:5px;
+	bottom:0;
+	left:10px;
+	right:10px;
+	-moz-border-radius:100px / 10px;
+	border-radius:100px / 10px;
+}
+.shadow-effect:after {
+	right:10px;
+	left:auto;
+	-webkit-transform:skew(8deg) rotate(3deg);
+		-moz-transform:skew(8deg) rotate(3deg);
+		-ms-transform:skew(8deg) rotate(3deg);
+		-o-transform:skew(8deg) rotate(3deg);
+			transform:skew(8deg) rotate(3deg);
+}
+
 				</style>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
+				
+				<div class="tooltip"><?php echo __( 'Copied', '0-day-analytics' ); ?></div>
+					
+				<script>
+
+					let preEl = document.getElementById('debug-log');
+
+					preEl.addEventListener('mouseup', checkForSelection);
+
+					let textBeingDragged;
+					let originalNode
+
+					function checkForSelection(event) {
+						let toolTip = document.getElementsByClassName("tooltip")[0];
+						const selection = window.getSelection();
+						const selectedText = selection.toString();
+						if (selectedText) {
+							navigator.clipboard.writeText(selectedText);
+							let x = event.clientX,
+							y = event.clientY;
+							toolTip.style.top = (y + 20) + 'px';
+							toolTip.style.left = (x + 20) + 'px';
+							toolTip.style.display = 'block';
+							setTimeout(function() {
+								toolTip.style.display = "none";
+						    }, 1000);
+						}
+					}
+				</script>
 					<?php
 				}
 		}
