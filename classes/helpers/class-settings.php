@@ -381,7 +381,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'no_rest_api_monitor'             => false,
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
-					'plugin_version_switch_count' => 3,
+					'plugin_version_switch_count'     => 3,
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -561,9 +561,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					);
 				}
 
-				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_help' ) );
+				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_error_log_help' ) );
 
-				\add_submenu_page(
+				$settings_hook = \add_submenu_page(
 					self::MENU_SLUG,
 					\esc_html__( 'Settings', '0-day-analytics' ),
 					\esc_html__( 'Settings', '0-day-analytics' ),
@@ -572,6 +572,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array( __CLASS__, 'aadvana_show_options' ),
 					301
 				);
+
+				\add_action( 'load-' . $settings_hook, array( __CLASS__, 'aadvana_settings_help' ) );
 
 				if ( ! self::is_plugin_settings_page() ) {
 					return;
@@ -1231,12 +1233,40 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		public static function aadvana_help() {
+		public static function aadvana_error_log_help() {
 
-			$screen = \get_current_screen();
+			$screen = WP_Helper::get_wp_screen();
 
-			if ( $screen->id !== self::$hook ) {
-				return; }
+			$screen->add_help_tab(
+				array(
+					'id'      => 'advanced-analytics-help-tab',
+					'title'   => __( 'Help', '0-day-analytics' ),
+					'content' => self::add_help_content_error_log(),
+				)
+			);
+
+			$screen->set_help_sidebar( self::add_sidebar_content() );
+		}
+
+		/**
+		 * Add Options Help
+		 *
+		 * Add help tab to options screen
+		 *
+		 * @since 1.1.0
+		 */
+		public static function aadvana_settings_help() {
+
+			?>
+			<style>
+				.<?php echo \esc_attr( self::PAGE_SLUG ); ?> #screen-meta-links {
+					z-index: 10;
+					position: relative;
+				}
+			</style>
+			<?php
+
+			$screen = WP_Helper::get_wp_screen();
 
 			$screen->add_help_tab(
 				array(
@@ -1256,12 +1286,32 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
+		 * @since latest
+		 */
+		public static function add_help_content_error_log() {
+
+			$help_text  = '<p>' . __( 'This screen allows you to see last occured reccords, check their sources, see the code responsible / involved in given error.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can specify how many error to be shown (up to 100), which columns to see or filter error by severity.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want toe be kept).', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window wher you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'You can see the size of your log file and download it if you need to.', '0-day-analytics' ) . '</p></h4>';
+
+			return $help_text;
+		}
+
+		/**
+		 * Options Help
+		 *
+		 * Return help text for options screen
+		 *
+		 * @return string  Help Text
+		 *
 		 * @since 1.1.0
 		 */
 		public static function add_help_content() {
 
 			$help_text  = '<p>' . __( 'This screen allows you to specify the options for the WP Control plugin.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'Here you can set how many errors to be shown (maximum is 100), create new debug log, or enebale / disable WP logging..', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Here adjust the plugin to your specific needs.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Remember to click the Save Changes button when on sexttings page for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
@@ -1279,8 +1329,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function add_sidebar_content() {
 
 			$help_text  = '<p><strong>' . __( 'For more information:', '0-day-analytics' ) . '</strong></p>';
-			$help_text .= '<p><a href="https://wordpress.org/plugins/0-day-analytics/">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
-			$help_text .= '<p><a href="https://wordpress.org/support/plugin/0-day-analytics">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
+			$help_text .= '<p><a href="https://wordpress.org/plugins/0-day-analytics/" target="__blank">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
+			$help_text .= '<p><a href="https://wordpress.org/support/plugin/0-day-analytics" target="__blank">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
 
 			return $help_text;
 		}

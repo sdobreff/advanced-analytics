@@ -182,7 +182,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
-				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
+				<?php \submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
 
 			<?php
@@ -259,17 +259,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			}
 
 			$this->_column_headers = array( self::$columns, $hidden, $sortable );
-			// phpcs:ignore
-			// usort( $items, [ &$this, 'usort_reorder' ] ); // phpcs:ignore
-
-			// Set the pagination.
-			// $this->set_pagination_args(
-			// array(
-			// 'total_items' => $this->count,
-			// 'per_page'    => $this->get_screen_option_per_page(),
-			// 'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
-			// )
-			// );
 		}
 
 		/**
@@ -355,36 +344,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 				self::$read_items = Crons_Helper::get_events();
 
-				// $crons = _get_cron_array();
-
-				// if ( $crons && is_array( $crons ) ) {
-				// if ( null === self::$read_items ) {
-				// self::$read_items = array();
-				// }
-				// foreach ( $crons as $timestamp => $cron ) {
-				// if ( ! is_array( $cron ) ) {
-				// continue;
-				// }
-				// foreach ( $cron as $hook => $events ) {
-				// foreach ( $events as $event ) {
-
-				// $cron_item = array();
-
-				// $cron_item['hook']     = \esc_html( $hook );
-				// $cron_item['schedule'] = $timestamp;
-				// if ( isset( $event['schedule'] ) ) {
-				// $cron_item['recurrence'] = \esc_html( $event['schedule'] );
-				// }
-				// if ( isset( $event['args'] ) ) {
-				// $cron_item['args'] = print_r( $event['args'], true );
-				// }
-
-				// $cron_item['hash'] = substr( md5( $cron_item['hook'] . $cron_item['recurrence'] . $cron_item['schedule'] . serialize( $event['args'] ) ), 0, 8 );
-				// }
-				// self::$read_items[] = $cron_item;
-				// }
-				// }
-				// }
 			}
 
 			if ( ! empty( $_REQUEST[ self::SEARCH_INPUT ] ) && is_string( $_REQUEST[ self::SEARCH_INPUT ] ) ) {
@@ -403,17 +362,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			}
 
 			return self::$read_items ?? array();
-		}
-
-		/**
-		 * Returns the current query
-		 *
-		 * @return array
-		 *
-		 * @since 1.1.0
-		 */
-		public static function get_query_occ(): array {
-			return self::$query_occ;
 		}
 
 		/**
@@ -517,7 +465,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				default:
 					return isset( $item[ $column_name ] )
 						? \esc_html( $item[ $column_name ] )
-						: 'Column "' . \esc_html( $column_name ) . '" not found';
+						: __( 'Column "', '0-day-analytics' ) . \esc_html( $column_name ) . __( '" not found', '0-day-analytics' );
 			}
 		}
 

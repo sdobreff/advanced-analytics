@@ -321,7 +321,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 * @return bool
 		 */
 		public static function is_just_in_time_for_0_day_domain( string $function_name, string $message ): bool {
-
 			return '_load_textdomain_just_in_time' === $function_name && strpos( $message, '<code>' . ADVAN_TEXTDOMAIN ) !== false;
 		}
 	}

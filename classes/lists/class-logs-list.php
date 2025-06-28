@@ -482,17 +482,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Returns the current query
-		 *
-		 * @return array
-		 *
-		 * @since 1.1.0
-		 */
-		public static function get_query_occ(): array {
-			return self::$query_occ;
-		}
-
-		/**
 		 * Render a column when no column specific method exists.
 		 *
 		 * Use that method for common rendering and separate columns logic in different methods. See below.
@@ -793,7 +782,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				default:
 					return isset( $item[ $column_name ] )
 				? \esc_html( $item[ $column_name ] )
-				: 'Column "' . \esc_html( $column_name ) . '" not found';
+				: __( 'Column "', '0-day-analytics' ) . \esc_html( $column_name ) . __( '" not found', '0-day-analytics' );
 			}
 		}
 
@@ -859,24 +848,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function graceful_exit() {
 			exit;
-		}
-
-		/**
-		 * Die when the nonce check fails.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @return void
-		 */
-		public function invalid_nonce_redirect() {
-			\wp_die(
-				'Invalid Nonce',
-				'Error',
-				array(
-					'response'  => 403,
-					'back_link' => \esc_url( \network_admin_url( 'users.php' ) ),
-				)
-			);
 		}
 
 		/**
@@ -1383,79 +1354,79 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 					?>
 					
-.container {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	height: 95vh;
-	width: 100%;
-}
+					.container {
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						align-items: center;
+						height: 95vh;
+						width: 100%;
+					}
 
-.img-block {
-	max-height: 80%;
-	width: auto;
-	cursor: pointer;
-	display: flex;
-	justify-content: center;
-	position: relative;
-}
+					.img-block {
+						max-height: 80%;
+						width: auto;
+						cursor: pointer;
+						display: flex;
+						justify-content: center;
+						position: relative;
+					}
 
-.image {
-	max-height: 100%;
-	width: auto;
-	max-width: 100%
-}
+					.image {
+						max-height: 100%;
+						width: auto;
+						max-width: 100%
+					}
 
-.tooltip {
-	position: fixed;
-	height: fit-content;
-	width: fit-content;
-	background-color: white;
-	padding: 5px 12px;
-	box-shadow: 0 0 2px rgba(0,0,0,0.2);
-	border-radius: 5px;
-	display: none;
-}
+					.tooltip {
+						position: fixed;
+						height: fit-content;
+						width: fit-content;
+						background-color: white;
+						padding: 5px 12px;
+						box-shadow: 0 0 2px rgba(0,0,0,0.2);
+						border-radius: 5px;
+						display: none;
+					}
 
-.img-block:hover #tooltip {
-	display: block;
-}
+					.img-block:hover #tooltip {
+						display: block;
+					}
 
-.shadow-effect {
-	position:relative;
-	-webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-		-moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-			box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-}
-.shadow-effect:before, .shadow-effect:after {
-	content:"";
-	position:absolute;
-	z-index:-1;
-	-webkit-box-shadow:0 0 20px rgba(0,0,0,0.8);
-	-moz-box-shadow:0 0 20px rgba(0,0,0,0.8);
-	box-shadow:0 0 20px rgba(0,0,0,0.8);
-	top:5px;
-	bottom:0;
-	left:10px;
-	right:10px;
-	-moz-border-radius:100px / 10px;
-	border-radius:100px / 10px;
-}
-.shadow-effect:after {
-	right:10px;
-	left:auto;
-	-webkit-transform:skew(8deg) rotate(3deg);
-		-moz-transform:skew(8deg) rotate(3deg);
-		-ms-transform:skew(8deg) rotate(3deg);
-		-o-transform:skew(8deg) rotate(3deg);
-			transform:skew(8deg) rotate(3deg);
-}
+					.shadow-effect {
+						position:relative;
+						-webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+							-moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+								box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+					}
+					.shadow-effect:before, .shadow-effect:after {
+						content:"";
+						position:absolute;
+						z-index:-1;
+						-webkit-box-shadow:0 0 20px rgba(0,0,0,0.8);
+						-moz-box-shadow:0 0 20px rgba(0,0,0,0.8);
+						box-shadow:0 0 20px rgba(0,0,0,0.8);
+						top:5px;
+						bottom:0;
+						left:10px;
+						right:10px;
+						-moz-border-radius:100px / 10px;
+						border-radius:100px / 10px;
+					}
+					.shadow-effect:after {
+						right:10px;
+						left:auto;
+						-webkit-transform:skew(8deg) rotate(3deg);
+							-moz-transform:skew(8deg) rotate(3deg);
+							-ms-transform:skew(8deg) rotate(3deg);
+							-o-transform:skew(8deg) rotate(3deg);
+								transform:skew(8deg) rotate(3deg);
+					}
 
 				</style>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
 				
-				<div class="tooltip"><?php echo __( 'Copied', '0-day-analytics' ); ?></div>
+				<div class="tooltip"><?php \esc_html_e( 'Copied', '0-day-analytics' ); ?></div>
 					
 				<script>
 
@@ -1479,7 +1450,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							toolTip.style.display = 'block';
 							setTimeout(function() {
 								toolTip.style.display = "none";
-						    }, 1000);
+							}, 1000);
 						}
 					}
 				</script>

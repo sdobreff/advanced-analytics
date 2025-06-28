@@ -273,7 +273,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 				)
 			);
 
-			$hidden = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
+			$hidden = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -299,7 +299,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 */
 		public static function get_hidden_columns() {
 			return array_filter(
-				(array) get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
+				(array) \get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
 			);
 		}
 
@@ -412,17 +412,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		}
 
 		/**
-		 * Returns the current query
-		 *
-		 * @return array
-		 *
-		 * @since 1.7.0
-		 */
-		public static function get_query_occ(): array {
-			return self::$query_occ;
-		}
-
-		/**
 		 * Render a column when no column specific method exists.
 		 *
 		 * Use that method for common rendering and separate columns logic in different methods. See below.
@@ -491,7 +480,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 				default:
 					return isset( $item[ $column_name ] )
 						? \esc_html( $item[ $column_name ] )
-						: 'Column "' . \esc_html( $column_name ) . '" not found';
+						: __( 'Column "', '0-day-analytics' ) . \esc_html( $column_name ) . __( '" not found', '0-day-analytics' );
 			}
 		}
 
