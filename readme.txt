@@ -3,7 +3,7 @@ Tags: log, error log, analytics, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 1.9.7
+Stable tag: 1.9.8
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -59,6 +59,9 @@ Yes, Error Log Manager is optimized for gigabyte-sized log files, ensuring smoot
 = Where are the error logs are stored? =  
 The plugin autodetects default error log location, usually WordPress defines that in `wp-config.php`. You can customize this path if needed - this is strongly recommended for security reasons, and don't worry - you can do it with one click from plugin settings.
 
+= Note =
+Because of its extremely poor implementation and interfering with the proper WordPress workflow (debug log set, constant pollution of the log file, improper JS implementation etc.), *Log-IQ* plugin is automatically deactivated.
+
 == Screenshots ==
 
 1. **Error Log Overview** - Displays a summary of recent errors logged.
@@ -69,6 +72,9 @@ The plugin autodetects default error log location, usually WordPress defines tha
 6. **Plugin Version Switcher** - Build-in plugin version switcher.
 
 == Changelog ==
+
+= 1.9.8 =
+Automatically deactivates Log-IQ plugin.
 
 = 1.9.7 =
 Extended default admin Plugins page - gives thee option to switch to older version directly from the page and shows information about the plugin main file location.

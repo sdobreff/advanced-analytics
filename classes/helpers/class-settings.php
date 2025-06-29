@@ -525,6 +525,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				\add_filter( 'manage_' . $cron_hook . '_columns', array( Crons_List::class, 'manage_columns' ) );
 
+				\add_action( 'load-' . $cron_hook, array( __CLASS__, 'aadvana_common_help' ) );
+
 				/* Crons end */
 
 				/* Transients */
@@ -541,6 +543,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				Transients_List::add_screen_options( $transients_hook );
 
 				\add_filter( 'manage_' . $transients_hook . '_columns', array( Transients_List::class, 'manage_columns' ) );
+
+				\add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				/* Transients end */
 
@@ -561,7 +565,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					);
 				}
 
-				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_error_log_help' ) );
+				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				$settings_hook = \add_submenu_page(
 					self::MENU_SLUG,
@@ -894,7 +898,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					}
 				}
 
-					$events_list->display();
+				$events_list->display();
 
 				?>
 					</form>
@@ -1200,7 +1204,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
-					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . self::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
+					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . self::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
 					<hr class="wp-header-end">
 					<form id="transients-filter" method="get">
 					<?php
@@ -1233,17 +1237,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		public static function aadvana_error_log_help() {
+		public static function aadvana_common_help() {
 
 			$screen = WP_Helper::get_wp_screen();
 
-			$screen->add_help_tab(
-				array(
-					'id'      => 'advanced-analytics-help-tab',
-					'title'   => __( 'Help', '0-day-analytics' ),
-					'content' => self::add_help_content_error_log(),
-				)
-			);
+			if ( Logs_List::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => self::add_help_content_error_log(),
+					)
+				);
+			}
+
+			if ( Transients_List::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => self::add_help_content_transients(),
+					)
+				);
+			}
+
+			if ( Crons_List::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => self::add_help_content_crons(),
+					)
+				);
+			}
 
 			$screen->set_help_sidebar( self::add_sidebar_content() );
 		}
@@ -1290,11 +1319,48 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_help_content_error_log() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to see last occured reccords, check their sources, see the code responsible / involved in given error.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can specify how many error to be shown (up to 100), which columns to see or filter error by severity.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want toe be kept).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window wher you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p></h4>';
+			$help_text  = '<p>' . __( 'This screen allows you to see last occurred records (last are first), check their sources, see the code responsible / involved in given error.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can specify how many errors to be shown (up to 100), which columns to see or filter error by severity.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want to be kept).', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window where you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p></h4>';
 			$help_text .= '<p>' . __( 'You can see the size of your log file and download it if you need to.', '0-day-analytics' ) . '</p></h4>';
+
+			return $help_text;
+		}
+
+		/**
+		 * Options Help
+		 *
+		 * Return help text for options screen
+		 *
+		 * @return string  Help Text
+		 *
+		 * @since latest
+		 */
+		public static function add_help_content_transients() {
+
+			$help_text  = '<p>' . __( 'This screen allows you to see all the transients on your WordPress site. These are only the ones that are Database based.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can specify how many transients to be shown, which columns to see or filter and search for given transient(s).', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can delete or edit transients - keep in mind that you may end up editing transient that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new transient directly from here.', '0-day-analytics' ) . '</p></h4>';
+
+			return $help_text;
+		}
+		/**
+		 * Options Help
+		 *
+		 * Return help text for options screen
+		 *
+		 * @return string  Help Text
+		 *
+		 * @since latest
+		 */
+		public static function add_help_content_crons() {
+
+			$help_text  = '<p>' . __( 'This screen allows you to see all the crons on your WordPress site.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You set which columns to see or filter and search for given cron(s).', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can delete, run or edit crons - keep in mind that you may end up editing cron that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new cron directly from here.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
 		}

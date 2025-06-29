@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Provides WordPress analytics with a focus on performance and security.
- * Version:         1.9.7
+ * Version:         1.9.8
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -27,6 +27,7 @@ use ADVAN\Advanced_Analytics;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Helpers\WP_Error_Handler;
+use ADVAN\Helpers\WP_Helper;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -34,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '1.9.7' );
+define( 'ADVAN_VERSION', '1.9.8' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -110,7 +111,34 @@ if ( ! Context_Helper::is_installing() ) {
 		\add_filter( 'rest_post_dispatch', array( WP_Error_Handler::class, 'log_rest_api_errors' ), 10, 3 );
 	}
 
+	\add_action( 'plugin_loaded', 'advana_remove_plugins' );
+
 	Endpoints::init();
+}
+
+if ( ! function_exists( 'advana_remove_plugins' ) ) {
+
+	/**
+	 * Deactivating plugins which interfere with proper working.
+	 *
+	 * @param string $plugin - Currently activated plugin.
+	 *
+	 * @return void
+	 *
+	 * @since latest
+	 */
+	function advana_remove_plugins( $plugin ) {
+		/**
+		 * Because of its extremely poor implementation, the log-iq plugin must be deactivated as it interferes very badly with the proper WP work.
+		 */
+		if ( false !== strpos( $plugin, 'log-iq' . DIRECTORY_SEPARATOR ) ) {
+			if ( WP_Helper::is_multisite() ) {
+				\deactivate_plugins( $plugin, true, true );
+			} else {
+				\deactivate_plugins( $plugin, true );
+			}
+		}
+	}
 }
 
 // Polyfill for str_starts_with (PHP < 8.0).
