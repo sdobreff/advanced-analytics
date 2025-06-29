@@ -42,6 +42,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 		public const UPDATE_ACTION = 'advan_crons_update';
 
+		public const NEW_ACTION = 'advan_crons_new';
+
 		public const NONCE_NAME = 'advana_crons_manager';
 
 		public const SEARCH_INPUT = 'sgp';

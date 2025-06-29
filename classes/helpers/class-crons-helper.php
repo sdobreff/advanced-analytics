@@ -381,6 +381,71 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		}
 
 		/**
+		 * Adds a cron event.
+		 *
+		 * @return void|\WP_Error
+		 *
+		 * @since 1.8.5
+		 */
+		public static function add_cron() {
+
+			$current_time = time();
+
+			$date = ( ( isset( $_REQUEST['cron_next_run_custom_date'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_date'] ) ) : '' );
+
+			$time = ( ( isset( $_REQUEST['cron_next_run_custom_time'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_next_run_custom_time'] ) ) : '' );
+
+			$next_run_local = $date . ' ' . $time;
+
+			$next_run_local = strtotime( $next_run_local, $current_time );
+
+			if ( false === $next_run_local ) {
+				return new \WP_Error(
+					'invalid_timestamp',
+					__( 'Invalid timestamp provided.', '0-day-analytics' )
+				);
+			}
+
+			$next_run_utc = (int) \get_gmt_from_date( \gmdate( 'Y-m-d H:i:s', $next_run_local ), 'U' );
+
+			$schedule = ( isset( $_REQUEST['cron_schedule'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['cron_schedule'] ) ) : '' );
+
+			if ( '_oneoff' === $schedule ) {
+				$schedule = '';
+			} elseif ( ! isset( \wp_get_schedules()[ $schedule ] ) ) {
+				return new \WP_Error(
+					'invalid_schedule',
+					__( 'Invalid schedule provided.', '0-day-analytics' )
+				);
+			}
+
+			$args = ( isset( $_REQUEST['cron_args'] ) ? \sanitize_textarea_field( \wp_unslash( $_REQUEST['cron_args'] ) ) : '' );
+
+			$args = \json_decode( $args, true );
+
+			if ( empty( $args ) || ! is_array( $args ) ) {
+				$args = array();
+			}
+
+			$new_hook_name = ( isset( $_REQUEST['name'] ) ) ? $_REQUEST['name'] : '';
+			if ( empty( $new_hook_name ) ) {
+				$new_hook_name = 'unnamed_hook_' . uniqid();
+			}
+
+			if ( '_oneoff' === $schedule || '' === $schedule ) {
+				$result = \wp_schedule_single_event( $next_run_utc, $new_hook_name, $args, true );
+			} else {
+				$result = \wp_schedule_event( $next_run_utc, $schedule, $new_hook_name, $args, true );
+			}
+			if ( \is_wp_error( $result ) ) {
+				return new \WP_Error(
+					'invalid_cron_parameters',
+					__( 'Cron job can not be added.', '0-day-analytics' )
+				);
+			}
+		}
+
+		/**
 		 * Tests the proper spawning of the WP Cron
 		 *
 		 * @param boolean $cache - Flag - should only use the cached results from previous calls.

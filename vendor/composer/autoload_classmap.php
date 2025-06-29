@@ -33,6 +33,8 @@ return array(
     'ADVAN\\Lists\\Crons_List' => $baseDir . '/classes/lists/class-crons-list.php',
     'ADVAN\\Lists\\Logs_List' => $baseDir . '/classes/lists/class-logs-list.php',
     'ADVAN\\Lists\\Transients_List' => $baseDir . '/classes/lists/class-transients-list.php',
+    'ADVAN\\Lists\\Views\\Crons_View' => $baseDir . '/classes/lists/views/class-crons-view.php',
+    'ADVAN\\Lists\\Views\\Transients_View' => $baseDir . '/classes/lists/views/class-transients-view.php',
     'ADVAN\\Migration\\Abstract_Migration' => $baseDir . '/classes/migration/class-abstract-migration.php',
     'ADVAN\\Migration\\Migration' => $baseDir . '/classes/migration/class-migration.php',
     'ADVAN\\Settings\\Settings_Builder' => $baseDir . '/classes/settings/class-settings-builder.php',

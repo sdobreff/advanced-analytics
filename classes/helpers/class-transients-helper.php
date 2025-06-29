@@ -32,6 +32,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			'update_themes',
 			'update_plugins',
 			'update_core',
+			'theme_roots',
+			'poptags_',
+			'wp_theme_files_patterns-',
 		);
 
 		/**
@@ -185,6 +188,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			// Values.
 			$value = \stripslashes( $_POST['value'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+			$value = \maybe_unserialize( $value );
 
 			/*
 			// $expiration = \absint( \wp_unslash( $_POST['expires'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing

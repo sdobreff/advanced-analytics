@@ -20,7 +20,9 @@ use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Lists\Transients_List;
+use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Lists\Views\Transients_View;
 use ADVAN\Settings\Settings_Builder;
 
 // Exit if accessed directly.
@@ -164,9 +166,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 
-			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( __CLASS__, 'update_transient' ) );
-			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( __CLASS__, 'new_transient' ) );
-			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( __CLASS__, 'update_cron' ) );
+			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( Transients_View::class, 'update_transient' ) );
+			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
+			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
+			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
 
 			/**
 			 * Draws the save button in the settings
@@ -273,7 +276,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			? sanitize_key( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			: '';
 
-			if ( \in_array( $action, array( 'edit_transient', 'edit_cron', 'new_transient' ), true ) ) {
+			if ( \in_array( $action, array( 'edit_transient', 'edit_cron', 'new_transient', 'new_cron' ), true ) ) {
 				// Try to enqueue the code editor.
 				$settings = \wp_enqueue_code_editor(
 					array(
@@ -517,7 +520,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\esc_html__( 'Cron viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::CRON_MENU_SLUG,
-					array( __CLASS__, 'analytics_cron_page' ),
+					array( Crons_View::class, 'analytics_cron_page' ),
 					1
 				);
 
@@ -536,7 +539,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\esc_html__( 'Transients viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::TRANSIENTS_MENU_SLUG,
-					array( __CLASS__, 'analytics_transients_page' ),
+					array( Transients_View::class, 'analytics_transients_page' ),
 					2
 				);
 
@@ -718,519 +721,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		}
 
 		/**
-		 * Displays the cron page.
-		 *
-		 * @return void
-		 *
-		 * @since 1.1.0
-		 */
-		public static function analytics_cron_page() {
-			\add_thickbox();
-			?>
-			<script>
-				if( 'undefined' != typeof localStorage ){
-					var skin = localStorage.getItem('aadvana-backend-skin');
-					if( skin == 'dark' ){
-
-						var element = document.getElementsByTagName("html")[0];
-						element.classList.add("aadvana-darkskin");
-					}
-				}
-			</script>
-			<?php
-
-			$action = ! empty( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			? sanitize_key( $_REQUEST['action'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			: '';
-
-			if ( ! empty( $action ) && ( 'edit_cron' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
-						) {
-				$cron_hash = ! empty( $_REQUEST['hash'] )
-				? \sanitize_text_field( \wp_unslash( $_REQUEST['hash'] ) )
-				: false;
-				if ( ! $cron_hash ) {
-					\wp_die( \esc_html__( 'Invalid cron hash.', '0-day-analytics' ) );
-				}
-				$cron = Crons_Helper::get_event( $cron_hash );
-
-				if ( $cron ) {
-					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $cron['schedule'] );
-					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
-				} else {
-					$suggestion          = strtotime( '+1 hour' );
-					$next_run_date_local = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $suggestion ), 'Y-m-d' );
-					$next_run_time_local = get_date_from_gmt( gmdate( 'Y-m-d H:\0\0:\0\0', $suggestion ), 'H:i:s' );
-				}
-
-				$arguments = \wp_json_encode( (array) $cron['args'] );
-
-				?>
-				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Cron', '0-day-analytics' ); ?></h1>
-					<hr class="wp-header-end">
-
-					<?php
-
-					if ( false === $cron ) {
-						?>
-					<div id="advaa-status-notice" class="notice notice-info">
-						<p><?php esc_html_e( 'Cron job does not exists or it has been executed', '0-day-analytics' ); ?></p>
-					</div>
-						<?php
-					} else {
-						?>
-	
-					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
-						<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
-						<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::UPDATE_ACTION ); ?>" />
-						<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
-
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th><?php esc_html_e( 'Hook', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $cron['hook'] ); ?>" /></td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Next Run', '0-day-analytics' ); ?></th>
-									<td>
-										<?php
-										printf(
-											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
-											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
-											esc_attr( $next_run_date_local ),
-											esc_attr( $next_run_time_local )
-										);
-										?>
-									</td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Arguments', '0-day-analytics' ); ?></th>
-									<td>
-										<textarea class="large-text code" name="cron_args" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $arguments ); ?></textarea>
-										<?php
-										printf(
-										/* translators: 1, 2, and 3: Example values for an input field. */
-											esc_html__( 'Use a JSON encoded array, e.g. %1$s, %2$s, or %3$s', 'wp-crontrol' ),
-											'<code>[25]</code>',
-											'<code>["asdf"]</code>',
-											'<code>["i","want",25,"cakes"]</code>'
-										);
-										?>
-									</td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Schedule', '0-day-analytics' ); ?></th>
-									<td><?php Crons_Helper::schedule_drop_down( $cron['recurrence'] ); ?></td>
-								</tr>
-							</tbody>
-						</table>
-	
-						<p class="submit">
-							<?php \submit_button( '', 'primary', '', false ); ?>
-						</p>
-					</form>
-						<?php
-					}
-					?>
-				</div>
-				<?php
-			} else {
-				$events_list = new Crons_List( array() );
-				$events_list->prepare_items();
-				?>
-				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
-					<form id="crons-filter" method="get">
-					<?php
-
-					$status = Crons_Helper::test_cron_spawn();
-
-					if ( \is_wp_error( $status ) ) {
-						if ( 'advana_cron_info' === $status->get_error_code() ) {
-							?>
-							<div id="advaa-status-notice" class="notice notice-info">
-								<p><?php echo esc_html( $status->get_error_message() ); ?></p>
-							</div>
-							<?php
-						} else {
-							?>
-							<div id="advana-status-error" class="notice notice-error">
-								<?php
-								printf(
-									'<p>%1$s</p>',
-									sprintf(
-										/* translators: %s: Error message text. */
-										esc_html__( 'There was a problem spawning a call to the WP-Cron system on your site. This means WP-Cron events on your site may not work. The problem was: %s', 'w0-day-analytics' ),
-										'</p><p><strong>' . esc_html( $status->get_error_message() ) . '</strong>'
-									)
-								);
-								?>
-							</div>
-							<?php
-						}
-					}
-
-					$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-					$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
-
-					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
-
-					echo '<div style="clear:both; float:right">';
-					$events_list->search_box(
-						__( 'Search', '0-day-analytics' ),
-						strtolower( $events_list::get_table_name() ) . '-find'
-					);
-					echo '</div>';
-
-					$status = WP_Helper::check_cron_status();
-
-				if ( \is_wp_error( $status ) ) {
-					if ( 'cron_info' === $status->get_error_code() ) {
-						?>
-							<div id="cron-status-notice" class="notice notice-info">
-								<p> <?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-							</div>
-							<?php
-					}
-				}
-
-				$events_list->display();
-
-				?>
-					</form>
-				</div>
-				<?php
-			}
-		}
-
-		/**
-		 * Collects all the data from the form and updates the transient.
-		 *
-		 * @return void
-		 *
-		 * @since 1.8.5
-		 */
-		public static function update_transient() {
-
-			// Bail if malformed Transient request.
-			if ( empty( $_REQUEST['transient'] ) ) {
-				return;
-			}
-
-			// Bail if nonce fails.
-			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Transients_List::NONCE_NAME ) ) {
-				return;
-			}
-
-			// Sanitize transient.
-			$transient = \sanitize_key( $_REQUEST['transient'] );
-
-			// Site wide.
-			$site_wide = ! empty( $_REQUEST['name'] ) && Transients_Helper::is_site_wide( \sanitize_text_field( \wp_unslash( $_REQUEST['name'] ) ) );
-
-			Transients_Helper::update_transient( $transient, $site_wide );
-
-			\wp_safe_redirect(
-				\remove_query_arg(
-					array( 'deleted' ),
-					add_query_arg(
-						array(
-							'page'                        => self::TRANSIENTS_MENU_SLUG,
-							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
-							'updated'                     => true,
-						),
-						\admin_url( 'admin.php' )
-					)
-				)
-			);
-			exit;
-		}
-
-		/**
-		 * Collects all the data from the form and creates new transient.
-		 *
-		 * @return void
-		 *
-		 * @since 1.9.2
-		 */
-		public static function new_transient() {
-
-			// Bail if nonce fails.
-			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Transients_List::NONCE_NAME ) ) {
-				return;
-			}
-
-			// Sanitize transient.
-			$transient = ( isset( $_REQUEST['name'] ) ) ? \sanitize_key( $_REQUEST['name'] ) : null;
-
-			// Site wide.
-			$site_wide = ! empty( $_REQUEST['side-wide'] ) ? filter_var( $_REQUEST['side-wide'], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			Transients_Helper::create_transient( $transient, $site_wide );
-
-			\wp_safe_redirect(
-				\remove_query_arg(
-					array( 'deleted' ),
-					add_query_arg(
-						array(
-							'page'                        => self::TRANSIENTS_MENU_SLUG,
-							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
-							'updated'                     => true,
-						),
-						\admin_url( 'admin.php' )
-					)
-				)
-			);
-			exit;
-		}
-
-		/**
-		 * Collects all the data from the form and updates the transient.
-		 *
-		 * @return void
-		 *
-		 * @since 1.8.5
-		 */
-		public static function update_cron() {
-
-			// Bail if malformed Transient request.
-			if ( empty( $_REQUEST['hash'] ) ) {
-				return;
-			}
-
-			// Bail if nonce fails.
-			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( Crons_List::NONCE_NAME ) ) {
-				return;
-			}
-
-			// Sanitize transient.
-			$cron_hash = \sanitize_key( $_REQUEST['hash'] );
-
-			Crons_Helper::update_cron( $cron_hash );
-
-			\wp_safe_redirect(
-				\remove_query_arg(
-					array( 'deleted' ),
-					add_query_arg(
-						array(
-							'page'                   => self::CRON_MENU_SLUG,
-							Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
-							'updated'                => true,
-						),
-						\admin_url( 'admin.php' )
-					)
-				)
-			);
-			exit;
-		}
-
-		/**
-		 * Displays the transients page.
-		 *
-		 * @return void
-		 *
-		 * @since 1.7.0
-		 */
-		public static function analytics_transients_page() {
-
-			?>
-			<script>
-				if( 'undefined' != typeof localStorage ){
-					var skin = localStorage.getItem('aadvana-backend-skin');
-					if( skin == 'dark' ){
-
-						var element = document.getElementsByTagName("html")[0];
-						element.classList.add("aadvana-darkskin");
-					}
-				}
-			</script>
-			<?php
-
-			$action = ! empty( $_REQUEST['action'] )
-			? sanitize_key( $_REQUEST['action'] )
-			: '';
-
-			if ( ! empty( $action ) && ( 'edit_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
-			) {
-				$transient_id = ! empty( $_REQUEST['trans_id'] )
-				? absint( $_REQUEST['trans_id'] )
-				: 0;
-				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
-				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
-				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
-
-				if ( 0 !== $expiration ) {
-
-					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
-					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
-				}
-
-				?>
-				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
-					<hr class="wp-header-end">
-
-					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
-						<input type="hidden" name="<?php echo \esc_attr( Transients_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Transients_List::escaped_search_input() ); ?>" />
-						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::UPDATE_ACTION ); ?>" />
-						<?php \wp_nonce_field( Transients_List::NONCE_NAME ); ?>
-
-						<?php
-						if ( in_array( $name, Transients_Helper::WP_CORE_TRANSIENTS ) ) {
-							?>
-							<div id="advaa-status-notice" class="notice notice-warning">
-								<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
-							</div>
-							<?php
-
-						}
-						?>
-
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th><?php esc_html_e( 'Option ID', '0-day-analytics' ); ?></th>
-									<td><input type="text" disabled class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_id'] ); ?>" /></td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_name'] ); ?>" /></td>
-								</tr>
-								<?php
-								if ( 0 !== $expiration ) {
-									?>
-								<tr>
-									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
-									<td>
-									<?php
-										printf(
-											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
-											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
-											esc_attr( $next_run_date_local ),
-											esc_attr( $next_run_time_local )
-										);
-									?>
-									</td>
-								</tr>
-									<?php
-								} else {
-
-										printf(
-											'<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s"" />
-											<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s"  />',
-											'',
-											''
-										);
-								}
-
-								?>
-								<tr>
-									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
-									<td>
-										<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $transient['option_value'] ); ?></textarea>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p class="submit">
-							<?php \submit_button( '', 'primary', '', false ); ?>
-						</p>
-					</form>
-				</div>
-				<?php
-			} elseif ( ! empty( $action ) && ( 'new_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
-			) {
-				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', time() );
-				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
-				?>
-				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'New Transient', '0-day-analytics' ); ?></h1>
-					<hr class="wp-header-end">
-
-					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="<?php echo \esc_attr( Transients_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Transients_List::escaped_search_input() ); ?>" />
-						<input type="hidden" name="action" value="<?php echo \esc_attr( Transients_List::NEW_ACTION ); ?>" />
-						<?php \wp_nonce_field( Transients_List::NONCE_NAME ); ?>
-
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="" /></td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Side Wide', '0-day-analytics' ); ?></th>
-									<td><input type="checkbox" name="side-wide" value="1" /></td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
-									<td>
-									<?php
-										printf(
-											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
-											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
-											esc_attr( $next_run_date_local ),
-											esc_attr( $next_run_time_local )
-										);
-									?>
-									</td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
-									<td>
-										<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"></textarea>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<p class="submit">
-							<?php \submit_button( '', 'primary', '', false ); ?>
-						</p>
-					</form>
-				</div>
-				<?php
-			} else {
-				$transients = new Transients_List( array() );
-				$transients->prepare_items();
-				?>
-				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
-					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . self::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
-					<hr class="wp-header-end">
-					<form id="transients-filter" method="get">
-					<?php
-
-					$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-					$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
-
-					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
-
-					echo '<div style="clear:both; float:right">';
-					$transients->search_box(
-						__( 'Search', '0-day-analytics' ),
-						strtolower( $transients::get_table_name() ) . '-find'
-					);
-					echo '</div>';
-					$transients->display();
-
-					?>
-					</form>
-				</div>
-				<?php
-			}
-		}
-
-		/**
 		 * Add Options Help
 		 *
 		 * Add help tab to options screen
@@ -1258,7 +748,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array(
 						'id'      => 'advanced-analytics-help-tab',
 						'title'   => __( 'Help', '0-day-analytics' ),
-						'content' => self::add_help_content_transients(),
+						'content' => Transients_View::add_help_content_transients(),
 					)
 				);
 			}
@@ -1269,7 +759,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array(
 						'id'      => 'advanced-analytics-help-tab',
 						'title'   => __( 'Help', '0-day-analytics' ),
-						'content' => self::add_help_content_crons(),
+						'content' => Crons_View::add_help_content_crons(),
 					)
 				);
 			}
@@ -1324,43 +814,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want to be kept).', '0-day-analytics' ) . '</p></h4>';
 			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window where you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p></h4>';
 			$help_text .= '<p>' . __( 'You can see the size of your log file and download it if you need to.', '0-day-analytics' ) . '</p></h4>';
-
-			return $help_text;
-		}
-
-		/**
-		 * Options Help
-		 *
-		 * Return help text for options screen
-		 *
-		 * @return string  Help Text
-		 *
-		 * @since latest
-		 */
-		public static function add_help_content_transients() {
-
-			$help_text  = '<p>' . __( 'This screen allows you to see all the transients on your WordPress site. These are only the ones that are Database based.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can specify how many transients to be shown, which columns to see or filter and search for given transient(s).', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can delete or edit transients - keep in mind that you may end up editing transient that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new transient directly from here.', '0-day-analytics' ) . '</p></h4>';
-
-			return $help_text;
-		}
-		/**
-		 * Options Help
-		 *
-		 * Return help text for options screen
-		 *
-		 * @return string  Help Text
-		 *
-		 * @since latest
-		 */
-		public static function add_help_content_crons() {
-
-			$help_text  = '<p>' . __( 'This screen allows you to see all the crons on your WordPress site.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You set which columns to see or filter and search for given cron(s).', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can delete, run or edit crons - keep in mind that you may end up editing cron that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new cron directly from here.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
 		}

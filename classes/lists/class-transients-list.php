@@ -465,6 +465,14 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 					if ( in_array( $item['transient_name'], Transients_Helper::WP_CORE_TRANSIENTS ) ) {
 						$core_trans = '<span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ';
+					} else {
+						foreach ( Transients_Helper::WP_CORE_TRANSIENTS as $trans_name ) {
+							if ( \str_starts_with( $item['transient_name'], $trans_name ) ) {
+								$core_trans = '<span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ';
+
+								break;
+							}
+						}
 					}
 
 					// translators: %s is the transient.

@@ -74,7 +74,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 1.9.8 =
-Automatically deactivates Log-IQ plugin.
+Automatically deactivates Log-IQ plugin. Lots of code optimizations, added Cron add functionality, fixed errors.
 
 = 1.9.7 =
 Extended default admin Plugins page - gives thee option to switch to older version directly from the page and shows information about the plugin main file location.
