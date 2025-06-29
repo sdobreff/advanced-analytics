@@ -3,7 +3,7 @@ Tags: log, error log, analytics, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 1.9.8
+Stable tag: 1.9.8.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -72,6 +72,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 6. **Plugin Version Switcher** - Build-in plugin version switcher.
 
 == Changelog ==
+
+= 1.9.8.1 =
+'Headers already sent' in settings error fix.
 
 = 1.9.8 =
 Automatically deactivates Log-IQ plugin. Lots of code optimizations, added Cron add functionality, fixed errors.

@@ -776,14 +776,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function aadvana_settings_help() {
 
-			?>
+			$add_style = '
 			<style>
-				.<?php echo \esc_attr( self::PAGE_SLUG ); ?> #screen-meta-links {
+				.' . \esc_attr( self::PAGE_SLUG ) . ' #screen-meta-links {
 					z-index: 10;
 					position: relative;
 				}
-			</style>
-			<?php
+			</style>';
 
 			$screen = WP_Helper::get_wp_screen();
 
@@ -791,7 +790,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				array(
 					'id'      => 'advanced-analytics-help-tab',
 					'title'   => __( 'Help', '0-day-analytics' ),
-					'content' => self::add_help_content(),
+					'content' => $add_style . self::add_help_content(),
 				)
 			);
 
