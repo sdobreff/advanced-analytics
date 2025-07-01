@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.9.8.1
  */
 
 declare(strict_types=1);
@@ -27,7 +27,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since latest
+	 * @since 1.9.8.1
 	 */
 	class Crons_View {
 				/**
@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 				 *
 				 * @return string  Help Text
 				 *
-				 * @since latest
+				 * @since 1.9.8.1
 				 */
 		public static function add_help_content_crons() {
 
@@ -347,7 +347,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 1.9.8.1
 		 */
 		public static function new_cron() {
 

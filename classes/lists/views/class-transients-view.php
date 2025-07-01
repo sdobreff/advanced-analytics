@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 1.9.8.1
  */
 
 declare(strict_types=1);
@@ -27,7 +27,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since latest
+	 * @since 1.9.8.1
 	 */
 	class Transients_View {
 
@@ -259,7 +259,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 1.9.8.1
 		 */
 		public static function add_help_content_transients() {
 

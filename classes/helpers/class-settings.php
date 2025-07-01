@@ -804,7 +804,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 1.9.8.1
 		 */
 		public static function add_help_content_error_log() {
 
