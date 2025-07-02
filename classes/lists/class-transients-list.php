@@ -755,6 +755,11 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 							let that = this;
 
+							jQuery(that).css({
+								"pointer-events": "none",
+								"cursor": "default"
+							});
+
 							var data = {
 								'action': 'aadvana_delete_transient',
 								'post_type': 'GET',
@@ -772,7 +777,13 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 								} else {
 									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
 								}
-							}, 'json');
+							}, 'json').always(function() {
+
+								jQuery(that).css({
+									"pointer-events": "",
+									"cursor": ""
+								})
+							});
 
 						});
 					});
