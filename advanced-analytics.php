@@ -110,6 +110,7 @@ if ( ! Context_Helper::is_installing() ) {
 	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
 		\add_filter( 'rest_post_dispatch', array( WP_Error_Handler::class, 'log_rest_api_errors' ), 10, 3 );
 	}
+	\add_action( 'wp_mail_failed', array( WP_Error_Handler::class, 'on_mail_error' ), -1 );
 
 	\add_action( 'plugin_loaded', 'advana_remove_plugins' );
 

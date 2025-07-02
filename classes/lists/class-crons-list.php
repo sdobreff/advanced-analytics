@@ -418,7 +418,21 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 					$actions['edit'] = '<a class="aadvana-transient-run" href="' . $edit_url . '">' . \esc_html__( 'Edit', '0-day-analytics' ) . '</a>';
 
-					return '<span><b>' . $item['hook'] . '</b></span>' . self::single_row_actions( $actions );
+					$core_crons = '';
+
+					if ( in_array( $item['hook'], Crons_Helper::WP_CORE_CRONS ) ) {
+						$core_crons = '<span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ';
+					} else {
+						foreach ( Crons_Helper::WP_CORE_CRONS as $cron_name ) {
+							if ( \str_starts_with( $item['hook'], $cron_name ) ) {
+								$core_crons = '<span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ';
+
+								break;
+							}
+						}
+					}
+
+					return '<span>' . $core_crons . '<b>' . $item['hook'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'recurrence':
 					return ( ! empty( $item['recurrence'] ) ? $item['recurrence'] : __( 'once', '0-day-analytics' ) );
 				case 'args':
@@ -447,20 +461,28 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 							}
 
 							if ( isset( $callback['callback']['component'] ) && ! empty( $callback['callback']['component'] ) && isset( $callback['callback']['component']['name'] ) && ! empty( $callback['callback']['component']['name'] ) ) {
-								$callbacks[] = '<span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> ' . esc_html( $callback['callback']['component']['name'] ) . '</span>';
+								$callbacks[ \array_key_last( $callbacks ) ] .= '<br><span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> ' . \esc_html( $callback['callback']['component']['name'] ) . '</span>';
 							}
 						}
 
 						if ( 'action_scheduler_run_queue' === $item['hook'] ) {
-							$callbacks[] = '';
-							$callbacks[] = sprintf(
-								'<span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> <a href="%s">%s</a></span>',
-								admin_url( 'tools.php?page=action-scheduler' ),
-								esc_html__( 'View the scheduled actions here &raquo;', '0-day-analytics' )
-							);
+							// $callbacks[] = '';
+							if ( \count( $callbacks ) ) {
+								$callbacks[ \array_key_last( $callbacks ) ] .= sprintf(
+									'<br><span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> <a href="%s">%s</a></span>',
+									\admin_url( 'tools.php?page=action-scheduler' ),
+									\esc_html__( 'View the scheduled actions here &raquo;', '0-day-analytics' )
+								);
+							} else {
+								$callbacks[] = sprintf(
+									'<span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> <a href="%s">%s</a></span>',
+									\admin_url( 'tools.php?page=action-scheduler' ),
+									\esc_html__( 'View the scheduled actions here &raquo;', '0-day-analytics' )
+								);
+							}
 						}
 
-						return implode( '<br>', $callbacks ); // WPCS:: XSS ok.
+						return '<ol><li>' . implode( '</li><li><hr>', $callbacks ) . '</li></ol>'; // WPCS:: XSS ok.
 					}
 
 					return '';

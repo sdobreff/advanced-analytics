@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		/**
 		 * WP wp_die handler callback.
 		 *
-		 * @param callable $handler
+		 * @param callable $handler - The handler to call, this method will store the original and call it later on.
 		 *
 		 * @return callable
 		 *
@@ -80,10 +80,13 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 							array( $get_message ),
 							\wp_list_pluck( $parsed_args['additional_errors'], 'message' )
 						);
-						$get_message = implode( ', ', $get_message );
-					}
 
-					self::handle_error( \E_USER_NOTICE, $get_message, '', '', null, 2, 0 );
+						$get_message = implode( ', ', $get_message );
+
+					}
+					$get_message = str_replace( array( "\n", "\r" ), ' ', $get_message );
+
+					self::handle_error( \E_USER_NOTICE, \esc_html( $get_message ), '', '', null, 2, 0 );
 				}
 			}
 
@@ -539,6 +542,51 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			// );
 
 			// \error_log( $message );
+		}
+
+		/**
+		 * Triggers on mail error
+		 *
+		 * @param \WP_error $wp_error - The actual error.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function on_mail_error( $wp_error ) {
+
+			if ( \is_wp_error( $wp_error ) ) {
+				self::log_wp_error( $wp_error );
+			}
+		}
+
+		/**
+		 * Logs error of type WP_Error in the error log
+		 *
+		 * @param \WP_Error $error - The error to log.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function log_wp_error( \WP_Error $error ) {
+			$error_data = $error->get_all_error_data();
+			\array_walk_recursive(
+				$error_data,
+				function( &$leaf ) {
+					if ( is_string( $leaf ) ) {
+						$leaf = \esc_html( $leaf );
+					}
+				}
+			);
+			error_log(
+				sprintf(
+					'WP_Error error: %s: %s.',
+					$error->get_error_code(),
+					$error->get_error_message(),
+				) . \PHP_EOL .
+				var_export( $error_data, true ),
+			);
 		}
 	}
 }

@@ -774,6 +774,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					if ( false !== \mb_strpos( $message, $admin_path ) ) {
 						return __( 'WP Admin Core', '0-day-analytics' ) . $source_link;
 					}
+					if ( 'wp_error' === $item['source'] ) {
+						return __( 'WP Error thrown', '0-day-analytics' );
+					}
 					if ( isset( $item['source'] ) ) {
 						return $item['source'] . $source_link;
 					} else {

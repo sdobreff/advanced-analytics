@@ -94,6 +94,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			// }
 			if ( \is_admin() ) {
 				Ajax_Helper::init();
+
+	//wp_mail('kura', '3', 'rere');
 			}
 		}
 
