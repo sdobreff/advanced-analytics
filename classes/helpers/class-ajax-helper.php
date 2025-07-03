@@ -313,6 +313,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\wp_send_json_success( 2 );
 			} elseif ( \is_wp_error( $result ) ) {
 				\wp_send_json_error( $result->get_error_message(), 500 );
+			} elseif ( false === $result ) {
+				\wp_send_json_error( __( 'Cron does not exists. Try to refresh the page.', '0-day-analytics' ), 500 );
 			} else {
 				\wp_send_json_error( __( 'Unable to run cron.', '0-day-analytics' ), 500 );
 			}

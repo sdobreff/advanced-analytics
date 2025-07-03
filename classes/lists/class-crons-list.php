@@ -863,6 +863,11 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 								if ( xhr.responseJSON && xhr.responseJSON.data ) {
 									errorMessage = xhr.responseJSON.data;
 									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+								} else {
+									if ( error ) {
+										errorMessage = error + ' Check your browser console for more information.';
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+									}
 								}
 							}).always(function() {
 
