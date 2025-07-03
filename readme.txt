@@ -1,9 +1,9 @@
 === WP Control ===
-Tags: log, error log, analytics, cron, transients
+Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 1.9.8.2
+Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -19,6 +19,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - **Transient manager** - all (stored in the DB) transients (edit / delete)
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
+- Easily see where exactly error is thrown (where detected)
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -29,10 +30,12 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Option to enable or disable logging via the admin interface.
 - Optimized for high-performance even with large log files.
 - Provides insights into logged errors for efficient troubleshooting.
-- Build-in fully functional Cron manager
-- Build-in fully functional Transients manager
-- Build-in badge that shows you current environment type
-- Option to randomize the name of the error log file (security)
+- Build-in fully functional Cron manager.
+- Build-in fully functional Transients manager.
+- Build-in badge that shows you current environment type.
+- Option to randomize the name of the error log file (security).
+- Easily plugin version switch (the ones from official WP marketstore).
+- Build-in dark mode.
 
 == Installation ==
 
@@ -49,6 +52,12 @@ Voila! It's ready to go.
 * PHP8 fully compatible
 
 == Frequently Asked Questions ==
+
+= Why only last 100 error logs? =
+Plugin is designed to be as fast as possible and work with enormously large log files, consuming as less resources as possible, no other plugin could provide something even close to that, thats why it comes with this limitation. And one single error could contain more than 30K sub-rows. But 100 is more than enough - errors before that are either too old, no longer related or repeating ones, in fact is best to regularly truncate your log file and check for only the last error. And last but not least - this are 100 errors not 100 lines of the error log.
+
+= Why there is no pagination for error logs? =
+That is once again related to the nature of the error log - one single reload could generate tens of new errors, so paginating this would probably never come handy, and in order to paginate, the entire log must be read every time - which is extremely bad idea resource-wise.
 
 = How do I enable or disable error logging? =  
 Go to "WP Control > Settings" in your WordPress dashboard and toggle the logging option as needed.
@@ -72,6 +81,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 6. **Plugin Version Switcher** - Build-in plugin version switcher.
 
 == Changelog ==
+
+= 2.0.0 =
+Code improvements - mostly JS responses and better interaction with UI. Errors coming from mail function (WP_Error) catching. Text selected in the console-like window (bottom of the error log viewer) is automatically copied into the clipboard.
 
 = 1.9.8.2 =
 Very small code updates and proper version settings.
