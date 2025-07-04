@@ -17,6 +17,7 @@ namespace ADVAN\Lists;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
+use ADVAN\Lists\Traits\List_Trait;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -35,6 +36,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 	 * @since 1.1.0
 	 */
 	class Crons_List extends \WP_List_Table {
+
+		use List_Trait;
 
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_crons_list';
 
@@ -92,15 +95,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @since 1.1.0
 		 */
 		protected static $log_errors_to_read = 100;
-
-		/**
-		 * Holds the array with all of the column names and their representation in the table header.
-		 *
-		 * @var array
-		 *
-		 * @since 1.1.0
-		 */
-		private static $columns = array();
 
 		/**
 		 * Events Query Arguments.
@@ -191,17 +185,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Returns the search query string escaped
-		 *
-		 * @return string
-		 *
-		 * @since 1.1.0
-		 */
-		public static function escaped_search_input() {
-			return isset( $_REQUEST[ self::SEARCH_INPUT ] ) ? \esc_sql( \sanitize_text_field( \wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		}
-
-		/**
 		 * Adds columns to the screen options screed.
 		 *
 		 * @param array $columns - Array of column names.
@@ -274,18 +257,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			return array_filter(
 				(array) get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
 			);
-		}
-
-		/**
-		 * Get a list of columns. The format is:
-		 * 'internal-name' => 'Title'.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @return array
-		 */
-		public function get_columns() {
-			return self::$columns;
 		}
 
 		/**
@@ -612,17 +583,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Stop execution and exit.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @return void
-		 */
-		public function graceful_exit() {
-			exit;
-		}
-
-		/**
 		 * Returns the records to show per page.
 		 *
 		 * @return int
@@ -664,17 +624,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Returns the columns array (with column name).
-		 *
-		 * @return array
-		 *
-		 * @since 1.1.0
-		 */
-		private static function get_column_names() {
-			return self::$columns;
-		}
-
-		/**
 		 * Adds a screen options to the current screen table.
 		 *
 		 * @param \WP_Hook $hook - The hook object to attach to.
@@ -711,26 +660,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					}
 				);
 			}
-		}
-
-		/**
-		 * Form table per-page screen option value.
-		 *
-		 * @since 1.1.0
-		 *
-		 * @param bool   $keep   Whether to save or skip saving the screen option value. Default false.
-		 * @param string $option The option name.
-		 * @param int    $value  The number of rows to use.
-		 *
-		 * @return mixed
-		 */
-		public static function set_screen_option( $keep, $option, $value ) {
-
-			if ( false !== \strpos( $option, self::SCREEN_OPTIONS_SLUG . '_' ) ) {
-				return $value;
-			}
-
-			return $keep;
 		}
 
 		/**

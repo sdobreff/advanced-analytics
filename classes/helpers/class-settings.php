@@ -21,9 +21,10 @@ use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Lists\Views\Crons_View;
+use ADVAN\Lists\Views\Table_View;
 use ADVAN\Controllers\Telegram_API;
-use ADVAN\Lists\Views\Transients_View;
 use ADVAN\Settings\Settings_Builder;
+use ADVAN\Lists\Views\Transients_View;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,6 +48,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const CRON_MENU_SLUG = 'advan_cron_jobs';
 
 		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
+
+		public const TABLE_MENU_SLUG = 'advan_table';
 
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
@@ -550,6 +553,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				/* Transients end */
+
+
+				/* Table */
+				$table_hook = \add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'WP Control', '0-day-analytics' ),
+					\esc_html__( 'Table viewer', '0-day-analytics' ),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					self::TABLE_MENU_SLUG,
+					array( Table_View::class, 'analytics_table_page' ),
+					2
+				);
+
+				//Transients_List::add_screen_options( $transients_hook );
+
+				//\add_filter( 'manage_' . $transients_hook . '_columns', array( Transients_List::class, 'manage_columns' ) );
+
+				//\add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
+
+				/* Table end */
 
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
