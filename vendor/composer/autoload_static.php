@@ -47,6 +47,7 @@ class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
         'ADVAN\\Helpers\\WP_Helper' => __DIR__ . '/../..' . '/classes/helpers/class-wp-helper.php',
         'ADVAN\\Lists\\Crons_List' => __DIR__ . '/../..' . '/classes/lists/class-crons-list.php',
         'ADVAN\\Lists\\Logs_List' => __DIR__ . '/../..' . '/classes/lists/class-logs-list.php',
+        'ADVAN\\Lists\\Traits\\List_Trait' => __DIR__ . '/../..' . '/classes/lists/traits/class-list-trait.php',
         'ADVAN\\Lists\\Transients_List' => __DIR__ . '/../..' . '/classes/lists/class-transients-list.php',
         'ADVAN\\Lists\\Views\\Crons_View' => __DIR__ . '/../..' . '/classes/lists/views/class-crons-view.php',
         'ADVAN\\Lists\\Views\\Transients_View' => __DIR__ . '/../..' . '/classes/lists/views/class-transients-view.php',

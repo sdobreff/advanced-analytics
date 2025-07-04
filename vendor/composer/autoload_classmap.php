@@ -32,6 +32,7 @@ return array(
     'ADVAN\\Helpers\\WP_Helper' => $baseDir . '/classes/helpers/class-wp-helper.php',
     'ADVAN\\Lists\\Crons_List' => $baseDir . '/classes/lists/class-crons-list.php',
     'ADVAN\\Lists\\Logs_List' => $baseDir . '/classes/lists/class-logs-list.php',
+    'ADVAN\\Lists\\Traits\\List_Trait' => $baseDir . '/classes/lists/traits/class-list-trait.php',
     'ADVAN\\Lists\\Transients_List' => $baseDir . '/classes/lists/class-transients-list.php',
     'ADVAN\\Lists\\Views\\Crons_View' => $baseDir . '/classes/lists/views/class-crons-view.php',
     'ADVAN\\Lists\\Views\\Transients_View' => $baseDir . '/classes/lists/views/class-transients-view.php',
