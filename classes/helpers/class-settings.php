@@ -15,6 +15,7 @@ namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
+use ADVAN\Lists\Table_List;
 use ADVAN\Controllers\Slack;
 use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
@@ -125,6 +126,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @var string
 		 */
 		private static $settings_crons_link = '';
+
+		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 * 
+		 * @since latest
+		 */
+		private static $settings_table_link = '';
 
 		/**
 		 * The link to the WP admin settings page
@@ -911,6 +921,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
+		 * @since latest
+		 */
+		public static function get_tables_page_link() {
+			if ( '' === self::$settings_table_link ) {
+				self::$settings_table_link = \add_query_arg( 'page', self::TABLE_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_table_link;
+		}
+
+		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
 		 * @since 1.7.5
 		 */
 		public static function get_error_log_page_link() {
@@ -1225,7 +1250,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1569,6 +1594,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::get_crons_page_link(),
 					__( 'Crons', 'wp-security-audit-log' ),
 					self::get_transients_page_link(),
+					__( 'Tables', 'wp-security-audit-log' ),
+					self::get_tables_page_link(),
 					__( 'Transients', 'wp-security-audit-log' ),
 					__( 'Version ', 'wp-security-audit-log' ),
 					ADVAN_VERSION
@@ -1591,6 +1618,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				Logs_List::PAGE_SLUG,
 				Transients_List::PAGE_SLUG,
 				Crons_List::PAGE_SLUG,
+				Table_List::PAGE_SLUG,
 			);
 		}
 

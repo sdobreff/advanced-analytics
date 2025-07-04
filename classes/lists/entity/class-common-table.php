@@ -611,5 +611,11 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 			return self::$admin_columns;
 		}
+
+		public static function get_tables(): array {
+			global $wpdb;
+
+			return $wpdb->tables( 'all' );
+		}
 	}
 }

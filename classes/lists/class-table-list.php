@@ -34,10 +34,12 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 	 */
 	class Table_List extends \WP_List_Table {
 
+		public const PAGE_SLUG = 'wp-control_page_advan_table';
+
 		/**
 		 * Current screen
 		 *
-		 * @var [type]
+		 * @var \WP_Screen
 		 *
 		 * @since 2.1.0
 		 */
@@ -46,7 +48,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		/**
 		 * The table to show
 		 *
-		 * @var \WpWhiteSecurity\Proxytron\Entities\Abstract_Entity
+		 * @var Common_Table
 		 *
 		 * @since 2.1.0
 		 */
@@ -210,7 +212,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @return string
 		 */
 		public function no_items() {
-			return 'No records available.';
+			\esc_html_e( 'No rows', '0-day-analytics' );
 		}
 
 		/**
@@ -306,40 +308,10 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		public function column_default( $item, $column_name ) {
 
 			switch ( $column_name ) {
-				case 'type':
-					return $item[ $column_name ];
+
 				default:
 					return $this->common_column_render( $item, $column_name );
 			}
-		}
-
-		/**
-		 * That column logic is different
-		 * In order to safe space and keep things fast, we are using CHAR(0) to store data in it
-		 * Which means that NULL in that column means paid account and empty string ('') means trail account
-		 *
-		 * @param array $item - Array with the current row values.
-		 *
-		 * @return void
-		 *
-		 * @since 2.1.0
-		 */
-		protected function column_type( $item ) {
-			echo ( null === $item['type'] ) ? 'Paid' : 'Trial';
-		}
-
-		/**
-		 * In that column we show the number of user's quotas current license has. Important - not site but license
-		 * If that has value of -1 - that means unlimited quota.
-		 *
-		 * @param array $item - Array with the current row values.
-		 *
-		 * @return void
-		 *
-		 * @since 2.1.0
-		 */
-		protected function column_quota( $item ) {
-			echo ( -1 === (int) $item['quota'] ) ? \esc_html( 'Unlimited', 'wps-proxytron' ) : \esc_html( $item['quota'], 'wps-proxytron' );
 		}
 
 		/**
@@ -377,7 +349,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				$actions['view_data'] = '<a href="' . $view_data_link . '">' . \esc_html( 'Show Info', 'wps-proxytron' ) . '</a>';
 			}
 
-			$row_value = '<strong>' . $item[ $column_name ] . '</strong>';
+			$row_value = '<strong>' . \esc_html( $item[ $column_name ] ) . '</strong>';
 
 			return $row_value . $this->row_actions( $actions );
 		}
@@ -418,7 +390,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			 * Action and action2 are set based on the triggers above or below the table
 			 */
 			$actions = array(
-				'delete' => 'Delete Records',
+				'delete' => __( 'Delete Records', '0-day-security' ),
 			);
 
 			return $actions;
@@ -567,6 +539,46 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				}
 			}
 			return $per_page;
+		}
+
+		/**
+		 * Table navigation.
+		 *
+		 * @param string $which - Position of the nav.
+		 *
+		 * @since 1.1.0
+		 */
+		public function extra_tablenav( $which ) {
+
+			?>
+			<div class="alignleft actions bulkactions">
+			
+				<select name="table_filter_<?php echo $which; ?>" class="advan-filter-table">
+					<option value=""><?php \esc_html_e( 'Switch table', '0-day-analytics' ); ?></option>
+
+					<?php
+					foreach ( Common_Table::get_tables() as $table ) {
+						?>
+						<option><?php echo $table; ?></option>
+						<?php
+					}
+					?>
+					
+				</select>
+							
+			</div>
+			<?php
+		}
+
+		/**
+		 * Returns an array of CSS class names for the table.
+		 *
+		 * @return array<int,string> Array of class names.
+		 *
+		 * @since 1.4.0
+		 */
+		protected function get_table_classes() {
+			return array( 'widefat', 'striped', 'table-view-list', $this->_args['plural'] );
 		}
 	}
 }
