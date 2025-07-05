@@ -86,16 +86,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 *
 		 * @since 1.7.0
 		 */
-		protected static $transients_per_page = 10;
-
-		/**
-		 * Current setting (if any) of per_page property - caching value.
-		 *
-		 * @var int
-		 *
-		 * @since 1.7.5
-		 */
-		protected static $per_page = null;
+		protected static $rows_per_page = 10;
 
 		/**
 		 * Events Query Arguments.
@@ -235,7 +226,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 			// Vars.
 			$search      = self::escaped_search_input();
-			$per_page    = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : $this->get_screen_option_per_page();
+			$per_page    = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : self::get_screen_option_per_page();
 			$orderby     = ! empty( $_GET['orderby'] ) ? \sanitize_text_field( \wp_unslash( $_GET['orderby'] ) ) : '';
 			$order       = ! empty( $_GET['order'] ) ? \sanitize_text_field( \wp_unslash( $_GET['order'] ) ) : 'DESC';
 			$page        = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
@@ -552,52 +543,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					
 				</script>
 				<?php
-			}
-		}
-
-		/**
-		 * Returns the records to show per page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.7.0
-		 */
-		public static function get_default_per_page() {
-			return self::$transients_per_page;
-		}
-
-		/**
-		 * Get the screen option per_page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.7.0
-		 */
-		private static function get_screen_option_per_page() {
-
-			if ( null !== self::$per_page ) {
-				return self::$per_page;
-			} else {
-				$wp_screen = WP_Helper::get_wp_screen();
-
-				if ( self::PAGE_SLUG === $wp_screen->base ) {
-					$option = $wp_screen->get_option( 'per_page', 'option' );
-					if ( ! $option ) {
-						$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
-					}
-				} else {
-					$option = 'advanced_analytics_transients_list_per_page';
-				}
-
-				self::$per_page = (int) \get_user_option( $option );
-				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
-					self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
-					if ( ! self::$per_page ) {
-						self::$per_page = self::get_default_per_page();
-					}
-				}
-
-				return self::$per_page;
 			}
 		}
 

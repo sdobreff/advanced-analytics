@@ -11,6 +11,8 @@
 
 namespace ADVAN\Lists\Traits;
 
+use ADVAN\Helpers\WP_Helper;
+
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
 if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
@@ -29,6 +31,15 @@ if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
 		 * @since 1.7.0
 		 */
 		private static $columns = array();
+
+		/**
+		 * Current setting (if any) of per_page property - caching value.
+		 *
+		 * @var int
+		 *
+		 * @since 1.7.5
+		 */
+		protected static $per_page = null;
 
 		/**
 		 * Returns the search query string escaped
@@ -93,6 +104,51 @@ if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
 		 */
 		private static function get_column_names() {
 			return self::$columns;
+		}
+
+		/**
+		 * Returns the records to show per page.
+		 *
+		 * @return int
+		 *
+		 * @since 1.7.0
+		 */
+		public static function get_default_per_page() {
+			return static::$rows_per_page;
+		}
+
+		/**
+		 * Get the screen option per_page.
+		 *
+		 * @return int
+		 *
+		 * @since 1.1.0
+		 */
+		private static function get_screen_option_per_page() {
+			if ( null !== self::$per_page ) {
+				return self::$per_page;
+			} else {
+				$wp_screen = WP_Helper::get_wp_screen();
+
+				if ( is_a( $wp_screen, '\WP_Screen' ) && self::PAGE_SLUG === $wp_screen->base ) {
+					$option = $wp_screen->get_option( 'per_page', 'option' );
+					if ( ! $option ) {
+						$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
+					}
+				} else {
+					$option = static::SCREEN_OPTIONS_SLUG . '_per_page';
+				}
+
+				self::$per_page = (int) \get_user_option( $option );
+				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
+					self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
+					if ( ! self::$per_page ) {
+						self::$per_page = self::get_default_per_page();
+					}
+				}
+
+				return self::$per_page;
+			}
 		}
 	}
 }

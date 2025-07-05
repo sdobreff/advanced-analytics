@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Helpers\WP_Helper;
 use ADVAN\Entities\Common_Table;
+use ADVAN\Lists\Traits\List_Trait;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -34,16 +36,13 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 	 */
 	class Table_List extends \WP_List_Table {
 
+		use List_Trait;
+
 		public const PAGE_SLUG = 'wp-control_page_advan_table';
 
-		/**
-		 * Current screen
-		 *
-		 * @var \WP_Screen
-		 *
-		 * @since 2.1.0
-		 */
-		protected $wp_screen;
+		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_table_list';
+
+		public const SEARCH_INPUT = 's';
 
 		/**
 		 * The table to show
@@ -79,7 +78,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 *
 		 * @since 2.1.0
 		 */
-		protected $records_per_page = 20;
+		protected static $rows_per_page = 20;
 
 		/**
 		 * Default class constructor
@@ -105,9 +104,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$this->table_name = $class::get_name();
 			$this->table      = $class;
 
-			$screen = $this->get_wp_screen();
-
-			add_filter( 'manage_' . $screen->id . '_columns', array( $class, 'manage_columns' ) );
+			add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
 		}
 
 		/**
@@ -119,16 +116,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 */
 		public function get_table_name(): string {
 			return $this->table_name;
-		}
-
-		/**
-		 * Get the wp_screen property.
-		 */
-		private function get_wp_screen() {
-			if ( empty( $this->wp_screen ) ) {
-				$this->wp_screen = get_current_screen();
-			}
-			return $this->wp_screen;
 		}
 
 		/**
@@ -144,7 +131,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$items = $this->fetch_table_data();
 
 			$columns = $this->table::manage_columns( array() );
-			$hidden  = get_user_option( 'manage' . $this->get_wp_screen()->id . 'columnshidden', false );
+			$hidden  = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -158,8 +145,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$this->set_pagination_args(
 				array(
 					'total_items' => $this->count,
-					'per_page'    => $this->get_screen_option_per_page(),
-					'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
+					'per_page'    => self::get_screen_option_per_page(),
+					'total_pages' => ceil( $this->count / self::get_screen_option_per_page() ),
 				)
 			);
 		}
@@ -195,7 +182,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			 * Actual sorting still needs to be done by prepare_items.
 			 * specify which columns should have the sort icon.
 			 *
-			 * The second bool param sets the colum sort order - true ASC, false - DESC or unsorted.
+			 * The second bool param sets the column sort order - true ASC, false - DESC or unsorted.
 			 */
 			foreach ( $first6_columns as  $value ) {
 				$sortable_columns[ $value ] = array( $value, false );
@@ -209,7 +196,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 *
 		 * @since   1.0.0
 		 *
-		 * @return string
+		 * @return void
 		 */
 		public function no_items() {
 			\esc_html_e( 'No rows', '0-day-analytics' );
@@ -226,7 +213,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 			global $wpdb;
 
-			$per_page = $this->get_screen_option_per_page();
+			$per_page = self::get_screen_option_per_page();
 
 			$current_page = $this->get_pagenum();
 			if ( 1 < $current_page ) {
@@ -235,7 +222,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				$offset = 0;
 			}
 
-			$search_string = ( isset( $_REQUEST['s'] ) ? \esc_sql( \wp_unslash( $_REQUEST['s'] ) ) : '' );
+			$search_string = self::escaped_search_input();
 
 			$search_sql = '';
 
@@ -480,17 +467,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		}
 
 		/**
-		 * Stop execution and exit
-		 *
-		 * @since    1.0.0
-		 *
-		 * @return void
-		 */
-		public function graceful_exit() {
-			exit;
-		}
-
-		/**
 		 * Die when the nonce check fails.
 		 *
 		 * @since    1.0.0
@@ -506,39 +482,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					'back_link' => esc_url( add_query_arg( array( 'page' => wp_unslash( $_REQUEST['page'] ) ), admin_url( 'users.php' ) ) ),
 				)
 			);
-		}
-
-		/**
-		 * Returns the records to show per page.
-		 *
-		 * @return int
-		 *
-		 * @since 2.1.0
-		 */
-		public function get_records_per_page() {
-			return $this->records_per_page;
-		}
-
-		/**
-		 * Get the screen option per_page.
-		 *
-		 * @return int
-		 */
-		private function get_screen_option_per_page() {
-			$this->get_wp_screen();
-			$option = $this->wp_screen->get_option( 'per_page', 'option' );
-			if ( ! $option ) {
-				$option = str_replace( '-', '_', "{$this->wp_screen->id}_per_page" );
-			}
-
-			$per_page = (int) get_user_option( $option );
-			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = $this->wp_screen->get_option( 'per_page', 'default' );
-				if ( ! $per_page ) {
-					$per_page = $this->get_records_per_page();
-				}
-			}
-			return $per_page;
 		}
 
 		/**

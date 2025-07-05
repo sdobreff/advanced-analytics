@@ -88,15 +88,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		protected $count;
 
 		/**
-		 * How many log records to read from the log page - that is a fall back option, it will try to extract that first from the stored user data, then from the settings and from here as a last resort.
-		 *
-		 * @var int
-		 *
-		 * @since 1.1.0
-		 */
-		protected static $log_errors_to_read = 100;
-
-		/**
 		 * Events Query Arguments.
 		 *
 		 * @since 1.1.0
@@ -583,47 +574,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Returns the records to show per page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.1.0
-		 */
-		public static function get_log_errors_to_read() {
-			return self::$log_errors_to_read;
-		}
-
-		/**
-		 * Get the screen option per_page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.1.0
-		 */
-		private static function get_screen_option_per_page() {
-			$wp_screen = WP_Helper::get_wp_screen();
-
-			if ( self::PAGE_SLUG === $wp_screen->base ) {
-				$option = $wp_screen->get_option( 'per_page', 'option' );
-				if ( ! $option ) {
-					$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
-				}
-			} else {
-				$option = 'advanced_analytics_crons_list_per_page';
-			}
-
-			$per_page = (int) \get_user_option( $option );
-			if ( empty( $per_page ) || $per_page < 1 ) {
-				$per_page = $wp_screen->get_option( 'per_page', 'default' );
-				if ( ! $per_page ) {
-					$per_page = self::get_log_errors_to_read();
-				}
-			}
-
-			return $per_page;
-		}
-
-		/**
 		 * Adds a screen options to the current screen table.
 		 *
 		 * @param \WP_Hook $hook - The hook object to attach to.
@@ -634,32 +584,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public static function add_screen_options( $hook ) {
 			return;
-			$screen_options = array( 'per_page' => __( 'Number of errors to read', '0-day-analytics' ) );
-
-			$result = array();
-
-			\array_walk(
-				$screen_options,
-				function ( &$a, $b ) use ( &$result ) {
-					$result[ self::SCREEN_OPTIONS_SLUG . '_' . $b ] = $a;
-				}
-			);
-			$screen_options = $result;
-
-			foreach ( $screen_options as $key => $value ) {
-				\add_action(
-					"load-$hook",
-					function () use ( $key, $value ) {
-						$option = 'per_page';
-						$args   = array(
-							'label'   => $value,
-							'default' => self::get_log_errors_to_read(),
-							'option'  => $key,
-						);
-						\add_screen_option( $option, $args );
-					}
-				);
-			}
 		}
 
 		/**

@@ -76,7 +76,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		protected static $log_errors_to_read = 100;
+		protected static $rows_per_page = 100;
 
 		/**
 		 * Holds the array with all of the collected sources.
@@ -114,15 +114,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @since 1.1.0
 		 */
 		private static $query_order = array();
-
-		/**
-		 * Current setting (if any) of per_page property - caching value.
-		 *
-		 * @var int
-		 *
-		 * @since 1.7.5
-		 */
-		protected static $per_page = null;
 
 		/**
 		 * Default class constructor.
@@ -242,8 +233,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$this->set_pagination_args(
 				array(
 					'total_items' => $this->count,
-					'per_page'    => $this->get_screen_option_per_page(),
-					'total_pages' => ceil( $this->count / $this->get_screen_option_per_page() ),
+					'per_page'    => self::get_screen_option_per_page(),
+					'total_pages' => ceil( $this->count / self::get_screen_option_per_page() ),
 				)
 			);
 		}
@@ -814,54 +805,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Returns the records to show per page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.1.0
-		 */
-		public static function get_log_errors_to_read() {
-			return self::$log_errors_to_read;
-		}
-
-		/**
-		 * Get the screen option per_page.
-		 *
-		 * @return int
-		 *
-		 * @since 1.1.0
-		 */
-		private static function get_screen_option_per_page() {
-			if ( null !== self::$per_page ) {
-				return self::$per_page;
-			} else {
-				$wp_screen = WP_Helper::get_wp_screen();
-
-				if ( is_a( $wp_screen, '\WP_Screen' ) && self::PAGE_SLUG === $wp_screen->base ) {
-					$option = $wp_screen->get_option( 'per_page', 'option' );
-					if ( ! $option ) {
-						$option = str_replace( '-', '_', $wp_screen->id . '_per_page' );
-					}
-				} else {
-					$option = 'advanced_analytics_logs_list_per_page';
-				}
-
-				self::$per_page = (int) \get_user_option( $option );
-				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
-					self::$per_page = false;
-					if ( is_a( $wp_screen, '\WP_Screen' ) ) {
-						self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
-					}
-					if ( ! self::$per_page ) {
-						self::$per_page = self::get_log_errors_to_read();
-					}
-				}
-
-				return self::$per_page;
-			}
-		}
-
-		/**
 		 * Adds a screen options to the current screen table.
 		 *
 		 * @param \WP_Hook $hook - The hook object to attach to.
@@ -890,7 +833,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$option = 'per_page';
 						$args   = array(
 							'label'   => $value,
-							'default' => self::get_log_errors_to_read(),
+							'default' => self::get_default_per_page(),
 							'option'  => $key,
 						);
 						\add_screen_option( $option, $args );
