@@ -575,9 +575,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					2
 				);
 
-				Table_List::add_screen_options( $transients_hook );
+				Table_List::add_screen_options( $table_hook );
 
-				\add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
+				// \add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
 
 				// \add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
 

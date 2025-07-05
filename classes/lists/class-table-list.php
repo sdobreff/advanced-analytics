@@ -51,16 +51,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 *
 		 * @since 2.1.0
 		 */
-		protected $table;
-
-		/**
-		 * Name of the table to show
-		 *
-		 * @var string
-		 *
-		 * @since 2.1.0
-		 */
-		protected $table_name;
+		private static $table;
 
 		/**
 		 * How many
@@ -89,6 +80,13 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 */
 		public function __construct( string $table_name ) {
 
+			$class = Common_Table::class;
+
+			Common_Table::init( $table_name );
+			self::$table = $class;
+
+			\add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
+
 			parent::__construct(
 				array(
 					'plural'   => $table_name,    // Plural value used for labels and the objects being listed.
@@ -96,15 +94,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					'ajax'     => false,      // If true, the parent class will call the _js_vars() method in the footer.
 				)
 			);
-
-			$class = Common_Table::class;
-
-			Common_Table::init( $table_name );
-
-			$this->table_name = $class::get_name();
-			$this->table      = $class;
-
-			add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
 		}
 
 		/**
@@ -115,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @since 2.1.0
 		 */
 		public function get_table_name(): string {
-			return $this->table_name;
+			return self::$table::get_name();
 		}
 
 		/**
@@ -130,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 			$items = $this->fetch_table_data();
 
-			$columns = $this->table::manage_columns( array() );
+			$columns = self::$table::manage_columns( array() );
 			$hidden  = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
@@ -160,7 +149,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @return array
 		 */
 		public function get_columns() {
-			return $this->table::manage_columns( array() );
+			return self::$table::manage_columns( array() );
 		}
 
 		/**
@@ -176,7 +165,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @return array
 		 */
 		protected function get_sortable_columns() {
-			$first6_columns = array_keys( $this->table::get_column_names_admin() );
+			$first6_columns = array_keys( self::$table::get_column_names_admin() );
 
 			/**
 			 * Actual sorting still needs to be done by prepare_items.
@@ -227,8 +216,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$search_sql = '';
 
 			if ( '' !== $search_string ) {
-				$search_sql = 'AND (' . $this->table::get_real_id_name() . ' LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
-				foreach ( array_keys( $this->table::get_column_names_admin() ) as $value ) {
+				$search_sql = 'AND (' . self::$table::get_real_id_name() . ' LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
+				foreach ( array_keys( self::$table::get_column_names_admin() ) as $value ) {
 					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
 				}
 				$search_sql .= ') ';
@@ -236,10 +225,10 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 			$wpdb_table = $this->get_table_name();
 
-			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : $this->table::get_real_id_name();
+			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : self::$table::get_real_id_name();
 			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'ASC';
 			$query   = 'SELECT
-				' . implode( ', ', $this->table::get_column_names() ) . '
+				' . implode( ', ', self::$table::get_column_names() ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 
 			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
@@ -249,7 +238,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$query_results = $wpdb->get_results( $query, ARRAY_A );
 
 			// phpcs:ignore
-			$this->count = $wpdb->get_var( 'SELECT COUNT(' . $this->table::get_real_id_name() . ') FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
+			$this->count = $wpdb->get_var( 'SELECT COUNT(' . self::$table::get_real_id_name() . ') FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
 
 			// return result array to prepare_items.
 			return $query_results;
@@ -326,11 +315,11 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			if ( 'plugin_id' === $column_name ) {
 				// row actions to edit record.
 				$query_args_view_data = array(
-					'page'                    => ( isset( $_REQUEST['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : 'wps-proxytron-sites',
-					'action'                  => 'view_data',
-					$this->table_name . '_id' => absint( $item[ $this->table::get_real_id_name() ] ),
-					'_wpnonce'                => \wp_create_nonce( 'view_data_nonce' ),
-					'get_back'                => urlencode( $pagenow . '?page=' . $current_screen->parent_base . '&paged=' . $paged . $search . $orderby . $order ),
+					'page'                           => ( isset( $_REQUEST['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : 'wps-proxytron-sites',
+					'action'                         => 'view_data',
+					self::$table::get_name() . '_id' => absint( $item[ self::$table::get_real_id_name() ] ),
+					'_wpnonce'                       => \wp_create_nonce( 'view_data_nonce' ),
+					'get_back'                       => urlencode( $pagenow . '?page=' . $current_screen->parent_base . '&paged=' . $paged . $search . $orderby . $order ),
 				);
 				$view_data_link       = esc_url( add_query_arg( $query_args_view_data, $admin_page_url ) );
 				$actions['view_data'] = '<a href="' . $view_data_link . '">' . \esc_html( 'Show Info', 'wps-proxytron' ) . '</a>';
@@ -352,12 +341,12 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
-				'<label class="screen-reader-text" for="' . $this->table_name . '_' . $item[ $this->table::get_real_id_name() ] . '">' . sprintf(
+				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '">' . sprintf(
 					// translators: The column name.
 					__( 'Select %s' ),
-					$this->table::get_real_id_name()
+					self::$table::get_real_id_name()
 				) . '</label>'
-				. '<input type="checkbox" name="' . $this->table_name . '[]" id="' . $this->table_name . '_' . $item[ $this->table::get_real_id_name() ] . '" value="' . $item[ $this->table::get_real_id_name() ] . '" />'
+				. '<input type="checkbox" name="' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '" value="' . $item[ self::$table::get_real_id_name() ] . '" />'
 			);
 		}
 
@@ -410,7 +399,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				if ( ! wp_verify_nonce( $nonce, 'view_data_nonce' ) ) {
 					$this->invalid_nonce_redirect();
 				} else {
-					$this->page_view_data( absint( $_REQUEST[ $this->table_name . '_id' ] ) );
+					$this->page_view_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
 					$this->graceful_exit();
 				}
 			}
@@ -423,10 +412,10 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
 
 				// verify the nonce.
-				if ( ! wp_verify_nonce( $nonce, 'add_' . $this->table_name . '_nonce' ) ) {
+				if ( ! wp_verify_nonce( $nonce, 'add_' . self::$table::get_name() . '_nonce' ) ) {
 					$this->invalid_nonce_redirect();
 				} else {
-					$this->page_add_data( absint( $_REQUEST[ $this->table_name . '_id' ] ) );
+					$this->page_add_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
 					$this->graceful_exit();
 				}
 			}
@@ -446,8 +435,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
 					$this->invalid_nonce_redirect();
 				} else {
-					foreach ( $_REQUEST[ $this->table_name ] as $id ) {
-						$this->table::delete_by_id( (int) $id );
+					foreach ( $_REQUEST[ self::$table::get_name() ] as $id ) {
+						self::$table::delete_by_id( (int) $id );
 					}
 				}
 			}
@@ -560,6 +549,18 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					}
 				);
 			}
+		}
+
+		/**
+		 * Adds columns to the screen options screed.
+		 *
+		 * @param array $columns - Array of column names.
+		 *
+		 * @since 1.1.0
+		 */
+		public static function manage_columns( $columns ): array {
+
+			return self::$table::manage_columns( $columns );
 		}
 	}
 }
