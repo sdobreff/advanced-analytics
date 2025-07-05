@@ -131,7 +131,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * The link to the WP admin settings page
 		 *
 		 * @var string
-		 * 
+		 *
 		 * @since latest
 		 */
 		private static $settings_table_link = '';
@@ -257,7 +257,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			<?php
 			// $hook is string value given add_menu_page function.
-			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook ) {
+			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook && Table_List::PAGE_SLUG !== $hook ) {
 				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
@@ -564,7 +564,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* Transients end */
 
-
 				/* Table */
 				$table_hook = \add_submenu_page(
 					self::MENU_SLUG,
@@ -576,11 +575,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					2
 				);
 
-				//Transients_List::add_screen_options( $transients_hook );
+				Table_List::add_screen_options( $transients_hook );
 
-				//\add_filter( 'manage_' . $transients_hook . '_columns', array( Transients_List::class, 'manage_columns' ) );
+				\add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
 
-				//\add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
+				// \add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				/* Table end */
 
