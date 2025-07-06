@@ -52,41 +52,20 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 			</script>
 			<?php
 
-			if ( isset( $_REQUEST['table_filter_top'] ) || isset( $_REQUEST['table_filter_bottom'] ) ) {
-				if ( \in_array( $_REQUEST['table_filter_top'], Common_Table::get_tables(), true ) ) {
-					$table = $_REQUEST['table_filter_top']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-
-					\wp_safe_redirect(
-						\remove_query_arg(
-							array( 'deleted' ),
-							add_query_arg(
-								array(
-									'page'       => Settings::TABLE_MENU_SLUG,
-									Table_List::SEARCH_INPUT => Table_List::escaped_search_input(),
-									'show_table' => rawurlencode( $table ),
-								),
-								\admin_url( 'admin.php' )
-							)
-						)
-					);
-					exit;
-				}
-			}
-
 			global $wpdb;
-			$table = $wpdb->prefix . 'options';
+			$table_name = $wpdb->prefix . 'options';
 
 			if ( isset( $_REQUEST['show_table'] ) ) {
 				if ( \in_array( $_REQUEST['show_table'], Common_Table::get_tables() ) ) {
-					$table = $_REQUEST['show_table']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+					$table_name = $_REQUEST['show_table']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 				}
 			}
 
-			$table = new Table_List( $table );
+			$table = new Table_List( $table_name );
 			$table->prepare_items();
 			?>
 				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table', '0-day-analytics' ); ?></h1>
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo \esc_html( $table_name ); ?></h1>
 					
 					<hr class="wp-header-end">
 					<form id="table-filter" method="get">
@@ -129,6 +108,38 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new transient directly from here.', '0-day-analytics' ) . '</p></h4>';
 
 			return $help_text;
+		}
+
+		/**
+		 * Responsible for switching the table of the view.
+		 *
+		 * @return void
+		 *
+		 * @since 2.1.0
+		 */
+		public static function switch_action() {
+
+			if ( isset( $_REQUEST['table_filter_top'] ) || isset( $_REQUEST['table_filter_bottom'] ) ) {
+
+				if ( check_admin_referer( Table_List::SWITCH_ACTION, Table_List::SWITCH_ACTION . 'nonce' ) && \in_array( $_REQUEST['table_filter_top'], Common_Table::get_tables(), true ) ) {
+					$table = $_REQUEST['table_filter_top']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+
+					\wp_safe_redirect(
+						\remove_query_arg(
+							array( 'deleted' ),
+							add_query_arg(
+								array(
+									'page'       => Settings::TABLE_MENU_SLUG,
+									Table_List::SEARCH_INPUT => Table_List::escaped_search_input(),
+									'show_table' => rawurlencode( $table ),
+								),
+								\admin_url( 'admin.php' )
+							)
+						)
+					);
+					exit;
+				}
+			}
 		}
 	}
 }

@@ -40,6 +40,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 		public const PAGE_SLUG = 'wp-control_page_advan_table';
 
+		public const SWITCH_ACTION = 'switch_advan_table';
+
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_table_list';
 
 		public const SEARCH_INPUT = 's';
@@ -486,8 +488,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			<div class="alignleft actions bulkactions">
 			
 				<select class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table">
-					<option value=""><?php \esc_html_e( 'Switch table', '0-day-analytics' ); ?></option>
-
 					<?php
 					foreach ( Common_Table::get_tables() as $table ) {
 						$selected = '';
@@ -505,15 +505,16 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			</div>
 
 			<?php
-				if ( 'top' === $which ) {
-					?>
+			//if ( 'top' === $which ) {
+				?>
 						<script>
 							jQuery('form .table_filter').on('change', function(e) {
-								jQuery( this ).closest( 'form' ).submit();
+								jQuery('form .table_filter').val(jQuery(this).val());
+								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION,self::SWITCH_ACTION.'nonce' ); ?>').submit();
 							});
 						</script>
 					<?php
-				}
+			//}
 		}
 
 		/**

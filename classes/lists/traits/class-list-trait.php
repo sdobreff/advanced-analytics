@@ -19,7 +19,7 @@ if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
 	/**
 	 * Responsible for the list logs show
 	 *
-	 * @since latest
+	 * @since 2.1.0
 	 */
 	trait List_Trait {
 

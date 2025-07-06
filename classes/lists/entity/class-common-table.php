@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		public static function init( string $table_name ) {
 			self::$table_name = $table_name;
@@ -625,7 +625,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		public static function get_tables(): array {
 			global $wpdb;

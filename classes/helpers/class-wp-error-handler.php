@@ -551,7 +551,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		public static function on_mail_error( $wp_error ) {
 
@@ -567,7 +567,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		public static function log_wp_error( \WP_Error $error ) {
 			$error_data = $error->get_all_error_data();

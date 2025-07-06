@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -32,6 +32,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Provides insights into logged errors for efficient troubleshooting.
 - Build-in fully functional Cron manager.
 - Build-in fully functional Transients manager.
+- Build-in Table manager.
 - Build-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
 - Easily plugin version switch (the ones from official WP marketstore).
@@ -54,7 +55,7 @@ Voila! It's ready to go.
 == Frequently Asked Questions ==
 
 = Why only last 100 error logs? =
-Plugin is designed to be as fast as possible and work with enormously large log files, consuming as less resources as possible, no other plugin could provide something even close to that, thats why it comes with this limitation. And one single error could contain more than 30K sub-rows. But 100 is more than enough - errors before that are either too old, no longer related or repeating ones, in fact is best to regularly truncate your log file and check for only the last error. And last but not least - this are 100 errors not 100 lines of the error log.
+Plugin is designed to be as fast as possible and work with enormously large log files, consuming as less resources as possible, no other plugin could provide something even close to that, thats why it comes with this limitation. And one single error could contain more than 30K sub-rows. But 100 is more than enough - errors before that are either too old, no longer related or repeating ones, in fact is best to regularly truncate your log file and check for only the last error. And last but not least - this are 100 errors not 100 lines of the error log. You can increase that up-to 999 using screen options menu but do that on your wn risk.
 
 = Why there is no pagination for error logs? =
 That is once again related to the nature of the error log - one single reload could generate tens of new errors, so paginating this would probably never come handy, and in order to paginate, the entire log must be read every time - which is extremely bad idea resource-wise.
@@ -78,9 +79,13 @@ Because of its extremely poor implementation and interfering with the proper Wor
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 4. **Cron manager** - Build-in is very powerful cron manager.
 5. **Transients manager** - Build-in is very powerful transients manager.
-6. **Plugin Version Switcher** - Build-in plugin version switcher.
+6. **Table manager** - Build-in is very powerful SQL table manager.
+7. **Plugin Version Switcher** - Build-in plugin version switcher.
 
 == Changelog ==
+
+= 2.1.0 =
+Code optimizations and SQL Table Viewer.
 
 = 2.0.0 =
 Code improvements - mostly JS responses and better interaction with UI. Errors coming from mail function (WP_Error) catching. Text selected in the console-like window (bottom of the error log viewer) is automatically copied into the clipboard.

@@ -132,7 +132,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		private static $settings_table_link = '';
 
@@ -183,6 +183,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
 			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
 			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
+
+			\add_action( 'admin_post_' . Table_List::SWITCH_ACTION, array( Table_View::class, 'switch_action' ) );
 
 			/**
 			 * Draws the save button in the settings
@@ -920,7 +922,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.1.0
 		 */
 		public static function get_tables_page_link() {
 			if ( '' === self::$settings_table_link ) {
