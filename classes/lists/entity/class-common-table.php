@@ -97,6 +97,15 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 */
 		protected static $admin_columns = array();
 
+		/**
+		 * Inits the class and sets the vars
+		 *
+		 * @param string $table_name - The name of the table to use.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function init( string $table_name ) {
 			self::$table_name = $table_name;
 		}
@@ -109,9 +118,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @since 2.1.0
 		 */
 		public static function get_name(): string {
-			global $wpdb;
 
-			return $wpdb->base_prefix . static::$table_name;
+			return static::$table_name;
 		}
 
 		/**
@@ -612,6 +620,13 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			return self::$admin_columns;
 		}
 
+		/**
+		 * Returns a list with all available tables.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
 		public static function get_tables(): array {
 			global $wpdb;
 

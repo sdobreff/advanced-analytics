@@ -485,13 +485,17 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			?>
 			<div class="alignleft actions bulkactions">
 			
-				<select name="table_filter_<?php echo $which; ?>" class="advan-filter-table">
+				<select class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table">
 					<option value=""><?php \esc_html_e( 'Switch table', '0-day-analytics' ); ?></option>
 
 					<?php
 					foreach ( Common_Table::get_tables() as $table ) {
+						$selected = '';
+						if ( self::$table::get_name() === $table ) {
+							$selected = ' selected="selected"';
+						}
 						?>
-						<option><?php echo $table; ?></option>
+						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>"><?php echo \esc_html( $table ); ?></option>
 						<?php
 					}
 					?>
@@ -499,7 +503,17 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				</select>
 							
 			</div>
+
 			<?php
+				if ( 'top' === $which ) {
+					?>
+						<script>
+							jQuery('form .table_filter').on('change', function(e) {
+								jQuery( this ).closest( 'form' ).submit();
+							});
+						</script>
+					<?php
+				}
 		}
 
 		/**
