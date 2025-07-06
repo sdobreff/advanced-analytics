@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Traits\List_Trait;
@@ -87,7 +88,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			Common_Table::init( $table_name );
 			self::$table = $class;
 
-			\add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
+			// \add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
 
 			parent::__construct(
 				array(
@@ -128,8 +129,6 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			}
 			$sortable              = $this->get_sortable_columns();
 			$this->_column_headers = array( $columns, $hidden, $sortable );
-			// phpcs:ignore
-			// usort( $items, [ &$this, 'usort_reorder' ] ); // phpcs:ignore
 
 			$this->items = $items;
 			// Set the pagination.
@@ -236,10 +235,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
 
 			// query output_type will be an associative array with ARRAY_A.
-			// phpcs:ignore
 			$query_results = $wpdb->get_results( $query, ARRAY_A );
 
-			// phpcs:ignore
 			$this->count = $wpdb->get_var( 'SELECT COUNT(' . self::$table::get_real_id_name() . ') FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
 
 			// return result array to prepare_items.
@@ -303,33 +300,30 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @since 2.1.0
 		 */
 		private function common_column_render( array $item, $column_name ): string {
-			global $pagenow, $current_screen;
 
-			$admin_page_url = admin_url( 'admin.php' );
+			if ( $column_name === self::$table::get_real_id_name() ) {
 
-			$paged = ( isset( $_GET['paged'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['paged'] ) ) : 1;
+				$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
 
-			$search  = ( isset( $_REQUEST['s'] ) ) ? '&s=' . \sanitize_text_field( \wp_unslash( $_REQUEST['s'] ) ) : '';
-			$orderby = ( isset( $_REQUEST['orderby'] ) ) ? '&orderby=' . \sanitize_text_field( \wp_unslash( $_REQUEST['orderby'] ) ) : '';
-			$order   = ( isset( $_REQUEST['order'] ) ) ? '&order=' . \sanitize_text_field( \wp_unslash( $_REQUEST['order'] ) ) : '';
+				$delete_url =
+					\add_query_arg(
+						array(
+							'action'           => 'delete',
+							'advan_' . self::$table::get_name() => $item[ self::$table::get_real_id_name() ],
+							self::SEARCH_INPUT => self::escaped_search_input(),
+							'_wpnonce'         => $query_args_view_data['_wpnonce'],
+						)
+					);
 
-			$actions = array();
-			if ( 'plugin_id' === $column_name ) {
-				// row actions to edit record.
-				$query_args_view_data = array(
-					'page'                           => ( isset( $_REQUEST['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : 'wps-proxytron-sites',
-					'action'                         => 'view_data',
-					self::$table::get_name() . '_id' => absint( $item[ self::$table::get_real_id_name() ] ),
-					'_wpnonce'                       => \wp_create_nonce( 'view_data_nonce' ),
-					'get_back'                       => urlencode( $pagenow . '?page=' . $current_screen->parent_base . '&paged=' . $paged . $search . $orderby . $order ),
-				);
-				$view_data_link       = esc_url( add_query_arg( $query_args_view_data, $admin_page_url ) );
-				$actions['view_data'] = '<a href="' . $view_data_link . '">' . \esc_html( 'Show Info', 'wps-proxytron' ) . '</a>';
+				$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . '">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
+
+				$row_value = \esc_html( $item[ $column_name ] ) . $this->row_actions( $actions );
+
+			} else {
+				$row_value = \esc_html( $item[ $column_name ] );
 			}
 
-			$row_value = '<strong>' . \esc_html( $item[ $column_name ] ) . '</strong>';
-
-			return $row_value . $this->row_actions( $actions );
+			return $row_value;
 		}
 
 		/**
@@ -340,6 +334,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @param object $item - A row's data.
 		 *
 		 * @return string Text to be placed inside the column < td > .
+		 *
+		 * @since 2.1.0
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
@@ -348,7 +344,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					__( 'Select %s' ),
 					self::$table::get_real_id_name()
 				) . '</label>'
-				. '<input type="checkbox" name="' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '" value="' . $item[ self::$table::get_real_id_name() ] . '" />'
+				. '<input type="checkbox" name="advan_' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '" value="' . $item[ self::$table::get_real_id_name() ] . '" />'
 			);
 		}
 
@@ -368,7 +364,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			 * Action and action2 are set based on the triggers above or below the table
 			 */
 			$actions = array(
-				'delete' => __( 'Delete Records', '0-day-security' ),
+				'delete' => __( 'Delete Records', '0-day-analytics' ),
 			);
 
 			return $actions;
@@ -388,58 +384,81 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			 * Action2 - is set if checkbox the bottom-most select-all checkbox is set, otherwise returns -1
 			 */
 
-			// check for individual row actions.
-			$the_table_action = $this->current_action();
+			if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
 
-			if ( 'view_data' === $the_table_action ) {
+				// check for individual row actions.
+				$the_table_action = $this->current_action();
 
-				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
-				}
-				$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
-				// verify the nonce.
-				if ( ! wp_verify_nonce( $nonce, 'view_data_nonce' ) ) {
-					$this->invalid_nonce_redirect();
-				} else {
-					$this->page_view_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
-					$this->graceful_exit();
-				}
-			}
+				if ( 'view_data' === $the_table_action ) {
 
-			if ( 'add_data' === $the_table_action ) {
-
-				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
-				}
-					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
-
-				// verify the nonce.
-				if ( ! wp_verify_nonce( $nonce, 'add_' . self::$table::get_name() . '_nonce' ) ) {
-					$this->invalid_nonce_redirect();
-				} else {
-					$this->page_add_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
-					$this->graceful_exit();
-				}
-			}
-
-			// check for table bulk actions.
-			if ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) {
-
-				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
-				}
-					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
-				// verify the nonce.
-				/**
-				 * Note: the nonce field is set by the parent class
-				 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );
-				 */
-				if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
-					$this->invalid_nonce_redirect();
-				} else {
-					foreach ( $_REQUEST[ self::$table::get_name() ] as $id ) {
-						self::$table::delete_by_id( (int) $id );
+					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
+						$this->graceful_exit();
 					}
+					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
+					// verify the nonce.
+					if ( ! \wp_verify_nonce( $nonce, 'view_data_nonce' ) ) {
+						$this->invalid_nonce_redirect();
+					} elseif ( isset( $_REQUEST[ self::$table::get_name() . '_id' ] ) ) {
+						$this->page_view_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
+						$this->graceful_exit();
+					}
+				}
+
+				if ( 'add_data' === $the_table_action ) {
+
+					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
+						$this->graceful_exit();
+					}
+					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
+
+					// verify the nonce.
+					if ( ! \wp_verify_nonce( $nonce, 'add_' . self::$table::get_name() . '_nonce' ) ) {
+						$this->invalid_nonce_redirect();
+					} else {
+						$this->page_add_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
+						$this->graceful_exit();
+					}
+				}
+
+				// check for table bulk actions.
+				if ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) {
+
+					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
+						$this->graceful_exit();
+					}
+					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
+					// verify the nonce.
+					/**
+					 * Note: the nonce field is set by the parent class
+					 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+					 */
+					if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
+						$this->invalid_nonce_redirect();
+					} elseif ( isset( $_REQUEST[ 'advan_' . self::$table::get_name() ] ) ) {
+						foreach ( (array) $_REQUEST[ 'advan_' . self::$table::get_name() ] as $id ) {
+							self::$table::delete_by_id( (int) $id );
+						}
+					}
+
+					$redirect =
+						\remove_query_arg(
+							array( 'delete', '_wpnonce', 'advan_' . self::$table::get_name() ),
+							\add_query_arg(
+								array(
+									self::SEARCH_INPUT => self::escaped_search_input(),
+									'paged'            => $_REQUEST['paged'] ?? 1,
+									'page'             => Settings::TABLE_MENU_SLUG,
+								),
+								\admin_url( 'admin.php' )
+							)
+						);
+
+					?>
+					<script>
+						window.location.href = '<?php echo $redirect; ?>';
+					</script>
+					<?php
+					exit;
 				}
 			}
 		}
@@ -465,12 +484,14 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		 * @return void
 		 */
 		public function invalid_nonce_redirect() {
-			wp_die(
+			\wp_die(
 				'Invalid Nonce',
 				'Error',
 				array(
 					'response'  => 403,
-					'back_link' => esc_url( add_query_arg( array( 'page' => wp_unslash( $_REQUEST['page'] ) ), admin_url( 'users.php' ) ) ),
+					'back_link' => esc_url(
+						\network_admin_url()
+					),
 				)
 			);
 		}
@@ -495,7 +516,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 							$selected = ' selected="selected"';
 						}
 						?>
-						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>"><?php echo \esc_html( $table ); ?></option>
+						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>"><?php echo \esc_html( $table );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></option>
 						<?php
 					}
 					?>
@@ -505,16 +526,16 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			</div>
 
 			<?php
-			//if ( 'top' === $which ) {
-				?>
+			// if ( 'top' === $which ) {
+			?>
 						<script>
 							jQuery('form .table_filter').on('change', function(e) {
 								jQuery('form .table_filter').val(jQuery(this).val());
-								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION,self::SWITCH_ACTION.'nonce' ); ?>').submit();
+								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION, self::SWITCH_ACTION . 'nonce' ); ?>').submit();
 							});
 						</script>
 					<?php
-			//}
+					// }
 		}
 
 		/**
