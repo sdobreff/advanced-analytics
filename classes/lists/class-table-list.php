@@ -537,7 +537,9 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION, self::SWITCH_ACTION . 'nonce' ); ?>').submit();
 							});
 						</script>
-
+						<?php
+if ( 'top' === $which ) {
+	?>
 					<style>
 					.flex {
 						display:flex;
@@ -567,8 +569,23 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 						font-size: 1.1em;
 						font-weight: bold;
 					}
-				</style>
+					.wp-list-table {
+						display: block;
+						overflow-x: auto;
+						white-space: nowrap;
+					}
+					.wp-list-table tbody {
+						display: table;
+						width: 100%;
+					}
+					.wp-list-table thead {
+						position: sticky;
+  z-index: 2;
+  top: 0;
+					}
 
+				</style>
+<?php } ?>
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 					</div>
