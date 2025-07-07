@@ -98,6 +98,15 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		protected static $admin_columns = array();
 
 		/**
+		 * Class cache keeps the size of the table
+		 *
+		 * @var int
+		 *
+		 * @since latest
+		 */
+		private static $table_size = null;
+
+		/**
 		 * Inits the class and sets the vars
 		 *
 		 * @param string $table_name - The name of the table to use.
@@ -631,6 +640,46 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			global $wpdb;
 
 			return $wpdb->tables( 'all' );
+		}
+
+		/**
+		 * Returns the table size in Megabyte format
+		 *
+		 * @return int
+		 *
+		 * @since latest
+		 */
+		public static function get_table_size() {
+			if ( null === $table_size ) {
+				global $wpdb;
+
+				$sql = "SELECT 
+				ROUND(((data_length + index_length) / 1024 / 1024), 2) AS `Size (MB)`
+			FROM
+				information_schema.TABLES
+			WHERE
+				table_schema = '" . $wpdb->dbname . "'
+				AND table_name = '" . self::get_name() . "';";
+
+				$wpdb->suppress_errors( true );
+				$results = $wpdb->get_var( $sql );
+
+				if ( '' !== $wpdb->last_error || null === $results ) {
+
+					$results = array();
+
+				}
+
+				$wpdb->suppress_errors( false );
+
+				if ( $results ) {
+					self::$table_size = $results;
+				} else {
+					self::$table_size = 0;
+				}
+			}
+
+			return self::$table_size;
 		}
 	}
 }

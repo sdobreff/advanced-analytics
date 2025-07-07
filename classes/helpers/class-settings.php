@@ -117,6 +117,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * The link to the WP admin settings page
 		 *
 		 * @var string
+		 * 
+		 * @since 1.2.0
 		 */
 		private static $settings_page_link = '';
 
@@ -124,6 +126,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * The link to the WP admin settings page
 		 *
 		 * @var string
+		 * 
+		 * @since 1.2.0
 		 */
 		private static $settings_crons_link = '';
 

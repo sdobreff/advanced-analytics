@@ -141,8 +141,12 @@ if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
 
 				self::$per_page = (int) \get_user_option( $option );
 				if ( empty( self::$per_page ) || self::$per_page < 1 ) {
-					self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
-					if ( ! self::$per_page ) {
+					if ( is_a( $wp_screen, '\WP_Screen' ) ) {
+						self::$per_page = $wp_screen->get_option( 'per_page', 'default' );
+						if ( ! self::$per_page ) {
+							self::$per_page = self::get_default_per_page();
+						}
+					} else {
 						self::$per_page = self::get_default_per_page();
 					}
 				}

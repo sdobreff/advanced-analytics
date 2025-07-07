@@ -15,6 +15,7 @@ namespace ADVAN\Lists;
 
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
+use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Traits\List_Trait;
 
@@ -506,9 +507,10 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		public function extra_tablenav( $which ) {
 
 			?>
+
 			<div class="alignleft actions bulkactions">
-			
-				<select class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table">
+				
+				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table">
 					<?php
 					foreach ( Common_Table::get_tables() as $table ) {
 						$selected = '';
@@ -522,7 +524,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					?>
 					
 				</select>
-							
+				
 			</div>
 
 			<?php
@@ -534,8 +536,45 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION, self::SWITCH_ACTION . 'nonce' ); ?>').submit();
 							});
 						</script>
-					<?php
-					// }
+
+					<style>
+					.flex {
+						display:flex;
+					}
+					.flex-row {
+						flex-direction:row;
+					}
+					.grow-0 {
+						flex-grow:0;
+					}
+					.p-2 {
+						padding:8px;
+					}
+					.w-full {
+						width:auto;
+					}
+					.border-t {
+						border-bottom-width:1px;
+					}
+					.justify-between {
+						justify-content:space-between;
+					}
+					.italic {
+						font-style: italic;
+					}
+					.text-lg {
+						font-size: 1.1em;
+						font-weight: bold;
+					}
+				</style>
+
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					<div>
+						<b><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( self::$table::get_name() ); ?></span></div>
+						<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
+					</div>
+				</div>
+				<?php
 		}
 
 		/**

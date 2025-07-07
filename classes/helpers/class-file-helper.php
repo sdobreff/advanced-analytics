@@ -151,6 +151,25 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 
 				$size = filesize( $filename );
 
+				return self::show_size( $size );
+			}
+
+			return '0 B';
+		}
+
+		/**
+		 * Shows formatted (human readable) size
+		 *
+		 * @param int $size - The size (in bytes) to format.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function show_size( $size ) {
+
+			if ( 0 <= $size ) {
+
 				$units          = array( 'B', 'KB', 'MB', 'GB', 'TB' );
 				$formatted_size = $size;
 
