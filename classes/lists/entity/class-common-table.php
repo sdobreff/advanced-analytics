@@ -102,7 +102,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since latest
+		 * @since 2.1.2
 		 */
 		private static $table_size = null;
 
@@ -647,7 +647,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 2.1.2
 		 */
 		public static function get_table_size() {
 			if ( null === $table_size ) {

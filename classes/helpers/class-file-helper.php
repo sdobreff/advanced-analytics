@@ -164,7 +164,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.1.2
 		 */
 		public static function show_size( $size ) {
 
