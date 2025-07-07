@@ -89,6 +89,15 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		protected static $columns_info = array();
 
 		/**
+		 * Class cache that holds all of the tables in chema,
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $tables = array();
+
+		/**
 		 * Holds the prepared options for speeding the proccess
 		 *
 		 * @var array
@@ -637,9 +646,33 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @since 2.1.0
 		 */
 		public static function get_tables(): array {
-			global $wpdb;
 
-			return $wpdb->tables( 'all' );
+			if ( empty( self::$tables ) ) {
+				global $wpdb;
+
+				$wpdb->suppress_errors( true );
+				$results = $wpdb->get_results(
+					$wpdb->prepare(
+						// 'SELECT table_name FROM information_schema.tables WHERE table_schema = %s;',
+						'SHOW TABLES;',
+						$wpdb->dbname
+					),
+					\ARRAY_A
+				);
+
+				if ( '' !== $wpdb->last_error || null === $results ) {
+
+					self::$tables = $wpdb->tables( 'all' );
+
+				} else {
+					foreach ( $results as $table ) {
+						self::$tables[] = reset( $table );
+					}
+				}
+
+				$wpdb->suppress_errors( false );
+			}
+			return self::$tables;
 		}
 
 		/**
@@ -654,7 +687,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				global $wpdb;
 
 				$sql = "SELECT 
-				ROUND(((data_length + index_length) / 1024 / 1024), 2) AS `Size (MB)`
+				ROUND(((data_length + index_length)), 2) AS `Size (B)`
 			FROM
 				information_schema.TABLES
 			WHERE

@@ -529,6 +529,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 			<?php
 			// if ( 'top' === $which ) {
+			global $wpdb;
 			?>
 						<script>
 							jQuery('form .table_filter').on('change', function(e) {
@@ -569,9 +570,10 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				</style>
 
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
+					</div>
 					<div>
-						<b><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( self::$table::get_name() ); ?></span></div>
-						<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
+						<b><?php \esc_html_e( 'Schema: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $wpdb->dbname ); ?></span> | <b><?php \esc_html_e( 'Tables: ', '0-day-analytics' ); ?></b><span class="italic"><?php echo \esc_attr( count(Common_Table::get_tables() )); ?></span>
 					</div>
 				</div>
 				<?php
