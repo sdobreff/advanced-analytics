@@ -650,7 +650,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @since 2.1.2
 		 */
 		public static function get_table_size() {
-			if ( null === $table_size ) {
+			if ( null === self::$table_size ) {
 				global $wpdb;
 
 				$sql = "SELECT 
