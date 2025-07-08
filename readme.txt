@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 2.1.3
+Stable tag: 2.2.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -83,6 +83,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 7. **Plugin Version Switcher** - Built-in plugin version switcher.
 
 == Changelog ==
+
+= 2.2.0 =
+Now supporting all tables in the give DataBase. Bug fixes and optimizations
 
 = 2.1.3 =
 PHP Warnings fix.

@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.2.0
 		 */
 		private static $tables = array();
 
@@ -102,7 +102,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.2.0
 		 */
 		private static $core_tables = array();
 
@@ -690,7 +690,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.2.0
 		 */
 		public static function get_wp_core_tables() {
 			if ( empty( self::$core_tables ) ) {
