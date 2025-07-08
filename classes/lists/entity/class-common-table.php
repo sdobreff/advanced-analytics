@@ -661,11 +661,11 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 				$wpdb->suppress_errors( true );
 				$results = $wpdb->get_results(
-					$wpdb->prepare(
+					// $wpdb->prepare(
 						// 'SELECT table_name FROM information_schema.tables WHERE table_schema = %s;',
-						'SHOW TABLES;',
-						$wpdb->dbname
-					),
+					'SHOW TABLES;',
+					// $wpdb->dbname
+					// ),
 					\ARRAY_A
 				);
 
