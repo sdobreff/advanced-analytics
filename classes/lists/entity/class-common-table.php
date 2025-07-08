@@ -89,13 +89,22 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		protected static $columns_info = array();
 
 		/**
-		 * Class cache that holds all of the tables in chema,
+		 * Class cache that holds all of the tables in schema.
 		 *
 		 * @var array
 		 *
 		 * @since latest
 		 */
 		private static $tables = array();
+
+		/**
+		 * Class cache that holds all core tables of WP.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $core_tables = array();
 
 		/**
 		 * Holds the prepared options for speeding the proccess
@@ -672,7 +681,23 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 				$wpdb->suppress_errors( false );
 			}
+
 			return self::$tables;
+		}
+
+		/**
+		 * Returns all of the core WP tables.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function get_wp_core_tables() {
+			if ( empty( self::$core_tables ) ) {
+				global $wpdb;
+				self::$core_tables = $wpdb->tables( 'all' );
+
+			}return self::$core_tables;
 		}
 
 		/**

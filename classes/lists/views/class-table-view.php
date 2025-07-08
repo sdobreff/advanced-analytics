@@ -63,9 +63,13 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 			$table = new Table_List( $table_name );
 			$table->prepare_items();
+			$core_table = '';
+			if ( in_array( $table_name, Common_Table::get_wp_core_tables(), true ) ) {
+				$core_table = ' ( <span class="dashicons dashicons-wordpress" aria-hidden="true" style="vertical-align: middle;"></span> ) ';
+			}
 			?>
 				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo \esc_html( $table_name ); ?></h1>
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo  $core_table . \esc_html( $table_name ); ?></h1>
 					
 					<hr class="wp-header-end">
 					<form id="table-filter" method="get">

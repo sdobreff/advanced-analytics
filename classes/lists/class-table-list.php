@@ -510,15 +510,19 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 			<div class="alignleft actions bulkactions">
 				
-				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table">
+				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table" style="font-family: dashicons;">
 					<?php
 					foreach ( Common_Table::get_tables() as $table ) {
 						$selected = '';
 						if ( self::$table::get_name() === $table ) {
 							$selected = ' selected="selected"';
 						}
+						$core_table = '';
+						if ( in_array( $table, Common_Table::get_wp_core_tables(), true ) ) {
+							$core_table = ' ';
+						}
 						?>
-						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>"><?php echo \esc_html( $table );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></option>
+						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>" style="font-family: dashicons;"><?php echo $core_table . \esc_html( $table );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></option>
 						<?php
 					}
 					?>
@@ -538,8 +542,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 							});
 						</script>
 						<?php
-if ( 'top' === $which ) {
-	?>
+						if ( 'top' === $which ) {
+							?>
 					<style>
 					.flex {
 						display:flex;
@@ -580,7 +584,7 @@ if ( 'top' === $which ) {
 					/* .wp-list-table {
 						display: block;
 						overflow-x: auto;
-					    white-space: nowrap;
+						white-space: nowrap;
 					}
 					.wp-list-table tbody {
 						display: table;
@@ -593,12 +597,12 @@ if ( 'top' === $which ) {
 					} */
 
 				</style>
-<?php } ?>
+						<?php } ?>
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 					</div>
 					<div>
-						<b><?php \esc_html_e( 'Schema: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $wpdb->dbname ); ?></span> | <b><?php \esc_html_e( 'Tables: ', '0-day-analytics' ); ?></b><span class="italic"><?php echo \esc_attr( count(Common_Table::get_tables() )); ?></span>
+						<b><?php \esc_html_e( 'Schema: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $wpdb->dbname ); ?></span> | <b><?php \esc_html_e( 'Tables: ', '0-day-analytics' ); ?></b><span class="italic"><?php echo \esc_attr( count( Common_Table::get_tables() ) ); ?></span>
 					</div>
 				</div>
 				<?php
