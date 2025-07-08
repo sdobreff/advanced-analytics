@@ -569,10 +569,18 @@ if ( 'top' === $which ) {
 						font-size: 1.1em;
 						font-weight: bold;
 					}
+					#wpwrap {
+						overflow-x: hidden !important;
+					}
 					.wp-list-table {
+						white-space: nowrap;
 						display: block;
 						overflow-x: auto;
-						white-space: nowrap;
+					}
+					/* .wp-list-table {
+						display: block;
+						overflow-x: auto;
+					    white-space: nowrap;
 					}
 					.wp-list-table tbody {
 						display: table;
@@ -580,9 +588,9 @@ if ( 'top' === $which ) {
 					}
 					.wp-list-table thead {
 						position: sticky;
-  z-index: 2;
-  top: 0;
-					}
+						z-index: 2;
+						top: 0;
+					} */
 
 				</style>
 <?php } ?>

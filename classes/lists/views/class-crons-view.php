@@ -95,8 +95,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					$next_run_time_local = get_date_from_gmt( gmdate( 'Y-m-d H:\0\0:\0\0', $suggestion ), 'H:i:s' );
 				}
 
-				$arguments = \wp_json_encode( (array) $cron['args'] );
-
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Cron', '0-day-analytics' ); ?></h1>
@@ -106,64 +104,67 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 
 					if ( false === $cron ) {
 						?>
-					<div id="advaa-status-notice" class="notice notice-info">
-						<p><?php esc_html_e( 'Cron job does not exists or it has been executed', '0-day-analytics' ); ?></p>
-					</div>
+						<div id="advaa-status-notice" class="notice notice-info">
+							<p><?php esc_html_e( 'Cron job does not exists or it has been executed', '0-day-analytics' ); ?></p>
+						</div>
 						<?php
 					} else {
+
+						$arguments = \wp_json_encode( (array) $cron['args'] );
+
 						?>
 	
-					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
-						<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
-						<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::UPDATE_ACTION ); ?>" />
-						<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
+						<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
+							<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
+							<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
+							<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::UPDATE_ACTION ); ?>" />
+							<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
 
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th><?php esc_html_e( 'Hook', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $cron['hook'] ); ?>" /></td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Next Run', '0-day-analytics' ); ?></th>
-									<td>
-										<?php
-										printf(
-											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
-											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
-											esc_attr( $next_run_date_local ),
-											esc_attr( $next_run_time_local )
-										);
-										?>
-									</td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Arguments', '0-day-analytics' ); ?></th>
-									<td>
-										<textarea class="large-text code" name="cron_args" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $arguments ); ?></textarea>
-										<?php
-										printf(
-										/* translators: 1, 2, and 3: Example values for an input field. */
-											esc_html__( 'Use a JSON encoded array, e.g. %1$s, %2$s, or %3$s', 'wp-crontrol' ),
-											'<code>[25]</code>',
-											'<code>["asdf"]</code>',
-											'<code>["i","want",25,"cakes"]</code>'
-										);
-										?>
-									</td>
-								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Schedule', '0-day-analytics' ); ?></th>
-									<td><?php Crons_Helper::schedule_drop_down( $cron['recurrence'] ); ?></td>
-								</tr>
-							</tbody>
-						</table>
-	
-						<p class="submit">
-							<?php \submit_button( '', 'primary', '', false ); ?>
-						</p>
-					</form>
+							<table class="form-table">
+								<tbody>
+									<tr>
+										<th><?php esc_html_e( 'Hook', '0-day-analytics' ); ?></th>
+										<td><input type="text" class="large-text code" name="name" value="<?php echo esc_attr( $cron['hook'] ); ?>" /></td>
+									</tr>
+									<tr>
+										<th><?php esc_html_e( 'Next Run', '0-day-analytics' ); ?></th>
+										<td>
+											<?php
+											printf(
+												'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
+												<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
+												esc_attr( $next_run_date_local ),
+												esc_attr( $next_run_time_local )
+											);
+											?>
+										</td>
+									</tr>
+									<tr>
+										<th><?php esc_html_e( 'Arguments', '0-day-analytics' ); ?></th>
+										<td>
+											<textarea class="large-text code" name="cron_args" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo esc_textarea( $arguments ); ?></textarea>
+											<?php
+											printf(
+											/* translators: 1, 2, and 3: Example values for an input field. */
+												esc_html__( 'Use a JSON encoded array, e.g. %1$s, %2$s, or %3$s', 'wp-crontrol' ),
+												'<code>[25]</code>',
+												'<code>["asdf"]</code>',
+												'<code>["i","want",25,"cakes"]</code>'
+											);
+											?>
+										</td>
+									</tr>
+									<tr>
+										<th><?php esc_html_e( 'Schedule', '0-day-analytics' ); ?></th>
+										<td><?php Crons_Helper::schedule_drop_down( $cron['recurrence'] ); ?></td>
+									</tr>
+								</tbody>
+							</table>
+		
+							<p class="submit">
+								<?php \submit_button( '', 'primary', '', false ); ?>
+							</p>
+						</form>
 						<?php
 					}
 					?>

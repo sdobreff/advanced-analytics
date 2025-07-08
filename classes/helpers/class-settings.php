@@ -1593,14 +1593,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
 
 				return sprintf(
-					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
+					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
 					self::get_error_log_page_link(),
 					__( 'Error Log', 'wp-security-audit-log' ),
 					self::get_crons_page_link(),
 					__( 'Crons', 'wp-security-audit-log' ),
-					self::get_transients_page_link(),
-					__( 'Tables', 'wp-security-audit-log' ),
 					self::get_tables_page_link(),
+					__( 'Tables', 'wp-security-audit-log' ),
+					self::get_transients_page_link(),
 					__( 'Transients', 'wp-security-audit-log' ),
 					__( 'Version ', 'wp-security-audit-log' ),
 					ADVAN_VERSION

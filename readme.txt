@@ -30,13 +30,13 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Option to enable or disable logging via the admin interface.
 - Optimized for high-performance even with large log files.
 - Provides insights into logged errors for efficient troubleshooting.
-- Build-in fully functional Cron manager.
-- Build-in fully functional Transients manager.
-- Build-in Table manager.
-- Build-in badge that shows you current environment type.
+- Built-in fully functional Cron manager.
+- Built-in fully functional Transients manager.
+- Built-in Table manager.
+- Built-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
 - Easily plugin version switch (the ones from official WP marketstore).
-- Build-in dark mode.
+- Built-in dark mode.
 
 == Installation ==
 
@@ -77,10 +77,10 @@ Because of its extremely poor implementation and interfering with the proper Wor
 1. **Error Log Overview** - Displays a summary of recent errors logged.
 2. **Settings Page** - Toggle logging options and configure advanced settings.
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
-4. **Cron manager** - Build-in is very powerful cron manager.
-5. **Transients manager** - Build-in is very powerful transients manager.
-6. **Table manager** - Build-in is very powerful SQL table manager.
-7. **Plugin Version Switcher** - Build-in plugin version switcher.
+4. **Cron manager** - Built-in is very powerful cron manager.
+5. **Transients manager** - Built-in is very powerful transients manager.
+6. **Table manager** - Built-in is very powerful SQL table manager.
+7. **Plugin Version Switcher** - Built-in plugin version switcher.
 
 == Changelog ==
 
