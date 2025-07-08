@@ -84,16 +84,16 @@ require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 \set_exception_handler( array( WP_Error_Handler::class, 'exception_handler' ) );
 
 if ( ! Context_Helper::is_installing() ) {
-	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 10, 4 );
+	\add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 0, 4 );
 	\add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 0, 3 );
 	\add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 20, 3 );
 
 	// All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.
-	\add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
-	\add_action( 'deprecated_constructor_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
-	\add_action( 'deprecated_class_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
-	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
-	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 10, 3 );
+	\add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_constructor_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_class_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
 	if ( ! Settings::get_current_options()['no_wp_die_monitor'] ) {

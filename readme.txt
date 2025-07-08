@@ -79,8 +79,8 @@ Because of its extremely poor implementation and interfering with the proper Wor
 3. **Setting reset / import / export** - You can upload or reset plugin settings from here.
 4. **Cron manager** - Built-in is very powerful cron manager.
 5. **Transients manager** - Built-in is very powerful transients manager.
-6. **Table manager** - Built-in is very powerful SQL table manager.
-7. **Plugin Version Switcher** - Built-in plugin version switcher.
+6. **Plugin Version Switcher** - Built-in plugin version switcher.
+7. **Table manager** - Built-in is very powerful SQL table manager.
 
 == Changelog ==
 

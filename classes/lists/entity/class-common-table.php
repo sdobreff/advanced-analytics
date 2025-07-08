@@ -252,6 +252,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 					static::$real_id = $result[0]['Column_name'];
 				}
 			}
+
 			return static::$real_id;
 		}
 
