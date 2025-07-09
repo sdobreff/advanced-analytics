@@ -127,13 +127,13 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 			if ( isset( $_REQUEST['table_filter_top'] ) || isset( $_REQUEST['table_filter_bottom'] ) ) {
 
-				if ( check_admin_referer( Table_List::SWITCH_ACTION, Table_List::SWITCH_ACTION . 'nonce' ) && \in_array( $_REQUEST['table_filter_top'], Common_Table::get_tables(), true ) ) {
+				if ( \check_admin_referer( Table_List::SWITCH_ACTION, Table_List::SWITCH_ACTION . 'nonce' ) && \in_array( $_REQUEST['table_filter_top'], Common_Table::get_tables(), true ) ) {
 					$table = $_REQUEST['table_filter_top']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
 					\wp_safe_redirect(
 						\remove_query_arg(
 							array( 'deleted' ),
-							add_query_arg(
+							\add_query_arg(
 								array(
 									'page'       => Settings::TABLE_MENU_SLUG,
 									Table_List::SEARCH_INPUT => Table_List::escaped_search_input(),
@@ -145,6 +145,22 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					);
 					exit;
 				}
+			}
+		}
+
+		/**
+		 * Removes unnecessary arguments if present and reloads.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function page_load() {
+			if ( ! empty( $_GET['_wp_http_referer'] ) ) {
+				\wp_redirect(
+					\remove_query_arg( array( '_wp_http_referer', '_wpnonce' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
+				);
+				exit;
 			}
 		}
 	}

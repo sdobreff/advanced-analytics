@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -15,8 +15,9 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - Read and analyze error logs even if the error log is gigabytes of size. (Only up to last 100 records are shown) Filtering by type is supported. The limitation is necessary for two reasons - first if there are more errors they are either not relevant or repeating ones, and second - that way your server will continue operate without any interruptions even if your log is few gigs of data.
 - Enable or disable error logging directly from the WordPress dashboard.
 - Manage large log files without performance degradation.
-- **Cron manager** at the tip of your fingers (edit / delete / run)
-- **Transient manager** - all (stored in the DB) transients (edit / delete)
+- **Cron manager** at the tip of your fingers (edit / delete / run).
+- **Transient manager** - all (stored in the DB) transients (edit / delete).
+- **SQL tables manager** - From here you can see and delete records from all the tables currently present in the Database.
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
 - Easily see where exactly error is thrown (where detected)
@@ -83,6 +84,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 7. **Table manager** - Built-in is very powerful SQL table manager.
 
 == Changelog ==
+
+= 2.2.2 =
+Bug fixes. Added confirmation dialog when delete DB table record from the quick menu. Logic improvements.
 
 = 2.2.1 =
 Fixed "doing_it_wrong" error.

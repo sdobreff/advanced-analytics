@@ -189,6 +189,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
 
 			\add_action( 'admin_post_' . Table_List::SWITCH_ACTION, array( Table_View::class, 'switch_action' ) );
+			\add_action( 'load-' . Table_List::PAGE_SLUG, array( Table_View::class, 'page_load' ) );
 
 			/**
 			 * Draws the save button in the settings
