@@ -809,7 +809,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.3.0
 		 */
 		private static function get_screen_per_page_title(): string {
 			return __( 'Number of errors to read', '0-day-analytics' );

@@ -903,7 +903,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return string The fully formatted file link or file name, safe for output.
 		 *
-		 * @since latest
+		 * @since 2.3.0
 		 */
 		public static function output_filename( $text, $file, $line = 0, $is_filename = false ) {
 			if ( empty( $file ) ) {
