@@ -449,6 +449,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 									self::SEARCH_INPUT => self::escaped_search_input(),
 									'paged'            => $_REQUEST['paged'] ?? 1,
 									'page'             => Settings::TABLE_MENU_SLUG,
+									'show_table'       => self::$table::get_name(),
 								),
 								\admin_url( 'admin.php' )
 							)

@@ -69,7 +69,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 			}
 			?>
 				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo  $core_table . \esc_html( $table_name ); ?></h1>
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo $core_table . \esc_html( $table_name ); ?></h1>
 					
 					<hr class="wp-header-end">
 					<form id="table-filter" method="get">
@@ -80,6 +80,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
 					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+
+					printf( '<input type="hidden" name="show_table" value="%s" />', \esc_attr( $table_name ) );
 
 					echo '<div style="clear:both; float:right">';
 					$table->search_box(
