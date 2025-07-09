@@ -154,5 +154,43 @@ if ( ! class_exists( '\ADVAN\Lists\List_Trait' ) ) {
 				return self::$per_page;
 			}
 		}
+
+		/**
+		 * Adds a screen options to the current screen table.
+		 *
+		 * @param \WP_Hook $hook - The hook object to attach to.
+		 *
+		 * @return void
+		 *
+		 * @since 1.7.0
+		 */
+		public static function add_screen_options( $hook ) {
+			$screen_options = array( 'per_page' => static::get_screen_per_page_title() );
+
+			$result = array();
+
+			\array_walk(
+				$screen_options,
+				function ( &$a, $b ) use ( &$result ) {
+					$result[ static::SCREEN_OPTIONS_SLUG . '_' . $b ] = $a;
+				}
+			);
+			$screen_options = $result;
+
+			foreach ( $screen_options as $key => $value ) {
+				\add_action(
+					"load-$hook",
+					function () use ( $key, $value ) {
+						$option = 'per_page';
+						$args   = array(
+							'label'   => $value,
+							'default' => self::get_default_per_page(),
+							'option'  => $key,
+						);
+						\add_screen_option( $option, $args );
+					}
+				);
+			}
+		}
 	}
 }

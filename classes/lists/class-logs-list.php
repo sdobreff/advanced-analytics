@@ -805,41 +805,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Adds a screen options to the current screen table.
+		 * Returns translatet text for per page option
 		 *
-		 * @param \WP_Hook $hook - The hook object to attach to.
+		 * @return string
 		 *
-		 * @return void
-		 *
-		 * @since 1.1.0
+		 * @since latest
 		 */
-		public static function add_screen_options( $hook ) {
-			$screen_options = array( 'per_page' => __( 'Number of errors to read', '0-day-analytics' ) );
-
-			$result = array();
-
-			\array_walk(
-				$screen_options,
-				function ( &$a, $b ) use ( &$result ) {
-					$result[ self::SCREEN_OPTIONS_SLUG . '_' . $b ] = $a;
-				}
-			);
-			$screen_options = $result;
-
-			foreach ( $screen_options as $key => $value ) {
-				\add_action(
-					"load-$hook",
-					function () use ( $key, $value ) {
-						$option = 'per_page';
-						$args   = array(
-							'label'   => $value,
-							'default' => self::get_default_per_page(),
-							'option'  => $key,
-						);
-						\add_screen_option( $option, $args );
-					}
-				);
-			}
+		private static function get_screen_per_page_title(): string {
+			return __( 'Number of errors to read', '0-day-analytics' );
 		}
 
 		/**

@@ -362,7 +362,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {
 				\wp_redirect(
-					\remove_query_arg( array( '_wp_http_referer', '_wpnonce', 'action', 'action2' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
+					\remove_query_arg( array( '_wp_http_referer', 'bulk_action' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
 				);
 				exit;
 			}

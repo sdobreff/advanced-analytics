@@ -91,7 +91,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		/**
 		 * Events Query Arguments.
 		 *
-		 * @since 1.7.0
 		 * @since 1.7.0 Transformed to array
 		 *
 		 * @var array
@@ -492,7 +491,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			 */
 			$actions = array(
 				'delete' => __( 'Delete', '0-day-security' ),
-				// 'run'    => __( 'Run', '0-day-security' ),
 			);
 
 			return $actions;
@@ -514,9 +512,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			 * Action2 - is set if checkbox the bottom-most select-all checkbox is set, otherwise returns -1
 			 */
 
-			// check for individual row actions.
-			$the_table_action = $this->current_action();
-
 			// check for table bulk actions.
 			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) ) {
 				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
@@ -537,51 +532,37 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 						}
 					}
 				}
+
+				$redirect =
+				\remove_query_arg(
+					array( 'delete', '_wpnonce', 'bulk_action', 'advanced_transients' ),
+					\add_query_arg(
+						array(
+							self::SEARCH_INPUT => self::escaped_search_input(),
+							'paged'            => $_REQUEST['paged'] ?? 1,
+							'page'             => Settings::TRANSIENTS_MENU_SLUG,
+						),
+						\admin_url( 'admin.php' )
+					)
+				);
+
 				?>
-				<script>
-					jQuery('body').addClass('has-overlay');
-					
-				</script>
+			<script>
+				window.location.href = '<?php echo $redirect; ?>';
+			</script>
 				<?php
 			}
 		}
 
 		/**
-		 * Adds a screen options to the current screen table.
+		 * Returns translatet text for per page option
 		 *
-		 * @param \WP_Hook $hook - The hook object to attach to.
+		 * @return string
 		 *
-		 * @return void
-		 *
-		 * @since 1.7.0
+		 * @since latest
 		 */
-		public static function add_screen_options( $hook ) {
-			$screen_options = array( 'per_page' => __( 'Number of transients to show', '0-day-analytics' ) );
-
-			$result = array();
-
-			\array_walk(
-				$screen_options,
-				function ( &$a, $b ) use ( &$result ) {
-					$result[ self::SCREEN_OPTIONS_SLUG . '_' . $b ] = $a;
-				}
-			);
-			$screen_options = $result;
-
-			foreach ( $screen_options as $key => $value ) {
-				\add_action(
-					"load-$hook",
-					function () use ( $key, $value ) {
-						$option = 'per_page';
-						$args   = array(
-							'label'   => $value,
-							'default' => self::get_default_per_page(),
-							'option'  => $key,
-						);
-						\add_screen_option( $option, $args );
-					}
-				);
-			}
+		private static function get_screen_per_page_title(): string {
+			return __( 'Number of transients to show', '0-day-analytics' );
 		}
 
 		/**

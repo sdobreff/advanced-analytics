@@ -69,7 +69,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 			}
 			?>
 				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo $core_table . \esc_html( $table_name ); ?></h1>
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Table: ', '0-day-analytics' ); ?><?php echo $core_table . \esc_html( $table_name );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 					
 					<hr class="wp-header-end">
 					<form id="table-filter" method="get">
@@ -158,7 +158,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {
 				\wp_redirect(
-					\remove_query_arg( array( '_wp_http_referer', '_wpnonce', 'action', 'action2' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
+					\remove_query_arg( array( '_wp_http_referer' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
 				);
 				exit;
 			}

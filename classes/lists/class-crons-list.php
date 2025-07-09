@@ -428,7 +428,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						}
 
 						if ( 'action_scheduler_run_queue' === $item['hook'] ) {
-							// $callbacks[] = '';
 							if ( \count( $callbacks ) ) {
 								$callbacks[ \array_key_last( $callbacks ) ] .= sprintf(
 									'<br><span class="status-crontrol-info"><span class="dashicons dashicons-info" aria-hidden="true"></span> <a href="%s">%s</a></span>',
@@ -516,7 +515,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			 */
 
 			// check for individual row actions.
-			$the_table_action = $this->current_action();
 
 			// check for table bulk actions.
 			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) ) {
@@ -538,10 +536,22 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						}
 					}
 				}
+
+				$redirect =
+				\remove_query_arg(
+					array( 'delete', '_wpnonce' ),
+					\add_query_arg(
+						array(
+							self::SEARCH_INPUT => self::escaped_search_input(),
+							'page'             => Settings::CRON_MENU_SLUG,
+						),
+						\admin_url( 'admin.php' )
+					)
+				);
+
 				?>
 				<script>
-					jQuery('body').addClass('has-overlay');
-					
+					window.location.href = '<?php echo $redirect; ?>';
 				</script>
 				<?php
 			}
@@ -564,10 +574,22 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 						}
 					}
 				}
+
+				$redirect =
+				\remove_query_arg(
+					array( 'delete', '_wpnonce' ),
+					\add_query_arg(
+						array(
+							self::SEARCH_INPUT => self::escaped_search_input(),
+							'page'             => Settings::CRON_MENU_SLUG,
+						),
+						\admin_url( 'admin.php' )
+					)
+				);
+
 				?>
 				<script>
-					jQuery('body').addClass('has-overlay');
-					
+					window.location.href = '<?php echo $redirect; ?>';
 				</script>
 				<?php
 			}
@@ -874,13 +896,14 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		/**
 		 * Returns a file path, name, and line number, or a clickable link to the file. Safe for output.
 		 *
-		 * @link https://querymonitor.com/help/clickable-stack-traces-and-function-names/
-		 *
 		 * @param  string $text        The display text, such as a function name or file name.
 		 * @param  string $file        The full file path and name.
 		 * @param  int    $line        Optional. A line number, if appropriate.
 		 * @param  bool   $is_filename Optional. Is the text a plain file name? Default false.
+		 *
 		 * @return string The fully formatted file link or file name, safe for output.
+		 *
+		 * @since latest
 		 */
 		public static function output_filename( $text, $file, $line = 0, $is_filename = false ) {
 			if ( empty( $file ) ) {
