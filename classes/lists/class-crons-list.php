@@ -521,7 +521,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			// check for table bulk actions.
 			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) ) {
 				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
+					self::graceful_exit();
 				}
 				/**
 				 * Note: the nonce field is set by the parent class
@@ -547,7 +547,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			}
 			if ( ( ( isset( $_REQUEST['action'] ) && 'run' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'run' === $_REQUEST['action2'] ) ) ) {
 				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
+					self::graceful_exit();
 				}
 				/**
 				 * Note: the nonce field is set by the parent class
@@ -640,43 +640,46 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 							e.preventDefault();
 
-							let that = this;
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this cron?', '0-day-analytics' ); ?>' ) ) {
 
-							jQuery(that).css({
-								"pointer-events": "none",
-								"cursor": "default"
-							});
-
-							var data = {
-								'action': 'aadvana_delete_cron',
-								'post_type': 'GET',
-								'_wpnonce': jQuery(this).data('nonce'),
-								'hash': jQuery(this).data('hash'),
-							};
-
-							jQuery.get(ajaxurl, data, function(response) {
-
-								if ( 2 === response['data'] || 0 === response['data'] ) {
-									jQuery(that).closest("tr").animate({
-										opacity: 0
-									}, 1000, function() {
-										jQuery(that).closest("tr").remove();
-									});
-								} else {
-									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
-								}
-							}, 'json').fail(function(xhr, status, error) {
-								if ( xhr.responseJSON && xhr.responseJSON.data ) {
-									errorMessage = xhr.responseJSON.data;
-									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
-								}
-							}).always(function() {
+								let that = this;
 
 								jQuery(that).css({
-									"pointer-events": "",
-									"cursor": ""
-								})
-							});
+									"pointer-events": "none",
+									"cursor": "default"
+								});
+
+								var data = {
+									'action': 'aadvana_delete_cron',
+									'post_type': 'GET',
+									'_wpnonce': jQuery(this).data('nonce'),
+									'hash': jQuery(this).data('hash'),
+								};
+
+								jQuery.get(ajaxurl, data, function(response) {
+
+									if ( 2 === response['data'] || 0 === response['data'] ) {
+										jQuery(that).closest("tr").animate({
+											opacity: 0
+										}, 1000, function() {
+											jQuery(that).closest("tr").remove();
+										});
+									} else {
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
+									}
+								}, 'json').fail(function(xhr, status, error) {
+									if ( xhr.responseJSON && xhr.responseJSON.data ) {
+										errorMessage = xhr.responseJSON.data;
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+									}
+								}).always(function() {
+
+									jQuery(that).css({
+										"pointer-events": "",
+										"cursor": ""
+									})
+								});
+							}
 
 						});
 						jQuery('.aadvana-cron-run').on('click', function(e){

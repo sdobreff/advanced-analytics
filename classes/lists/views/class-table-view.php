@@ -153,12 +153,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.3.0
 		 */
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {
 				\wp_redirect(
-					\remove_query_arg( array( '_wp_http_referer', '_wpnonce' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
+					\remove_query_arg( array( '_wp_http_referer', '_wpnonce', 'action', 'action2' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
 				);
 				exit;
 			}

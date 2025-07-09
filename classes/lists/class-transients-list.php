@@ -520,7 +520,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			// check for table bulk actions.
 			if ( ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) ) {
 				if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-					$this->graceful_exit();
+					self::graceful_exit();
 				}
 				/**
 				 * Note: the nonce field is set by the parent class
@@ -626,38 +626,39 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 						jQuery('.aadvana-transient-delete').on('click', function(e){
 
 							e.preventDefault();
-
-							let that = this;
-
-							jQuery(that).css({
-								"pointer-events": "none",
-								"cursor": "default"
-							});
-
-							var data = {
-								'action': 'aadvana_delete_transient',
-								'post_type': 'GET',
-								'_wpnonce': jQuery(this).data('nonce'),
-								'id': jQuery(this).data('id'),
-							};
-
-							jQuery.get(ajaxurl, data, function(response) {
-								if ( 2 === response['data'] || 0 === response['data'] ) {
-									jQuery(that).closest("tr").animate({
-										opacity: 0
-									}, 1000, function() {
-										jQuery(that).closest("tr").remove();
-									});
-								} else {
-									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
-								}
-							}, 'json').always(function() {
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this transient?', '0-day-analytics' ); ?>' ) ) {
+								let that = this;
 
 								jQuery(that).css({
-									"pointer-events": "",
-									"cursor": ""
-								})
-							});
+									"pointer-events": "none",
+									"cursor": "default"
+								});
+
+								var data = {
+									'action': 'aadvana_delete_transient',
+									'post_type': 'GET',
+									'_wpnonce': jQuery(this).data('nonce'),
+									'id': jQuery(this).data('id'),
+								};
+
+								jQuery.get(ajaxurl, data, function(response) {
+									if ( 2 === response['data'] || 0 === response['data'] ) {
+										jQuery(that).closest("tr").animate({
+											opacity: 0
+										}, 1000, function() {
+											jQuery(that).closest("tr").remove();
+										});
+									} else {
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
+									}
+								}, 'json').always(function() {
+
+									jQuery(that).css({
+										"pointer-events": "",
+										"cursor": ""
+									})
+								});
+							}
 
 						});
 					});

@@ -740,5 +740,32 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 			return self::$table_size;
 		}
+
+		/**
+		 * Extracts table information and returns it
+		 *
+		 * @return array
+		 *
+		 * @since 2.3.0
+		 */
+		public static function get_table_status(): array {
+			global $wpdb;
+
+			$sql = 'SHOW TABLE STATUS FROM ' . $wpdb->dbname . ' LIKE \'' . self::get_name() . '\'; ';
+
+			$wpdb->suppress_errors( true );
+
+			$results = $wpdb->get_results( $sql, \ARRAY_A );
+
+			if ( '' !== $wpdb->last_error || null === $results ) {
+
+					$results = array();
+
+			}
+
+			$wpdb->suppress_errors( false );
+
+			return $results;
+		}
 	}
 }

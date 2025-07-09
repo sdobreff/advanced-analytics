@@ -185,6 +185,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( Transients_View::class, 'update_transient' ) );
 			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
+			\add_action( 'load-' . Transients_List::PAGE_SLUG, array( Transients_View::class, 'page_load' ) );
 			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
 			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
 

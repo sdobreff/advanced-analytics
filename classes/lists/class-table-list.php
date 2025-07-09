@@ -393,7 +393,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				if ( 'view_data' === $the_table_action ) {
 
 					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-						$this->graceful_exit();
+						self::graceful_exit();
 					}
 					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
 					// verify the nonce.
@@ -401,14 +401,14 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 						$this->invalid_nonce_redirect();
 					} elseif ( isset( $_REQUEST[ self::$table::get_name() . '_id' ] ) ) {
 						$this->page_view_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
-						$this->graceful_exit();
+						self::graceful_exit();
 					}
 				}
 
 				if ( 'add_data' === $the_table_action ) {
 
 					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-						$this->graceful_exit();
+						self::graceful_exit();
 					}
 					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
 
@@ -417,7 +417,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 						$this->invalid_nonce_redirect();
 					} else {
 						$this->page_add_data( absint( $_REQUEST[ self::$table::get_name() . '_id' ] ) );
-						$this->graceful_exit();
+						self::graceful_exit();
 					}
 				}
 
@@ -425,7 +425,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				if ( ( isset( $_REQUEST['action'] ) && 'delete' === $_REQUEST['action'] ) || ( isset( $_REQUEST['action2'] ) && 'delete' === $_REQUEST['action2'] ) ) {
 
 					if ( ! isset( $_REQUEST['_wpnonce'] ) ) {
-						$this->graceful_exit();
+						self::graceful_exit();
 					}
 					$nonce = \sanitize_text_field( \wp_unslash( $_REQUEST['_wpnonce'] ) );
 					// verify the nonce.
@@ -601,6 +601,42 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 						<?php } ?>
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
+
+					<?php
+					$table_info = Common_Table::get_table_status();
+					if ( ! empty( $table_info ) && isset( $table_info[0] ) ) {
+
+						if ( isset( $table_info[0]['Engine'] ) ) {
+							?>
+							| <b><?php \esc_html_e( 'Engine: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Engine'] ); ?></span>
+							<?php
+						}
+
+						if ( isset( $table_info[0]['Auto_increment'] ) ) {
+							?>
+							| <b><?php \esc_html_e( 'Auto increment: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Auto_increment'] ); ?></span>
+							<?php
+						}
+
+						if ( isset( $table_info[0]['Collation'] ) ) {
+							?>
+							| <b><?php \esc_html_e( 'Collation: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Collation'] ); ?></span>
+							<?php
+						}
+
+						if ( isset( $table_info[0]['Create_time'] ) ) {
+							?>
+							| <b><?php \esc_html_e( 'Create time : ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Create_time'] ); ?></span>
+							<?php
+						}
+
+						if ( isset( $table_info[0]['Update_time'] ) ) {
+							?>
+							| <b><?php \esc_html_e( 'Update time : ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Update_time'] ); ?></span>
+							<?php
+						}
+					}
+					?>
 					</div>
 					<div>
 						<b><?php \esc_html_e( 'Schema: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $wpdb->dbname ); ?></span> | <b><?php \esc_html_e( 'Tables: ', '0-day-analytics' ); ?></b><span class="italic"><?php echo \esc_attr( count( Common_Table::get_tables() ) ); ?></span>
