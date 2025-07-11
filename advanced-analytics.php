@@ -11,7 +11,7 @@
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
  * Plugin Name:     WP Control
- * Description:     Provides WordPress analytics with a focus on performance and security.
+ * Description:     Take full control of error log, crons, transients, plugins and DB tables.
  * Version:         2.3.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
