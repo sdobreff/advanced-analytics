@@ -708,7 +708,7 @@ $doc.ready(function () {
     ------------------------------------------------------------------------------------------ */
     var $saveAlert = jQuery('#aadvana-saving-settings');
 
-    jQuery('#aadvana_form').submit(function () {
+    jQuery('#aadvana_form').on( 'submit' , function () {
 
         // Check if the import field has a file
         var importSettings = jQuery('#aadvana-import-file').val();
@@ -744,8 +744,7 @@ $doc.ready(function () {
                 }
                 else if (response.data == 2) {
                     // Disk operations take some time to be done - so postpone the reload with 2 seconds.
-                    setTimeout(function () { location.reload( true ); }, 2000);
-                    
+                    setTimeout(function () { window.location.reload(); }, 2000);
                 }
                 else {
                     $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
