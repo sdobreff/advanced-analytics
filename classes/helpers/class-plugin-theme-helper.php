@@ -116,7 +116,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		}
 
 		/**
-		 * Tries to find the path root for the thems (not exactly possible as they might be everywhere but it gets the current theme and extracts the path from there)
+		 * Tries to find the path root for the theme (not exactly possible as they might be everywhere but it gets the current theme and extracts the path from there)
 		 *
 		 * @return string
 		 *

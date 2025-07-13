@@ -580,7 +580,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						</div>
 						<div class=""><span><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> </div>
 				</div>';
-					$message .= '<span class="error_message">'.\esc_html( $item[ $column_name ] ).'</span>';
+					$message .= '<span class="error_message">' . \esc_html( $item[ $column_name ] ) . '</span>';
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
 						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', '0-day-analytics' ) . '"></div>';
 
@@ -717,13 +717,19 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
 								$name = $theme->get( 'Name' );
 
-								$name = ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' );
+								$version = $theme->get( 'Version' );
+								$version = ( ! empty( $version ) ) ? '<br>' . __( 'Current version: ', '0-day-analytics' ) . $version : '<br>' . __( 'Unknown version', '0-day-analytics' );
+
+								$name = ( ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' ) ) . $version;
 
 								$parent = $theme->parent(); // ( 'parent_theme' );
 								if ( $parent ) {
 									$parent = $theme->parent()->get( 'Name' );
 
-									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '</div>' : '';
+									$parent_version = $theme->parent()->get( 'Version' );
+									$parent_version = ( ! empty( $parent_version ) ) ? $parent_version : __( 'Unknown version', '0-day-analytics' );
+
+									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '<br>' . __( 'Parent Current Version: ', '0-day-analytics' ) . $parent_version . '</div>' : '';
 								}
 								$name .= (string) $parent;
 
@@ -869,8 +875,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					jQuery( document ).on( 'click', '.generated-logs .dashicons-clipboard', function( e ) {
 						let selectedText = jQuery(this).parent().parent().parent().next().closest('.error_message').text();
 
-						if ( jQuery(this).parent().parent().parent().next().closest('.log_details_show').length ) {
-							selectedText = selectedText + '\n' .jQuery(this).parent().parent().parent().next().closest('.log_details_show').text();
+						if ( jQuery(this).parent().parent().parent().next().next().next('.log_details_show').children('pre').length ) {
+							selectedText = selectedText + '\n\n' + '<?php \esc_html_e( 'Trace:', '0-day-analytics' ); ?>' + '\n' + jQuery(this).parent().parent().parent().next().next().next('.log_details_show').children('pre').html();
+
+							selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+							selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+							selectedText = jQuery(selectedText).text();
 						}
 
 						navigator.clipboard.writeText(selectedText);
