@@ -575,7 +575,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					);
 
 				case 'message':
-					$message = esc_html( $item[ $column_name ] );
+					$message  = '<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					<div>
+						</div>
+						<div class=""><span><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> </div>
+				</div>';
+					$message .= '<span class="error_message">'.\esc_html( $item[ $column_name ] ).'</span>';
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
 						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', '0-day-analytics' ) . '"></div>';
 
@@ -671,14 +676,14 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 
 						if ( isset( self::$sources[ $plugin_base ] ) ) {
-							return __( 'Plugin: ', '0-day-analytics' ) . esc_html( self::$sources[ $plugin_base ]['Name'] ) . $source_link;
+							return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources[ $plugin_base ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
 						} else {
 
 							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
 
 							if ( ! empty( $plugin ) ) {
 								self::$sources[ $plugin_base ] = $plugin;
-								return __( 'Plugin: ', '0-day-analytics' ) . esc_html( $plugin['Name'] ) . $source_link;
+								return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( $plugin['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
 							}
 						}
 					}
@@ -704,7 +709,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 
 						if ( isset( self::$sources[ $theme_base ] ) ) {
-							return __( 'Theme: ', '0-day-analytics' ) . esc_html( self::$sources[ $theme_base ] ) . $source_link;
+							return __( 'Theme: ', '0-day-analytics' ) . '<b>' . esc_html( self::$sources[ $theme_base ] ) . '</b>' . $source_link;
 						} else {
 
 							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
@@ -723,18 +728,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 								$name .= (string) $parent;
 
 								self::$sources[ $theme_base ] = $name;
-								return __( 'Theme: ', '0-day-analytics' ) . ( $name ) . $source_link;
+								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
 							}
 						}
 					}
 					if ( false !== \mb_strpos( $message, ABSPATH . WPINC . \DIRECTORY_SEPARATOR ) ) {
-						return __( 'WP Core', '0-day-analytics' ) . $source_link;
+						return '<span><span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ' . __( 'WP Core', '0-day-analytics' ) . $source_link;
 					}
 
 					$admin_path = str_replace( \get_home_url( 1 ) . '/', ABSPATH, \network_admin_url() );
 
 					if ( false !== \mb_strpos( $message, $admin_path ) ) {
-						return __( 'WP Admin Core', '0-day-analytics' ) . $source_link;
+						return '<span><span class="dashicons dashicons-wordpress" aria-hidden="true"></span></span> ' . __( 'WP Admin Core', '0-day-analytics' ) . $source_link;
 					}
 					if ( isset( $item['source'] ) && 'wp_error' === $item['source'] ) {
 						return __( 'WP Error thrown', '0-day-analytics' );
@@ -861,6 +866,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				?>
 				<script>
+					jQuery( document ).on( 'click', '.generated-logs .dashicons-clipboard', function( e ) {
+						let selectedText = jQuery(this).parent().parent().parent().next().closest('.error_message').text();
+
+						if ( jQuery(this).parent().parent().parent().next().closest('.log_details_show').length ) {
+							selectedText = selectedText + '\n' .jQuery(this).parent().parent().parent().next().closest('.log_details_show').text();
+						}
+
+						navigator.clipboard.writeText(selectedText);
+					});
 					jQuery( document ).on( 'click', '#top-truncate, #bottom-truncate', function ( e ) {
 						var data = {
 							'action': 'advanced_analytics_truncate_log_file',
@@ -1187,8 +1201,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						height: 400px;
 						overflow-y: auto;
 					}
-					.generated-logs #timestamp { width: 15%; }
-					.generated-logs #severity { width: 10%; }
+					.generated-logs #timestamp { width: 12%; }
+					.generated-logs #severity { width: 7%; }
+					.generated-logs #message { width: 60%; }
 
 					<?php
 					foreach ( Settings::get_current_options()['severities'] as $class => $properties ) {
