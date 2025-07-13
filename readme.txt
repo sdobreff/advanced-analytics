@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.1
 Requires PHP: 7.4
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -84,6 +84,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 7. **Table manager** - Built-in is very powerful SQL table manager.
 
 == Changelog ==
+
+= 2.4.0 =
+Code and UI improvements. JS fixes.
 
 = 2.3.0 =
 Bug fixes. Added single rows delete confirmation. Table information included.
