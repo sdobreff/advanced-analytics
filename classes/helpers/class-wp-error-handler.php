@@ -167,9 +167,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
 			}
@@ -256,9 +253,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
 			}
@@ -333,9 +327,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_DISPLAY ) {
-				echo nl2br( $out ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			}
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
 			}

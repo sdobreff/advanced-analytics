@@ -125,6 +125,15 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		private static $table_size = null;
 
 		/**
+		 * Inner class cache to store the table status
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $table_stat = array();
+
+		/**
 		 * Inits the class and sets the vars
 		 *
 		 * @param string $table_name - The name of the table to use.
@@ -749,23 +758,41 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @since 2.3.0
 		 */
 		public static function get_table_status(): array {
-			global $wpdb;
 
-			$sql = 'SHOW TABLE STATUS FROM ' . $wpdb->dbname . ' LIKE \'' . self::get_name() . '\'; ';
+			if ( empty( self::$table_stat ) ) {
+				global $wpdb;
 
-			$wpdb->suppress_errors( true );
+				$sql = 'SHOW TABLE STATUS FROM ' . $wpdb->dbname . ' LIKE \'' . self::get_name() . '\'; ';
 
-			$results = $wpdb->get_results( $sql, \ARRAY_A );
+				$wpdb->suppress_errors( true );
 
-			if ( '' !== $wpdb->last_error || null === $results ) {
+				$results = $wpdb->get_results( $sql, \ARRAY_A );
+
+				if ( '' !== $wpdb->last_error || null === $results ) {
 
 					$results = array();
 
+				}
+
+				$wpdb->suppress_errors( false );
+
+				self::$table_stat = $results;
 			}
 
-			$wpdb->suppress_errors( false );
+			return self::$table_stat;
+		}
 
-			return $results;
+		/**
+		 * Returns the default table to show if none selected.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_default_table(): string {
+			global $wpdb;
+
+			return $wpdb->prefix . 'options';
 		}
 	}
 }

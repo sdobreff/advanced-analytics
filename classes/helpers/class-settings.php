@@ -117,7 +117,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * The link to the WP admin settings page
 		 *
 		 * @var string
-		 * 
+		 *
 		 * @since 1.2.0
 		 */
 		private static $settings_page_link = '';
@@ -126,7 +126,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * The link to the WP admin settings page
 		 *
 		 * @var string
-		 * 
+		 *
 		 * @since 1.2.0
 		 */
 		private static $settings_crons_link = '';
@@ -587,7 +587,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				// \add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
 
-				// \add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
+				\add_action( 'load-' . $table_hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				/* Table end */
 
@@ -800,6 +800,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						'id'      => 'advanced-analytics-help-tab',
 						'title'   => __( 'Help', '0-day-analytics' ),
 						'content' => Crons_View::add_help_content_crons(),
+					)
+				);
+			}
+
+			if ( Table_List::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'Table Info', '0-day-analytics' ),
+						'content' => Table_View::add_config_content_table(),
+					)
+				);
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-info-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => Table_View::add_help_content_table(),
 					)
 				);
 			}

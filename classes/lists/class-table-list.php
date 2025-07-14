@@ -124,7 +124,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 			$items = $this->fetch_table_data();
 
 			$columns = self::$table::manage_columns( array() );
-			$hidden  = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
+			$hidden  = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
