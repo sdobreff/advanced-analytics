@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace ADVAN\ControllersApi;
 
+use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Logs_List;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
@@ -40,7 +41,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'live'     => array(
+				'live'       => array(
 					'class'     => Logs_List::class,
 					'namespace' => 'wp-control/v1',
 
@@ -57,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'severity' => array(
+				'severity'   => array(
 					'class'     => Logs_List::class,
 					'namespace' => 'wp-control/v1',
 
@@ -78,6 +79,31 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 										'required'    => true,
 										'type'        => 'string',
 										'description' => 'Severity status',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'drop_table' => array(
+					'class'     => Common_Table::class,
+					'namespace' => 'wp-control/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<table_name>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::DELETABLE,
+									'callback' => 'drop_table',
+								),
+								'args'             => array(
+									'table_name' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'pattern'     => '\w+',
+										'description' => 'Severity name',
 									),
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),

@@ -228,6 +228,46 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					<?php
 				}
 
+				if ( ! \in_array( $table_info[0]['Name'], Common_Table::get_wp_core_tables() ) ) {
+					?>
+				<input type="button" name="bulk_action" id="drop_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Drop Table', '0-day-analytics' ); ?>">
+
+				<script>
+					let action = document.getElementById("drop_table");
+
+					action.onclick = tableDrop;
+
+					async function tableDrop(e) {
+
+						if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this table? That operation is destrutive', '0-day-analytics' ); ?>' ) ) {
+							let tableName = e.target.getAttribute('data-table-name');
+
+							let attResp;
+
+							try {
+								attResp = await wp.apiFetch({
+									path: '/wp-control/v1/drop_table/' + tableName,
+									method: 'DELETE',
+									cache: 'no-cache'
+								});
+
+								if (attResp.success) {
+									
+									location.href= '<?php echo Settings::get_tables_page_link(); ?>';
+								} else if (attResp.message) {
+									jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+								}
+
+							} catch (error) {
+								throw error;
+							}
+						}
+					}
+
+				</script>
+					<?php
+				}
+
 				$help_text = \ob_get_clean();
 			}
 

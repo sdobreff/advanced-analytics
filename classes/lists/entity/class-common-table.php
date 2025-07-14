@@ -213,18 +213,41 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		/**
 		 * Drop the table from the DB.
 		 *
-		 * @param string $table_name - The name of the table, if one is not provided, the default will be used.
+		 * @param \WP_REST_Request $request - The request object.
+		 * @param string           $table_name - The name of the table, if one is not provided, the default will be used.
 		 *
-		 * @return void
+		 * @return \WP_REST_Response|\WP_Error
 		 *
 		 * @since 2.1.0
 		 */
-		public static function drop_table( string $table_name = '' ) {
+		public static function drop_table( ?\WP_REST_Request $request = null, string $table_name = '' ) {
+
+			if ( null !== $request ) {
+				$table_name = $request->get_param( 'table_name' );
+			}
+
 			if ( '' === $table_name ) {
 				$table_name = static::get_name();
 			}
 
-			self::execute_query( 'DROP TABLE IF EXISTS ' . static::get_name() ); // phpcs:ignore
+			if ( ! \in_array( $table_name, self::get_wp_core_tables(), true ) ) {
+
+				self::execute_query( 'DROP TABLE IF EXISTS ' . $table_name );
+			} elseif ( null !== $request ) {
+				return new \WP_Error(
+					'core_table',
+					__( 'Can not delete core table.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( null !== $request ) {
+				return rest_ensure_response(
+					array(
+						'success' => true,
+					)
+				);
+			}
 		}
 
 		/**
@@ -478,6 +501,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * Collects table column names
 		 *
 		 * @return array
+		 *
+		 * @since latest
 		 */
 		public static function get_column_names(): array {
 			$array = array_column( self::get_columns_info(), 'Field' );
@@ -488,6 +513,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * Returns the class shortname
 		 *
 		 * @return string
+		 *
+		 * @since latest
 		 */
 		public static function get_entity_name(): string {
 			return ( new \ReflectionClass( get_called_class() ) )->getShortName();
@@ -499,6 +526,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @param integer $id - The real id of the table.
 		 *
 		 * @return int|bool
+		 *
+		 * @since latest
 		 */
 		public static function delete_by_id( int $id ) {
 			global $wpdb;
@@ -520,6 +549,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @param array $data - Array with key and value pair.
 		 *
 		 * @return int bool
+		 *
+		 * @since latest
 		 */
 		public static function delete_data( array $data ) {
 			global $wpdb;
@@ -545,6 +576,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @param array $data - Array with key and value pair.
 		 *
 		 * @return int bool
+		 *
+		 * @since latest
 		 */
 		public static function update_data( array $data ) {
 			global $wpdb;
@@ -567,6 +600,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @param array $data - Array with key and value pair.
 		 *
 		 * @return int|bool
+		 *
+		 * @since latest
 		 */
 		public static function insert_data( array $data ) {
 			global $wpdb;
@@ -610,6 +645,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * @param array $data - The array to extract the data from.
 		 *
 		 * @return array
+		 *
+		 * @since latest
 		 */
 		protected static function extract_where( array &$data ): array {
 			$where[ self::get_real_id_name() ] = $data['data'][ self::get_real_id_name() ];
@@ -681,7 +718,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 				if ( '' !== $wpdb->last_error || null === $results ) {
 
-					self::$tables = $wpdb->tables( 'all' );
+					self::$tables = self::get_wp_core_tables();
 
 				} else {
 					foreach ( $results as $table ) {
@@ -707,7 +744,9 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				global $wpdb;
 				self::$core_tables = $wpdb->tables( 'all' );
 
-			}return self::$core_tables;
+			}
+
+			return self::$core_tables;
 		}
 
 		/**
