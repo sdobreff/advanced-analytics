@@ -61,6 +61,9 @@ Plugin is designed to be as fast as possible and work with enormously large log 
 = Why there is no pagination for error logs? =
 That is once again related to the nature of the error log - one single reload could generate tens of new errors, so paginating this would probably never come handy, and in order to paginate, the entire log must be read every time - which is extremely bad idea resource-wise.
 
+= Why I see 2 records for errors which look the same but one is with "Details" button? =
+Usually deprecated errors in WP and next to useless when it comes to guess what is causing them - WP Control captures deprecated WP errors as early as possible and even before the check if they should or not trigger error. That means the plugin will log deprecated error even if that given error is set (usually by other plugins) not to trigger error (silenced) and then will return the execution to the WordPress. That is done because this way plugin can provide very detailed information of what caused the error and when (in code) hence - the "Details" button. If the given error is not silenced, it will then trigger normal error which comes after the plugin check - that is the reason for 2 almost the same errors.
+
 = How do I enable or disable error logging? =  
 Go to "WP Control > Settings" in your WordPress dashboard and toggle the logging option as needed.
 
@@ -87,7 +90,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 2.4.1 =
-Removed messages when WP_DEBUG_DISPLAY is enabled as it produces "headers already sent" notification. Tables view now supports Truncate operation (for all tables) and Drop operation (for non wp core tables).
+Removed messages when WP_DEBUG_DISPLAY is enabled as it produces "headers already sent" notification. Tables view now supports Truncate operation (for all tables) and Drop operation (for non wp core tables). Deprecation WP functions improvements.
 
 = 2.4.0 =
 Code and UI improvements. JS fixes.

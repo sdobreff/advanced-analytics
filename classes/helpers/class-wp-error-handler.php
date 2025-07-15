@@ -280,8 +280,20 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				'function' => '',
 			);
 
+			if ( empty( $deprecated_name ) ) {
+				$deprecated_name = 'Unknown';
+			}
+
+			if ( ! empty( $version ) ) {
+				$version = ' as of version ' . $version;
+			}
+
+			if ( ! empty( $replacement ) ) {
+				$replacement = '. Replacement: ' . $replacement;
+			}
+
 			$php_error_name = 'DEPRECATED';
-			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . $version . $replacement . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
 			$trace      = debug_backtrace();
 			$main_shown = false;

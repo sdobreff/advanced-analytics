@@ -94,6 +94,7 @@ if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'deprecated_class_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_argument_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
 	if ( ! Settings::get_current_options()['no_wp_die_monitor'] ) {
