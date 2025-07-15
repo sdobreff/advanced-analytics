@@ -119,14 +119,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			// }
 			*/
 
-			// These are default values for a single trace.
-			// To prevent errors when a trace ommits some values.
-			$defaults = array(
-				'line'     => '',
-				'file'     => '',
-				'class'    => '',
-				'function' => '',
-			);
 			// $errfile  = self::clean_file_path( $errfile );
 			$php_error_name = self::error_code_to_string( $errno );
 			$out            = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
@@ -199,65 +191,40 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				return false;
 			}
 
-			$defaults = array(
-				'line'     => '',
-				'file'     => '',
-				'class'    => '',
-				'function' => '',
-			);
-
 			$php_error_name = self::error_code_to_string( $errno );
 			$out            = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
-			$trace      = debug_backtrace();
-			$main_shown = false;
-
-			$thrown_file = '';
-			$thrown_line = '';
-
-			$args = '';
-
-			// skip current function and require() in /index.php .
-			$counter = count( $trace ) - 3;
-			for ( $i = 1; $i < $counter; $i++ ) {
-				$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 3 ] );
-				$index = $i - 1;
-				$file  = $sf->file;
-				// $file  = self::clean_file_path( $sf->file );
-
-				if ( 1 === $i ) {
-					$thrown_file = $file;
-					$thrown_line = $sf->line;
-				}
-
-				$caller = '';
-				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
-					$caller = $sf->class . '::' . $sf->function . '()';
-				} elseif ( ! empty( $sf->function ) ) {
-					$caller = $sf->function . '()';
-				} else {
-					$main_shown = true;
-					$caller     = '{main}';
-				}
-
-				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
-					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
-				} else {
-					$args = '';
-				}
-
-				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
-
-			}
-			if ( ! $main_shown ) {
-				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
-			}
-			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_LOG ) {
-				error_log( $out );
-			}
+			self::trace_log( $out );
 
 			return $status;
+		}
+		/**
+		 * Fires when a deprecated constructor is called.
+		 *
+		 * @param string $deprecated_name   The class containing the deprecated constructor.
+		 * @param string $version      The version of WordPress that deprecated the function.
+		 * @param string $parent_class The parent class calling the deprecated constructor.
+		 *
+		 * @since latest
+		 */
+		public static function deprecated_constructor( $deprecated_name, $version, $parent_class ) {
+
+			if ( empty( $deprecated_name ) ) {
+				$deprecated_name = 'Unknown';
+			}
+
+			if ( ! empty( $version ) ) {
+				$version = ' as of version ' . $version;
+			}
+
+			if ( ! empty( $parent_class ) ) {
+				$parent_class = '. Parent class: ' . $parent_class;
+			}
+
+			$php_error_name = 'DEPRECATED';
+			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . $version . $parent_class . PHP_EOL . 'Stack trace:' . PHP_EOL;
+
+			self::trace_log( $out );
 		}
 
 		/**
@@ -266,19 +233,13 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 * @param string $deprecated_name - Name of the deprecated.
 		 * @param string $replacement - What can be used as replacement.
 		 * @param string $version - Since which WP version given error was added.
+		 * @param string $message    - A message regarding the change.
 		 *
 		 * @return void
 		 *
 		 * @since 1.1.1
 		 */
-		public static function deprecated_error( string $deprecated_name, $replacement, $version ) {
-
-			$defaults = array(
-				'line'     => '',
-				'file'     => '',
-				'class'    => '',
-				'function' => '',
-			);
+		public static function deprecated_error( string $deprecated_name, $replacement, $version, $message = '' ) {
 
 			if ( empty( $deprecated_name ) ) {
 				$deprecated_name = 'Unknown';
@@ -292,56 +253,14 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$replacement = '. Replacement: ' . $replacement;
 			}
 
+			if ( ! empty( $message ) ) {
+				$message = '. Message: ' . $message;
+			}
+
 			$php_error_name = 'DEPRECATED';
-			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . $version . $replacement . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			$out            = "PHP $php_error_name: $deprecated_name is deprecated" . $version . $replacement . $message . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
-			$trace      = debug_backtrace();
-			$main_shown = false;
-
-			$thrown_file = '';
-			$thrown_line = '';
-
-			$args = '';
-
-			// skip current function and require() in /index.php .
-			$counter = count( $trace ) - 3;
-			for ( $i = 1; $i < $counter; $i++ ) {
-				$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 3 ] );
-				$index = $i - 1;
-				$file  = $sf->file;
-				// $file  = self::clean_file_path( $sf->file );
-
-				if ( 1 === $i ) {
-					$thrown_file = $file;
-					$thrown_line = $sf->line;
-				}
-
-				$caller = '';
-				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
-					$caller = $sf->class . '::' . $sf->function . '()';
-				} elseif ( ! empty( $sf->function ) ) {
-					$caller = $sf->function . '()';
-				} else {
-					$main_shown = true;
-					$caller     = '{main}';
-				}
-
-				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
-					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
-				} else {
-					$args = '';
-				}
-
-				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
-
-			}
-			if ( ! $main_shown ) {
-				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
-			}
-			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_LOG ) {
-				error_log( $out );
-			}
+			self::trace_log( $out );
 		}
 
 		/**
@@ -501,7 +420,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$sf    = (object) shortcode_atts( $defaults, $e->getTrace()[ $i ] );
 				$index = $i;
 				$file  = $sf->file;
-				// $file  = self::clean_file_path( $sf->file );
 
 				if ( 1 === $i ) {
 					$thrown_file = $file;
@@ -535,16 +453,6 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			if ( WP_DEBUG_LOG ) {
 				\error_log( $out );
 			}
-
-			// $message = sprintf(
-			// '%s in %s on line %d trace: %s',
-			// $e->getMessage(),
-			// $e->getFile(),
-			// $e->getLine(),
-			// $e->getTrace()
-			// );
-
-			// \error_log( $message );
 		}
 
 		/**
@@ -590,6 +498,75 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				) . \PHP_EOL .
 				var_export( $error_data, true ),
 			);
+		}
+
+		/**
+		 * Writes a stack trace to the error log.
+		 *
+		 * @param string $out - String with the lead erro log line.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		private static function trace_log( string $out ) {
+
+			// These are default values for a single trace.
+			// To prevent errors when a trace ommits some values.
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
+
+			$trace      = debug_backtrace();
+			$main_shown = false;
+
+			$thrown_file = '';
+			$thrown_line = '';
+
+			$args = '';
+
+			// skip current function and require() in /index.php .
+			$counter = count( $trace ) - 3;
+			for ( $i = 1; $i < $counter; $i++ ) {
+				$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 3 ] );
+				$index = $i - 1;
+				$file  = $sf->file;
+				// $file  = self::clean_file_path( $sf->file );
+
+				if ( 1 === $i ) {
+					$thrown_file = $file;
+					$thrown_line = $sf->line;
+				}
+
+				$caller = '';
+				if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
+					$caller = $sf->class . '::' . $sf->function . '()';
+				} elseif ( ! empty( $sf->function ) ) {
+					$caller = $sf->function . '()';
+				} else {
+					$main_shown = true;
+					$caller     = '{main}';
+				}
+
+				if ( ! $main_shown && isset( $trace[ $i + 3 ]['args'] ) && ! empty( $trace[ $i + 3 ]['args'] ) ) {
+					$args = ' Arguments ' . \htmlentities( \json_encode( $trace[ $i + 3 ]['args'] ) );
+				} else {
+					$args = '';
+				}
+
+				$out .= "#$index $file({$sf->line}): $caller $args" . PHP_EOL;
+
+			}
+			if ( ! $main_shown ) {
+				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
+			}
+			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
+			if ( WP_DEBUG_LOG ) {
+				error_log( $out );
+			}
 		}
 	}
 }

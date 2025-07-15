@@ -90,7 +90,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 2.4.1 =
-Removed messages when WP_DEBUG_DISPLAY is enabled as it produces "headers already sent" notification. Tables view now supports Truncate operation (for all tables) and Drop operation (for non wp core tables). Deprecation WP functions improvements.
+Removed messages when WP_DEBUG_DISPLAY is enabled as it produces "headers already sent" notification. Tables view now supports Truncate operation (for all tables) and Drop operation (for non wp core tables). Deprecation WP functions improvements and better handling. Code optimizations.
 
 = 2.4.0 =
 Code and UI improvements. JS fixes.

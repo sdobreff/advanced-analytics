@@ -90,9 +90,9 @@ if ( ! Context_Helper::is_installing() ) {
 
 	// All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.
 	\add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
-	\add_action( 'deprecated_constructor_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_constructor', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 	\add_action( 'deprecated_class_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
-	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
+	\add_action( 'deprecated_file_included', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 4 );
 	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 	\add_action( 'deprecated_argument_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 
