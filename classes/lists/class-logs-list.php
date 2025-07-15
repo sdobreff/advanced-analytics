@@ -578,7 +578,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					$message  = '<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
 					<div>
 						</div>
-						<div class=""><span><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> </div>
+						<div class=""><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="' . __( 'Share', '0-day-analytics' ) . '" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
 				</div>';
 					$message .= '<span class="error_message">' . \esc_html( $item[ $column_name ] ) . '</span>';
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
@@ -873,10 +873,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				?>
 				<script>
 					jQuery( document ).on( 'click', '.generated-logs .dashicons-clipboard', function( e ) {
-						let selectedText = jQuery(this).parent().parent().parent().next().closest('.error_message').text();
+						let selectedText = jQuery(this).parent().parent().next().closest('.error_message').text();
 
-						if ( jQuery(this).parent().parent().parent().next().next().next('.log_details_show').children('pre').length ) {
-							selectedText = selectedText + '\n\n' + '<?php \esc_html_e( 'Trace:', '0-day-analytics' ); ?>' + '\n' + jQuery(this).parent().parent().parent().next().next().next('.log_details_show').children('pre').html();
+						if ( jQuery(this).parent().parent().next().next().next('.log_details_show').children('pre').length ) {
+							selectedText = selectedText + '\n\n' + '<?php \esc_html_e( 'Trace:', '0-day-analytics' ); ?>' + '\n' + jQuery(this).parent().parent().next().next().next('.log_details_show').children('pre').html();
 
 							selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
 							selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
@@ -923,6 +923,38 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					jQuery( document ).on( 'click', '.show_log_details', function() {
 						jQuery(this).parent().next().closest('.log_details_show').toggle();
 					});
+
+					jQuery( document ).ready( function() {
+
+						if ( navigator.share ) {
+
+							jQuery( document ).on( 'click', '.generated-logs .dashicons-share', function( e ) {
+								let selectedText = jQuery(this).parent().parent().next().closest('.error_message').text();
+
+								if ( jQuery(this).parent().parent().next().next().next('.log_details_show').children('pre').length ) {
+									selectedText = selectedText + '\n\n' + '<?php \esc_html_e( 'Trace:', '0-day-analytics' ); ?>' + '\n' + jQuery(this).parent().parent().next().next().next('.log_details_show').children('pre').html();
+
+									selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+									selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+									selectedText = jQuery(selectedText).text();
+								}
+
+								const shareData = {
+									text: selectedText + '\n\n' + "<?php echo \get_site_url(); ?>",
+								};
+
+								try {
+									navigator.share(shareData);
+								} catch (err) {
+									jQuery(this).text( `Error: ${err}` );
+								}
+							});
+							
+						} else {
+							jQuery( '.generated-logs .dashicons-share' ).remove();
+						}
+					});
+
 				</script>
 				<?php
 			}
