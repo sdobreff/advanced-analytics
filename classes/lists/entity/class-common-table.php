@@ -167,14 +167,22 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @since 2.1.0
 		 */
-		public static function check_table_exists( string $table_name = '' ): bool {
-			global $wpdb;
+		public static function check_table_exists( string $table_name = '', $connection = null ): bool {
+			if ( null !== $connection ) {
+				if ( $connection instanceof \wpdb ) {
+					$_wpdb = $connection;
+				}
+			} else {
+				global $wpdb;
+
+				$_wpdb = $wpdb;
+			}
 
 			if ( '' === $table_name ) {
 				$table_name = static::get_name();
 			}
 
-			foreach ( $wpdb->get_col( 'SHOW TABLES', 0 ) as $table ) { // phpcs:ignore
+			foreach ( $_wpdb->get_col( 'SHOW TABLES', 0 ) as $table ) {
 				if ( $table === $table_name ) {
 					return true;
 				}
@@ -188,15 +196,23 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * Important - query string is not checked nor validated, the calling script is responsible for that.
 		 *
 		 * @param string $query - The query which needs to be executed.
+		 * @param \wpdb  $connection - \wpdb connection to be used for name extraction.
 		 *
 		 * @return array
 		 *
 		 * @since 2.1.0
 		 */
-		public static function execute_query( string $query ) {
-			global $wpdb;
+		public static function execute_query( string $query, $connection = null ) {
+			if ( null !== $connection ) {
+				if ( $connection instanceof \wpdb ) {
+					$_wpdb = $connection;
+				}
+			} else {
+				global $wpdb;
+				$_wpdb = $wpdb;
+			}
 
-			return $wpdb->query( $query );
+			return $_wpdb->query( $query );
 		}
 
 		/**
@@ -215,12 +231,22 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @param \WP_REST_Request $request - The request object.
 		 * @param string           $table_name - The name of the table, if one is not provided, the default will be used.
+		 * @param \wpdb            $connection - \wpdb connection to be used for name extraction.
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
 		 * @since 2.1.0
 		 */
-		public static function drop_table( ?\WP_REST_Request $request = null, string $table_name = '' ) {
+		public static function drop_table( ?\WP_REST_Request $request = null, string $table_name = '', $connection = null ) {
+
+			if ( null !== $connection ) {
+				if ( $connection instanceof \wpdb ) {
+					$_wpdb = $connection;
+				}
+			} else {
+				global $wpdb;
+				$_wpdb = $wpdb;
+			}
 
 			if ( null !== $request ) {
 				$table_name = $request->get_param( 'table_name' );
@@ -231,9 +257,9 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			}
 
 			if ( ! \in_array( $table_name, self::get_wp_core_tables(), true )
-			&& \in_array( $table_name, self::get_tables(), true ) ) {
+			&& \in_array( $table_name, self::get_tables($_wpdb), true ) ) {
 
-				self::execute_query( 'DROP TABLE IF EXISTS ' . $table_name );
+				self::execute_query( 'DROP TABLE IF EXISTS ' . $table_name, $_wpdb );
 			} elseif ( null !== $request ) {
 				return new \WP_Error(
 					'core_table',
@@ -256,12 +282,21 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @param \WP_REST_Request $request - The request object.
 		 * @param string           $table_name - The name of the table, if one is not provided, the default will be used.
+		 * @param \wpdb            $connection - \wpdb connection to be used for name extraction.
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
 		 * @since 2.4.1
 		 */
-		public static function truncate_table( ?\WP_REST_Request $request = null, string $table_name = '' ) {
+		public static function truncate_table( ?\WP_REST_Request $request = null, string $table_name = '', $connection = null ) {
+			if ( null !== $connection ) {
+				if ( $connection instanceof \wpdb ) {
+					$_wpdb = $connection;
+				}
+			} else {
+				global $wpdb;
+				$_wpdb = $wpdb;
+			}
 
 			if ( null !== $request ) {
 				$table_name = $request->get_param( 'table_name' );
@@ -271,9 +306,9 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				$table_name = static::get_name();
 			}
 
-			if ( \in_array( $table_name, self::get_tables(), true ) ) {
+			if ( \in_array( $table_name, self::get_tables($_wpdb), true ) ) {
 
-				self::execute_query( 'TRUNCATE TABLE ' . $table_name );
+				self::execute_query( 'TRUNCATE TABLE ' . $table_name, $_wpdb );
 			} elseif ( null !== $request ) {
 				return new \WP_Error(
 					'truncate_table',
@@ -738,17 +773,26 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		/**
 		 * Returns a list with all available tables.
 		 *
+		 * @param \wpdb $connection - \wpdb connection to be used for name extraction.
+		 *
 		 * @return array
 		 *
 		 * @since 2.1.0
 		 */
-		public static function get_tables(): array {
+		public static function get_tables( $connection = null ): array {
 
 			if ( empty( self::$tables ) ) {
-				global $wpdb;
+				if ( null !== $connection ) {
+					if ( $connection instanceof \wpdb ) {
+						$_wpdb = $connection;
+					}
+				} else {
+					global $wpdb;
+					$_wpdb = $wpdb;
+				}
 
-				$wpdb->suppress_errors( true );
-				$results = $wpdb->get_results(
+				$_wpdb->suppress_errors( true );
+				$results = $_wpdb->get_results(
 					// $wpdb->prepare(
 						// 'SELECT table_name FROM information_schema.tables WHERE table_schema = %s;',
 					'SHOW TABLES;',
@@ -757,7 +801,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 					\ARRAY_A
 				);
 
-				if ( '' !== $wpdb->last_error || null === $results ) {
+				if ( '' !== $_wpdb->last_error || null === $results ) {
 
 					self::$tables = self::get_wp_core_tables();
 
@@ -767,7 +811,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 					}
 				}
 
-				$wpdb->suppress_errors( false );
+				$_wpdb->suppress_errors( false );
 			}
 
 			return self::$tables;
@@ -783,8 +827,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		public static function get_wp_core_tables() {
 			if ( empty( self::$core_tables ) ) {
 				global $wpdb;
-				self::$core_tables = $wpdb->tables( 'all' );
 
+				self::$core_tables = $wpdb->tables( 'all' );
 			}
 
 			return self::$core_tables;
