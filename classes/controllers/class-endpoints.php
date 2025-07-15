@@ -103,7 +103,32 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 										'required'    => true,
 										'type'        => 'string',
 										'pattern'     => '\w+',
-										'description' => 'Severity name',
+										'description' => 'Table name',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'truncate_table' => array(
+					'class'     => Common_Table::class,
+					'namespace' => 'wp-control/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<table_name>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::DELETABLE,
+									'callback' => 'truncate_table',
+								),
+								'args'             => array(
+									'table_name' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'pattern'     => '\w+',
+										'description' => 'Table name',
 									),
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),

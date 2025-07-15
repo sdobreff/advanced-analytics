@@ -6,13 +6,13 @@
  *
  * @package   0-day-analytics
  * @author    sdobreff
- * @copyright Copyright (C) 2023-%%YEAR%%, WP Control
+ * @copyright Copyright (C) 2025-%%YEAR%%, WP Control
  * @license   GPL v3
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
  * Plugin Name:     WP Control
  * Description:     Take full control of error log, crons, transients, plugins and DB tables.
- * Version:         2.4.0
+ * Version:         2.4.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '2.4.0' );
+define( 'ADVAN_VERSION', '2.4.1' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );

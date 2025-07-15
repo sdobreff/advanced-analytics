@@ -123,7 +123,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 2.4.1
 		 */
 		public static function add_config_content_table() {
 
@@ -227,48 +227,85 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					<div><b><?php \esc_html_e( 'Collation: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Collation'] ); ?></span></div>
 					<?php
 				}
+				?>
+				<input type="button" name="truncate_action" id="truncate_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Truncate Table', '0-day-analytics' ); ?>">
 
-				if ( ! \in_array( $table_info[0]['Name'], Common_Table::get_wp_core_tables() ) ) {
-					?>
-				<input type="button" name="bulk_action" id="drop_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Drop Table', '0-day-analytics' ); ?>">
+					<script>
+						let action = document.getElementById("truncate_table");
 
-				<script>
-					let action = document.getElementById("drop_table");
+						action.onclick = tableTruncate;
 
-					action.onclick = tableDrop;
+						async function tableTruncate(e) {
 
-					async function tableDrop(e) {
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to truncate this table? That operation is destructive', '0-day-analytics' ); ?>' ) ) {
+								let tableName = e.target.getAttribute('data-table-name');
 
-						if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this table? That operation is destrutive', '0-day-analytics' ); ?>' ) ) {
-							let tableName = e.target.getAttribute('data-table-name');
+								let attResp;
 
-							let attResp;
+								try {
+									attResp = await wp.apiFetch({
+										path: '/wp-control/v1/truncate_table/' + tableName,
+										method: 'DELETE',
+										cache: 'no-cache'
+									});
 
-							try {
-								attResp = await wp.apiFetch({
-									path: '/wp-control/v1/drop_table/' + tableName,
-									method: 'DELETE',
-									cache: 'no-cache'
-								});
+									if (attResp.success) {
+										
+										location.reload();
+									} else if (attResp.message) {
+										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+									}
 
-								if (attResp.success) {
-									
-									location.href= '<?php echo Settings::get_tables_page_link(); ?>';
-								} else if (attResp.message) {
-									jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+								} catch (error) {
+									throw error;
 								}
-
-							} catch (error) {
-								throw error;
 							}
 						}
+
+					</script>
+					<?php
+
+					if ( ! \in_array( $table_info[0]['Name'], Common_Table::get_wp_core_tables() ) ) {
+						?>
+					<input type="button" name="drop_action" id="drop_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Drop Table', '0-day-analytics' ); ?>">
+
+					<script>
+						let action = document.getElementById("drop_table");
+
+						action.onclick = tableDrop;
+
+						async function tableDrop(e) {
+
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this table? That operation is destructive', '0-day-analytics' ); ?>' ) ) {
+								let tableName = e.target.getAttribute('data-table-name');
+
+								let attResp;
+
+								try {
+									attResp = await wp.apiFetch({
+										path: '/wp-control/v1/drop_table/' + tableName,
+										method: 'DELETE',
+										cache: 'no-cache'
+									});
+
+									if (attResp.success) {
+										
+										location.href= '<?php echo Settings::get_tables_page_link(); ?>';
+									} else if (attResp.message) {
+										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+									}
+
+								} catch (error) {
+									throw error;
+								}
+							}
+						}
+
+					</script>
+						<?php
 					}
 
-				</script>
-					<?php
-				}
-
-				$help_text = \ob_get_clean();
+					$help_text = \ob_get_clean();
 			}
 
 			return $help_text;
