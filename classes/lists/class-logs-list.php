@@ -816,7 +816,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Returns translatet text for per page option
+		 * Returns translated text for per page option
 		 *
 		 * @return string
 		 *
