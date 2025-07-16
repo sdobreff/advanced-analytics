@@ -886,7 +886,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			if ( empty( self::$table_stat ) ) {
 				global $wpdb;
 
-				$sql = 'SHOW TABLE STATUS FROM ' . $wpdb->dbname . ' LIKE \'' . self::get_name() . '\'; ';
+				$sql = 'SHOW TABLE STATUS FROM `' . $wpdb->dbname . '` LIKE \'' . self::get_name() . '\'; ';
 
 				$wpdb->suppress_errors( true );
 
