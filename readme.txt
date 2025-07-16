@@ -1,9 +1,9 @@
 === WP Control ===
 Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.4.1
+Stable tag: 2.4.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -88,6 +88,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 8. **Table manager operations** - Current table more detailed information and truncate and delete operations.
 
 == Changelog ==
+
+= 2.4.2 =
+Bug fix with missing variable in error class - special thanks to @lucianwpwhite.
 
 = 2.4.1 =
 Removed messages when WP_DEBUG_DISPLAY is enabled as it produces "headers already sent" notification. Tables view now supports Truncate operation (for all tables) and Drop operation (for non wp core tables). Deprecation WP functions improvements and better handling. Code optimizations.

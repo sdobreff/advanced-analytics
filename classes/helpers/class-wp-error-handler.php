@@ -118,6 +118,12 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			// return false;
 			// }
 			*/
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
 
 			// $errfile  = self::clean_file_path( $errfile );
 			$php_error_name = self::error_code_to_string( $errno );
