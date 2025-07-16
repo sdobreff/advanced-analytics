@@ -38,10 +38,17 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 * @since 2.4.2.1
 		 */
 		protected static $fields = array(
-			'id'            => 'int',
-			'occurrence_id' => 'int',
-			'name'          => 'string',
-			'value'         => 'string',
+			'id'             => 'int',
+			'page_id'        => 'int',
+			'url'            => 'string',
+			'domain'         => 'string',
+			'runtime'        => 'float',
+			'request_status' => 'string',
+			'request_group'  => 'string',
+			'request_source' => 'string',
+			'request_args'   => 'string',
+			'response'       => 'string',
+			'date_added'     => 'string',
 		);
 
 		/**
@@ -52,10 +59,17 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 * @since 2.4.2.1
 		 */
 		protected static $fields_values = array(
-			'id'            => 0,
-			'occurrence_id' => 0,
-			'name'          => '',
-			'value'         => '',
+			'id'             => 0,
+			'page_id'        => 0,
+			'url'            => '',
+			'domain'         => '',
+			'runtime'        => 0,
+			'request_status' => '',
+			'request_group'  => '',
+			'request_source' => '',
+			'request_args'   => '',
+			'response'       => '',
+			'date_added'     => '',
 		);
 
 		/**
@@ -77,13 +91,20 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			$table_name    = self::get_table_name( $connection );
 			$wp_entity_sql = '
 				CREATE TABLE `' . $table_name . '` (
-					`id` bigint NOT NULL AUTO_INCREMENT,
-					`occurrence_id` bigint(20) NOT NULL,
-					`name` varchar(60) NOT NULL,
-					`value` longtext NOT NULL,
-				PRIMARY KEY (`id`),
-				KEY `occurrence_name` (`occurrence_id`,`name`),
-				KEY `name_value` (`name`,`value`(64))
+					id BIGINT unsigned not null auto_increment,
+					page_id BIGINT unsigned not null,
+					url TEXT(2048),
+					domain TEXT(255),
+					runtime DECIMAL(10,3),
+					request_status VARCHAR(20),
+					request_group VARCHAR(20),
+					request_source VARCHAR(255),
+					request_args MEDIUMTEXT,
+					response MEDIUMTEXT,            
+					date_added TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY `page_id` (`page_id`),
+				KEY `runtime` (`runtime`),
 				)
 			  ' . $collate . ';';
 
