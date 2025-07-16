@@ -264,8 +264,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				</script>
 
 			<?php
+
+			$suffix = '';
+
+			if ( WP_Helper::is_multisite() ) {
+				$suffix = '-network';
+			}
+
 			// $hook is string value given add_menu_page function.
-			if ( Logs_List::PAGE_SLUG !== $hook && Crons_List::PAGE_SLUG !== $hook && Transients_List::PAGE_SLUG !== $hook && Table_List::PAGE_SLUG !== $hook ) {
+			if ( Logs_List::PAGE_SLUG . $suffix !== $hook && Crons_List::PAGE_SLUG . $suffix !== $hook && Transients_List::PAGE_SLUG . $suffix !== $hook && Table_List::PAGE_SLUG . $suffix !== $hook ) {
 				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
@@ -771,7 +778,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$screen = WP_Helper::get_wp_screen();
 
-			if ( Logs_List::PAGE_SLUG === $screen->base ) {
+			$suffix = '';
+
+			if ( WP_Helper::is_multisite() ) {
+				$suffix = '-network';
+			}
+
+			if ( Logs_List::PAGE_SLUG . $suffix === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -782,7 +795,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Transients_List::PAGE_SLUG === $screen->base ) {
+			if ( Transients_List::PAGE_SLUG . $suffix === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -793,7 +806,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Crons_List::PAGE_SLUG === $screen->base ) {
+			if ( Crons_List::PAGE_SLUG . $suffix === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -804,7 +817,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Table_List::PAGE_SLUG === $screen->base ) {
+			if ( Table_List::PAGE_SLUG . $suffix === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -1638,12 +1651,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 1.7.5
 		 */
 		private static function get_plugin_page_slugs(): array {
+
+			$suffix = '';
+
+			if ( WP_Helper::is_multisite() ) {
+				$suffix = '-network';
+			}
+
 			return array(
-				self::PAGE_SLUG,
-				Logs_List::PAGE_SLUG,
-				Transients_List::PAGE_SLUG,
-				Crons_List::PAGE_SLUG,
-				Table_List::PAGE_SLUG,
+				self::PAGE_SLUG . $suffix,
+				Logs_List::PAGE_SLUG . $suffix,
+				Transients_List::PAGE_SLUG . $suffix,
+				Crons_List::PAGE_SLUG . $suffix,
+				Table_List::PAGE_SLUG . $suffix,
 			);
 		}
 

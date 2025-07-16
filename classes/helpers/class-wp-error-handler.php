@@ -197,6 +197,20 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				return false;
 			}
 
+			/**
+			 * Shall we trigger that error or not - sending the error and message so others can check it.
+			 *
+			 * @param string $function_name - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
+			 * @param string $errstr - The WP error string (message).
+			 *
+			 * @since 2.4.2.1
+			 */
+			$shall_trigger = \apply_filters( ADVAN_PREFIX . 'trigger_error', true, $function_name, $errstr );
+
+			if ( false === $shall_trigger ) {
+				return $status;
+			}
+
 			$php_error_name = self::error_code_to_string( $errno );
 			$out            = "PHP $php_error_name: $errstr" . PHP_EOL . 'Stack trace:' . PHP_EOL;
 
@@ -211,7 +225,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 * @param string $version      The version of WordPress that deprecated the function.
 		 * @param string $parent_class The parent class calling the deprecated constructor.
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function deprecated_constructor( $deprecated_name, $version, $parent_class ) {
 
@@ -513,7 +527,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		private static function trace_log( string $out ) {
 

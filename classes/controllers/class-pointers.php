@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace ADVAN\Controllers;
 
 use ADVAN\Lists\Logs_List;
+use ADVAN\Helpers\WP_Helper;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -67,7 +68,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 		 */
 		public static function print_footer_scripts() {
 
-			$element_id = Logs_List::PAGE_SLUG;
+			$suffix = '';
+
+			if ( WP_Helper::is_multisite() ) {
+				$suffix = '-network';
+			}
+
+			$element_id = Logs_List::PAGE_SLUG . $suffix;
 			?>
 			<script>
 				jQuery(

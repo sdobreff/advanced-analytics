@@ -4,7 +4,7 @@
  *
  * @package advan
  *
- * @since latest
+ * @since 2.4.2.1
  */
 
 declare(strict_types=1);
@@ -28,7 +28,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		private static $table = '';
 
@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @var \wpdb Connection
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		private static $connection = null;
 
@@ -46,7 +46,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		private static $fields = array();
 
@@ -57,7 +57,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function get_table_name( $connection = null ): string {
 			if ( null !== $connection ) {
@@ -75,7 +75,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return \wpdb
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function get_connection() {
 			if ( null === self::$connection ) {
@@ -93,7 +93,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function set_connection( $connection ) {
 			self::$connection = $connection;
@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function destroy_connection() {
 			self::$connection = null;
@@ -119,7 +119,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function maybe_create_table( string $table_name, string $create_ddl, $connection = null ): bool {
 			if ( null !== $connection ) {
@@ -154,7 +154,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function check_index_exists( string $index ): bool {
 			$index = \sanitize_text_field( $index );
@@ -177,7 +177,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return integer
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function get_last_sql_error( $_wpdb ): int {
 			$code = 0;
@@ -200,7 +200,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return boolean
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function is_installed( $connection = null ): bool {
 			return Common_Table::check_table_exists( self::get_table_name( $connection ), $connection );
@@ -215,7 +215,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function count( $cond = '%d', $args = array( 1 ), $connection = null ) {
 			if ( null !== $connection ) {
@@ -253,7 +253,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return int
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function save( $data ) {
 
@@ -303,7 +303,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function prepare_data( array $data ): array {
 
@@ -407,7 +407,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return int|bool
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function delete_query( $query, $args = array(), $connection = null ) {
 			if ( null !== $connection ) {
@@ -442,7 +442,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return int|bool
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function delete_by_id( int $id, $connection = null ) {
 			if ( null !== $connection ) {
@@ -546,7 +546,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array|bool
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function find( array $data ) {
 			/**
@@ -628,7 +628,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function prepare_full_where(
 			array $where_clause,
@@ -681,7 +681,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function get_fields_values(): array {
 			return ( static::class )::$fields_values;
@@ -692,7 +692,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function get_fields(): array {
 			return ( static::class )::$fields;
@@ -705,7 +705,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function prepare_full_select_statement( $connection = null ): array {
 			$full_fields = array();

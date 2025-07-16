@@ -4,7 +4,7 @@
  *
  * @package advan
  *
- * @since latest
+ * @since 2.4.2.1
  */
 
 declare(strict_types=1);
@@ -26,7 +26,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		protected static $table = ADVAN_PREFIX . 'requests_log';
 
@@ -35,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		protected static $fields = array(
 			'id'            => 'int',
@@ -49,7 +49,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		protected static $fields_values = array(
 			'id'            => 0,
@@ -63,7 +63,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 *
 		 * @param \wpdb $connection - \wpdb connection to be used for name extraction.
 		 *
-		 * @since latest
+		 * @since 2.4.2.1
 		 */
 		public static function create_table( $connection = null ): bool {
 			if ( null !== $connection ) {
