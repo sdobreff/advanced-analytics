@@ -255,7 +255,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @since 2.4.2.1
 		 */
-		public static function save( $data ) {
+		public static function insert( $data ) {
 
 			$format      = array();
 			$insert_data = array();

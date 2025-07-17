@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Entities\Requests_Log_Entity;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,6 +26,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 	 */
 	class Requests_Log {
 
+		/**
+		 * Inits the class.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function init() {
 			\apply_filters( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
 			\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
@@ -62,7 +71,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 			);
 
 			// Save the log entry to the database.
-			\ADVAN\Entities\Requests_Log_Entity::insert( $log_entry );
+			Requests_Log_Entity::insert( $log_entry );
 		}
 
 		/**
@@ -79,6 +88,43 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 			$_SERVER['REQUEST_TIME_FLOAT'] = microtime( true );
 
 			return $response;
+		}
+
+		/**
+		 * Return current page type.
+		 * Id adding new page type update self::$page_types array with new page type group
+		 *
+		 * @return string cron|ajax|rest_api|xmlrpc|login|admin|frontend
+		 * 
+		 * @since latest
+		 */
+		public static function current_page_type() {
+
+			if ( is_null( $return ) ) {
+				if ( is_null( $return ) && ( ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) ) {
+					$return = 'cron';
+				}
+
+				if ( is_null( $return ) && wp_doing_ajax() ) {
+					$return = 'ajax';
+				}
+
+				// is REST API endpoint
+				if ( is_null( $return ) && ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ! empty( $GLOBALS['wp']->query_vars['rest_route'] ) ) ) {
+					$return = 'rest_api';
+				}
+
+				if ( is_null( $return ) && ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ) {
+					$return = 'xmlrpc';
+				}
+
+				if ( is_null( $return ) && self::is_login_page() ) {
+					$return = 'login';
+				}
+			}
+
+			// certain or fallback type
+			return is_null( $return ) ? ( is_admin() ? 'admin' : 'frontend' ) : $return;
 		}
 	}
 }
