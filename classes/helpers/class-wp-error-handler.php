@@ -495,12 +495,13 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 * Logs error of type WP_Error in the error log
 		 *
 		 * @param \WP_Error $error - The error to log.
+		 * @param string    $additional_message - More to add to the message.
 		 *
 		 * @return void
 		 *
 		 * @since 2.1.0
 		 */
-		public static function log_wp_error( \WP_Error $error ) {
+		public static function log_wp_error( \WP_Error $error, ?string $additional_message = '' ) {
 			$error_data = $error->get_all_error_data();
 			\array_walk_recursive(
 				$error_data,
@@ -586,6 +587,41 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 			if ( WP_DEBUG_LOG ) {
 				error_log( $out );
+			}
+		}
+
+		/**
+		 * Fires after an HTTP API response is received and before the response is returned.
+		 *
+		 * @param array|\WP_Error $response    HTTP response or WP_Error object.
+		 * @param string          $context     Context under which the hook is fired.
+		 * @param string          $class       HTTP transport used.
+		 * @param array           $parsed_args HTTP request arguments.
+		 * @param string          $url         The request URL.
+		 *
+		 * @since latest
+		 */
+		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
+			// Check if the response is an error.
+			if ( \is_wp_error( $response ) ) {
+				self::log_wp_error(
+					$response,
+					sprintf(
+						// translators: %1$s is the URL of the request, %2$s are the arguments of the request.
+						__( 'HTTP API request: %1$s. Arguments: %2$s', '0-day-analytics' ),
+						$url,
+						\implode(
+							', ',
+							\array_map(
+								function( $key, $value ) {
+									return sprintf( '%s: %s', $key, \is_array( $value ) ? \json_encode( $value ) : $value );
+								},
+								\array_keys( $parsed_args ),
+								\array_values( $parsed_args )
+							)
+						),
+					)
+				);
 			}
 		}
 	}
