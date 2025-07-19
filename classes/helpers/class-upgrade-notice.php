@@ -221,6 +221,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 			if ( ! function_exists( 'plugins_api' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 			}
+
 			$plugin_information = plugins_api(
 				'plugin_information',
 				array(
@@ -240,6 +241,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 				)
 			);
 
+			if ( \is_wp_error( $plugin_information ) ) {
+				if ( 'plugins_api_failed' === $plugin_information->get_error_code() ) {
+					return new \WP_Error( 'plugins_api_failed', __( 'Plugin API information could not be retrieved.', '0-day-analytics' ) );
+				}
+
+				return $plugin_information;
+			}
+
+			$rollback_versions = array();
+
 			if ( ! empty( $plugin_information->versions ) || is_array( $plugin_information->versions ) ) {
 
 				$versions = $plugin_information->versions;
@@ -247,8 +258,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 				usort( $versions, 'version_compare' );
 
 				$versions = array_slice( $versions, -( Settings::get_current_options()['plugin_version_switch_count'] ), Settings::get_current_options()['plugin_version_switch_count'], true );
-
-				$rollback_versions = array();
 
 				foreach ( $plugin_information->versions as $version => $download_link ) {
 					$key = array_search( $download_link, $versions );

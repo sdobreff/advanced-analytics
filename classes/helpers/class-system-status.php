@@ -158,6 +158,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 				'script_debug'              => ( defined( 'SCRIPT_DEBUG' ) && \SCRIPT_DEBUG ),
 				'save_queries'              => ( defined( 'SAVEQUERIES' ) && \SAVEQUERIES ),
 				'wp_environment_type'       => ( defined( 'WP_ENVIRONMENT_TYPE' ) && \WP_ENVIRONMENT_TYPE ) ? \WP_ENVIRONMENT_TYPE : 'production',
+				'block_external_requests'       => ( defined( 'WP_HTTP_BLOCK_EXTERNAL' ) && \WP_HTTP_BLOCK_EXTERNAL ) ? \WP_HTTP_BLOCK_EXTERNAL : false,
 				'wp_development_mode'       => ( defined( 'WP_DEVELOPMENT_MODE' ) && \WP_DEVELOPMENT_MODE ) ? \WP_DEVELOPMENT_MODE : '',
 				'language'                  => get_locale(),
 				'server_info'               => $_SERVER['SERVER_SOFTWARE'] ?? '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized

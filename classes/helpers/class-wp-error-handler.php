@@ -511,14 +511,27 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 					}
 				}
 			);
-			error_log(
-				sprintf(
-					'WP_Error error: %s: %s.',
-					$error->get_error_code(),
-					$error->get_error_message(),
-				) . \PHP_EOL .
-				var_export( $error_data, true ),
-			);
+			if ( empty( $error_data ) ) {
+				$error_data = '';
+			} else {
+				$error_data = var_export( $error_data, true );
+			}
+			$out = sprintf(
+				'WP_Error error: %s: %s',
+				$error->get_error_code(),
+				$error->get_error_message(),
+			) . \PHP_EOL .
+			$error_data . $additional_message . PHP_EOL . 'Stack trace:' . PHP_EOL;
+			self::trace_log( $out );
+			// $trace      = wp_debug_backtrace_summary('\ADVAN\Helpers\WP_Error_Handler', 8, false);
+			// error_log(
+			// sprintf(
+			// 'WP_Error error: %s: %s.',
+			// $error->get_error_code(),
+			// $error->get_error_message().$additional_message,
+			// ) . \PHP_EOL .
+			// $error_data,
+			// );
 		}
 
 		/**
@@ -604,17 +617,19 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
 			// Check if the response is an error.
 			if ( \is_wp_error( $response ) ) {
+				unset( $parsed_args['_info'] );
+				unset( $parsed_args['_redirection'] );
 				self::log_wp_error(
 					$response,
 					sprintf(
 						// translators: %1$s is the URL of the request, %2$s are the arguments of the request.
-						__( 'HTTP API request: %1$s. Arguments: %2$s', '0-day-analytics' ),
+						__( ' HTTP API request: %1$s. Arguments: %2$s', '0-day-analytics' ),
 						$url,
 						\implode(
-							', ',
+							"\n",
 							\array_map(
 								function( $key, $value ) {
-									return sprintf( '%s: %s', $key, \is_array( $value ) ? \json_encode( $value ) : $value );
+									return sprintf( '%s: %s', $key, \is_array( $value ) ? \json_encode( $value ) : var_export( $value, true ) );
 								},
 								\array_keys( $parsed_args ),
 								\array_values( $parsed_args )

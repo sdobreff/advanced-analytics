@@ -1550,13 +1550,17 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					// Clear the flag for keep reading the error log if WP settings are disabled (because at this point they are enabled).
 					$advanced_options['keep_reading_error_log'] = false;
-
-					@clearstatcache( false, File_Helper::get_wp_config_file_path() );
 				}
 
 				$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 				Config_Transformer::update( 'constant', 'DISABLE_WP_CRON', $wp_cron_disable, self::$config_args );
+
+				$block_external_requests = ( array_key_exists( 'block_external_requests', $post_array ) ) ? filter_var( $post_array['block_external_requests'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+				Config_Transformer::update( 'constant', 'WP_HTTP_BLOCK_EXTERNAL', $block_external_requests, self::$config_args );
+
+				@clearstatcache( false, File_Helper::get_wp_config_file_path() );
 			}
 
 			self::$current_options = $advanced_options;

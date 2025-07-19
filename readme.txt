@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.5.0
+Stable tag: 2.6.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -88,6 +88,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 8. **Table manager operations** - Current table more detailed information and truncate and delete operations.
 
 == Changelog ==
+
+= 2.6.0 =
+Code logic improvements. Added option to disable all external requests. Added error capturing for when API requests trow WP_Error. Extended error reporting feature.
 
 = 2.5.0 =
 Multisite fixes, trigger_error filter introduction.

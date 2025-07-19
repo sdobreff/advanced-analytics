@@ -610,7 +610,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 
 			if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
 				return new \WP_Error(
-					'cron_info',
+					'advana_cron_info',
 					sprintf(
 					/* translators: %s: The name of the PHP constant that is set. %s The url to the cron settings */
 						__( 'The %1$s constant is set to true. WP-Cron spawning is disabled. Try to enable it in settings - %2$s', '0-day-analytics' ),

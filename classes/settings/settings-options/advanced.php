@@ -63,6 +63,15 @@ Settings::build_option(
 
 	Settings::build_option(
 		array(
+			'name'    => \esc_html__( 'Block all external requests', '0-day-analytics' ),
+			'id'      => 'block_external_requests',
+			'type'    => 'checkbox',
+			'default' => $env_info['block_external_requests'],
+		)
+	);
+
+	Settings::build_option(
+		array(
 			'name'    => \esc_html__( 'How many versions to show in options for plugin version switch', '0-day-analytics' ),
 			'id'      => 'plugin_version_switch_count',
 			'type'    => 'number',

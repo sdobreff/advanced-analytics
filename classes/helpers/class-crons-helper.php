@@ -490,14 +490,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			}
 
 			if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) {
-				return new \WP_Error(
-					'advana_cron_info',
-					sprintf(
-					/* translators: %s: The name of the PHP constant that is set. */
-						__( 'The %s constant is set to true. WP-Cron spawning is disabled.', '0-day-analytics' ),
-						'DISABLE_WP_CRON'
-					)
-				);
+				return WP_Helper::check_cron_status();
 			}
 
 			if ( defined( 'ALTERNATE_WP_CRON' ) && ALTERNATE_WP_CRON ) {

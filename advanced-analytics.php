@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Take full control of error log, crons, transients, plugins and DB tables.
- * Version:         2.5.0
+ * Version:         2.6.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '2.5.0' );
+define( 'ADVAN_VERSION', '2.6.0' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -96,7 +96,7 @@ if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'deprecated_hook_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 	\add_action( 'deprecated_argument_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );
 
-	\add_action( 'http_api_debug', array( WP_Error_Handler::class, 'capture_request' ), 10, 5 );
+	\add_action( 'http_api_debug', array( WP_Error_Handler::class, 'capture_request' ), 0, 5 );
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
 	if ( ! Settings::get_current_options()['no_wp_die_monitor'] ) {

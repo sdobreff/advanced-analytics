@@ -248,7 +248,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 						if ( 'advana_cron_info' === $status->get_error_code() ) {
 							?>
 							<div id="advaa-status-notice" class="notice notice-info">
-								<p><?php echo esc_html( $status->get_error_message() ); ?></p>
+								<p><?php echo $status->get_error_message();  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 							</div>
 							<?php
 						} else {
@@ -282,6 +282,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					);
 					echo '</div>';
 
+					/*
 					$status = WP_Helper::check_cron_status();
 
 				if ( \is_wp_error( $status ) ) {
@@ -293,7 +294,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 							<?php
 					}
 				}
-
+*/
 				$events_list->display();
 
 				?>
