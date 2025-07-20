@@ -71,8 +71,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 			$args = array(
 				'body'    => array(
 					'chat_id'                  => $channel_id,
-					'text'                     => \wp_kses_post( $text ),
-					'parse_mode'               => in_array( $parse_mode, array( 'Markdown', 'HTML' ), true ) ? $parse_mode : '',
+					'text'                     => $text,
+					'parse_mode'               => '', //in_array( $parse_mode, array( 'Markdown', 'HTML' ), true ) ? $parse_mode : '',
 					'disable_web_page_preview' => true,
 				),
 				'timeout' => 15,

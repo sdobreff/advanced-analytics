@@ -22,6 +22,10 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
 - Easily see where exactly error is thrown (where detected)
 
+Recovery Mode link (still experimental) in the notification channels (if set) is added along with the fatal error. Wp core not always kicks in on fatality errors and this makes sure that you still have access to your website.
+How this feature works:
+If fatal error is detected from the plugin, it sends notifications to Slack or Telegram channels (if set), and provides recovery link along with the error message. When used, that link allows admin to login and suppresses all the plugins and active theme (except the **WP Control** plugin). You can observe the error log using the plugin screen and see where, when and what caused the error and take measures. You can completely disable the errored plugin or theme, switch to another version or just fix the error (if possible). Once done - just exit recovery mode and everything should continue working normally.
+
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
 You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?preview=1&networking=yes "WP Playground") or use the "Live Preview" button on the WordPress plugin page.
@@ -90,7 +94,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 2.6.0 =
-Code logic improvements. Added option to disable all external requests. Added error capturing for when API requests trow WP_Error. Extended error reporting feature.
+Code logic improvements. Added option to disable all external requests. Added error capturing for when API requests trow WP_Error. Extended error reporting feature. Implemented recovery mode if fatal error occurs and WP Core does not catch it.
 
 = 2.5.0 =
 Multisite fixes, trigger_error filter introduction.

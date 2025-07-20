@@ -117,6 +117,72 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\add_action( 'plugin_loaded', 'advana_remove_plugins' );
 
+	if ( \wp_recovery_mode()->is_active() ) {
+		\add_action(
+			'plugin_loaded',
+			function() {
+				$paused_plugins = \wp_paused_plugins()->get_all();
+				if ( empty( $paused_plugins ) ) {
+					$storage = new \WP_Paused_Extensions_Storage( 'plugin' );
+					foreach ( \wp_get_active_and_valid_plugins() as $plugin ) {
+						$plugin_base         = \plugin_basename( $plugin );
+						list( $plugin_file ) = explode( '/', $plugin_base );
+						if ( ADVAN_PLUGIN_BASENAME !== $plugin_base ) {
+							$storage->set(
+								$plugin_file,
+								array(
+									'type'    => __( 'Check WP Cron plugin, find fatal errors and fix them.', '0-day-analytics' ),
+									'line'    => 0,
+									'file'    => 0,
+									'message' => '',
+								)
+							);
+						}
+						// $GLOBALS['_paused_plugins'][ $plugin_file ] = ['type'=>'Advanced'];
+					}
+
+					global $wp_theme_directories;
+
+					$paused_themes = \wp_paused_themes()->get_all();
+
+					if ( ! empty( $wp_theme_directories ) && empty( $paused_themes ) ) {
+
+						$storage = new \WP_Paused_Extensions_Storage( 'theme' );
+
+						// foreach ( $wp_theme_directories as $theme_directory ) {
+						// 	$theme_directory = \wp_normalize_path( $theme_directory );
+
+						// 	$stylesheet       = \get_stylesheet();
+
+						// 	$parts = explode( '/', $theme_directory );
+
+							$storage->set(
+								\get_stylesheet(),
+								array(
+									'type'    => __( 'Check WP Cron plugin, find fatal errors and fix them.', '0-day-analytics' ),
+									'line'    => 0,
+									'file'    => 0,
+									'message' => '',
+								)
+							);
+					// 	}
+					}
+
+					$redirect_to = 'wp-login.php?action=entered_recovery_mode';
+					if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+						$redirect_to = \wp_unslash( $_SERVER['REQUEST_URI'] );
+					}
+					if ( ! function_exists( 'wp_redirect' ) ) {
+						require_once ABSPATH . WPINC . '/pluggable.php';
+					}
+					\wp_redirect( $redirect_to );
+
+					exit;
+				}
+			}
+		);
+	}
+
 	\add_filter( 'det_display_environment_type', '__return_false' );
 
 	Endpoints::init();
@@ -167,3 +233,4 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
+// throw new \Exception('hu');

@@ -407,14 +407,32 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$error = 'Uncaught Exception';
 			}
 
+			if ( ! function_exists( 'wp_generate_password' ) ) {
+				require_once ABSPATH . WPINC . '/pluggable.php';
+			}
+
+			$key_service = new \WP_Recovery_Mode_Key_Service();
+
+			$token = $key_service->generate_recovery_mode_token();
+			$key   = $key_service->generate_and_store_recovery_mode_key( $token );
+
+			$url = \add_query_arg(
+				array(
+					'action'   => 'enter_recovery_mode',
+					'rm_token' => $token,
+					'rm_key'   => $key,
+				),
+				\wp_login_url()
+			);
+
 			if ( Slack::is_set() ) {
 				// Send error to Slack.
-				Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+				Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . "\n" . __( 'Recovery URL: ', '0-day-analytics' ) . $url ) );
 			}
 
 			if ( Telegram::is_set() ) {
 				// Send error to \Telegram.
-				Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() ) );
+				Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . $error . ' ' . $e->getMessage() . ' ' . $e->getFile() . ' ' . $e->getLine() . "\n" . __( 'Recovery URL: ', '0-day-analytics' ) . $url ) );
 			}
 
 			$main_shown = false;
