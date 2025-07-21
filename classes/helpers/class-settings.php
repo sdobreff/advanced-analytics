@@ -272,7 +272,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			// $hook is string value given add_menu_page function.
-			if ( Logs_List::PAGE_SLUG . $suffix !== $hook && Crons_List::PAGE_SLUG . $suffix !== $hook && Transients_List::PAGE_SLUG . $suffix !== $hook && Table_List::PAGE_SLUG . $suffix !== $hook ) {
+			if ( ! in_array( $hook, self::get_plugin_page_slugs(), true ) ) {
 				return;
 			}
 			\wp_enqueue_style( 'advan-admin-style', \ADVAN_PLUGIN_ROOT_URL . 'css/admin/style.css', array(), \ADVAN_VERSION, 'all' );
@@ -784,7 +784,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$suffix = '-network';
 			}
 
-			if ( Logs_List::PAGE_SLUG . $suffix === $screen->base ) {
+			if ( Logs_List::PAGE_SLUG . $suffix === $screen->base || Logs_List::PAGE_SLUG === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -795,7 +795,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Transients_List::PAGE_SLUG . $suffix === $screen->base ) {
+			if ( Transients_List::PAGE_SLUG . $suffix === $screen->base || Transients_List::PAGE_SLUG === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -806,7 +806,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Crons_List::PAGE_SLUG . $suffix === $screen->base ) {
+			if ( Crons_List::PAGE_SLUG . $suffix === $screen->base || Crons_List::PAGE_SLUG === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -817,7 +817,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( Table_List::PAGE_SLUG . $suffix === $screen->base ) {
+			if ( Table_List::PAGE_SLUG . $suffix === $screen->base || Table_List::PAGE_SLUG === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -1662,12 +1662,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$suffix = '-network';
 			}
 
-			return array(
-				self::PAGE_SLUG . $suffix,
-				Logs_List::PAGE_SLUG . $suffix,
-				Transients_List::PAGE_SLUG . $suffix,
-				Crons_List::PAGE_SLUG . $suffix,
-				Table_List::PAGE_SLUG . $suffix,
+			return array_unique(
+				array(
+					self::PAGE_SLUG . $suffix,
+					Logs_List::PAGE_SLUG . $suffix,
+					Transients_List::PAGE_SLUG . $suffix,
+					Crons_List::PAGE_SLUG . $suffix,
+					Table_List::PAGE_SLUG . $suffix,
+					self::PAGE_SLUG,
+					Logs_List::PAGE_SLUG,
+					Transients_List::PAGE_SLUG,
+					Crons_List::PAGE_SLUG,
+					Table_List::PAGE_SLUG,
+				)
 			);
 		}
 
