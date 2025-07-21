@@ -294,7 +294,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 							<?php
 					}
 				}
-*/
+				*/
 				$events_list->display();
 
 				?>

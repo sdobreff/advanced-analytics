@@ -128,7 +128,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					/**
 					 * If file is outside web root or somewhere where restrictions are in place, that will trigger warnings in PHP, so lets suppress it.
 					 */
-					if ( @\is_file( $error_file ) ) {
+					if ( @\is_file( $error_file ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 						// If the file exists, we can use it.
 
 						$error_line = $matches[2] ? $matches[2] : $matches[4];

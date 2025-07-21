@@ -69,7 +69,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		/**
 		 * Extracts plugin from just given path (the one after the (default) plugin/<directory>) and searches that against the plugins array stored in given WP
 		 *
-		 * @param string $path_name - The name of the directory where the plugin is stored - no triling slash - this method will add one to he string.
+		 * @param string $path_name - The name of the directory where the plugin is stored - no trailing slash - this method will add one to he string.
 		 *
 		 * @return array
 		 *

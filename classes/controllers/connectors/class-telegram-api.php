@@ -65,14 +65,14 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 
 			$url = sprintf(
 				'https://api.telegram.org/bot%s/sendMessage',
-				urlencode( $bot_token )
+				rawurlencode( $bot_token )
 			);
 
 			$args = array(
 				'body'    => array(
 					'chat_id'                  => $channel_id,
 					'text'                     => $text,
-					'parse_mode'               => '', //in_array( $parse_mode, array( 'Markdown', 'HTML' ), true ) ? $parse_mode : '',
+					'parse_mode'               => '', // in_array( $parse_mode, array( 'Markdown', 'HTML' ), true ) ? $parse_mode : '', .
 					'disable_web_page_preview' => true,
 				),
 				'timeout' => 15,

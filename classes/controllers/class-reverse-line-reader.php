@@ -333,7 +333,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 			if ( \is_resource( self::$memory_handle ) && ( 'handle' === get_resource_type( self::$memory_handle ) || 'stream' === get_resource_type( self::$memory_handle ) ) ) {
 
 				$line = '';
-				for ( $x_pos = 0; fseek( self::$memory_handle, $x_pos, SEEK_END ) !== -1; $x_pos-- ) {
+				for ( $x_pos = 0; fseek( self::$memory_handle, $x_pos, SEEK_END ) !== -1; $x_pos-- ) { // phpcs:ignore Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed
 					$char = fgetc( self::$memory_handle );
 
 					if ( PHP_EOL === $char ) {
@@ -411,12 +411,12 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				if ( ! is_dir( $dir ) ) {
 					return new \WP_Error( 'directory_not_found', 'The directory does not exist: ' . $dir );
 				}
-				if ( ! is_writable( $dir ) ) {
+				if ( ! is_writable( $dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 					return new \WP_Error( 'directory_not_writable', 'The directory is not writable: ' . $dir );
 				}
 
 				// Attempt to open the file.
-				$handle = @fopen( $file_path, $mode );
+				$handle = @fopen( $file_path, $mode ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 				if ( false === $handle ) {
 					return new \WP_Error( 'file_open_error', 'Unable to open or create the file: ' . $file_path );
 				}

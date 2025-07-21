@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.6.1
+Stable tag: 2.6.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -94,6 +94,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 8. **Table manager operations** - Current table more detailed information and truncate and delete operations.
 
 == Changelog ==
+
+= 2.6.2 =
+Multisite improvements and transient edit functionality fixes.
 
 = 2.6.1 =
 Recovery mode improvements - Fixes problem with Slack notifications - by default Slack follows links. Added checks for multisite and suppresses logic if one is detected.

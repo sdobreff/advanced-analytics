@@ -187,7 +187,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			File_Helper::remove_empty_lines_low_memory( $new_log_file );
 
-			rename( $new_log_file, $file_and_path );
+			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
 
 			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
@@ -198,7 +198,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			File_Helper::remove_empty_lines_low_memory( $new_log_file );
 
-			rename( $new_log_file, $file_and_path );
+			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
 
 			Error_Log::enable_error_logging();
 
@@ -480,7 +480,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				\wp_send_json_error( \esc_html__( 'Plugin slug is not provided.', '0-day-analytics' ), 404 );
 			}
 
-			$plugin_versions = Upgrade_Notice::extract_plugin_versions( \sanitize_title( \wp_unslash( $_REQUEST['plugin_slug'] ) ) );
+			$plugin_versions = Upgrade_Notice::extract_plugin_versions( \sanitize_title( \wp_unslash( $_REQUEST['plugin_slug'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if ( \is_wp_error( $plugin_versions ) ) {
 				\wp_send_json_error( $plugin_versions->get_error_message(), 500 );

@@ -41,7 +41,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'live'       => array(
+				'live'           => array(
 					'class'     => Logs_List::class,
 					'namespace' => 'wp-control/v1',
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'severity'   => array(
+				'severity'       => array(
 					'class'     => Logs_List::class,
 					'namespace' => 'wp-control/v1',
 
@@ -87,7 +87,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'drop_table' => array(
+				'drop_table'     => array(
 					'class'     => Common_Table::class,
 					'namespace' => 'wp-control/v1',
 

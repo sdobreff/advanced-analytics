@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Take full control of error log, crons, transients, plugins and DB tables.
- * Version:         2.6.1
+ * Version:         2.6.2
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '2.6.1' );
+define( 'ADVAN_VERSION', '2.6.2' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );

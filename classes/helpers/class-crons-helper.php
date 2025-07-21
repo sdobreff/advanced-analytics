@@ -324,7 +324,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 				\wp_safe_redirect(
 					\remove_query_arg(
 						array( 'deleted' ),
-						add_query_arg(
+						\add_query_arg(
 							array(
 								'page'                   => Settings::CRON_MENU_SLUG,
 								Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
@@ -460,6 +460,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		}
 
 		/**
+		 * Adds a cron job to the stored ones.
+		 *
+		 * @param array $cron_job - Array with the cron job information. Every cron job information includes 'time', 'hook', 'args', if it is a recurring one - and 'next_run'.
+		 *
+		 * Example:
+		 * 'hook_name'   => array(
+		 *      'time'     => 'monthly',
+		 *      'hook'     => array( __CLASS_TO_CALL__, 'method_to_call' ),
+		 *      'args'     => array(),
+		 *      'next_run' => '00:00 first day of next month',
+		 *  )
+		 * .
+		 *
+		 * @return void
+		 *
+		 * @throws \InvalidArgumentException When cron job information passed not contains required keys.
+		 *
+		 * @since 1.9.2
+		 */
+		public static function add_cron_from_array( array $cron_job ) {
+			
+		}
+
+		/**
 		 * Tests the proper spawning of the WP Cron
 		 *
 		 * @param boolean $cache - Flag - should only use the cached results from previous calls.
@@ -513,7 +537,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			$sslverify     = version_compare( $wp_version, '4.0', '<' );
 			$doing_wp_cron = sprintf( '%.22F', microtime( true ) );
 
-			$cron_request = apply_filters(
+			$cron_request = \apply_filters(
 				'cron_request',
 				array(
 					'url'  => \add_query_arg( 'doing_wp_cron', $doing_wp_cron, site_url( 'wp-cron.php' ) ),
