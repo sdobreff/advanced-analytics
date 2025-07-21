@@ -64,7 +64,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Slack_API' ) ) {
 			$url  = 'https://slack.com/api/chat.postMessage';
 			$data = array(
 				'channel' => $channel_name,
-				'text'    => ':warning: ' . \wp_kses_post( $text ),
+				'text'    => ':warning: ' . ( $text ),
+				'unfurl_links' => false,
+				'unfurl_media' => false,
 			);
 
 			$headers = array(

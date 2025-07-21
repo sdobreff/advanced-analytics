@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Take full control of error log, crons, transients, plugins and DB tables.
- * Version:         2.6.0
+ * Version:         2.6.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-define( 'ADVAN_VERSION', '2.6.0' );
+define( 'ADVAN_VERSION', '2.6.1' );
 define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 define( 'ADVAN_NAME', 'WP Control' );
 define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -117,7 +117,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\add_action( 'plugin_loaded', 'advana_remove_plugins' );
 
-	if ( \wp_recovery_mode()->is_active() ) {
+	if ( ! WP_Helper::is_multisite() && \wp_recovery_mode()->is_active() ) {
 		\add_action(
 			'plugin_loaded',
 			function() {

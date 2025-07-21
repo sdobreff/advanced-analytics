@@ -3,7 +3,7 @@ Tags: log, error log, debug, cron, transients
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.6.0
+Stable tag: 2.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -22,9 +22,11 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
 - Easily see where exactly error is thrown (where detected)
 
+**Important:** Description below does not apply for multisites, as this feature is not implemented by the WordPress core team for multisites!
 Recovery Mode link (still experimental) in the notification channels (if set) is added along with the fatal error. Wp core not always kicks in on fatality errors and this makes sure that you still have access to your website.
 How this feature works:
 If fatal error is detected from the plugin, it sends notifications to Slack or Telegram channels (if set), and provides recovery link along with the error message. When used, that link allows admin to login and suppresses all the plugins and active theme (except the **WP Control** plugin). You can observe the error log using the plugin screen and see where, when and what caused the error and take measures. You can completely disable the errored plugin or theme, switch to another version or just fix the error (if possible). Once done - just exit recovery mode and everything should continue working normally.
+Note: Every time fatal is thrown, for security reasons new link is generated, every single one of them should work, but on busy sites that could lead to 10s of generated links.
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -92,6 +94,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 8. **Table manager operations** - Current table more detailed information and truncate and delete operations.
 
 == Changelog ==
+
+= 2.6.1 =
+Recovery mode improvements - Fixes problem with Slack notifications - by default Slack follows links. Added checks for multisite and suppresses logic if one is detected.
 
 = 2.6.0 =
 Code logic improvements. Added option to disable all external requests. Added error capturing for when API requests trow WP_Error. Extended error reporting feature. Implemented recovery mode if fatal error occurs and WP Core does not catch it.
