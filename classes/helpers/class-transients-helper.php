@@ -219,6 +219,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			$expiration = ( $expiration - time() );
 
+			$new_name = $_POST['name'] ?? '';
+
+			if ( ! empty( $new_name ) && $transient !== self::clear_transient_name( $new_name ) ) {
+				\delete_transient( $transient );
+				$transient = $new_name;
+			}
+
 			// Transient type.
 			$retval = ( false !== $site_wide )
 			? \set_site_transient( $transient, $value, $expiration )
@@ -452,6 +459,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			// Return transients.
 			return $transients;
+		}
+
+		/**
+		 * Checks for _transient and _site_transient strings and removes them if present.
+		 *
+		 * @param string $transient - The name of the transient to clear.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function clear_transient_name( string $transient ): string {
+			if ( \str_starts_with( $transient, '_site_transient_' ) ) {
+				return str_replace( '_site_transient_', '', $transient );
+			} elseif ( \str_starts_with( $transient, '_transient_' ) ) {
+				return str_replace( '_transient_', '', $transient );
+			}
+
+			return $transient;
 		}
 	}
 }

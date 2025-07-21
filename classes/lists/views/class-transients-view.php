@@ -95,9 +95,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 							foreach ( Transients_Helper::WP_CORE_TRANSIENTS as $trans_name ) {
 								if ( \str_starts_with( $name, $trans_name ) ) {
 									?>
-							<div id="advaa-status-notice" class="notice notice-warning">
-								<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
-							</div>
+									<div id="advaa-status-notice" class="notice notice-warning">
+										<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
+									</div>
 									<?php
 									break;
 								}
@@ -113,7 +113,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 								</tr>
 								<tr>
 									<th><?php \esc_html_e( 'Name', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="<?php echo \esc_attr( $transient['option_name'] ); ?>" /></td>
+									<td><input type="text" class="large-text code" name="name" value="<?php echo \esc_attr( Transients_Helper::clear_transient_name( $transient['option_name'] ) ); ?>" /></td>
 								</tr>
 								<?php
 								if ( 0 !== $expiration ) {
@@ -188,10 +188,16 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 									<th><?php esc_html_e( 'Name', '0-day-analytics' ); ?></th>
 									<td><input type="text" class="large-text code" name="name" value="" /></td>
 								</tr>
-								<tr>
-									<th><?php esc_html_e( 'Side Wide', '0-day-analytics' ); ?></th>
-									<td><input type="checkbox" name="side-wide" value="1" /></td>
-								</tr>
+								<?php
+								if ( WP_Helper::is_multisite() ) {
+									?>
+									<tr>
+										<th><?php esc_html_e( 'Side Wide', '0-day-analytics' ); ?></th>
+										<td><input type="checkbox" name="side-wide" value="1" /></td>
+									</tr>
+									<?php
+								}
+								?>
 								<tr>
 									<th><?php esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
 									<td>
