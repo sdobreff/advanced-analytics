@@ -28,6 +28,7 @@ use ADVAN\Helpers\Context_Helper;
 use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Helpers\WP_Helper;
+use ADVAN\Controllers\Requests_Log;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -150,11 +151,11 @@ if ( ! Context_Helper::is_installing() ) {
 						$storage = new \WP_Paused_Extensions_Storage( 'theme' );
 
 						// foreach ( $wp_theme_directories as $theme_directory ) {
-						// 	$theme_directory = \wp_normalize_path( $theme_directory );
+						// $theme_directory = \wp_normalize_path( $theme_directory );
 
-						// 	$stylesheet       = \get_stylesheet();
+						// $stylesheet       = \get_stylesheet();
 
-						// 	$parts = explode( '/', $theme_directory );
+						// $parts = explode( '/', $theme_directory );
 
 							$storage->set(
 								\get_stylesheet(),
@@ -165,7 +166,7 @@ if ( ! Context_Helper::is_installing() ) {
 									'message' => '',
 								)
 							);
-					// 	}
+						// }
 					}
 
 					$redirect_to = 'wp-login.php?action=entered_recovery_mode';
@@ -185,6 +186,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\add_filter( 'det_display_environment_type', '__return_false' );
 
+	Requests_Log::init();
 	Endpoints::init();
 }
 
@@ -233,4 +235,4 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
-// throw new \Exception('hu');
+

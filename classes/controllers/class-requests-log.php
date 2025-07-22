@@ -2,7 +2,7 @@
 /**
  * Requests log class - showing the pointers where necessary.
  *
- * @package awesome-footnotes
+ * @package 0-day-analytics
  *
  * @since latest
  */
@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Helpers\Context_Helper;
 use ADVAN\Entities\Requests_Log_Entity;
 
 // Exit if accessed directly.
@@ -34,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since latest
 		 */
 		public static function init() {
-			\apply_filters( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+			\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
 			\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
 		}
 
@@ -57,17 +58,26 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				$status = 'success';
 			}
 
+			$user_id = 0;
+
+			if ( \is_user_logged_in() ) {
+				$user_id = \get_current_user_id();
+			}
+
 			// Prepare the log entry.
 			$log_entry = array(
 				'url'            => $url,
+				'page_url'       => self::page_url(),
+				'type'           => self::current_page_type(),
 				'domain'         => \wp_parse_url( $url, PHP_URL_HOST ),
+				'user_id'        => $user_id,
 				'runtime'        => microtime( true ) - ( ( $_SERVER['REQUEST_TIME_FLOAT'] ) ?? 0 ),
 				'request_status' => $status,
 				'request_group'  => isset( $parsed_args['group'] ) ? $parsed_args['group'] : '',
 				'request_source' => isset( $parsed_args['source'] ) ? $parsed_args['source'] : '',
 				'request_args'   => \wp_json_encode( $parsed_args ),
 				'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
-				'date_added'     => current_time( 'mysql' ),
+				'date_added'     => time(),
 			);
 
 			// Save the log entry to the database.
@@ -95,36 +105,86 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * Id adding new page type update self::$page_types array with new page type group
 		 *
 		 * @return string cron|ajax|rest_api|xmlrpc|login|admin|frontend
-		 * 
+		 *
 		 * @since latest
 		 */
 		public static function current_page_type() {
 
+			static $return;
+
 			if ( is_null( $return ) ) {
-				if ( is_null( $return ) && ( ( function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) ) {
+				if ( is_null( $return ) && Context_Helper::is_cron() ) {
 					$return = 'cron';
 				}
 
-				if ( is_null( $return ) && wp_doing_ajax() ) {
+				if ( is_null( $return ) && Context_Helper::is_ajax() ) {
 					$return = 'ajax';
 				}
 
-				// is REST API endpoint
-				if ( is_null( $return ) && ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ! empty( $GLOBALS['wp']->query_vars['rest_route'] ) ) ) {
+				// Is REST API endpoint.
+				if ( is_null( $return ) && Context_Helper::is_rest() ) {
 					$return = 'rest_api';
 				}
 
-				if ( is_null( $return ) && ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ) {
+				if ( is_null( $return ) && Context_Helper::is_xml_rpc() ) {
 					$return = 'xmlrpc';
 				}
 
-				if ( is_null( $return ) && self::is_login_page() ) {
+				if ( is_null( $return ) && Context_Helper::is_wp_cli() ) {
+					$return = 'wp-cli';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_login() ) {
 					$return = 'login';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_front() ) {
+					$return = 'frontend';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_admin() ) {
+					$return = 'admin';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_core() ) {
+					$return = 'core';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_installing() ) {
+					$return = 'installing';
+				}
+
+				if ( is_null( $return ) && Context_Helper::is_wp_activate() ) {
+					$return = 'activate';
+				}
+				if ( is_null( $return ) && Context_Helper::is_undetermined() ) {
+					$return = 'undetermined';
 				}
 			}
 
-			// certain or fallback type
-			return is_null( $return ) ? ( is_admin() ? 'admin' : 'frontend' ) : $return;
+			// Certain or fallback type.
+			return $return;
+		}
+
+		/**
+		 * Collects the given page URL.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function page_url(): string {
+			if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
+				$host        = \sanitize_text_field( $_SERVER['HTTP_HOST'] );
+				$uri         = \sanitize_text_field( $_SERVER['REQUEST_URI'] );
+				$current_url = ( \is_ssl() ? 'https://' : 'http://' ) . $host . $uri;
+			} else {
+				// use WordPress functions.
+				global $wp;
+				$current_url = \home_url( \add_query_arg( array(), $wp->request ) );
+			}
+
+			return $current_url;
 		}
 	}
 }

@@ -39,8 +39,9 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 */
 		protected static $fields = array(
 			'id'             => 'int',
-			'page_id'        => 'int',
+			'type'           => 'string',
 			'url'            => 'string',
+			'page_url'       => 'string',
 			'domain'         => 'string',
 			'runtime'        => 'float',
 			'request_status' => 'string',
@@ -60,8 +61,9 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 */
 		protected static $fields_values = array(
 			'id'             => 0,
-			'page_id'        => 0,
+			'type'           => '',
 			'url'            => '',
+			'page_url'       => '',
 			'domain'         => '',
 			'runtime'        => 0,
 			'request_status' => '',
@@ -92,8 +94,10 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			$wp_entity_sql = '
 				CREATE TABLE `' . $table_name . '` (
 					id BIGINT unsigned not null auto_increment,
-					page_id BIGINT unsigned not null,
+					type VARCHAR(20) NOT NULL DEFAULT "",
 					url TEXT(2048),
+					page_url TEXT(2048),
+					user_id BIGINT unsigned NOT NULL DEFAULT 0,
 					domain TEXT(255),
 					runtime DECIMAL(10,3),
 					request_status VARCHAR(20),
@@ -101,10 +105,9 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 					request_source VARCHAR(255),
 					request_args MEDIUMTEXT,
 					response MEDIUMTEXT,            
-					date_added TIMESTAMP,
+					date_added DOUBLE NOT NULL DEFAULT 0,
 				PRIMARY KEY (id),
-				KEY `page_id` (`page_id`),
-				KEY `runtime` (`runtime`),
+				KEY `runtime` (`runtime`)
 				)
 			  ' . $collate . ';';
 

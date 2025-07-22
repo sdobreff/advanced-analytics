@@ -16,8 +16,8 @@ namespace ADVAN\Helpers;
 use ADVAN\Controllers\Slack;
 use ADVAN\Advanced_Analytics;
 use ADVAN\Controllers\Telegram;
-use ADVAN\Controllers\Slack_API;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Controllers\Slack_API;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	/**
 	 * Class: WP_Error_Handler
+use ADVAN\Controllers\Telegram_API;
 	 *
 	 * Helper class to handle errors and exceptions.
 	 *

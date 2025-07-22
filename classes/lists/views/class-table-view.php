@@ -231,9 +231,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 				<input type="button" name="truncate_action" id="truncate_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Truncate Table', '0-day-analytics' ); ?>">
 
 					<script>
-						let action = document.getElementById("truncate_table");
+						let action_truncate = document.getElementById("truncate_table");
 
-						action.onclick = tableTruncate;
+						action_truncate.onclick = tableTruncate;
 
 						async function tableTruncate(e) {
 
@@ -270,9 +270,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					<input type="button" name="drop_action" id="drop_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Drop Table', '0-day-analytics' ); ?>">
 
 					<script>
-						let action = document.getElementById("drop_table");
+						let action_drop = document.getElementById("drop_table");
 
-						action.onclick = tableDrop;
+						action_drop.onclick = tableDrop;
 
 						async function tableDrop(e) {
 

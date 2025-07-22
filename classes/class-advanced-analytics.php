@@ -118,6 +118,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				array_unshift( $links, $settings_link );
 				$settings_link = '<a href="' . esc_url( Settings::get_transients_page_link() ) . '">' . \esc_html__( 'Transients', '0-day-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
+				$settings_link = '<a href="' . esc_url( Settings::get_requests_page_link() ) . '">' . \esc_html__( 'Requests', '0-day-analytics' ) . '</a>';
+				array_unshift( $links, $settings_link );
 				$settings_link = '<a href="' . esc_url( Settings::get_tables_page_link() ) . '">' . \esc_html__( 'Tables', '0-day-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
 				$settings_link = '<a href="' . esc_url( Settings::get_settings_page_link() ) . '">' . \esc_html__( 'Error Logs', '0-day-analytics' ) . '</a>';

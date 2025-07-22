@@ -17,6 +17,7 @@ use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Lists\Table_List;
 use ADVAN\Controllers\Slack;
+use ADVAN\Lists\Requests_List;
 use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Controllers\Slack_API;
@@ -49,6 +50,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public const CRON_MENU_SLUG = 'advan_cron_jobs';
 
 		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
+
+		public const REQUESTS_MENU_SLUG = 'advan_requests';
 
 		public const TABLE_MENU_SLUG = 'advan_table';
 
@@ -153,6 +156,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @var string
 		 */
 		private static $settings_transients_link = '';
+
+		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 */
+		private static $settings_requests_link = '';
 
 		/**
 		 * The current version of the plugin
@@ -541,6 +551,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					1
 				);
 
+				/* Requests start */
+				$requests_hook = \add_submenu_page(
+					self::MENU_SLUG,
+					\esc_html__( 'WP Control', '0-day-analytics' ),
+					\esc_html__( 'Requests viewer', '0-day-analytics' ),
+					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					self::REQUESTS_MENU_SLUG,
+					array( Transients_View::class, 'analytics_transients_page' ),
+					3
+				);
+
+				Requests_List::add_screen_options( $requests_hook );
+
+				\add_filter( 'manage_' . $requests_hook . '_columns', array( Requests_List::class, 'manage_columns' ) );
+
+				\add_action( 'load-' . $requests_hook, array( __CLASS__, 'aadvana_common_help' ) );
+
+				/* Requests end */
+
 				/* Crons */
 				$cron_hook = \add_submenu_page(
 					self::MENU_SLUG,
@@ -587,7 +616,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::TABLE_MENU_SLUG,
 					array( Table_View::class, 'analytics_table_page' ),
-					2
+					4
 				);
 
 				Table_List::add_screen_options( $table_hook );
@@ -1000,6 +1029,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		}
 
 		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
+		 * @since 1.7.4
+		 */
+		public static function get_requests_page_link() {
+			if ( '' === self::$settings_requests_link ) {
+				self::$settings_requests_link = \add_query_arg( 'page', self::REQUESTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_requests_link;
+		}
+
+		/**
 		 * Shows the save button in the settings
 		 *
 		 * @return void
@@ -1288,7 +1332,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || self::REQUESTS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1630,7 +1674,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
 
 				return sprintf(
-					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
+					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
 					self::get_error_log_page_link(),
 					__( 'Error Log', 'wp-security-audit-log' ),
 					self::get_crons_page_link(),
@@ -1639,6 +1683,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					__( 'Tables', 'wp-security-audit-log' ),
 					self::get_transients_page_link(),
 					__( 'Transients', 'wp-security-audit-log' ),
+					self::get_requests_page_link(),
+					__( 'Requests', 'wp-security-audit-log' ),
 					__( 'Version ', 'wp-security-audit-log' ),
 					ADVAN_VERSION
 				);

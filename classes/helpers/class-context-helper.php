@@ -579,7 +579,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Context_Helper' ) ) {
 		 *
 		 * @since 1.1.0
 		 */
-		private static function is_undetermined(): bool {
+		public static function is_undetermined(): bool {
 			if ( is_null( self::$undetermined ) ) {
 				$is_not_installing = self::is_not_installing();
 				$is_ajax           = self::is_ajax();
