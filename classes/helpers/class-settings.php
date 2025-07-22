@@ -25,6 +25,7 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Lists\Views\Table_View;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
 
@@ -558,7 +559,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\esc_html__( 'Requests viewer', '0-day-analytics' ),
 					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::REQUESTS_MENU_SLUG,
-					array( Transients_View::class, 'analytics_transients_page' ),
+					array( Requests_View::class, 'analytics_requests_page' ),
 					3
 				);
 

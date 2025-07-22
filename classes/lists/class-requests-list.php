@@ -77,6 +77,15 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		protected static $rows_per_page = 20;
 
 		/**
+		 * Holds the prepared options for speeding the proccess
+		 *
+		 * @var array
+		 *
+		 * @since 2.1.0
+		 */
+		protected static $admin_columns = array();
+
+		/**
 		 * Default class constructor
 		 *
 		 * @param string $table_name - The name of the table to use for the listing.
@@ -108,7 +117,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @since 2.1.0
 		 */
-		public function get_table_name(): string {
+		public static function get_table_name(): string {
 			return self::$table::get_name();
 		}
 
@@ -281,13 +290,139 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @param string $column_name - The name of the currently processed column.
 		 *
 		 * @return mixed
+		 *
+		 * @since latest
 		 */
 		public function column_default( $item, $column_name ) {
 
 			switch ( $column_name ) {
 
-				default:
-					return $this->common_column_render( $item, $column_name );
+				case 'type':
+					return \esc_html( $item[ $column_name ] );
+
+				case 'url':
+				case 'page_url':
+					$value = \str_replace( array( 'http://', 'https://' ), '', $item[ $column_name ] );
+					$value = \str_replace( WP_Helper::get_blog_domain(), '', $value );
+
+					$title = \esc_html( $value );
+
+					$value = substr( $value, 0, 70 );
+
+					// Escape & wrap in <code> tag.
+					$value = '<code title="' . $title . '">' . \esc_html( $value ) . '</code>';
+					return $value;
+
+				case 'user_id':
+					if ( isset( $item[ $column_name ] ) && ! empty( $item[ $column_name ] ) && 0 !== $item[ $column_name ] ) {
+						$user = \get_user_by( 'id', $item[ $column_name ] );
+						if ( $user ) {
+							return '<a href="' . \esc_url( \get_edit_user_link( $user->ID ) ) . '">' . \esc_html( $user->display_name ) . '</a> (' . \esc_html( $user->user_email ) . ')';
+						} else {
+							return \esc_html__( 'Unknown or deleted user', '0-day-analytics' );
+						}
+					} else {
+						return \esc_html__( 'WP System or Anonymous user', '0-day-analytics' );
+					}
+
+				case 'domain':
+					// Escape & wrap in <code> tag.
+					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
+
+				case 'runtime':
+					// Escape & wrap in <code> tag.
+					return '<code>' . \esc_html( \number_format( (float) $item[ $column_name ], 3 ) ) . 's</code>';
+
+				case 'request_status':
+					// Escape & wrap in <code> tag.
+					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
+
+				case 'request_group':
+				case 'request_source':
+					// Escape & wrap in <code> tag.
+					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
+				case 'date_added':
+					$time_format = 'g:i a';
+
+					$item['date_added'] = (int) $item['date_added'];
+
+					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['date_added'] );
+
+					$timezone_local  = \wp_timezone();
+					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
+					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
+					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
+
+					// If the offset of the date of the event is different from the offset of the site, add a marker.
+					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+						$time_format .= ' (P)';
+					}
+
+					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+
+					if ( $event_local === $today_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Today at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $tomorrow_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Tomorrow at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} elseif ( $event_local === $yesterday_local ) {
+						$date = sprintf(
+						/* translators: %s: Time */
+							__( 'Yesterday at %s', '0-day-analytics' ),
+							$event_time_local,
+						);
+					} else {
+						$date = sprintf(
+						/* translators: 1: Date, 2: Time */
+							__( '%1$s at %2$s', '0-day-analytics' ),
+							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
+							$event_time_local,
+						);
+					}
+
+					$time = sprintf(
+						'<time datetime="%1$s">%2$s</time>',
+						\esc_attr( gmdate( 'c', $item['date_added'] ) ),
+						\esc_html( $date )
+					);
+
+					$until = $item['date_added'] - time();
+
+					if ( $until < 0 ) {
+						$ago = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+							__( '%s ago', '0-day-analytics' ),
+							WP_Helper::interval( abs( $until ) )
+						);
+
+						return sprintf(
+							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+							esc_html( $ago ),
+							$time,
+						);
+					} elseif ( 0 === $until ) {
+						$in = __( 'Now', '0-day-analytics' );
+					} else {
+						$in = sprintf(
+						/* translators: %s: Time period, for example "8 minutes" */
+							__( 'In %s', '0-day-analytics' ),
+							WP_Helper::interval( $until ),
+						);
+					}
+
+					return sprintf(
+						'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
+						\esc_html( $in ),
+						$time,
+					);
 			}
 		}
 
@@ -512,37 +647,12 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			<div class="alignleft actions bulkactions">
 				
-				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table" style="font-family: dashicons;">
-					<?php
-					foreach ( Common_Table::get_tables() as $table ) {
-						$selected = '';
-						if ( self::$table::get_name() === $table ) {
-							$selected = ' selected="selected"';
-						}
-						$core_table = '';
-						if ( in_array( $table, Common_Table::get_wp_core_tables(), true ) ) {
-							$core_table = ' ';
-						}
-						?>
-						<option <?php echo $selected; ?> value="<?php echo \esc_attr( $table ); ?>" style="font-family: dashicons;"><?php echo $core_table . \esc_html( $table );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></option>
-						<?php
-					}
-					?>
-					
-				</select>
-				
 			</div>
 
 			<?php
 			// if ( 'top' === $which ) {
 			global $wpdb;
 			?>
-						<script>
-							jQuery('form .table_filter').on('change', function(e) {
-								jQuery('form .table_filter').val(jQuery(this).val());
-								jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SWITCH_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SWITCH_ACTION, self::SWITCH_ACTION . 'nonce' ); ?>').submit();
-							});
-						</script>
 						<?php
 						if ( 'top' === $which ) {
 							?>
@@ -640,7 +750,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					?>
 					</div>
 					<div>
-						<b><?php \esc_html_e( 'Schema: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $wpdb->dbname ); ?></span> | <b><?php \esc_html_e( 'Tables: ', '0-day-analytics' ); ?></b><span class="italic"><?php echo \esc_attr( count( Common_Table::get_tables() ) ); ?></span>
+						
 					</div>
 				</div>
 				<?php
@@ -677,9 +787,20 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		public static function manage_columns( $columns ): array {
 
-			Common_Table::init( Requests_Log_Entity::get_table_name() );
+			if ( empty( self::$admin_columns ) ) {
 
-			return Common_Table::manage_columns( $columns );
+				$admin_columns = Requests_Log_Entity::get_column_names_admin();
+
+				$screen_options = $admin_columns;
+
+				$table_columns = array(
+					'cb' => '<input type="checkbox" />', // to display the checkbox.
+				);
+
+				self::$admin_columns = \array_merge( $table_columns, $screen_options, $columns );
+			}
+
+			return self::$admin_columns;
 		}
 	}
 }

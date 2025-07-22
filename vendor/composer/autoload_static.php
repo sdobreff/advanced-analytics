@@ -56,6 +56,7 @@ class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
         'ADVAN\\Lists\\Traits\\List_Trait' => __DIR__ . '/../..' . '/classes/lists/traits/class-list-trait.php',
         'ADVAN\\Lists\\Transients_List' => __DIR__ . '/../..' . '/classes/lists/class-transients-list.php',
         'ADVAN\\Lists\\Views\\Crons_View' => __DIR__ . '/../..' . '/classes/lists/views/class-crons-view.php',
+        'ADVAN\\Lists\\Views\\Requests_View' => __DIR__ . '/../..' . '/classes/lists/views/class-requests-view.php',
         'ADVAN\\Lists\\Views\\Table_View' => __DIR__ . '/../..' . '/classes/lists/views/class-table-view.php',
         'ADVAN\\Lists\\Views\\Transients_View' => __DIR__ . '/../..' . '/classes/lists/views/class-transients-view.php',
         'ADVAN\\Migration\\Abstract_Migration' => __DIR__ . '/../..' . '/classes/migration/class-abstract-migration.php',

@@ -113,5 +113,24 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 
 			return self::maybe_create_table( $table_name, $wp_entity_sql, $connection );
 		}
+
+		/**
+		 * Returns the table CMS admin fields
+		 *
+		 * @return array
+		 *
+		 * @since 2.1.0
+		 */
+		public static function get_column_names_admin(): array {
+			return array(
+				'type',
+				'url',
+				'page_url',
+				'domain',
+				'runtime',
+				'request_status',
+				'date_added',
+			);
+		}
 	}
 }
