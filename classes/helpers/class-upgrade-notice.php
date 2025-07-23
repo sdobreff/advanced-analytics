@@ -222,7 +222,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 			}
 
-			$plugin_information = plugins_api(
+			$plugin_information = \plugins_api(
 				'plugin_information',
 				array(
 					'slug'   => esc_html( $plugin_slug ),

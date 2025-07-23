@@ -43,6 +43,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			'url'            => 'string',
 			'page_url'       => 'string',
 			'domain'         => 'string',
+			'user_id'        => 'int',
 			'runtime'        => 'float',
 			'request_status' => 'string',
 			'request_group'  => 'string',
@@ -65,6 +66,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			'url'            => '',
 			'page_url'       => '',
 			'domain'         => '',
+			'user_id'        => 0,
 			'runtime'        => 0,
 			'request_status' => '',
 			'request_group'  => '',
@@ -123,13 +125,14 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		 */
 		public static function get_column_names_admin(): array {
 			return array(
-				'type',
-				'url',
-				'page_url',
-				'domain',
-				'runtime',
-				'request_status',
-				'date_added',
+				'date_added'     => __( 'Date', '0-day-analytics' ),
+				'type'           => __( 'Type', '0-day-analytics' ),
+				'request_status' => __( 'Status', '0-day-analytics' ),
+				'url'            => __( 'URL', '0-day-analytics' ),
+				'page_url'       => __( 'Page', '0-day-analytics' ),
+				'domain'         => __( 'Domain', '0-day-analytics' ),
+				'user_id'        => __( 'User', '0-day-analytics' ),
+				'runtime'        => __( 'Runtime', '0-day-analytics' ),
 			);
 		}
 	}

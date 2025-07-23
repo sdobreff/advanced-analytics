@@ -133,7 +133,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			$items = $this->fetch_table_data();
 
-			$columns = self::$table::manage_columns( array() );
+			$columns = self::manage_columns( array() );
 			$hidden  = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
@@ -161,7 +161,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @return array
 		 */
 		public function get_columns() {
-			return self::$table::manage_columns( array() );
+			return self::manage_columns( array() );
 		}
 
 		/**
@@ -238,7 +238,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			$wpdb_table = $this->get_table_name();
 
 			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : self::$table::get_real_id_name();
-			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'ASC';
+			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
 			$query   = 'SELECT
 				' . implode( ', ', self::$table::get_column_names() ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;

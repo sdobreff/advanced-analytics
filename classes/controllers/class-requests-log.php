@@ -52,7 +52,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 */
 		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
 			// Check if the response is an error.
-			if ( is_wp_error( $response ) ) {
+			if ( \is_wp_error( $response ) ) {
 				$status = 'error';
 			} else {
 				$status = 'success';
