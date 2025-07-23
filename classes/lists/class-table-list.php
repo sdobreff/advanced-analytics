@@ -303,6 +303,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		private function common_column_render( array $item, $column_name ): string {
 
 			if ( $column_name === self::$table::get_real_id_name() ) {
+				$query_args_view_data = array();
 
 				$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
 

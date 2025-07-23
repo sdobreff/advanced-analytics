@@ -359,6 +359,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		public static function format_column_value( $item, $column_name ) {
 			switch ( $column_name ) {
 				case 'hook':
+					$query_args_view_data             = array();
 					$query_args_view_data['hash']     = $item['hash'];
 					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-custom-delete' );
 

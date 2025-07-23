@@ -28,6 +28,33 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 	class Requests_Log {
 
 		/**
+		 * Class cache for the requests count.
+		 *
+		 * @var integer
+		 *
+		 * @since latest
+		 */
+		private static $requests = 0;
+
+		/**
+		 * Class cache for the last inserted request ID.
+		 *
+		 * @var integer
+		 *
+		 * @since latest
+		 */
+		private static $last_id = 0;
+
+		/**
+		 * Class cache for the extracted page URL.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $page_url = '';
+
+		/**
 		 * Inits the class.
 		 *
 		 * @return void
@@ -51,6 +78,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since latest
 		 */
 		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
+
+			static $user_id = null;
+
 			// Check if the response is an error.
 			if ( \is_wp_error( $response ) ) {
 				$status = 'error';
@@ -58,10 +88,30 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				$status = 'success';
 			}
 
-			$user_id = 0;
+			++self::$requests;
 
-			if ( \is_user_logged_in() ) {
+			if ( null === $user_id && \is_user_logged_in() ) {
 				$user_id = \get_current_user_id();
+			} else {
+				$user_id = 0;
+			}
+
+			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
+				$log_entry = array(
+					'id'             => self::$last_id,
+					'url'            => $url,
+					'page_url'       => self::page_url(),
+					'type'           => self::current_page_type(),
+					'domain'         => \wp_parse_url( $url, PHP_URL_HOST ),
+					'user_id'        => $user_id,
+					'runtime'        => microtime( true ) - ( ( $_SERVER['REQUEST_TIME_FLOAT'] ) ?? 0 ),
+					'request_status' => $status,
+					'request_group'  => isset( $parsed_args['group'] ) ? $parsed_args['group'] : '',
+					'request_source' => isset( $parsed_args['source'] ) ? $parsed_args['source'] : '',
+					'request_args'   => \wp_json_encode( $parsed_args ),
+					'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
+					'date_added'     => time(),
+				);
 			}
 
 			// Prepare the log entry.
@@ -78,10 +128,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'request_args'   => \wp_json_encode( $parsed_args ),
 				'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
 				'date_added'     => time(),
+				'requests'       => self::$requests,
 			);
 
 			// Save the log entry to the database.
-			Requests_Log_Entity::insert( $log_entry );
+			self::$last_id = Requests_Log_Entity::insert( $log_entry );
 		}
 
 		/**
@@ -174,17 +225,22 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since latest
 		 */
 		public static function page_url(): string {
+
+			if ( ! empty( self::$page_url ) ) {
+				return self::$page_url;
+			}
+
 			if ( isset( $_SERVER['HTTP_HOST'] ) && isset( $_SERVER['REQUEST_URI'] ) ) {
-				$host        = \sanitize_text_field( $_SERVER['HTTP_HOST'] );
-				$uri         = \sanitize_text_field( $_SERVER['REQUEST_URI'] );
-				$current_url = ( \is_ssl() ? 'https://' : 'http://' ) . $host . $uri;
+				$host           = \sanitize_text_field( $_SERVER['HTTP_HOST'] );
+				$uri            = \sanitize_text_field( $_SERVER['REQUEST_URI'] );
+				self::$page_url = ( \is_ssl() ? 'https://' : 'http://' ) . $host . $uri;
 			} else {
 				// use WordPress functions.
 				global $wp;
-				$current_url = \home_url( \add_query_arg( array(), $wp->request ) );
+				self::$page_url = \home_url( \add_query_arg( array(), $wp->request ) );
 			}
 
-			return $current_url;
+			return self::$page_url;
 		}
 	}
 }

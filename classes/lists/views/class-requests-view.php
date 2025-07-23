@@ -172,7 +172,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Requests', '0-day-analytics' ); ?></h1>
-					<?php echo '<a href="' . \esc_url( \admin_url( 'admin.php?page=' . Settings::REQUESTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
+
 					<hr class="wp-header-end">
 					<form id="requests-filter" method="get">
 					<?php

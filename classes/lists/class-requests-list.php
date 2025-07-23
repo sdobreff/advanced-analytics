@@ -342,6 +342,20 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					// Escape & wrap in <code> tag.
 					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
 				case 'date_added':
+					$query_args_view_data = array();
+					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
+					$delete_url           =
+					\add_query_arg(
+						array(
+							'action'           => 'delete',
+							'advan_' . self::$table::get_name() => $item[ self::$table::get_real_id_name() ],
+							self::SEARCH_INPUT => self::escaped_search_input(),
+							'_wpnonce'         => $query_args_view_data['_wpnonce'],
+						)
+					);
+
+					$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
+
 					$time_format = 'g:i a';
 
 					$item['date_added'] = (int) $item['date_added'];
@@ -407,7 +421,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 							esc_html( $ago ),
 							$time,
-						);
+						) . $this->row_actions( $actions );
 					} elseif ( 0 === $until ) {
 						$in = __( 'Now', '0-day-analytics' );
 					} else {
@@ -422,45 +436,8 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 						'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 						\esc_html( $in ),
 						$time,
-					);
+					) . $this->row_actions( $actions );
 			}
-		}
-
-		/**
-		 * Responsible for common column rendering
-		 *
-		 * @param array  $item - The current riw with data.
-		 * @param string $column_name - The column name.
-		 *
-		 * @return string
-		 *
-		 * @since 2.1.0
-		 */
-		private function common_column_render( array $item, $column_name ): string {
-
-			if ( $column_name === self::$table::get_real_id_name() ) {
-
-				$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
-
-				$delete_url =
-					\add_query_arg(
-						array(
-							'action'           => 'delete',
-							'advan_' . self::$table::get_name() => $item[ self::$table::get_real_id_name() ],
-							self::SEARCH_INPUT => self::escaped_search_input(),
-							'_wpnonce'         => $query_args_view_data['_wpnonce'],
-						)
-					);
-
-				$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
-
-				$row_value = \esc_html( $item[ $column_name ] ) . $this->row_actions( $actions );
-
-			} else {
-				$row_value = \esc_html( $item[ $column_name ] );
-			}
-
-			return $row_value;
 		}
 
 		/**
@@ -521,7 +498,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			 * Action2 - is set if checkbox the bottom-most select-all checkbox is set, otherwise returns -1
 			 */
 
-			if ( is_user_logged_in() && current_user_can( 'manage_options' ) ) {
+			if ( \is_user_logged_in() && \current_user_can( 'manage_options' ) ) {
 
 				// check for individual row actions.
 				$the_table_action = $this->current_action();
@@ -579,12 +556,12 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 					$redirect =
 						\remove_query_arg(
-							array( 'delete', '_wpnonce', 'advan_' . self::$table::get_name() ),
+							array( 'delete', '_wpnonce', 'advan_' . self::$table::get_name(), 'action' ),
 							\add_query_arg(
 								array(
 									self::SEARCH_INPUT => self::escaped_search_input(),
 									'paged'            => $_REQUEST['paged'] ?? 1,
-									'page'             => Settings::TABLE_MENU_SLUG,
+									'page'             => Settings::REQUESTS_MENU_SLUG,
 									'show_table'       => self::$table::get_name(),
 								),
 								\admin_url( 'admin.php' )
