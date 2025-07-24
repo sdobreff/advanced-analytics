@@ -39,6 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 */
 		public static function analytics_requests_page() {
 			\add_thickbox();
+			\wp_enqueue_style('media-views');
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -194,6 +195,167 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					?>
 					</form>
 				</div>
+				<style>
+					/* modal */
+					.media-modal,
+					.media-modal-backdrop {
+						display: none;
+					}
+
+					.media-modal.open,
+					.media-modal-backdrop.open {
+						display: block;
+					}
+
+					#vphrm-modal.vphrm-modal .media-frame-title,
+					#vphrm-modal.vphrm-modal .media-frame-content {
+						left: 0;
+					}
+
+					.media-frame-router {
+						left: 10px;
+					}
+					#vphrm-modal.vphrm-modal
+					.media-frame-content {
+						top: 48px;
+						bottom: 0;
+						overflow: auto;
+					}
+
+					.button-link.media-modal-close {
+						cursor: pointer;
+						text-decoration: none;
+					}
+
+					.vphrm-modal-buttons{
+						position: absolute;
+						top: 0;
+						right: 0;
+					}
+					.vphrm-modal-buttons .media-modal-close{
+						position: relative;
+						width: auto;
+						padding: 0 .5rem;
+					}
+
+					.media-modal-close.prev .media-modal-icon::before {
+						content: "\f342";
+					}
+
+					.media-modal-close.next .media-modal-icon::before {
+						content: "\f346";
+					}
+
+					.modal-content-wrap {
+						padding: 16px;
+					}
+
+					/* tab and panel */
+					.vphrm-modal .nav-tab-active{
+						border-bottom: solid 1px white;
+						background-color: white;
+					}
+					.vphrm-panel{
+						display:none;
+					}
+					.vphrm-panel-active{
+						display:block;
+						margin: 1rem 0;
+					}
+
+					/* view more link */
+					.vphrm-more-hidden,
+					.vphrm-hidden{
+						display: none;
+					}
+
+					.wrapper {
+						text-align: center;
+					}
+					.wrapper .box{
+						text-align: left;
+						background-color: #f4f5f6;
+						padding: .5rem;
+						border-radius: .5rem;
+						margin-bottom: 1rem;
+						display: inline-block;
+						vertical-align: top;
+						width: 48%;
+						box-sizing: border-box;
+					}
+					@media screen and (max-width: 782px) {
+
+						.wrapper .box{
+							display: block;
+							width: auto;
+						}
+
+					}
+
+				</style>
+
+				<div id="vphrm-modal" class="media-modal vphrm-modal">
+					<div class="vphrm-modal-buttons">
+						<button class="button-link media-modal-close"><span class="media-modal-icon"></span></button>
+					</div>
+					<div class="media-modal-content">
+						<div class="media-frame">
+							<div class="media-frame-title">
+								<h1>jknkjnjkn</h1>
+							</div>
+							<div class="media-frame-content">
+								<div class="modal-content-wrap">
+									<p>
+										<b>Request <span class="http-request-runtime"></span>:</b> 
+										[<span class="http-request-id"></span>]
+										<span class="http-url vphrm-break-word"></span>
+									</p>
+									<p>
+										<b>Page <span class="http-page-runtime"></span>:</b> 
+										<span class="http-page vphrm-break-word"></span>
+									</p>
+
+									<p class="nav-tab-wrapper wp-clearfix">
+										<a href="#vphrm-request-response" class="nav-tab nav-tab-active">Request</a>
+										<a href="#vphrm-cp" class="nav-tab">Check point</a>
+									</p>					
+									<div class="vphrm-panel-wrapper">
+										<div class="vphrm-request-response vphrm-panel vphrm-panel-active wrapper">
+											<div class="box">
+												<h3>Request</h3>
+												<div class="http-request-args vphrm-pre-300"></div>
+											</div>
+											<div class="box">
+												<h3>Response</h3>
+												<div class="http-response vphrm-pre-300"></div>
+											</div>						
+										</div>
+										<div class="vphrm-cp vphrm-panel"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="media-modal-backdrop"></div>
+
+<script>
+
+	jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
+		e.preventDefault();
+		jQuery('.media-modal').addClass('open');
+		jQuery('.media-modal-backdrop').addClass('open');
+	});
+
+
+	jQuery(document).on('click', '.media-modal-close', function () {
+		jQuery('.media-modal .http-request-args').html('');
+		jQuery('.media-modal .http-response').html('');
+		jQuery('.media-modal').removeClass('open');
+		jQuery('.media-modal-backdrop').removeClass('open');
+		jQuery(document).off('keydown.vphrm-modal-close');
+	});
+</script>
 				<?php
 			}
 		}

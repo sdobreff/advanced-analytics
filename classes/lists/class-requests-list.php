@@ -352,13 +352,15 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					\add_query_arg(
 						array(
 							'action'           => 'delete',
-							'advan_' . self::$table::get_name() => $item[ 'id' ],
+							'advan_' . self::$table::get_name() => $item['id'],
 							self::SEARCH_INPUT => self::escaped_search_input(),
 							'_wpnonce'         => $query_args_view_data['_wpnonce'],
 						)
 					);
 
 					$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
+
+					$actions['details'] = '<a href="#" class="aadvan-request-show-details">' . \esc_html__( 'Details' ) . '</a>';
 
 					$time_format = 'g:i a';
 
@@ -457,12 +459,12 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
-				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item[ 'id' ] . '">' . sprintf(
+				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item['id'] . '">' . sprintf(
 					// translators: The column name.
 					__( 'Select %s' ),
 					'id'
 				) . '</label>'
-				. '<input type="checkbox" name="advan_' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ 'id' ] . '" value="' . $item[ 'id' ] . '" />'
+				. '<input type="checkbox" name="advan_' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item['id'] . '" value="' . $item['id'] . '" />'
 			);
 		}
 
