@@ -715,5 +715,38 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 
 			return $full_fields;
 		}
+
+
+		public static function get_results( string $query, $connection = null ): array {
+			if ( null !== $connection ) {
+				if ( $connection instanceof \wpdb ) {
+					$_wpdb = $connection;
+				}
+			} else {
+				global $wpdb;
+				$_wpdb = $wpdb;
+			}
+
+			$_wpdb->suppress_errors( true );
+
+			$results = $_wpdb->get_results(
+				$query,
+				\ARRAY_A
+			);
+
+			if ( '' !== $_wpdb->last_error ) {
+				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+					if ( ( static::class )::create_table( $_wpdb ) ) {
+
+						$results = array();
+
+					}
+				}
+			}
+
+			$_wpdb->suppress_errors( false );
+
+			return $results;
+		}
 	}
 }

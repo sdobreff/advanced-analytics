@@ -4,7 +4,7 @@
  *
  * @package 0-day-analytics
  *
- * @since latest
+ * @since 2.7.0
  */
 
 declare(strict_types=1);
@@ -23,7 +23,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 	/**
 	 * Responsible for collecting the requests.
 	 *
-	 * @since latest
+	 * @since 2.7.0
 	 */
 	class Requests_Log {
 
@@ -32,7 +32,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		private static $requests = 0;
 
@@ -41,7 +41,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		private static $last_id = 0;
 
@@ -50,16 +50,25 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		private static $page_url = '';
+
+		/**
+		 * Class cache for the collected trace.
+		 *
+		 * @var string
+		 *
+		 * @since 2.7.0
+		 */
+		private static $trace = '';
 
 		/**
 		 * Inits the class.
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function init() {
 			\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
@@ -75,7 +84,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @param array          $parsed_args HTTP request arguments.
 		 * @param string         $url         The request URL.
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
 
@@ -96,24 +105,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				$user_id = 0;
 			}
 
-			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
-				$log_entry = array(
-					'id'             => self::$last_id,
-					'url'            => $url,
-					'page_url'       => self::page_url(),
-					'type'           => self::current_page_type(),
-					'domain'         => \wp_parse_url( $url, PHP_URL_HOST ),
-					'user_id'        => $user_id,
-					'runtime'        => microtime( true ) - ( ( $_SERVER['REQUEST_TIME_FLOAT'] ) ?? 0 ),
-					'request_status' => $status,
-					'request_group'  => isset( $parsed_args['group'] ) ? $parsed_args['group'] : '',
-					'request_source' => isset( $parsed_args['source'] ) ? $parsed_args['source'] : '',
-					'request_args'   => \wp_json_encode( $parsed_args ),
-					'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
-					'date_added'     => time(),
-				);
-			}
-
 			// Prepare the log entry.
 			$log_entry = array(
 				'url'            => $url,
@@ -129,10 +120,32 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
 				'date_added'     => time(),
 				'requests'       => self::$requests,
+				'trace'          => self::get_trace(),
 			);
+
+			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
+				$log_entry ['id'] = self::$last_id;
+			}
 
 			// Save the log entry to the database.
 			self::$last_id = Requests_Log_Entity::insert( $log_entry );
+		}
+
+		/**
+		 * Collects and returns the trace of the current request in JSON format.
+		 *
+		 * @return string
+		 *
+		 * @since 2.7.0
+		 */
+		public static function get_trace(): string {
+			if ( empty( self::$trace ) ) {
+				$trace = new \Exception( '' )->getTrace();
+
+				self::$trace = \json_encode( $trace, );
+			}
+
+			return self::$trace;
 		}
 
 		/**
@@ -142,7 +155,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @param array                $parsed_args HTTP request arguments.
 		 * @param string               $url         The request URL.
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function pre_http_request( $response, $parsed_args, $url ) {
 			// Start the timer.
@@ -157,7 +170,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @return string cron|ajax|rest_api|xmlrpc|login|admin|frontend
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function current_page_type() {
 
@@ -222,7 +235,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function page_url(): string {
 

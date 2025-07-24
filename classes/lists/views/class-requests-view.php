@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 * @since 1.7.0
 		 */
 		public static function analytics_requests_page() {
-
+			\add_thickbox();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

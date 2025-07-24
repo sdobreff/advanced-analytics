@@ -41,7 +41,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 		use List_Trait;
 
-		public const PAGE_SLUG = 'wp-control_page_advan_reuqests';
+		public const PAGE_SLUG = 'wp-control_page_advan_requests';
 
 		public const SWITCH_ACTION = 'switch_advan_table';
 
@@ -177,7 +177,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @return array
 		 */
 		protected function get_sortable_columns() {
-			$first6_columns = array_keys( self::$table::get_column_names_admin() );
+			$first6_columns = array_keys( Requests_Log_Entity::get_column_names_admin() );
 
 			/**
 			 * Actual sorting still needs to be done by prepare_items.
@@ -228,8 +228,8 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			$search_sql = '';
 
 			if ( '' !== $search_string ) {
-				$search_sql = 'AND (' . self::$table::get_real_id_name() . ' LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
-				foreach ( array_keys( self::$table::get_column_names_admin() ) as $value ) {
+				$search_sql = 'AND (id LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
+				foreach ( array_keys( Requests_Log_Entity::get_column_names_admin() ) as $value ) {
 					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
 				}
 				$search_sql .= ') ';
@@ -237,18 +237,18 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			$wpdb_table = $this->get_table_name();
 
-			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : self::$table::get_real_id_name();
+			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : 'id';
 			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
 			$query   = 'SELECT
-				' . implode( ', ', self::$table::get_column_names() ) . '
+				' . implode( ', ', \array_keys( Requests_Log_Entity::get_fields() ) ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 
 			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
 
 			// query output_type will be an associative array with ARRAY_A.
-			$query_results = $wpdb->get_results( $query, ARRAY_A );
+			$query_results = Requests_Log_Entity::get_results( $query );
 
-			$this->count = $wpdb->get_var( 'SELECT COUNT(' . self::$table::get_real_id_name() . ') FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
+			$this->count = $wpdb->get_var( 'SELECT COUNT(id) FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
 
 			// return result array to prepare_items.
 			return $query_results;
@@ -291,7 +291,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public function column_default( $item, $column_name ) {
 
@@ -335,20 +335,24 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 				case 'request_status':
 					// Escape & wrap in <code> tag.
-					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
+					$extra_info = '';
+					if ( 'error' === $item[ $column_name ] ) {
+						$extra_info = ' <span class="status-control-error"><span class="dashicons dashicons-warning" aria-hidden="true"></span> ' . \esc_html( $item['response'] ) . '</span>';
+					}
+					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info . self::format_trace( $item['trace'] );
 
 				case 'request_group':
 				case 'request_source':
 					// Escape & wrap in <code> tag.
 					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
 				case 'date_added':
-					$query_args_view_data = array();
+					$query_args_view_data             = array();
 					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
-					$delete_url           =
+					$delete_url                       =
 					\add_query_arg(
 						array(
 							'action'           => 'delete',
-							'advan_' . self::$table::get_name() => $item[ self::$table::get_real_id_name() ],
+							'advan_' . self::$table::get_name() => $item[ 'id' ],
 							self::SEARCH_INPUT => self::escaped_search_input(),
 							'_wpnonce'         => $query_args_view_data['_wpnonce'],
 						)
@@ -453,12 +457,12 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
-				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '">' . sprintf(
+				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item[ 'id' ] . '">' . sprintf(
 					// translators: The column name.
 					__( 'Select %s' ),
-					self::$table::get_real_id_name()
+					'id'
 				) . '</label>'
-				. '<input type="checkbox" name="advan_' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ self::$table::get_real_id_name() ] . '" value="' . $item[ self::$table::get_real_id_name() ] . '" />'
+				. '<input type="checkbox" name="advan_' . self::$table::get_name() . '[]" id="' . self::$table::get_name() . '_' . $item[ 'id' ] . '" value="' . $item[ 'id' ] . '" />'
 			);
 		}
 
@@ -778,6 +782,81 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			}
 
 			return self::$admin_columns;
+		}
+
+		/**
+		 * Formats the trace from the request log.
+		 *
+		 * @param string $trace - JSON encoded trace.
+		 *
+		 * @return string
+		 *
+		 * @since 2.7.0
+		 */
+		public static function format_trace( string $trace ): string {
+
+			if ( empty( $trace ) ) {
+				return '';
+			}
+
+			$trace = \json_decode( $trace, true );
+
+			$defaults = array(
+				'line'     => '',
+				'file'     => '',
+				'class'    => '',
+				'function' => '',
+			);
+
+			$out = '';
+
+			if ( \is_array( $trace ) && ! empty( $trace ) ) {
+
+				$query_array = array(
+					'_wpnonce' => \wp_create_nonce( 'source-view' ),
+					'action'   => 'log_source_view',
+				);
+
+				$counter = count( $trace ) - 6;
+				for ( $i = 1; $i < $counter; $i++ ) {
+					$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 6 ] );
+					$index = $i - 1;
+					$file  = $sf->file;
+
+					$caller = '';
+					if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
+						$caller = $sf->class . '::' . $sf->function . '()';
+					} elseif ( ! empty( $sf->function ) ) {
+						$caller = $sf->function . '()';
+					}
+
+					$source_link = '';
+
+					if ( isset( $file ) && ! empty( $file ) ) {
+						$query_array['error_file'] = $file;
+						$query_array['error_line'] = 1;
+
+						if ( isset( $sf->line ) && ! empty( $sf->line ) ) {
+							$query_array['error_line'] = $sf->line;
+						}
+
+						$query_array['TB_iframe'] = 'true';
+
+						$view_url = \esc_url_raw(
+							\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
+						);
+
+						$title = __( 'Viewing: ', '0-day-analytics' ) . $query_array['error_file'];
+
+						$source_link = ' <a href="' . $view_url . '" title="' . $title . '" class="thickbox view-source">' . $file . '(' . $sf->line . ')</a>';
+
+					}
+
+					$out .= "#$index {$source_link}: $caller" . '<br>';
+				}
+			}
+
+			return $out;
 		}
 	}
 }

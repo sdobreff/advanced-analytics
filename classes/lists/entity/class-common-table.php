@@ -448,7 +448,6 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 					self::get_name(),
 					ARRAY_A
 				);
-
 			}
 
 			return static::$columns_info;

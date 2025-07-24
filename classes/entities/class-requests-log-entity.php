@@ -52,6 +52,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			'response'       => 'string',
 			'date_added'     => 'string',
 			'requests'       => 'int',
+			'trace'          => 'string',
 		);
 
 		/**
@@ -76,6 +77,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			'response'       => '',
 			'date_added'     => '',
 			'requests'       => 0,
+			'trace'          => '',
 		);
 
 		/**
@@ -111,6 +113,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 					response MEDIUMTEXT,            
 					date_added DOUBLE NOT NULL DEFAULT 0,
 					requests SMALLINT unsigned NOT NULL DEFAULT 0,
+					trace MEDIUMTEXT,
 				PRIMARY KEY (id),
 				KEY `runtime` (`runtime`)
 				)

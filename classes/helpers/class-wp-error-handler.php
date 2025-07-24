@@ -636,7 +636,7 @@ use ADVAN\Controllers\Telegram_API;
 		 * @param array           $parsed_args HTTP request arguments.
 		 * @param string          $url         The request URL.
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function capture_request( $response, $context, $class, $parsed_args, $url ) {
 			// Check if the response is an error.

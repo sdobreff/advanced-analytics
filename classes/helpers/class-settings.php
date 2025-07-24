@@ -276,12 +276,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			<?php
 
-			$suffix = '';
-
-			if ( WP_Helper::is_multisite() ) {
-				$suffix = '-network';
-			}
-
 			// $hook is string value given add_menu_page function.
 			if ( ! in_array( $hook, self::get_plugin_page_slugs(), true ) ) {
 				return;
@@ -337,7 +331,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'code-editor',
 					sprintf(
 						'jQuery( function() { wp.codeEditor.initialize( "transient-editor", %s ); } );',
-						wp_json_encode( $settings )
+						\wp_json_encode( $settings )
 					)
 				);
 
@@ -1713,11 +1707,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				array(
 					self::PAGE_SLUG . $suffix,
 					Logs_List::PAGE_SLUG . $suffix,
+					Requests_List::PAGE_SLUG . $suffix,
 					Transients_List::PAGE_SLUG . $suffix,
 					Crons_List::PAGE_SLUG . $suffix,
 					Table_List::PAGE_SLUG . $suffix,
 					self::PAGE_SLUG,
 					Logs_List::PAGE_SLUG,
+					Requests_List::PAGE_SLUG,
 					Transients_List::PAGE_SLUG,
 					Crons_List::PAGE_SLUG,
 					Table_List::PAGE_SLUG,

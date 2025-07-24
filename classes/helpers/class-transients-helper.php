@@ -468,7 +468,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function clear_transient_name( string $transient ): string {
 			if ( \str_starts_with( $transient, '_site_transient_' ) ) {

@@ -655,9 +655,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$source_link = '<div> <a href="' . $view_url . '" title = "' . $title . '" class="thickbox view-source gray_lab badge">' . __( 'view source', '0-day-analytics' ) . '</a></div>';
 					}
 
-					$message = esc_html( $item['message'] );
+					$message = \esc_html( $item['message'] );
 
-					$plugins_dir_basename = basename( WP_PLUGIN_DIR );
+					$plugins_dir_basename = basename( \WP_PLUGIN_DIR );
 
 					if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
 
