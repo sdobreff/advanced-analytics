@@ -343,6 +343,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 
 	jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
 		e.preventDefault();
+		let id = jQuery( this ).data( 'details-id' );
+		jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
+		jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
 		jQuery('.media-modal').addClass('open');
 		jQuery('.media-modal-backdrop').addClass('open');
 	});

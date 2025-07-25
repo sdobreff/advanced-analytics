@@ -81,6 +81,11 @@ if ( version_compare( PHP_VERSION, ADVAN_MIN_PHP_VERSION, '<=' ) ) {
 
 require ADVAN_PLUGIN_ROOT . 'vendor/autoload.php';
 
+// Query monitor grabs handler and cancel the process of error capturing, disable it.
+if ( ! defined( 'QM_DISABLE_ERROR_HANDLER' ) ) {
+	define( 'QM_DISABLE_ERROR_HANDLER', true );
+}
+
 \register_shutdown_function( array( WP_Error_Handler::class, 'shutdown' ) );
 \set_exception_handler( array( WP_Error_Handler::class, 'exception_handler' ) );
 
@@ -117,6 +122,8 @@ if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'wp_mail_failed', array( WP_Error_Handler::class, 'on_mail_error' ), -1 );
 
 	\add_action( 'plugin_loaded', 'advana_remove_plugins' );
+	\add_action( 'network_plugin_loaded', 'advana_remove_plugins' );
+
 
 	if ( ! WP_Helper::is_multisite() && \wp_recovery_mode()->is_active() ) {
 		\add_action(

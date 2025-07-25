@@ -360,7 +360,14 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 					$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
-					$actions['details'] = '<a href="#" class="aadvan-request-show-details">' . \esc_html__( 'Details' ) . '</a>';
+					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
+
+					$data  = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
+					$data .= '<pre style="overflow-y: hidden;">' . var_export( self::get_formatted_string( $item['request_args'] ), true ) . '</pre>';
+					$data .= '</div>';
+					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
+					$data .= '<pre style="overflow-y: hidden;">' . var_export( self::get_formatted_string( $item['response'] ), true ) . '</pre>';
+					$data .= '</div>';
 
 					$time_format = 'g:i a';
 
@@ -427,7 +434,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 							'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 							esc_html( $ago ),
 							$time,
-						) . $this->row_actions( $actions );
+						) . $this->row_actions( $actions ) . $data;
 					} elseif ( 0 === $until ) {
 						$in = __( 'Now', '0-day-analytics' );
 					} else {
@@ -442,7 +449,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 						'<span class="status-control-warning"><span class="dashicons dashicons-clock" aria-hidden="true"></span> %s</span><br>%s',
 						\esc_html( $in ),
 						$time,
-					) . $this->row_actions( $actions );
+					) . $this->row_actions( $actions ) . $data;
 			}
 		}
 
@@ -859,6 +866,34 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			}
 
 			return $out;
+		}
+
+		/**
+		 * Checks string format and decodes it if it is a valid JSON.
+		 *
+		 * @param string $string - The string to check and decode.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_formatted_string( $string ) {
+			$encoded = json_decode( $string, true, 512, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			if ( json_last_error() === JSON_ERROR_NONE ) {
+
+				foreach ( $encoded as $key => $value ) {
+					if ( ! empty( $value ) && is_string( $value ) && ! is_numeric( $value ) ) {
+						$encoded[ $key ] = self::get_formatted_string( $value );
+						// if ( is_array( $encoded[ $key ] ) ) {
+						// 	$encoded[ $key ] = array_map( 'htmlspecialchars', $encoded[ $key ] );
+						// }
+					}
+				}
+
+				return $encoded;
+			} else {
+				return $string;
+			}
 		}
 	}
 }
