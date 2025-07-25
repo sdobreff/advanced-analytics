@@ -298,7 +298,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			switch ( $column_name ) {
 
 				case 'type':
-					return \esc_html( $item[ $column_name ] );
+					return '<span id="advana-request-type-' . $item['id'] . '" class="dark-badge badge">' . \esc_html( $item[ $column_name ] ) . '</span>';
 
 				case 'url':
 				case 'page_url':
@@ -310,7 +310,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					$value = substr( $value, 0, 70 );
 
 					// Escape & wrap in <code> tag.
-					$value = '<code title="' . $title . '">' . \esc_html( $value ) . '</code>';
+					$value = '<code id="advana-request-' . $column_name . '-' . $item['id'] . '" title="' . $title . '">' . \esc_html( $value ) . '</code>';
 					return $value;
 
 				case 'user_id':
@@ -327,19 +327,21 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 				case 'domain':
 					// Escape & wrap in <code> tag.
-					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
+					return '<code id="advana-request-' . $column_name . '-' . $item['id'] . '">' . \esc_html( $item[ $column_name ] ) . '</code>';
 
 				case 'runtime':
 					// Escape & wrap in <code> tag.
-					return '<code>' . \esc_html( \number_format( (float) $item[ $column_name ], 3 ) ) . 's</code>';
+					return '<code id="advana-request-' . $column_name . '-' . $item['id'] . '">' . \esc_html( \number_format( (float) $item[ $column_name ], 3 ) ) . 's</code>';
 
 				case 'request_status':
 					// Escape & wrap in <code> tag.
 					$extra_info = '';
+					$style      = 'style="color: #00ff00 !important;"';
 					if ( 'error' === $item[ $column_name ] ) {
 						$extra_info = ' <span class="status-control-error"><span class="dashicons dashicons-warning" aria-hidden="true"></span> ' . \esc_html( $item['response'] ) . '</span>';
+						$style      = 'style="color:rgb(235, 131, 55) !important;"';
 					}
-					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info . self::format_trace( $item['trace'] );
+					return '<code class="badge dark-badge" id="advana-request-' . $column_name . '-' . $item['id'] . '" ' . $style . '>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info . self::format_trace( $item['trace'] );
 
 				case 'request_group':
 				case 'request_source':
@@ -885,7 +887,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					if ( ! empty( $value ) && is_string( $value ) && ! is_numeric( $value ) ) {
 						$encoded[ $key ] = self::get_formatted_string( $value );
 						// if ( is_array( $encoded[ $key ] ) ) {
-						// 	$encoded[ $key ] = array_map( 'htmlspecialchars', $encoded[ $key ] );
+						// $encoded[ $key ] = array_map( 'htmlspecialchars', $encoded[ $key ] );
 						// }
 					}
 				}

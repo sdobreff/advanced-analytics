@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 */
 		public static function analytics_requests_page() {
 			\add_thickbox();
-			\wp_enqueue_style('media-views');
+			\wp_enqueue_style( 'media-views' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -207,15 +207,15 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 						display: block;
 					}
 
-					#vphrm-modal.vphrm-modal .media-frame-title,
-					#vphrm-modal.vphrm-modal .media-frame-content {
+					#aadvana-modal.aadvana-modal .media-frame-title,
+					#aadvana-modal.aadvana-modal .media-frame-content {
 						left: 0;
 					}
 
 					.media-frame-router {
 						left: 10px;
 					}
-					#vphrm-modal.vphrm-modal
+					#aadvana-modal.aadvana-modal
 					.media-frame-content {
 						top: 48px;
 						bottom: 0;
@@ -227,12 +227,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 						text-decoration: none;
 					}
 
-					.vphrm-modal-buttons{
+					.aadvana-modal-buttons{
 						position: absolute;
 						top: 0;
 						right: 0;
 					}
-					.vphrm-modal-buttons .media-modal-close{
+					.aadvana-modal-buttons .media-modal-close{
 						position: relative;
 						width: auto;
 						padding: 0 .5rem;
@@ -251,22 +251,13 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					}
 
 					/* tab and panel */
-					.vphrm-modal .nav-tab-active{
+					.aadvana-modal .nav-tab-active{
 						border-bottom: solid 1px white;
 						background-color: white;
 					}
-					.vphrm-panel{
-						display:none;
-					}
-					.vphrm-panel-active{
+					.aadvana-panel-active{
 						display:block;
 						margin: 1rem 0;
-					}
-
-					/* view more link */
-					.vphrm-more-hidden,
-					.vphrm-hidden{
-						display: none;
 					}
 
 					.wrapper {
@@ -294,43 +285,39 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 
 				</style>
 
-				<div id="vphrm-modal" class="media-modal vphrm-modal">
-					<div class="vphrm-modal-buttons">
+				<div id="aadvana-modal" class="media-modal aadvana-modal">
+					<div class="aadvana-modal-buttons">
 						<button class="button-link media-modal-close"><span class="media-modal-icon"></span></button>
 					</div>
 					<div class="media-modal-content">
 						<div class="media-frame">
 							<div class="media-frame-title">
-								<h1>jknkjnjkn</h1>
+								<h1><?php \esc_html_e( 'Request details:', '0-day-analytics' ); ?></h1>
 							</div>
 							<div class="media-frame-content">
 								<div class="modal-content-wrap">
 									<p>
-										<b>Request <span class="http-request-runtime"></span>:</b> 
-										[<span class="http-request-id"></span>]
-										<span class="http-url vphrm-break-word"></span>
+										<b><?php \esc_html_e( 'Request: ', '0-day-analytics' ); ?> </b>
+										<span class="http-request-type"></span>
+										 | <span class="http-request-status"></span>
+										 | <span class="http-request-runtime"></span>
+										<span class="http-url aadvana-break-word"></span>
 									</p>
 									<p>
-										<b>Page <span class="http-page-runtime"></span>:</b> 
-										<span class="http-page vphrm-break-word"></span>
+										<b><?php \esc_html_e( 'Page:', '0-day-analytics' ); ?> <span class="http-page-runtime"></span>:</b> 
+										<span class="http-page aadvana-break-word"></span>
 									</p>
-
-									<p class="nav-tab-wrapper wp-clearfix">
-										<a href="#vphrm-request-response" class="nav-tab nav-tab-active">Request</a>
-										<a href="#vphrm-cp" class="nav-tab">Check point</a>
-									</p>					
-									<div class="vphrm-panel-wrapper">
-										<div class="vphrm-request-response vphrm-panel vphrm-panel-active wrapper">
+									<div class="aadvana-panel-wrapper">
+										<div class="aadvana-request-response aadvana-panel-active wrapper">
 											<div class="box">
-												<h3>Request</h3>
-												<div class="http-request-args vphrm-pre-300"></div>
+												<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
+												<div class="http-request-args aadvana-pre-300"></div>
 											</div>
 											<div class="box">
-												<h3>Response</h3>
-												<div class="http-response vphrm-pre-300"></div>
+												<h3><?php \esc_html_e( 'Response:', '0-day-analytics' ); ?></h3>
+												<div class="http-response aadvana-pre-300"></div>
 											</div>						
 										</div>
-										<div class="vphrm-cp vphrm-panel"></div>
 									</div>
 								</div>
 							</div>
@@ -339,26 +326,29 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 				</div>
 				<div class="media-modal-backdrop"></div>
 
-<script>
+					<script>
 
-	jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
-		e.preventDefault();
-		let id = jQuery( this ).data( 'details-id' );
-		jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
-		jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
-		jQuery('.media-modal').addClass('open');
-		jQuery('.media-modal-backdrop').addClass('open');
-	});
+						jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
+							e.preventDefault();
+							let id = jQuery( this ).data( 'details-id' );
+							jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
+							jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
 
+							jQuery('.http-request-status').html( jQuery('#advana-request-request_status-' + id ).clone() );
+							jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
+							jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
 
-	jQuery(document).on('click', '.media-modal-close', function () {
-		jQuery('.media-modal .http-request-args').html('');
-		jQuery('.media-modal .http-response').html('');
-		jQuery('.media-modal').removeClass('open');
-		jQuery('.media-modal-backdrop').removeClass('open');
-		jQuery(document).off('keydown.vphrm-modal-close');
-	});
-</script>
+							jQuery('.media-modal').addClass('open');
+							jQuery('.media-modal-backdrop').addClass('open');
+						});
+
+						jQuery(document).on('click', '.media-modal-close', function () {
+							jQuery('.media-modal .http-request-args').html('');
+							jQuery('.media-modal .http-response').html('');
+							jQuery('.media-modal').removeClass('open');
+							jQuery('.media-modal-backdrop').removeClass('open');
+						});
+					</script>
 				<?php
 			}
 		}
