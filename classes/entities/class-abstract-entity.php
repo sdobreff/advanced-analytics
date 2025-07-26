@@ -231,11 +231,11 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			$_wpdb->suppress_errors( true );
 			$count = (int) $_wpdb->get_var( $sql );
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 						$count = 0;
 					}
-				}
+				//}
 			}
 			$_wpdb->suppress_errors( false );
 
@@ -281,11 +281,11 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 				$_wpdb->replace( self::get_table_name( $_wpdb ), $insert_data, $format );
 
 				if ( '' !== $_wpdb->last_error ) {
-					if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+					//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 						if ( ( static::class )::create_table( $_wpdb ) ) {
 							$_wpdb->replace( self::get_table_name( $_wpdb ), $data, $format );
 						}
-					}
+					//}
 				}
 
 				$_wpdb->suppress_errors( false );
@@ -387,11 +387,11 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			$results = $_wpdb->get_results( $sql, ARRAY_A );
 
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 						$results = array();
 					}
-				}
+				//}
 			}
 			$_wpdb->suppress_errors( false );
 
@@ -423,11 +423,11 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			$_wpdb->suppress_errors( true );
 			$res = $_wpdb->query( $sql );
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 						$res = true;
 					}
-				}
+				//}
 			}
 			$_wpdb->suppress_errors( false );
 
@@ -497,7 +497,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			);
 
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 
 						$result = $_wpdb->query(
@@ -505,7 +505,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 						);
 
 					}
-				}
+				//}
 			}
 			$_wpdb->suppress_errors( false );
 
@@ -604,13 +604,13 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			);
 
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 
 						$result = array();
 
 					}
-				}
+				//}
 			}
 			$_wpdb->suppress_errors( false );
 
@@ -735,13 +735,13 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			);
 
 			if ( '' !== $_wpdb->last_error ) {
-				if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
+				//if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 					if ( ( static::class )::create_table( $_wpdb ) ) {
 
 						$results = array();
 
 					}
-				}
+				//}
 			}
 
 			$_wpdb->suppress_errors( false );
