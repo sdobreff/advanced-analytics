@@ -365,10 +365,10 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
 
 					$data  = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . var_export( self::get_formatted_string( $item['request_args'] ), true ) . '</pre>';
+					$data .= '<pre style="overflow-y: hidden;">' . \esc_html(var_export( self::get_formatted_string( $item['request_args'] ), true ) ). '</pre>';
 					$data .= '</div>';
 					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . var_export( self::get_formatted_string( $item['response'] ), true ) . '</pre>';
+					$data .= '<pre style="overflow-y: hidden;">' . \esc_html(var_export( self::get_formatted_string( $item['response'] ), true )) . '</pre>';
 					$data .= '</div>';
 
 					$time_format = 'g:i a';

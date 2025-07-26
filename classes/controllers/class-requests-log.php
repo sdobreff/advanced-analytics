@@ -140,7 +140,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 */
 		public static function get_trace(): string {
 			if ( empty( self::$trace ) ) {
-				$trace = new \Exception( '' )->getTrace();
+				$trace = ( new \Exception( '' ) )->getTrace();
 
 				self::$trace = \json_encode( $trace, );
 			}
