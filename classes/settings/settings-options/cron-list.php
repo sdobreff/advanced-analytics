@@ -47,14 +47,12 @@ Settings::set_current_options( $settings );
 		);
 	} else {
 
-		$env_info = System_Status::environment_info();
-
 		Settings::build_option(
 			array(
 				'name'    => \esc_html__( 'WP Cron disabled', '0-day-analytics' ),
 				'id'      => 'wp_cron_disable',
 				'type'    => 'checkbox',
-				'default' => $env_info['wp_cron_disable'],
+				'default' => System_Status::environment_info()['wp_cron_disable'],
 			)
 		);
 

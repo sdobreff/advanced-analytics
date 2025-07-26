@@ -297,15 +297,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							<div class="media-frame-content">
 								<div class="modal-content-wrap">
 									<p>
-										<b><?php \esc_html_e( 'Request: ', '0-day-analytics' ); ?> </b>
-										<span class="http-request-type"></span>
-										 | <span class="http-request-status"></span>
-										 | <span class="http-request-runtime"></span>
-										<span class="http-url aadvana-break-word"></span>
+										<b><?php \esc_html_e( 'Request: ', '0-day-analytics' ); ?> </b><span class="http-request-type"></span> | <span class="http-request-status"></span> | <span class="http-request-runtime"></span> | <?php \esc_html_e( 'Domain: ', '0-day-analytics' ); ?><span class="http-request-domain"></span>
 									</p>
 									<p>
-										<b><?php \esc_html_e( 'Page:', '0-day-analytics' ); ?> <span class="http-page-runtime"></span>:</b> 
-										<span class="http-page aadvana-break-word"></span>
+										<b><?php \esc_html_e( 'Page:', '0-day-analytics' ); ?>:</b> 
+										<span class="http-request-page"></span><br>
+										<b><?php \esc_html_e( 'Request URL:', '0-day-analytics' ); ?>:</b> <span class="http-request-url"></span>
 									</p>
 									<div class="aadvana-panel-wrapper">
 										<div class="aadvana-request-response aadvana-panel-active wrapper">
@@ -337,6 +334,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							jQuery('.http-request-status').html( jQuery('#advana-request-request_status-' + id ).clone() );
 							jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
 							jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
+							jQuery('.http-request-domain').html( jQuery('#advana-request-domain-' + id ).clone() );
+							jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone() );
+							jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone() );
 
 							jQuery('.media-modal').addClass('open');
 							jQuery('.media-modal-backdrop').addClass('open');

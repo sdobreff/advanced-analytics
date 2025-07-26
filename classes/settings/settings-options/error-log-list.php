@@ -48,25 +48,23 @@ Settings::set_current_options( $settings );
 		);
 	} else {
 
-		$env_info = System_Status::environment_info();
-
 		Settings::build_option(
 			array(
 				'name'    => \esc_html__( 'WP Debug Enable', '0-day-analytics' ),
 				'id'      => 'wp_debug_enable',
 				'type'    => 'checkbox',
-				'default' => $env_info['wp_debug_mode'],
+				'default' => System_Status::environment_info()['wp_debug_mode'],
 			)
 		);
 
-		if ( $env_info['wp_debug_mode'] ) {
+		if ( System_Status::environment_info()['wp_debug_mode'] ) {
 
 			Settings::build_option(
 				array(
 					'name'    => \esc_html__( 'WP Debug Log Enabled', '0-day-analytics' ),
 					'id'      => 'wp_debug_log_enable',
 					'type'    => 'checkbox',
-					'default' => $env_info['wp_debug_log'],
+					'default' => System_Status::environment_info()['wp_debug_log'],
 				)
 			);
 
@@ -75,7 +73,7 @@ Settings::set_current_options( $settings );
 					'name'    => \esc_html__( 'WP Debug Display Errors in HTML', '0-day-analytics' ),
 					'id'      => 'wp_debug_display_enable',
 					'type'    => 'checkbox',
-					'default' => $env_info['wp_debug_display'],
+					'default' => System_Status::environment_info()['wp_debug_display'],
 				)
 			);
 
@@ -116,7 +114,7 @@ Settings::set_current_options( $settings );
 						'name'    => \esc_html__( 'WP Script Debug', '0-day-analytics' ),
 						'id'      => 'wp_script_debug',
 						'type'    => 'checkbox',
-						'default' => $env_info['script_debug'],
+						'default' => System_Status::environment_info()['script_debug'],
 					)
 				);
 
@@ -125,7 +123,7 @@ Settings::set_current_options( $settings );
 						'name'    => \esc_html__( 'WP Save Queries', '0-day-analytics' ),
 						'id'      => 'wp_save_queries',
 						'type'    => 'checkbox',
-						'default' => $env_info['save_queries'],
+						'default' => System_Status::environment_info()['save_queries'],
 					)
 				);
 
@@ -134,7 +132,7 @@ Settings::set_current_options( $settings );
 						'name'    => \esc_html__( 'WP Environment Type', '0-day-analytics' ),
 						'id'      => 'wp_environment_type',
 						'type'    => 'select',
-						'default' => $env_info['wp_environment_type'],
+						'default' => System_Status::environment_info()['wp_environment_type'],
 						'options' => array(
 							'production'  => \esc_html__( 'Production', '0-day-analytics' ),
 							'local'       => \esc_html__( 'Local', '0-day-analytics' ),
@@ -150,7 +148,7 @@ Settings::set_current_options( $settings );
 						'name'    => \esc_html__( 'WP Development Mode', '0-day-analytics' ),
 						'id'      => 'wp_development_mode',
 						'type'    => 'select',
-						'default' => $env_info['wp_development_mode'],
+						'default' => System_Status::environment_info()['wp_development_mode'],
 						'options' => array(
 							''       => \esc_html__( 'Disabled', '0-day-analytics' ),
 							'core'   => \esc_html__( 'Core', '0-day-analytics' ),

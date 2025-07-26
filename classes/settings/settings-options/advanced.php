@@ -8,6 +8,7 @@
  */
 
 use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\System_Status;
 
 Settings::build_option(
 	array(
@@ -66,7 +67,7 @@ Settings::build_option(
 			'name'    => \esc_html__( 'Block all external requests', '0-day-analytics' ),
 			'id'      => 'block_external_requests',
 			'type'    => 'checkbox',
-			'default' => $env_info['block_external_requests'],
+			'default' => System_Status::environment_info()['block_external_requests'],
 		)
 	);
 

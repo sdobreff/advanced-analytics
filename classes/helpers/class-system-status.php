@@ -121,6 +121,13 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function environment_info() {
+
+			static $environment_info = null;
+
+			if ( null !== $environment_info ) {
+				return $environment_info;
+			}
+
 			global $wpdb;
 
 			// $get_response_msg = '';
@@ -145,7 +152,7 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			// $get_response_msg = $get_response['response']['code'];
 			// }
 
-			return array(
+			return $environment_info = array(
 				'home_url'                  => home_url( '/' ),
 				'site_url'                  => site_url( '/' ),
 				'wp_version'                => get_bloginfo( 'version' ),
