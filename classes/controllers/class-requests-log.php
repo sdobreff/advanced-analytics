@@ -145,7 +145,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				self::$trace = \json_encode( $trace, );
 			}
 
-			return self::$trace;
+			return (string) self::$trace;
 		}
 
 		/**
