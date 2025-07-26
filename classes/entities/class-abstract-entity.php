@@ -281,7 +281,6 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 				$_wpdb->replace( self::get_table_name( $_wpdb ), $insert_data, $format );
 
 				if ( '' !== $_wpdb->last_error ) {
-					error_log(self::get_last_sql_error( $_wpdb ));
 					if ( 1146 === self::get_last_sql_error( $_wpdb ) ) {
 						if ( ( static::class )::create_table( $_wpdb ) ) {
 							$_wpdb->replace( self::get_table_name( $_wpdb ), $data, $format );
