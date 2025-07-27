@@ -406,7 +406,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 			$help_text .= '<p>' . __( 'You can specify how many rows to be shown, or filter and search for given value(s).', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You can delete rows - keep in mind that this operation is destructive and can not be undone - make a backup first.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Bulk operations are supported.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'Use the drop-down to select different table.', '0-day-analytics' ) . '</p>';
 
 			return $help_text;
 		}
@@ -448,63 +447,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					<?php
 				}
 
-				if ( isset( $table_info[0]['Row_format'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Row format: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Row_format'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Rows'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Rows: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Rows'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Avg_row_length'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Avg row length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Avg_row_length'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Data_length'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Data length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Data_length'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Index_length'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Index length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Index_length'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Data_free'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Data free: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Data_free'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Auto_increment'] ) ) {
-					?>
-					<div> <b><?php \esc_html_e( 'Auto increment: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Auto_increment'] ); ?></span></div>
-					<?php
-				}
-
 				if ( isset( $table_info[0]['Create_time'] ) ) {
 					?>
 					<div><b><?php \esc_html_e( 'Create time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Create_time'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Update_time'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Update time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Update_time'] ); ?></span></div>
-					<?php
-				}
-
-				if ( isset( $table_info[0]['Check_time'] ) ) {
-					?>
-					<div><b><?php \esc_html_e( 'Check time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Check_time'] ); ?></span></div>
 					<?php
 				}
 

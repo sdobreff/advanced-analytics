@@ -1,13 +1,13 @@
 === WP Control ===
-Tags: log, error log, debug, cron, transients
+Tags: error log, debug, cron, transients, requests
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.6.2
+Stable tag: 2.7.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. It has build in fully functional **Cron** and **Transients** management system and plugin version switcher.
+**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. 
 
 == Description ==
 
@@ -17,6 +17,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - Manage large log files without performance degradation.
 - **Cron manager** at the tip of your fingers (edit / delete / run).
 - **Transient manager** - all (stored in the DB) transients (edit / delete).
+- **Requests manager** - all requests which your WP install is making (edit / delete).
 - **SQL tables manager** - From here you can see and delete records from all the tables currently present in the Database.
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
@@ -40,6 +41,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Built-in fully functional Cron manager.
 - Built-in fully functional Transients manager.
 - Built-in Table manager.
+- Built-in Requests viewer.
 - Built-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
 - Easily plugin version switch (the ones from official WP marketstore).
@@ -92,8 +94,12 @@ Because of its extremely poor implementation and interfering with the proper Wor
 6. **Plugin Version Switcher** - Built-in plugin version switcher.
 7. **Table manager** - Built-in is very powerful SQL table manager.
 8. **Table manager operations** - Current table more detailed information and truncate and delete operations.
+9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 2.7.0 =
+Introduced Request viewer log. Bug fixes and UI improvements. Code optimizations. Multisite optimizations.
 
 = 2.6.2 =
 Multisite improvements and transient edit functionality fixes.
