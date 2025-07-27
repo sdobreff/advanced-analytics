@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since 1.9.8.1
+ * @since latest
  */
 
 declare(strict_types=1);
@@ -16,6 +16,8 @@ namespace ADVAN\Lists\Views;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Lists\Requests_List;
+use ADVAN\Entities\Common_Table;
+use ADVAN\Entities\Requests_Log_Entity;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -26,7 +28,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since 1.9.8.1
+	 * @since latest
 	 */
 	class Requests_View {
 
@@ -35,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 1.7.0
+		 * @since latest
 		 */
 		public static function analytics_requests_page() {
 			\add_thickbox();
@@ -396,14 +398,201 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since 1.9.8.1
+		 * @since latest
 		 */
-		public static function add_help_content_requests() {
+		public static function add_help_content_table() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to see all the requests on your WordPress site. These are only the ones that are Database based.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can specify how many requests to be shown, which columns to see or filter and search for given transient(s).', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can delete or edit requests - keep in mind that you may end up editing transient that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new transient directly from here.', '0-day-analytics' ) . '</p></h4>';
+			$help_text  = '<p>' . __( 'This screen allows you to see all the requests where your WordPress site is currently running.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can specify how many rows to be shown, or filter and search for given value(s).', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can delete rows - keep in mind that this operation is destructive and can not be undone - make a backup first.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Bulk operations are supported.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Use the drop-down to select different table.', '0-day-analytics' ) . '</p>';
+
+			return $help_text;
+		}
+
+		/**
+		 * Options Help
+		 *
+		 * Return help text for options screen
+		 *
+		 * @return string  Help Text
+		 *
+		 * @since latest
+		 */
+		public static function add_config_content_table() {
+
+			Common_Table::init( Requests_Log_Entity::get_table_name() );
+
+			$table_info = Common_Table::get_table_status();
+			$help_text  = '';
+			if ( ! empty( $table_info ) && isset( $table_info[0] ) ) {
+
+				\ob_start();
+
+				if ( isset( $table_info[0]['Name'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Name: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Name'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Engine'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Engine: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Engine'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Version'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Version: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Version'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Row_format'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Row format: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Row_format'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Rows'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Rows: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Rows'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Avg_row_length'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Avg row length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Avg_row_length'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Data_length'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Data length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Data_length'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Index_length'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Index length: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Index_length'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Data_free'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Data free: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Data_free'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Auto_increment'] ) ) {
+					?>
+					<div> <b><?php \esc_html_e( 'Auto increment: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Auto_increment'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Create_time'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Create time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Create_time'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Update_time'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Update time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Update_time'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Check_time'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Check time: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Check_time'] ); ?></span></div>
+					<?php
+				}
+
+				if ( isset( $table_info[0]['Collation'] ) ) {
+					?>
+					<div><b><?php \esc_html_e( 'Collation: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Collation'] ); ?></span></div>
+					<?php
+				}
+				?>
+				<input type="button" name="truncate_action" id="truncate_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Truncate Table', '0-day-analytics' ); ?>">
+
+					<script>
+						let action_truncate = document.getElementById("truncate_table");
+
+						action_truncate.onclick = tableTruncate;
+
+						async function tableTruncate(e) {
+
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to truncate this table? That operation is destructive', '0-day-analytics' ); ?>' ) ) {
+								let tableName = e.target.getAttribute('data-table-name');
+
+								let attResp;
+
+								try {
+									attResp = await wp.apiFetch({
+										path: '/wp-control/v1/truncate_table/' + tableName,
+										method: 'DELETE',
+										cache: 'no-cache'
+									});
+
+									if (attResp.success) {
+										
+										location.reload();
+									} else if (attResp.message) {
+										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+									}
+
+								} catch (error) {
+									throw error;
+								}
+							}
+						}
+
+					</script>
+					<?php
+
+					if ( ! \in_array( $table_info[0]['Name'], Common_Table::get_wp_core_tables() ) ) {
+						?>
+					<input type="button" name="drop_action" id="drop_table" class="button action" data-table-name="<?php echo \esc_attr( $table_info[0]['Name'] ); ?>" value="<?php \esc_html_e( 'Drop Table', '0-day-analytics' ); ?>">
+
+					<script>
+						let action_drop = document.getElementById("drop_table");
+
+						action_drop.onclick = tableDrop;
+
+						async function tableDrop(e) {
+
+							if ( confirm( '<?php echo \esc_html__( 'You sure you want to delete this table? That operation is destructive', '0-day-analytics' ); ?>' ) ) {
+								let tableName = e.target.getAttribute('data-table-name');
+
+								let attResp;
+
+								try {
+									attResp = await wp.apiFetch({
+										path: '/wp-control/v1/drop_table/' + tableName,
+										method: 'DELETE',
+										cache: 'no-cache'
+									});
+
+									if (attResp.success) {
+										
+										location.reload();
+									} else if (attResp.message) {
+										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+									}
+
+								} catch (error) {
+									throw error;
+								}
+							}
+						}
+
+					</script>
+						<?php
+					}
+
+					$help_text = \ob_get_clean();
+			}
 
 			return $help_text;
 		}
@@ -413,7 +602,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.3.0
+		 * @since latest
 		 */
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {

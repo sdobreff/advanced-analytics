@@ -109,9 +109,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 			$help_text  = '<p>' . __( 'This screen allows you to see all the tables in your Database where your WordPress site is currently running.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You can specify how many rows to be shown, or filter and search for given value(s).', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can delete rows - keep in mind that this operation is destructive and can not be undone - make a backup first.', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Bulk operations are supported.', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Use the drop-down to select different table.', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'You can delete rows - keep in mind that this operation is destructive and can not be undone - make a backup first.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Bulk operations are supported.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Use the drop-down to select different table.', '0-day-analytics' ) . '</p>';
 
 			return $help_text;
 		}

@@ -43,8 +43,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 
 			$help_text  = '<p>' . __( 'This screen allows you to see all the crons on your WordPress site.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You set which columns to see or filter and search for given cron(s).', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can delete, run or edit crons - keep in mind that you may end up editing cron that is no longer available (if the time passes).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new cron directly from here.', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'You can delete, run or edit crons - keep in mind that you may end up editing cron that is no longer available (if the time passes).', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Bulk operations are supported and you can even add new cron directly from here.', '0-day-analytics' ) . '</p>';
 
 			return $help_text;
 		}

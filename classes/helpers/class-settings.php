@@ -28,6 +28,7 @@ use ADVAN\Controllers\Telegram_API;
 use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
+use Requests;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -860,6 +861,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
+			if ( Requests_List::PAGE_SLUG . $suffix === $screen->base || Requests_List::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'Requests Table Info', '0-day-analytics' ),
+						'content' => Requests_View::add_config_content_table(),
+					)
+				);
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-info-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => Requests_View::add_help_content_table(),
+					)
+				);
+			}
+
 			$screen->set_help_sidebar( self::add_sidebar_content() );
 		}
 
@@ -906,9 +925,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$help_text  = '<p>' . __( 'This screen allows you to see last occurred records (last are first), check their sources, see the code responsible / involved in given error.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You can specify how many errors to be shown (up to 100), which columns to see or filter error by severity.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want to be kept).', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window where you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p></h4>';
-			$help_text .= '<p>' . __( 'You can see the size of your log file and download it if you need to.', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'You can truncate error log (clear it) or truncate it but leave last records (from settings you can specify how many records you want to be kept).', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'Right under the list, there is a console-like window where you can see the raw error list, everything you select there (with mouse) is automatically copied in you clipboard, so you can use it in chat channel or share it easily.', '0-day-analytics' ) . '</p>';
+			$help_text .= '<p>' . __( 'You can see the size of your log file and download it if you need to.', '0-day-analytics' ) . '</p>';
 
 			return $help_text;
 		}
@@ -926,7 +945,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$help_text  = '<p>' . __( 'This screen allows you to specify the options for the WP Control plugin.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Here adjust the plugin to your specific needs.', '0-day-analytics' ) . '</p>';
-			$help_text .= '<p>' . __( 'Remember to click the Save Changes button when on sexttings page for new settings to take effect.', '0-day-analytics' ) . '</p></h4>';
+			$help_text .= '<p>' . __( 'Remember to click the Save Changes button when on sexttings page for new settings to take effect.', '0-day-analytics' ) . '</p>';
 
 			return $help_text;
 		}
@@ -944,7 +963,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$help_text  = '<p><strong>' . __( 'For more information:', '0-day-analytics' ) . '</strong></p>';
 			$help_text .= '<p><a href="https://wordpress.org/plugins/0-day-analytics/" target="__blank">' . __( 'Instructions', '0-day-analytics' ) . '</a></p>';
-			$help_text .= '<p><a href="https://wordpress.org/support/plugin/0-day-analytics" target="__blank">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p></h4>';
+			$help_text .= '<p><a href="https://wordpress.org/support/plugin/0-day-analytics" target="__blank">' . __( 'Support Forum', '0-day-analytics' ) . '</a></p>';
 
 			return $help_text;
 		}
