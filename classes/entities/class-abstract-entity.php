@@ -193,7 +193,9 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			if ( is_a( $_wpdb, '\WP_SQLite_DB' ) ) {
 
 				// This is best that can get from that undocumented methods.
-				$code = $_wpdb->last_error;
+				$code = (int) $_wpdb->last_error;
+
+				error_log( \var_export($_wpdb, true));
 
 				if ( ! isset( $code ) || 1569 === (int) $code ) {
 					$code = 1146;
