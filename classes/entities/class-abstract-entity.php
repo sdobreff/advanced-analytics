@@ -205,7 +205,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 				$code = 1146;
 			}
 
-			return $code;
+			return (int) $code;
 		}
 
 		/**
