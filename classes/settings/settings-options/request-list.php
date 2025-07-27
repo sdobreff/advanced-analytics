@@ -1,0 +1,48 @@
+<?php
+/**
+ * Option settings of the plugin
+ *
+ * @package awe
+ *
+ * @since 2.0.0
+ */
+
+use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\File_Helper;
+use ADVAN\Helpers\System_Status;
+
+$settings = Settings::get_current_options();
+
+foreach ( $settings['severities'] as $name => $severity ) {
+	$settings[ 'severity_colors_' . $name . '_color' ] = $severity['color'];
+	$settings[ 'severity_show_' . $name . '_display' ] = $severity['display'];
+}
+
+Settings::set_current_options( $settings );
+
+	Settings::build_option(
+		array(
+			'title' => esc_html__( 'Request Options', '0-day-analytics' ),
+			'id'    => 'options-settings-tab',
+			'type'  => 'tab-title',
+		)
+	);
+
+	// Cron options.
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Request options', '0-day-analytics' ),
+			'id'    => 'cron-settings-options',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Disable reuests logging', '0-day-analytics' ),
+			'id'      => 'advana_requests_disable',
+			'type'    => 'checkbox',
+			'default' => Settings::get_current_options()['advana_requests_disable'],
+		)
+	);
+

@@ -190,6 +190,21 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 				$code = mysql_errno( $_wpdb->dbh ); // phpcs:ignore WordPress.DB.RestrictedFunctions.mysql_mysql_errno
 			}
 
+			if ( is_a( $_wpdb, '\WP_SQLite_DB' ) ) {
+
+				// This is best that can get from that undocumented methods.
+				$code = $_wpdb->last_error;
+
+				if ( ! isset( $code ) || 1569 === (int) $code ) {
+					$code = 1146;
+				}
+			}
+
+			if ( 0 === $code ) {
+				// No code but error is present - fall back to 1146.
+				$code = 1146;
+			}
+
 			return $code;
 		}
 

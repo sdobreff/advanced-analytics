@@ -42,7 +42,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '13'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '14'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 
@@ -414,6 +414,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'environment_type_admin_bar'      => true,
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
+					'advana_requests_disable'         => false,
 					'no_rest_api_monitor'             => false,
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
@@ -1252,6 +1253,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
 				),
 
+				'head-requests-list'  => esc_html__( 'Requests Log', '0-day-analytics' ),
+
+				'request-list'        => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Request options', '0-day-analytics' ),
+				),
+
 				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
 
 				'notifications'       => array(
@@ -1498,6 +1506,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['telegram_notifications']['all']['channel'] = ( array_key_exists( 'notification_default_telegram_channel', $post_array ) ) ? \sanitize_text_field( \wp_unslash( $post_array['notification_default_telegram_channel'] ) ) : '';
 
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['advana_requests_disable'] = ( array_key_exists( 'advana_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['no_rest_api_monitor'] = ( array_key_exists( 'no_rest_api_monitor', $post_array ) ) ? filter_var( $post_array['no_rest_api_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
 

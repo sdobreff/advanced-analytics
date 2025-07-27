@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Entities\Requests_Log_Entity;
 
@@ -71,8 +72,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since 2.7.0
 		 */
 		public static function init() {
-			\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
-			\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
+			if ( ! Settings::get_current_options()['advana_requests_disable'] ) {
+				\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+				\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
+			}
 		}
 
 		/**
