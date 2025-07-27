@@ -192,18 +192,11 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 
 			if ( is_a( $_wpdb, '\WP_SQLite_DB' ) ) {
 
-				// This is best that can get from that undocumented methods.
-				$code = (int) $_wpdb->last_error;
+				// This driver does not provide error codes and it is impossible to tell what is going on here.
+				// So we will just return 1146 (MYSQL error code for table not found and retry give query but first recreate the table).
 
-				error_log( \var_export($_wpdb, true));
+				// Maybe can try search for "SQLSTATE[HY000]: General error: 1 no such table" but that is a long shot if someone decides to translate this.
 
-				if ( ! isset( $code ) || 1569 === (int) $code ) {
-					$code = 1146;
-				}
-			}
-
-			if ( 0 === $code ) {
-				// No code but error is present - fall back to 1146.
 				$code = 1146;
 			}
 
