@@ -44,7 +44,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function init() {
 			if ( \is_admin() && ! \wp_doing_ajax() ) {
-				// \add_filter( 'doing_it_wrong_trigger_error', array( __CLASS__, 'filter_doing_it_wrong_trigger_error' ), 10, 4 );
 
 				Migration::migrate();
 
@@ -94,8 +93,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			// }
 			if ( \is_admin() ) {
 				Ajax_Helper::init();
-
-	//wp_mail('kura', '3', 'rere');
 			}
 		}
 

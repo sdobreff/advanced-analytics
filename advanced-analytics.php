@@ -139,7 +139,7 @@ if ( ! Context_Helper::is_installing() ) {
 							$storage->set(
 								$plugin_file,
 								array(
-									'type'    => __( 'Check WP Cron plugin, find fatal errors and fix them.', '0-day-analytics' ),
+									'type'    => __( 'Check WP Control plugin, find fatal errors and fix them.', '0-day-analytics' ),
 									'line'    => 0,
 									'file'    => 0,
 									'message' => '',
@@ -167,7 +167,7 @@ if ( ! Context_Helper::is_installing() ) {
 							$storage->set(
 								\get_stylesheet(),
 								array(
-									'type'    => __( 'Check WP Cron plugin, find fatal errors and fix them.', '0-day-analytics' ),
+									'type'    => __( 'Check WP Control plugin, find fatal errors and fix them.', '0-day-analytics' ),
 									'line'    => 0,
 									'file'    => 0,
 									'message' => '',
