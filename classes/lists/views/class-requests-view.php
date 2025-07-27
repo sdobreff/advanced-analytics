@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 2.7.0
  */
 
 declare(strict_types=1);
@@ -28,7 +28,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since latest
+	 * @since 2.7.0
 	 */
 	class Requests_View {
 
@@ -37,7 +37,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function analytics_requests_page() {
 			\add_thickbox();
@@ -398,7 +398,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function add_help_content_table() {
 
@@ -417,7 +417,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function add_config_content_table() {
 
@@ -547,7 +547,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {

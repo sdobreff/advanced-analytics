@@ -877,7 +877,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 2.7.0
 		 */
 		public static function get_formatted_string( $string ) {
 			$encoded = json_decode( $string, true, 512, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
