@@ -312,6 +312,13 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 						width: 48%;
 						box-sizing: border-box;
 					}
+					html.aadvana-darkskin .wrapper .box {
+						background-color: #1d456b !important;
+						border: 1px solid #ccc;
+					}
+					html.aadvana-darkskin .media-frame-content {
+						background-color: #1d456b !important;
+					}
 					@media screen and (max-width: 782px) {
 
 						.wrapper .box{
@@ -373,8 +380,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
 							jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
 							jQuery('.http-request-domain').html( jQuery('#advana-request-domain-' + id ).clone() );
-							jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone() );
-							jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone() );
+							jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone().html(jQuery('#advana-request-page_url-' + id ).attr('title') ) );
+							jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone().html(jQuery('#advana-request-url-' + id ).attr('title') ) );
 
 							jQuery('.media-modal').addClass('open');
 							jQuery('.media-modal-backdrop').addClass('open');

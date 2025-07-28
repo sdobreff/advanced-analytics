@@ -1668,16 +1668,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function admin_footer_text( $text ) {
 
 			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
-				$our_footer = '';
 
 				$link        = 'https://github.com/sdobreff';
 				$footer_link = 'https://wordpress.org/plugins/0-day-analytics/';
 
-				return $our_footer . \sprintf(
+				return \sprintf(
 				/* translators: This text is prepended by a link to Melapress's website, and appended by a link to Melapress's website. */
 					'<a href="%1$s" target="_blank">' . ADVAN_NAME . '</a> ' . __( 'is developed and maintained by', 'wp-security-audit-log' ) . ' <a href="%2$s" target="_blank">Stoil Dobreff</a>.',
 					$footer_link,
 					$link
+				) . '<br><br>' . sprintf(
+				/* translators: 1: Plugin Name, 3: Plugin review URL */
+					__( 'If you like <strong><ins>%1$s</ins></strong>. please leave us a <a target="_blank" style="color:#f9b918" href="%2$s">★★★★★</a> rating. A huge thank you in advance!', 'error-log-viewer-wp' ),
+					\esc_attr( ADVAN_NAME ),
+					\esc_url_raw( 'https://wordpress.org/support/view/plugin-reviews/0-day-analytics?filter=5' ),
 				);
 			}
 

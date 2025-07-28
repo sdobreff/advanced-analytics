@@ -84,12 +84,12 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 							{
 								content:
 									"<h3>" + __( 'WP Control', '0-day-analytics' ) + "<\/h3>" +
-									"<h4>" + __( 'Here is the home for your', '0-day-analytics' ) + "<\/h4>" +
-									"<p>" + __( ' - Error Logs', '0-day-analytics' ) + "</p>" +
-									"<p>" + __( ' - Cron Jobs', '0-day-analytics' ) + "</p>" +
-									"<p>" + __( ' - Transients', '0-day-analytics' ) + "</p>",
-
-
+									"<h4>" + __( 'Here is the home for your', '0-day-analytics' ) + "<\/h4><ol>" +
+									"<li>" + __( ' - Error Logs', '0-day-analytics' ) + "<\/li>" +
+									"<li>" + __( ' - Cron Jobs', '0-day-analytics' ) + "<\/li>" +
+									"<li>" + __( ' - Transients', '0-day-analytics' ) + "<\/li>" +
+									"<li>" + __( ' - Requests', '0-day-analytics' ) + "<\/li>" +
+									"<li>" + __( ' - Tables', '0-day-analytics' ) + "<\/li><\/ol>",
 								position:
 									{
 										edge:  'left',
