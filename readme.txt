@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.7.0
+Stable tag: 2.7.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -97,6 +97,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 2.7.1 =
+Small maintenance update - mostly UI problems addressed.
 
 = 2.7.0 =
 Introduced Request viewer log. Bug fixes and UI improvements. Code optimizations. Multisite optimizations.

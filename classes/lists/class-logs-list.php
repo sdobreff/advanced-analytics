@@ -220,7 +220,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			$this->fetch_table_data();
 
-			$hidden = get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
+			$hidden = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
 			if ( ! $hidden ) {
 				$hidden = array();
 			}
@@ -248,7 +248,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public static function get_hidden_columns() {
 			return array_filter(
-				(array) get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
+				(array) \get_user_option( 'manage' . Settings::get_main_menu_page_hook() . 'columnshidden', false )
 			);
 		}
 

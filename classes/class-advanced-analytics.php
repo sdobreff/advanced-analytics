@@ -25,6 +25,8 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Display_Environment_Type;
+use ADVAN\Lists\Requests_List;
+use ADVAN\Lists\Table_List;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -49,10 +51,16 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				\add_action( 'admin_init', array( __CLASS__, 'plugin_redirect' ) );
 
-				// Setup screen options. Needs to be here as admin_init hook is too late.
+				// Setup screen options. Needs to be here as admin_init hook is too late. Per page set is below.
 				\add_filter( 'set-screen-option', array( Logs_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'set-screen-option', array( Transients_List::class, 'set_screen_option' ), 10, 3 );
+
+				\add_filter( 'set-screen-option', array( Requests_List::class, 'set_screen_option' ), 10, 3 );
+
+				\add_filter( 'set-screen-option', array( Table_List::class, 'set_screen_option' ), 10, 3 );
+
+				// End screen options set. per_page.
 
 				\add_filter( 'plugin_action_links', array( __CLASS__, 'add_settings_link' ), 10, 2 );
 				\add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_meta' ), 10, 2 );
