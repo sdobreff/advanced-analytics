@@ -75,6 +75,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 			if ( ! Settings::get_current_options()['advana_requests_disable'] ) {
 				\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
 				\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
+
+				// REST API events.
+				// \add_filter( 'rest_pre_dispatch', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+				// \add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'capture_rest_request' ), 10, 3 );
 			}
 		}
 
@@ -102,8 +106,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 
 			++self::$requests;
 
-			if ( null === $user_id && \is_user_logged_in() ) {
-				$user_id = \get_current_user_id();
+			if ( \function_exists( 'is_user_logged_in' ) ) {
+
+				if ( null === $user_id && \is_user_logged_in() ) {
+					$user_id = \get_current_user_id();
+				} else {
+					$user_id = 0;
+				}
 			} else {
 				$user_id = 0;
 			}
@@ -257,6 +266,42 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 			}
 
 			return self::$page_url;
+		}
+
+		/**
+		 * Captures the REST API request response and store it.
+		 *
+		 *  @param WP_REST_Response|WP_HTTP_Response|WP_Error|mixed - $response Result to send to the client.
+		 *                                                                   Usually a WP_REST_Response or WP_Error.
+		 * @param array                                            - $handler  Route handler used for the request.
+		 * @param WP_REST_Request                                  - $request  Request used to generate the response.
+		 *
+		 * @return WP_REST_Response|WP_HTTP_Response|WP_Error|mixed
+		 *
+		 * @since latest
+		 */
+		public static function capture_rest_request( $response, $handler, $request ) {
+			if ( ( $request['WP_DEBUG'] || WP_DEBUG ) && $response instanceof \WP_REST_Response ) {
+				global $wpdb;
+				$queries = array_filter(
+					array_map(
+						function ( $query_item ) {
+							if ( strpos( $query_item[2], 'Controller' ) !== false ) {
+								return $query_item[0];
+							} else {
+								return null;
+							}
+						},
+						$wpdb->queries
+					),
+					function ( $item ) {
+						return $item !== null; }
+				);
+				$response->header( 'X-A8C-all-queries', wp_json_encode( $queries ) );
+				$response->header( 'X-A8C-last-query', $wpdb->last_query );
+			}
+
+			return $response;
 		}
 	}
 }
