@@ -416,6 +416,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
 					'advana_requests_disable'         => false,
+					'advana_http_requests_disable'    => false,
+					'advana_rest_requests_disable'    => false,
 					'no_rest_api_monitor'             => false,
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
@@ -1527,6 +1529,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['advana_requests_disable'] = ( array_key_exists( 'advana_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['advana_http_requests_disable'] = ( array_key_exists( 'advana_http_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_http_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$advanced_options['advana_rest_requests_disable'] = ( array_key_exists( 'advana_rest_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_rest_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['no_rest_api_monitor'] = ( array_key_exists( 'no_rest_api_monitor', $post_array ) ) ? filter_var( $post_array['no_rest_api_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
