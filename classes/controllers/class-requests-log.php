@@ -77,8 +77,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
 
 				// REST API events.
-				// \add_filter( 'rest_pre_dispatch', array( __CLASS__, 'pre_http_request' ), 0, 3 );
-				// \add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'capture_rest_request' ), 10, 3 );
+				\add_filter( 'rest_pre_dispatch', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+				\add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'capture_rest_request' ), 10, 3 );
 			}
 		}
 
@@ -106,7 +106,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 
 			++self::$requests;
 
-			if ( \function_exists( 'is_user_logged_in' ) ) {
+			if ( \function_exists( 'is_user_logged_in' ) && \function_exists( 'get_current_user_id' ) ) {
 
 				if ( null === $user_id && \is_user_logged_in() ) {
 					$user_id = \get_current_user_id();
@@ -281,25 +281,53 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since latest
 		 */
 		public static function capture_rest_request( $response, $handler, $request ) {
-			if ( ( $request['WP_DEBUG'] || WP_DEBUG ) && $response instanceof \WP_REST_Response ) {
-				global $wpdb;
-				$queries = array_filter(
-					array_map(
-						function ( $query_item ) {
-							if ( strpos( $query_item[2], 'Controller' ) !== false ) {
-								return $query_item[0];
-							} else {
-								return null;
-							}
-						},
-						$wpdb->queries
-					),
-					function ( $item ) {
-						return $item !== null; }
-				);
-				$response->header( 'X-A8C-all-queries', wp_json_encode( $queries ) );
-				$response->header( 'X-A8C-last-query', $wpdb->last_query );
+
+			static $user_id = null;
+
+			// Check if the response is an error.
+			if ( \is_wp_error( $response ) ) {
+				$status = 'error';
+			} else {
+				$status = 'success';
 			}
+
+			++self::$requests;
+
+			if ( \function_exists( 'is_user_logged_in' ) && \function_exists( 'get_current_user_id' ) ) {
+
+				if ( null === $user_id && \is_user_logged_in() ) {
+					$user_id = \get_current_user_id();
+				} else {
+					$user_id = 0;
+				}
+			} else {
+				$user_id = 0;
+			}
+
+			// Prepare the log entry.
+			$log_entry = array(
+				'url'            => \property_exists( $request, 'route' ) ? $request->get_route() : '',
+				'page_url'       => self::page_url(),
+				'type'           => self::current_page_type(),
+				'domain'         => '',
+				'user_id'        => $user_id,
+				'runtime'        => microtime( true ) - ( ( $_SERVER['REQUEST_TIME_FLOAT'] ) ?? 0 ),
+				'request_status' => $status,
+				'request_group'  => '',
+				'request_source' => '',
+				'request_args'   => \wp_json_encode( (array) $request ),
+				'response'       => \is_wp_error( $response ) ? $response->get_error_message() : \wp_json_encode( $response ),
+				'date_added'     => time(),
+				'requests'       => self::$requests,
+				'trace'          => self::get_trace(),
+			);
+
+			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
+				$log_entry ['id'] = self::$last_id;
+			}
+
+			// Save the log entry to the database.
+			self::$last_id = Requests_Log_Entity::insert( $log_entry );
 
 			return $response;
 		}
