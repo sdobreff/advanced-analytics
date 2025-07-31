@@ -14,8 +14,9 @@ declare(strict_types=1);
 
 namespace ADVAN\ControllersApi;
 
-use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Logs_List;
+use ADVAN\Lists\Requests_List;
+use ADVAN\Entities\Common_Table;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
@@ -24,13 +25,14 @@ defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
  */
 if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 
-
 	/**
 	 * Creates and registers all the API endpoints for the plugin
 	 *
 	 * @since 1.9.2
 	 */
 	class Endpoints {
+
+		public const ENDPOINT_ROOT_NAME = '0-day';
 
 		/**
 		 * All of the endpoints supported by the plugin.
@@ -43,7 +45,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 			self::class => array(
 				'live'           => array(
 					'class'     => Logs_List::class,
-					'namespace' => 'wp-control/v1',
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
 					'endpoints' => array(
 						array(
@@ -60,7 +62,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 				),
 				'severity'       => array(
 					'class'     => Logs_List::class,
-					'namespace' => 'wp-control/v1',
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
 					'endpoints' => array(
 						array(
@@ -87,9 +89,38 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
+				'requests'       => array(
+					'class'     => Requests_List::class,
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<request_type>\w+)/(?P<status>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'set_request_status',
+								),
+								'args'             => array(
+									'request_type' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Request type',
+									),
+									'status'        => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Severity status',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
 				'drop_table'     => array(
 					'class'     => Common_Table::class,
-					'namespace' => 'wp-control/v1',
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
 					'endpoints' => array(
 						array(
@@ -114,7 +145,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 				),
 				'truncate_table' => array(
 					'class'     => Common_Table::class,
-					'namespace' => 'wp-control/v1',
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
 					'endpoints' => array(
 						array(

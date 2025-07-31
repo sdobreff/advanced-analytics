@@ -27,7 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 	/**
 	 * Class: WP_Error_Handler
-use ADVAN\Controllers\Telegram_API;
 	 *
 	 * Helper class to handle errors and exceptions.
 	 *
@@ -375,6 +374,30 @@ use ADVAN\Controllers\Telegram_API;
 			$error = error_get_last();
 
 			if ( null !== $error && ( \in_array( $error['type'], array( 1, 4 ) ) ) ) {
+
+				$url = '';
+
+				if ( ! WP_Helper::is_multisite() ) {
+
+					if ( ! function_exists( 'wp_generate_password' ) ) {
+						require_once ABSPATH . WPINC . '/pluggable.php';
+					}
+
+					$key_service = new \WP_Recovery_Mode_Key_Service();
+
+					$token = $key_service->generate_recovery_mode_token();
+					$key   = $key_service->generate_and_store_recovery_mode_key( $token );
+
+					$url = \add_query_arg(
+						array(
+							'action'   => 'enter_recovery_mode',
+							'rm_token' => $token,
+							'rm_key'   => $key,
+						),
+						\wp_login_url()
+					);
+				}
+
 				$errno   = $error['type'];
 				$errfile = $error['file'];
 				$errline = $error['line'];
@@ -382,12 +405,12 @@ use ADVAN\Controllers\Telegram_API;
 
 				if ( Slack::is_set() ) {
 					// Send error to Slack.
-					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+					Slack_API::send_slack_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) . "\n" . __( 'Recovery URL: ', '0-day-analytics' ) . $url );
 				}
 
 				if ( Telegram::is_set() ) {
 					// Send error to \Telegram.
-					Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) );
+					Telegram_API::send_telegram_message_via_api( null, null, ( WP_Helper::get_blog_domain() . "\n" . self::error_code_to_string( $errno ) . ' ' . $errstr . ' ' . $errfile . ' ' . $errline ) . "\n" . __( 'Recovery URL: ', '0-day-analytics' ) . $url );
 				}
 			}
 		}

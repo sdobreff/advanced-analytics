@@ -600,7 +600,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 				</style>
 						<?php } ?>
-				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 
 					<?php

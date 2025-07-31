@@ -16,6 +16,7 @@ namespace ADVAN\Lists\Views;
 use ADVAN\Helpers\Settings;
 use ADVAN\Lists\Table_List;
 use ADVAN\Entities\Common_Table;
+use ADVAN\ControllersApi\Endpoints;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -244,7 +245,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 								try {
 									attResp = await wp.apiFetch({
-										path: '/wp-control/v1/truncate_table/' + tableName,
+										path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/truncate_table/' + tableName,
 										method: 'DELETE',
 										cache: 'no-cache'
 									});
@@ -283,7 +284,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 								try {
 									attResp = await wp.apiFetch({
-										path: '/wp-control/v1/drop_table/' + tableName,
+										path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/drop_table/' + tableName,
 										method: 'DELETE',
 										cache: 'no-cache'
 									});

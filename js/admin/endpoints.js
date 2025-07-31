@@ -6,7 +6,7 @@ async function fetchSingleItem() {
 
 	try {
 		attResp = await wp.apiFetch({
-			path: '/wp-control/v1/live/get_last_item',
+			path: '/0-day/v1/live/get_last_item',
 			method: 'GET',
 			cache: 'no-cache'
 		});

@@ -17,8 +17,9 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
-use ADVAN\Entities\Requests_Log_Entity;
 use ADVAN\Lists\Traits\List_Trait;
+use ADVAN\ControllersApi\Endpoints;
+use ADVAN\Entities\Requests_Log_Entity;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -365,10 +366,10 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
 
 					$data  = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . \esc_html(var_export( self::get_formatted_string( $item['request_args'] ), true ) ). '</pre>';
+					$data .= '<pre style="overflow-y: hidden;">' . \esc_html( var_export( self::get_formatted_string( $item['request_args'] ), true ) ) . '</pre>';
 					$data .= '</div>';
 					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . \esc_html(var_export( self::get_formatted_string( $item['response'] ), true )) . '</pre>';
+					$data .= '<pre style="overflow-y: hidden;">' . \esc_html( var_export( self::get_formatted_string( $item['response'] ), true ) ) . '</pre>';
 					$data .= '</div>';
 
 					$time_format = 'g:i a';
@@ -469,7 +470,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		protected function column_cb( $item ) {
 			return sprintf(
 				'<label class="screen-reader-text" for="' . self::$table::get_name() . '_' . $item['id'] . '">' . sprintf(
-					// translators: The column name.
+				// translators: The column name.
 					__( 'Select %s' ),
 					'id'
 				) . '</label>'
@@ -570,18 +571,18 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					}
 
 					$redirect =
-						\remove_query_arg(
-							array( 'delete', '_wpnonce', 'advan_' . self::$table::get_name(), 'action' ),
-							\add_query_arg(
-								array(
-									self::SEARCH_INPUT => self::escaped_search_input(),
-									'paged'            => $_REQUEST['paged'] ?? 1,
-									'page'             => Settings::REQUESTS_MENU_SLUG,
-									'show_table'       => self::$table::get_name(),
-								),
-								\admin_url( 'admin.php' )
-							)
-						);
+					\remove_query_arg(
+						array( 'delete', '_wpnonce', 'advan_' . self::$table::get_name(), 'action' ),
+						\add_query_arg(
+							array(
+								self::SEARCH_INPUT => self::escaped_search_input(),
+								'paged'            => $_REQUEST['paged'] ?? 1,
+								'page'             => Settings::REQUESTS_MENU_SLUG,
+								'show_table'       => self::$table::get_name(),
+							),
+							\admin_url( 'admin.php' )
+						)
+					);
 
 					?>
 					<script>
@@ -635,20 +636,9 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		public function extra_tablenav( $which ) {
 
-			?>
-
-			<div class="alignleft actions bulkactions">
-				
-			</div>
-
-			<?php
-			// if ( 'top' === $which ) {
-			global $wpdb;
-			?>
-						<?php
-						if ( 'top' === $which ) {
-							?>
-					<style>
+			if ( 'top' === $which ) {
+				?>
+				<style>
 					.flex {
 						display:flex;
 					}
@@ -699,53 +689,184 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 						z-index: 2;
 						top: 0;
 					} */
+					.checkbox-wrapper-2 label{
+						margin-right: 7px !important;
+						cursor: pointer !important;
+					}
 
+					.checkbox-wrapper-2 .ikxBAC {
+						appearance: none;
+						background-color: #dfe1e4;
+						border-radius: 72px;
+						border-style: none;
+						flex-shrink: 0;
+						height: 20px;
+						margin: 0;
+						position: relative;
+						width: 30px;
+						cursor: pointer !important;
+						border: 1px solid #cec6c6;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC::before {
+						bottom: -6px !important;
+						content: "" !important;
+						left: -6px !important;
+						position: absolute !important;
+						right: -6px !important;
+						top: -6px !important;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC,
+					.checkbox-wrapper-2 .ikxBAC::after {
+						transition: all 100ms ease-out;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC::after {
+						background-color: #e68a6e;
+						border-radius: 50%;
+						content: "";
+						height: 14px;
+						left: 3px;
+						position: absolute;
+						top: 3px;
+						width: 14px;
+					}
+
+					.checkbox-wrapper-2 input[type=checkbox] {
+						cursor: default;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC:hover {
+						background-color: #c9cbcd;
+						transition-duration: 0s;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC:checked {
+						background-color: #d3f9d6;
+					}
+
+					html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
+						background-color:rgb(27, 27, 28) !important;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC:checked::after {
+						background-color: #17c622;
+						left: 13px;
+					}
+
+					.checkbox-wrapper-2 :focus:not(.focus-visible) {
+						outline: 0;
+					}
+
+					.checkbox-wrapper-2 .ikxBAC:checked:hover {
+						background-color: #dfe1e4;
+					}
+
+					.tablenav {
+						height: auto !important;
+					}
 				</style>
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
+					<div class="checkbox-wrapper-2">
+					
+						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="http" id="advana_http_requests_disable" <?php \checked( Settings::get_current_options()['advana_http_requests_disable'], true ); ?>>
+							
+						<label for="advana_http_requests_disable" class="badge dark-badge">
+						<?php \esc_html_e( 'Disable HTTP monitoring', '0-day-analytics' ); ?>
+						</label>
+					
+						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="rest" id="advana_rest_requests_disable" <?php \checked( Settings::get_current_options()['advana_rest_requests_disable'], true ); ?>>
+							
+						<label for="advana_rest_requests_disable" class="badge dark-badge">
+						<?php \esc_html_e( 'Disable REST API monitoring', '0-day-analytics' ); ?>
+						</label>
+						<script>
+							let requests_disable = document.getElementsByClassName("requests-monitoring-filter");
+
+							let len = requests_disable.length;
+
+							// call updateCost() function to onclick event on every checkbox
+							for (var i = 0; i < len; i++) {
+								if (requests_disable[i].type === 'checkbox') {
+									requests_disable[i].onclick = setMonitoring;
+								}
+							}
+
+							async function setMonitoring(e) {
+
+								let monitoringName = e.target.value;
+								let monitoringStatus = e.target.checked;
+								let attResp;
+
+								try {
+									attResp = await wp.apiFetch({
+										path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/requests/' + monitoringName + '/' + ( monitoringStatus ? 'enable' : 'disable' ),
+										method: 'GET',
+										cache: 'no-cache'
+									});
+
+									if (attResp.success) {
+										
+										location.reload();
+									} else if (attResp.message) {
+										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+									}
+
+								} catch (error) {
+									throw error;
+								}
+							}
+
+						</script>
+					</div>
+				</div>
+
 						<?php } ?>
-				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 
-					<?php
-					$table_info = Common_Table::get_table_status();
-					if ( ! empty( $table_info ) && isset( $table_info[0] ) ) {
+						<?php
+						$table_info = Common_Table::get_table_status();
+						if ( ! empty( $table_info ) && isset( $table_info[0] ) ) {
 
-						if ( isset( $table_info[0]['Engine'] ) ) {
-							?>
+							if ( isset( $table_info[0]['Engine'] ) ) {
+								?>
 							| <b><?php \esc_html_e( 'Engine: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Engine'] ); ?></span>
-							<?php
-						}
+								<?php
+							}
 
-						if ( isset( $table_info[0]['Auto_increment'] ) ) {
-							?>
+							if ( isset( $table_info[0]['Auto_increment'] ) ) {
+								?>
 							| <b><?php \esc_html_e( 'Auto increment: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Auto_increment'] ); ?></span>
-							<?php
-						}
+								<?php
+							}
 
-						if ( isset( $table_info[0]['Collation'] ) ) {
-							?>
+							if ( isset( $table_info[0]['Collation'] ) ) {
+								?>
 							| <b><?php \esc_html_e( 'Collation: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Collation'] ); ?></span>
-							<?php
-						}
+								<?php
+							}
 
-						if ( isset( $table_info[0]['Create_time'] ) ) {
-							?>
+							if ( isset( $table_info[0]['Create_time'] ) ) {
+								?>
 							| <b><?php \esc_html_e( 'Create time : ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Create_time'] ); ?></span>
-							<?php
-						}
+								<?php
+							}
 
-						if ( isset( $table_info[0]['Update_time'] ) ) {
-							?>
+							if ( isset( $table_info[0]['Update_time'] ) ) {
+								?>
 							| <b><?php \esc_html_e( 'Update time : ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( $table_info[0]['Update_time'] ); ?></span>
-							<?php
+								<?php
+							}
 						}
-					}
-					?>
+						?>
 					</div>
 					<div>
 						
 					</div>
 				</div>
-				<?php
+					<?php
 		}
 
 		/**
@@ -896,6 +1017,53 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			} else {
 				return $string;
 			}
+		}
+
+		/**
+		 * Sets the request type status.
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return \WP_REST_Response|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function set_request_status( \WP_REST_Request $request ) {
+			$request_type = $request->get_param( 'request_type' );
+			$status       = $request->get_param( 'status' );
+
+			if ( ! in_array( $request_type, array( 'http', 'rest' ), true ) ) {
+				return new \WP_Error(
+					'invalid_request_type',
+					__( 'Invalid request type name.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$request_type = 'advana_' . $request_type . '_requests_disable';
+
+			$settings = Settings::get_current_options();
+
+			if ( 'enable' === $status ) {
+				$settings[ $request_type ] = true;
+			} elseif ( 'disable' === $status ) {
+				$settings[ $request_type ] = false;
+			} else {
+				return new \WP_Error(
+					'invalid_status',
+					__( 'Invalid status.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			Settings::store_options( $settings );
+			Settings::set_current_options( $settings );
+
+			return rest_ensure_response(
+				array(
+					'success' => true,
+				)
+			);
 		}
 	}
 }

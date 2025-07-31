@@ -20,6 +20,7 @@ use ADVAN\Helpers\File_Helper;
 use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Lists\Traits\List_Trait;
+use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Controllers\Reverse_Line_Reader;
 
@@ -575,7 +576,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					);
 
 				case 'message':
-					$message  = '<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+					$message  = '<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div>
 						</div>
 						<div class=""><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="' . __( 'Share', '0-day-analytics' ) . '" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
@@ -1043,7 +1044,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						font-weight: bold;
 					}
 				</style>
-				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid  justify-between">
 					<div>
 						<b><?php \esc_html_e( 'Log file: ', '0-day-analytics' ); ?></b> <span class="italic"><?php echo \esc_attr( Error_Log::extract_file_name( Error_Log::autodetect() ) ); ?></span></div>
 						<div class=""> <?php echo \esc_attr( File_Helper::format_file_size( Error_Log::autodetect() ) ); ?> <span class="text-lg leading-none">|</span> <?php \esc_html_e( 'Last modified: ', '0-day-analytics' ); ?> <?php echo \esc_attr( $time ); ?>
@@ -1054,82 +1055,82 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					?>
 
 				<style>
-				.checkbox-wrapper-2 label{
-					margin-right: 7px !important;
-					cursor: pointer !important;
-				}
+					.checkbox-wrapper-2 label{
+						margin-right: 7px !important;
+						cursor: pointer !important;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC {
-					appearance: none;
-					background-color: #dfe1e4;
-					border-radius: 72px;
-					border-style: none;
-					flex-shrink: 0;
-					height: 20px;
-					margin: 0;
-					position: relative;
-					width: 30px;
-					cursor: pointer !important;
-					border: 1px solid #cec6c6;
-				}
+					.checkbox-wrapper-2 .ikxBAC {
+						appearance: none;
+						background-color: #dfe1e4;
+						border-radius: 72px;
+						border-style: none;
+						flex-shrink: 0;
+						height: 20px;
+						margin: 0;
+						position: relative;
+						width: 30px;
+						cursor: pointer !important;
+						border: 1px solid #cec6c6;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC::before {
-					bottom: -6px !important;
-					content: "" !important;
-					left: -6px !important;
-					position: absolute !important;
-					right: -6px !important;
-					top: -6px !important;
-				}
+					.checkbox-wrapper-2 .ikxBAC::before {
+						bottom: -6px !important;
+						content: "" !important;
+						left: -6px !important;
+						position: absolute !important;
+						right: -6px !important;
+						top: -6px !important;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC,
-				.checkbox-wrapper-2 .ikxBAC::after {
-					transition: all 100ms ease-out;
-				}
+					.checkbox-wrapper-2 .ikxBAC,
+					.checkbox-wrapper-2 .ikxBAC::after {
+						transition: all 100ms ease-out;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC::after {
-					background-color: #e68a6e;
-					border-radius: 50%;
-					content: "";
-					height: 14px;
-					left: 3px;
-					position: absolute;
-					top: 3px;
-					width: 14px;
-				}
+					.checkbox-wrapper-2 .ikxBAC::after {
+						background-color: #e68a6e;
+						border-radius: 50%;
+						content: "";
+						height: 14px;
+						left: 3px;
+						position: absolute;
+						top: 3px;
+						width: 14px;
+					}
 
-				.checkbox-wrapper-2 input[type=checkbox] {
-					cursor: default;
-				}
+					.checkbox-wrapper-2 input[type=checkbox] {
+						cursor: default;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC:hover {
-					background-color: #c9cbcd;
-					transition-duration: 0s;
-				}
+					.checkbox-wrapper-2 .ikxBAC:hover {
+						background-color: #c9cbcd;
+						transition-duration: 0s;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC:checked {
-					background-color: #d3f9d6;
-				}
+					.checkbox-wrapper-2 .ikxBAC:checked {
+						background-color: #d3f9d6;
+					}
 
-				html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
-					background-color:rgb(27, 27, 28) !important;
-				}
+					html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
+						background-color:rgb(27, 27, 28) !important;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC:checked::after {
-					background-color: #17c622;
-					left: 13px;
-				}
+					.checkbox-wrapper-2 .ikxBAC:checked::after {
+						background-color: #17c622;
+						left: 13px;
+					}
 
-				.checkbox-wrapper-2 :focus:not(.focus-visible) {
-					outline: 0;
-				}
+					.checkbox-wrapper-2 :focus:not(.focus-visible) {
+						outline: 0;
+					}
 
-				.checkbox-wrapper-2 .ikxBAC:checked:hover {
-					background-color: #dfe1e4;
-				}
+					.checkbox-wrapper-2 .ikxBAC:checked:hover {
+						background-color: #dfe1e4;
+					}
 				</style>
 
-				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid border-[var(--adbtl-log-viewer-border-color)] justify-between">
+				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class="checkbox-wrapper-2">
 						<?php
 						foreach ( Settings::get_current_options()['severities'] as $name => $severity ) {
@@ -1164,7 +1165,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						try {
 							attResp = await wp.apiFetch({
-								path: '/wp-control/v1/severity/' + severityName + '/' + ( severityStatus ? 'enable' : 'disable' ),
+								path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/severity/' + severityName + '/' + ( severityStatus ? 'enable' : 'disable' ),
 								method: 'GET',
 								cache: 'no-cache'
 							});
@@ -1480,7 +1481,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
-		 * Sets teh severity status.
+		 * Sets the severity status.
 		 *
 		 * @param \WP_REST_Request $request - The request object.
 		 *
