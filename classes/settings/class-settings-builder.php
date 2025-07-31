@@ -1498,9 +1498,9 @@ if ( ! class_exists( '\ADVAN\Settings\Settings_Builder' ) ) {
 			self::$placeholder_attr = ! empty( $placeholder ) ? 'placeholder="' . $placeholder . '"' : '';
 
 			// Get the option stored data.
-			if ( ! empty( $data ) ) {
+			if ( ! \is_null( $data ) ) {
 				self::$current_value = $data;
-			} elseif ( ! empty( $default ) ) {
+			} elseif ( isset( $default ) ) {
 				self::$current_value = $default;
 			}
 		}

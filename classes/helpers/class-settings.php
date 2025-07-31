@@ -190,7 +190,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'network_admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin on multisite install panel.
 			}
 
-			\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
+			if ( self::get_current_options()['keep_reading_error_log'] || ( defined( 'WP_DEBUG' ) && \WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ) ) {
+				\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
+			}
 
 			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
 			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
@@ -415,7 +417,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'environment_type_admin_bar'      => true,
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
-					'advana_requests_disable'         => false,
+					'advana_requests_enable'         => true,
 					'advana_http_requests_disable'    => false,
 					'advana_rest_requests_disable'    => false,
 					'no_rest_api_monitor'             => false,
@@ -1319,7 +1321,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function build_option( array $value ) {
-			$data = false;
+			$data = null;
 
 			if ( empty( $value['id'] ) ) {
 				$value['id'] = ' ';
@@ -1528,7 +1530,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
-			$advanced_options['advana_requests_disable'] = ( array_key_exists( 'advana_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['advana_requests_enable'] = ( array_key_exists( 'advana_requests_enable', $post_array ) ) ? filter_var( $post_array['advana_requests_enable'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['advana_http_requests_disable'] = ( array_key_exists( 'advana_http_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_http_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
 

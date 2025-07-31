@@ -72,13 +72,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 * @since 2.7.0
 		 */
 		public static function init() {
-			if ( ! Settings::get_current_options()['advana_requests_disable'] ) {
-				\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
-				\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
+			if ( Settings::get_current_options()['advana_requests_enable'] ) {
 
-				// REST API events.
-				\add_filter( 'rest_pre_dispatch', array( __CLASS__, 'pre_http_request' ), 0, 3 );
-				\add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'capture_rest_request' ), 10, 3 );
+				if ( ! Settings::get_current_options()['advana_http_requests_disable'] ) {
+					\add_filter( 'pre_http_request', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+					\add_action( 'http_api_debug', array( __CLASS__, 'capture_request' ), 10, 5 );
+				}
+
+				if ( ! Settings::get_current_options()['advana_rest_requests_disable'] ) {
+					// REST API events.
+					\add_filter( 'rest_pre_dispatch', array( __CLASS__, 'pre_http_request' ), 0, 3 );
+					\add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'capture_rest_request' ), 10, 3 );
+				}
 			}
 		}
 

@@ -141,5 +141,25 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			Settings::store_options( $settings );
 			Settings::set_current_options( $settings );
 		}
+
+		/**
+		 * Migrates the plugin up-to version 2.8.0
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.0
+		 */
+		public static function migrate_up_to_280() {
+			$settings = Settings::get_current_options();
+
+			if ( isset( $settings['advana_requests_disable'] ) ) {
+				$settings['advana_requests_enable'] = ! $settings['advana_requests_disable'];
+
+				unset( $settings['advana_requests_disable'] );
+			}
+
+			Settings::store_options( $settings );
+			Settings::set_current_options( $settings );
+		}
 	}
 }

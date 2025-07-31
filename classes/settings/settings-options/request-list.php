@@ -38,10 +38,10 @@ Settings::set_current_options( $settings );
 	Settings::build_option(
 		array(
 			'name'    => \esc_html__( 'Enable requests logging', '0-day-analytics' ),
-			'id'      => 'advana_requests_disable',
+			'id'      => 'advana_requests_enable',
 			'type'    => 'checkbox',
 			'toggle'  => '#advana_http_requests_disable-item, #advana_rest_requests_disable-item',
-			'default' => ! Settings::get_current_options()['advana_requests_disable'],
+			'default' => Settings::get_current_options()['advana_requests_enable'],
 		)
 	);
 

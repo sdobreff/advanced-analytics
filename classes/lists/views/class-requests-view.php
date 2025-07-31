@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
 					<?php
-					if ( Settings::get_current_options()['advana_requests_disable'] ) {
+					if ( ! Settings::get_current_options()['advana_requests_enable'] ) {
 						?>
 					<div id="advana-status-error" class="notice notice-error">
 						<?php
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							sprintf(
 								/* translators: %s: Link to requests settings. */
 								esc_html__( 'The requests logging is disabled. To enable it go to : %s', '0-day-analytics' ),
-								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-request-list">' . __( 'here', '0-day-analytics' ) . '</a>',
+								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-request-list">' . __( 'settings', '0-day-analytics' ) . '</a>',
 							)
 						);
 						?>
@@ -195,7 +195,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 
 					<hr class="wp-header-end">
 					<?php
-					if ( Settings::get_current_options()['advana_requests_disable'] ) {
+					if ( ! Settings::get_current_options()['advana_requests_enable'] ) {
 						?>
 					<div id="advana-status-error" class="notice notice-error">
 						<?php
@@ -203,13 +203,44 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							'<p>%1$s</p>',
 							sprintf(
 								/* translators: %s: Link to requests settings. */
-								esc_html__( 'The requests logging is disabled. To enable it go to : %s', '0-day-analytics' ),
-								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-request-list">' . __( 'here', '0-day-analytics' ) . '</a>',
+								\esc_html__( 'The requests logging is disabled. To enable it go to : %s', '0-day-analytics' ),
+								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-request-list">' . __( 'settings', '0-day-analytics' ) . '</a>',
 							)
 						);
 						?>
 					</div>
 						<?php
+					} else {
+						if ( Settings::get_current_options()['advana_http_requests_disable'] ) {
+							?>
+					<div id="advana-status-error" class="notice notice-error">
+							<?php
+							printf(
+								'<p>%1$s</p>',
+								sprintf(
+								/* translators: %s: Link to requests settings. */
+									\esc_html__( 'HTTP Requests monitoring is disabled', '0-day-analytics' ),
+								)
+							);
+							?>
+					</div>
+							<?php
+						}
+						if ( Settings::get_current_options()['advana_rest_requests_disable'] ) {
+							?>
+					<div id="advana-status-error" class="notice notice-error">
+							<?php
+							printf(
+								'<p>%1$s</p>',
+								sprintf(
+								/* translators: %s: Link to requests settings. */
+									\esc_html__( 'REST API Requests monitoring is disabled', '0-day-analytics' ),
+								)
+							);
+							?>
+					</div>
+							<?php
+						}
 					}
 					?>
 
