@@ -396,7 +396,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return mixed
 		 *
-		 * @since latest
+		 * @since 2.8.0
 		 */
 		public static function get_option( string $option ) {
 

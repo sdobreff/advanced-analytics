@@ -283,7 +283,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 		 *
 		 * @return WP_REST_Response|WP_HTTP_Response|WP_Error|mixed
 		 *
-		 * @since latest
+		 * @since 2.8.0
 		 */
 		public static function capture_rest_request( $response, $handler, $request ) {
 

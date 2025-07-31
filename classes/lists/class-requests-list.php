@@ -1026,7 +1026,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
-		 * @since latest
+		 * @since 2.8.0
 		 */
 		public static function set_request_status( \WP_REST_Request $request ) {
 			$request_type = $request->get_param( 'request_type' );
