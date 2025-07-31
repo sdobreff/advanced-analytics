@@ -105,7 +105,7 @@ if ( ! Context_Helper::is_installing() ) {
 	\add_action( 'http_api_debug', array( WP_Error_Handler::class, 'capture_request' ), 0, 5 );
 
 	// Need to add deprecated_argument_run as it is bit different than the others.
-	if ( ! Settings::get_current_options()['no_wp_die_monitor'] ) {
+	if ( ! Settings::get_option( 'no_wp_die_monitor' ) ) {
 		\add_filter( 'wp_die_ajax_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
 		\add_filter( 'wp_die_json_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
 		\add_filter( 'wp_die_jsonp_handler', array( WP_Error_Handler::class, 'wp_die_handler' ), PHP_INT_MAX );
@@ -116,7 +116,7 @@ if ( ! Context_Helper::is_installing() ) {
 
 	\register_activation_hook( ADVAN_PLUGIN_ABSOLUTE, array( Advanced_Analytics::class, 'plugin_activate' ) );
 	\add_action( 'plugins_loaded', array( Advanced_Analytics::class, 'init' ) );
-	if ( ! Settings::get_current_options()['no_rest_api_monitor'] ) {
+	if ( ! Settings::get_option( 'no_rest_api_monitor' ) ) {
 		\add_filter( 'rest_post_dispatch', array( WP_Error_Handler::class, 'log_rest_api_errors' ), 10, 3 );
 	}
 	\add_action( 'wp_mail_failed', array( WP_Error_Handler::class, 'on_mail_error' ), -1 );

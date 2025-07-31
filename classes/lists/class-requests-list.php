@@ -770,13 +770,13 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class="checkbox-wrapper-2">
 					
-						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="http" id="advana_http_requests_disable" <?php \checked( Settings::get_current_options()['advana_http_requests_disable'], true ); ?>>
+						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="http" id="advana_http_requests_disable" <?php \checked( Settings::get_option( 'advana_http_requests_disable' ), true ); ?>>
 							
 						<label for="advana_http_requests_disable" class="badge dark-badge">
 						<?php \esc_html_e( 'Disable HTTP monitoring', '0-day-analytics' ); ?>
 						</label>
 					
-						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="rest" id="advana_rest_requests_disable" <?php \checked( Settings::get_current_options()['advana_rest_requests_disable'], true ); ?>>
+						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="rest" id="advana_rest_requests_disable" <?php \checked( Settings::get_option( 'advana_rest_requests_disable' ), true ); ?>>
 							
 						<label for="advana_rest_requests_disable" class="badge dark-badge">
 						<?php \esc_html_e( 'Disable REST API monitoring', '0-day-analytics' ); ?>

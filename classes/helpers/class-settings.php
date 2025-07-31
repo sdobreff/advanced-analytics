@@ -190,7 +190,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'network_admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin on multisite install panel.
 			}
 
-			if ( self::get_current_options()['keep_reading_error_log'] || ( defined( 'WP_DEBUG' ) && \WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ) ) {
+			if ( self::get_option( 'keep_reading_error_log' ) || ( defined( 'WP_DEBUG' ) && \WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ) ) {
 				\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
 			}
 
@@ -371,7 +371,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					self::$current_options = self::get_default_options();
 					self::store_options( self::$current_options );
-				} elseif ( ! isset( self::$current_options['version'] ) || self::OPTIONS_VERSION !== self::$current_options['version'] ) {
+				}
+
+				if ( ! isset( self::$current_options['version'] ) || self::OPTIONS_VERSION !== self::$current_options['version'] ) {
 
 					// Set any unset options.
 					foreach ( self::get_default_options() as $key => $value ) {
@@ -385,6 +387,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return self::$current_options;
+		}
+
+		/**
+		 * Returns current option or one stored in the defaults if not present in the current options.
+		 *
+		 * @param string $option - The name of the option to return value for.
+		 *
+		 * @return mixed
+		 *
+		 * @since latest
+		 */
+		public static function get_option( string $option ) {
+
+			$current = self::get_current_options();
+
+			if ( ! isset( $current[ $option ] ) ) {
+				$current = self::get_default_options();
+
+				if ( ! isset( $current[ $option ] ) ) {
+					return null;
+				}
+			}
+
+			return $current[ $option ];
 		}
 
 		/**
@@ -417,7 +443,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'environment_type_admin_bar'      => true,
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
-					'advana_requests_enable'         => true,
+					'advana_requests_enable'          => true,
 					'advana_http_requests_disable'    => false,
 					'advana_rest_requests_disable'    => false,
 					'no_rest_api_monitor'             => false,
@@ -509,7 +535,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function add_options_page() {
 
-			if ( self::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
+			if ( self::get_option( 'menu_admins_only' ) && ! \current_user_can( 'manage_options' ) ) {
 				return;
 			} else {
 
@@ -522,7 +548,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				self::$hook = \add_menu_page(
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'WP Control', '0-day-analytics' ) . self::get_updates_count_html(),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ),
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ),
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
 					'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
@@ -546,7 +572,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Error Log viewer', '0-day-analytics' ),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::MENU_SLUG,
 					array( __CLASS__, 'analytics_options_page' ),
 					1
@@ -557,7 +583,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Requests viewer', '0-day-analytics' ),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::REQUESTS_MENU_SLUG,
 					array( Requests_View::class, 'analytics_requests_page' ),
 					3
@@ -576,7 +602,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Cron viewer', '0-day-analytics' ),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::CRON_MENU_SLUG,
 					array( Crons_View::class, 'analytics_cron_page' ),
 					1
@@ -595,7 +621,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Transients viewer', '0-day-analytics' ),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::TRANSIENTS_MENU_SLUG,
 					array( Transients_View::class, 'analytics_transients_page' ),
 					2
@@ -614,7 +640,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Table viewer', '0-day-analytics' ),
-					( ( self::get_current_options()['menu_admins_only'] ) ? 'manage_options' : 'read' ), // No capability requirement.
+					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
 					self::TABLE_MENU_SLUG,
 					array( Table_View::class, 'analytics_table_page' ),
 					4
@@ -628,7 +654,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* Table end */
 
-				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_current_options()['live_notifications_admin_bar'] ) {
+				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_option( 'live_notifications_admin_bar' ) ) {
 					\add_action( 'admin_bar_menu', array( __CLASS__, 'live_notifications' ), 1000, 1 );
 					\add_action( 'shutdown', array( __CLASS__, 'live_notifications_update' ), \PHP_INT_MAX );
 					\add_action(
@@ -1437,14 +1463,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						background: #d7dce0;
 						color: #42425d !important;
 					} */
-					<?php
-					// foreach ( self::get_current_options()['severities'] as $class => $properties ) {
-					// if ( isset( self::get_current_options()['severities'][ $event['severity'] ] ) ) {
-					// echo '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( self::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
-					// }
-						// echo '.aadvan-live-notif-item.' . \esc_attr( $class ) . ' a { color: '.$properties['color'].' !important; }';
-					// }
-					?>
 				</style>
 				<?php
 			}
@@ -1476,12 +1494,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['protected_config_source'] = ( array_key_exists( 'protected_config_source', $post_array ) ) ? filter_var( $post_array['protected_config_source'], FILTER_VALIDATE_BOOLEAN ) : false;
 
-			foreach ( self::get_current_options()['severities'] as $name => $severity ) {
+			foreach ( self::get_option( 'severities' ) as $name => $severity ) {
 				$advanced_options['severities'][ $name ]['color'] = ( array_key_exists( 'severity_colors_' . $name . '_color', $post_array ) && ! empty( $post_array[ 'severity_colors_' . $name . '_color' ] ) ) ? \sanitize_text_field( $post_array[ 'severity_colors_' . $name . '_color' ] ) : ( ( isset( $post_array['severities'][ $name ]['color'] ) ) ? \sanitize_text_field( $post_array['severities'][ $name ]['color'] ) : $severity['color'] );
 
 				$advanced_options['severities'][ $name ]['display'] = ( array_key_exists( 'severity_show_' . $name . '_display', $post_array ) && ! empty( $post_array[ 'severity_show_' . $name . '_display' ] ) ) ? true : ( ( isset( $post_array['severities'][ $name ]['display'] ) ) ? (bool) $post_array['severities'][ $name ]['display'] : false );
 
-				$advanced_options['severities'][ $name ]['name'] = self::get_current_options()['severities'][ $name ]['name'];
+				$advanced_options['severities'][ $name ]['name'] = self::get_option( 'severities' )[ $name ]['name'];
 			}
 
 			$advanced_options['slack_notifications']['all'] = array();
@@ -1654,7 +1672,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function get_disabled_severities(): array {
 			if ( null === self::$disabled_severities ) {
 				self::$disabled_severities = array();
-				foreach ( self::get_current_options()['severities'] as $name => $severity ) {
+				foreach ( self::get_option( 'severities' ) as $name => $severity ) {
 					if ( ! $severity['display'] ) {
 						self::$disabled_severities[] = $name;
 					}

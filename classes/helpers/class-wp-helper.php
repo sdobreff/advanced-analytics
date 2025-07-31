@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 * @since 1.4.0
 		 */
 		public static function verify_admin_nonce( string $action, string $nonce_name = '_wpnonce' ) {
-			if ( Settings::get_current_options()['menu_admins_only'] && ! \current_user_can( 'manage_options' ) ) {
+			if ( Settings::get_option( 'menu_admins_only' ) && ! \current_user_can( 'manage_options' ) ) {
 				\wp_send_json_error( 'Insufficient permissions.', 403 );
 			}
 
@@ -633,7 +633,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			/**
 			 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
 			 */
-			if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
+			if ( ! Settings::get_option( 'keep_reading_error_log' ) ) {
 				if ( ! defined( 'WP_DEBUG' ) || ! \WP_DEBUG ) {
 					return new \WP_Error(
 						'debug_off',
@@ -660,7 +660,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			/**
 			 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
 			 */
-			if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
+			if ( ! Settings::get_option( 'keep_reading_error_log' ) ) {
 
 				if ( ! defined( 'WP_DEBUG_LOG' ) || ! \WP_DEBUG_LOG ) {
 					return new \WP_Error(

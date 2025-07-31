@@ -60,7 +60,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 				/**
 				 * If the user has enabled the option to keep the error log, we will not check for the WP Debug and WP Debug Log.
 				 */
-				if ( ! Settings::get_current_options()['keep_reading_error_log'] ) {
+				if ( ! Settings::get_option( 'keep_reading_error_log' ) ) {
 
 					// First check if the WP Debug is enabled.
 					if ( ! \defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {

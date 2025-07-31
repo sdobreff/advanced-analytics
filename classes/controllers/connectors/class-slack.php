@@ -107,7 +107,13 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 */
 		public static function get_settings(): array {
 			if ( null === self::$settings ) {
-				self::$settings = Settings::get_current_options()['slack_notifications']['all'];
+
+				$option = Settings::get_option( 'slack_notifications' );
+				if ( isset( $option['all'] ) ) {
+					self::$settings = $option['all'];
+				} else {
+					self::$settings = array();
+				}
 			}
 
 			return self::$settings;
@@ -159,7 +165,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Slack' ) ) {
 		 * @since 1.8.0
 		 */
 		public static function get_slack_channel() {
-			return self::get_settings()['channel'];
+			return self::get_settings()['channel'] ?? '';
 		}
 
 		/**

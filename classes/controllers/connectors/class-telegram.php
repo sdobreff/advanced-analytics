@@ -107,7 +107,13 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 */
 		public static function get_settings(): array {
 			if ( null === self::$settings ) {
-				self::$settings = Settings::get_current_options()['telegram_notifications']['all'];
+
+				$option = Settings::get_option( 'telegram_notifications' );
+				if ( isset( $option['all'] ) ) {
+					self::$settings = $option['all'];
+				} else {
+					self::$settings = array();
+				}
 			}
 
 			return self::$settings;
@@ -159,7 +165,7 @@ if ( ! class_exists( 'ADVAN\Controllers\Telegram' ) ) {
 		 * @since 1.8.5
 		 */
 		public static function get_telegram_channel() {
-			return self::get_settings()['channel'];
+			return self::get_settings()['channel'] ?? '';
 		}
 
 		/**

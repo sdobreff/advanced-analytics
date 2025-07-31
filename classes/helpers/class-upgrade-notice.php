@@ -257,7 +257,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 
 				usort( $versions, 'version_compare' );
 
-				$versions = array_slice( $versions, -( Settings::get_current_options()['plugin_version_switch_count'] ), Settings::get_current_options()['plugin_version_switch_count'], true );
+				$versions = array_slice( $versions, -( Settings::get_option( 'plugin_version_switch_count' ) ), Settings::get_option( 'plugin_version_switch_count' ), true );
 
 				foreach ( $plugin_information->versions as $version => $download_link ) {
 					$key = array_search( $download_link, $versions );

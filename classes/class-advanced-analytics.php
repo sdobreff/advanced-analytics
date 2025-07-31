@@ -80,7 +80,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// Check for urgent upgrades.
 				\add_action( 'current_screen', array( Upgrade_Notice::class, 'init' ) );
 
-				if ( Settings::get_current_options()['environment_type_admin_bar'] ) {
+				if ( Settings::get_option( 'environment_type_admin_bar' ) ) {
 					\add_action( 'init', array( Display_Environment_Type::class, 'init' ) );
 				}
 			}

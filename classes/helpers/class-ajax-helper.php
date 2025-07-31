@@ -180,7 +180,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
-			$items = Logs_List::get_error_items( true, Settings::get_current_options()['keep_error_log_records_truncate'] );
+			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
 
 			Error_Log::clear( $file_and_path );
 			Log_Line_Parser::delete_last_parsed_timestamp();
@@ -191,7 +191,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
 
-			$items = Logs_List::get_error_items( true, Settings::get_current_options()['keep_error_log_records_truncate'] );
+			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
 
 			Error_Log::clear( $file_and_path );
 			Log_Line_Parser::delete_last_parsed_timestamp();
@@ -537,7 +537,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 
 			}
 			// Don't show any configurational files for security reasons.
-			if ( Settings::get_current_options()['protected_config_source'] && ( strpos( \basename( $file_name ), 'config' ) !== false || strpos( \basename( $file_name ), 'settings' ) !== false || strpos( \basename( $file_name ), 'wp-load' ) !== false ) ) {
+			if ( Settings::get_option( 'protected_config_source' ) && ( strpos( \basename( $file_name ), 'config' ) !== false || strpos( \basename( $file_name ), 'settings' ) !== false || strpos( \basename( $file_name ), 'wp-load' ) !== false ) ) {
 				\wp_send_json_error( \esc_html__( 'File source view is protected. You can change this in Advanced Settings', '0-day-analytics' ), 404 );
 			}
 

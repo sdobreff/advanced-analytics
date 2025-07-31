@@ -477,9 +477,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				case 'severity':
 					if ( isset( $item['severity'] ) && ! empty( $item['severity'] ) ) {
 
-						if ( isset( Settings::get_current_options()['severities'][ $item['severity'] ] ) ) {
+						if ( isset( Settings::get_option( 'severities' )[ $item['severity'] ] ) ) {
 
-							return '<span class="badge dark-badge" style="color: ' . Settings::get_current_options()['severities'][ $item['severity'] ]['color'] . ' !important;">' . \esc_html( $item['severity'] ) . '</span>';
+							return '<span class="badge dark-badge" style="color: ' . Settings::get_option( 'severities' )[ $item['severity'] ]['color'] . ' !important;">' . \esc_html( $item['severity'] ) . '</span>';
 						} else {
 							return '<span class="badge dark-badge">' . \esc_html( $item['severity'] ) . '</span>';
 						}
@@ -1001,7 +1001,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<?php
 				\esc_html_e( 'Following types are filtered and not showing: ', '0-day-analytics' );
 				foreach ( Settings::get_disabled_severities() as $severity ) {
-					echo '<label for="severity_filter_' . \esc_attr( $severity ) . '" class="badge dark-badge" style="cursor: pointer; color: ' . \esc_html( Settings::get_current_options()['severities'][ $severity ]['color'] ) . ' !important;">' . \esc_html( $severity ) . '</label> ';
+					echo '<label for="severity_filter_' . \esc_attr( $severity ) . '" class="badge dark-badge" style="cursor: pointer; color: ' . \esc_html( Settings::get_option( 'severities' )[ $severity ]['color'] ) . ' !important;">' . \esc_html( $severity ) . '</label> ';
 				}
 				?>
 					</p>
@@ -1133,7 +1133,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class="checkbox-wrapper-2">
 						<?php
-						foreach ( Settings::get_current_options()['severities'] as $name => $severity ) {
+						foreach ( Settings::get_option( 'severities' ) as $name => $severity ) {
 							?>
 							<input type="checkbox"  class="sc-gJwTLC ikxBAC severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
 								
@@ -1249,7 +1249,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					.generated-logs #message { width: 60%; }
 
 					<?php
-					foreach ( Settings::get_current_options()['severities'] as $class => $properties ) {
+					foreach ( Settings::get_option( 'severities' ) as $class => $properties ) {
 
 						$color = '#252630';
 
@@ -1459,8 +1459,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				$style = '';
 
-				if ( isset( Settings::get_current_options()['severities'][ $event['severity'] ] ) ) {
-					$style .= '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( Settings::get_current_options()['severities'][ $event['severity'] ]['color'] ) . ' !important; }';
+				if ( isset( Settings::get_option( 'severities' )[ $event['severity'] ] ) ) {
+					$style .= '.aadvan-live-notif-item.' . \esc_attr( $event['severity'] ) . '{ border-left: 5px solid ' . \esc_attr( Settings::get_option( 'severities' )[ $event['severity'] ]['color'] ) . ' !important; }';
 				}
 
 				$response = array(
@@ -1493,7 +1493,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$severity = $request->get_param( 'severity_name' );
 			$status   = $request->get_param( 'status' );
 
-			if ( ! in_array( $severity, array_keys( Settings::get_current_options()['severities'] ), true ) ) {
+			if ( ! in_array( $severity, array_keys( Settings::get_option( 'severities' ) ), true ) ) {
 				return new \WP_Error(
 					'invalid_severity',
 					__( 'Invalid severity name.', '0-day-analytics' ),

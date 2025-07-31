@@ -81,7 +81,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
 					<?php
-					if ( ! Settings::get_current_options()['advana_requests_enable'] ) {
+					if ( ! Settings::get_option( 'advana_requests_enable' ) ) {
 						?>
 					<div id="advana-status-error" class="notice notice-error">
 						<?php
@@ -196,7 +196,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 
 					<hr class="wp-header-end">
 					<?php
-					if ( ! Settings::get_current_options()['advana_requests_enable'] ) {
+					if ( ! Settings::get_option( 'advana_requests_enable' ) ) {
 						?>
 					<div id="advana-status-error" class="notice notice-error">
 						<?php
@@ -212,7 +212,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					</div>
 						<?php
 					} else {
-						if ( Settings::get_current_options()['advana_http_requests_disable'] ) {
+						if ( Settings::get_option( 'advana_http_requests_disable' ) ) {
 							?>
 					<div id="advana-status-error" class="notice notice-error">
 							<?php
@@ -227,7 +227,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 					</div>
 							<?php
 						}
-						if ( Settings::get_current_options()['advana_rest_requests_disable'] ) {
+						if ( Settings::get_option( 'advana_rest_requests_disable' ) ) {
 							?>
 					<div id="advana-status-error" class="notice notice-error">
 							<?php
