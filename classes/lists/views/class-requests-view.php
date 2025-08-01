@@ -384,11 +384,21 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 									<div class="aadvana-panel-wrapper">
 										<div class="aadvana-request-response aadvana-panel-active wrapper">
 											<div class="box">
-												<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
+												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
+													<div>
+														<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
+													</div>
+													<div class=""><span title="<?= __( 'Copy to clipboard', '0-day-analytics' ) ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?= __( 'Share', '0-day-analytics' ) ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+												</div>
 												<div class="http-request-args aadvana-pre-300"></div>
 											</div>
 											<div class="box">
-												<h3><?php \esc_html_e( 'Response:', '0-day-analytics' ); ?></h3>
+												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
+													<div>
+														<h3><?php \esc_html_e( 'Response:', '0-day-analytics' ); ?></h3>
+													</div>
+													<div class=""><span title="<?= __( 'Copy to clipboard', '0-day-analytics' ) ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?= __( 'Share', '0-day-analytics' ) ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+												</div>
 												<div class="http-response aadvana-pre-300"></div>
 											</div>						
 										</div>
@@ -425,6 +435,51 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 							jQuery('.media-modal').removeClass('open');
 							jQuery('.media-modal-backdrop').removeClass('open');
 						});
+
+						jQuery( document ).on( 'click', '.dashicons.dashicons-clipboard', function( e ) {
+
+							if ( jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').length ) {
+								let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').html();
+
+								selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+								selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+								selectedText = jQuery(selectedText).text();
+
+								navigator.clipboard.writeText(selectedText);
+							}
+
+						});
+					
+					jQuery( document ).ready( function() {
+
+						if ( navigator.share ) {
+
+							jQuery( document ).on( 'click', '.dashicons.dashicons-share', function( e ) {
+
+								if ( jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').length ) {
+									let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').html();
+
+									selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+									selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+									selectedText = jQuery(selectedText).text();
+
+									const shareData = {
+										text: selectedText + '\n\n' + "<?php echo \get_site_url(); ?>",
+									};
+
+									try {
+										navigator.share(shareData);
+									} catch (err) {
+										jQuery(this).text( `Error: ${err}` );
+									}
+
+								}
+							});
+							
+						} else {
+							jQuery( '.dashicons.dashicons-share' ).remove();
+						}
+					});
 					</script>
 				<?php
 			}
