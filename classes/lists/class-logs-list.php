@@ -117,6 +117,15 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		private static $query_order = array();
 
 		/**
+		 * Holds array of the collected items
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $items_collected = array();
+
+		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args Events query arguments.
@@ -227,8 +236,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			}
 
 			$this->_column_headers = array( self::$columns, $hidden, $sortable );
-			// phpcs:ignore
-			// usort( $items, [ &$this, 'usort_reorder' ] ); // phpcs:ignore
 
 			// Set the pagination.
 			$this->set_pagination_args(
@@ -305,9 +312,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function fetch_table_data() {
 
-			$this->items = self::get_error_items( true );
-
-			return $this->items;
+			return self::get_error_items( true );
 		}
 
 		/**
@@ -441,7 +446,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			Log_Line_Parser::store_last_parsed_timestamp();
 
-			return $errors;
+			self::$items_collected = $errors;
+
+			$errors = null;
+			unset( $errors );
+
+			return self::$items_collected;
 		}
 
 		/**
@@ -1145,6 +1155,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						?>
 					</div>
 				</div>
+				<div>
+				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table" style="font-family: dashicons;">
+				</select>
+				</div>
 				<script>
 					let severities = document.getElementsByClassName("severity-filter");
 
@@ -1231,7 +1245,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			</div>
 				<?php
 				$this->extra_tablenav( $which );
-				if ( 'top' !== $which && ! empty( $this->items ) ) {
+				if ( 'top' !== $which && ! empty( self::$items_collected ) ) {
 					?>
 				<style>
 					.toplevel_page_advan_logs #debug-log {
@@ -1532,6 +1546,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			$event = reset( $events );
 
+			$events = null;
+			unset( $events );
+
 			$data = array();
 
 			if ( $event && ! empty( $event ) ) {
@@ -1630,6 +1647,30 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			}
 
 			return $data;
+		}
+
+		/**
+		 * Determines whether the table has items to display or not
+		 *
+		 * @since latest
+		 *
+		 * @return bool
+		 */
+		public function has_items() {
+			return ! empty( self::$items_collected );
+		}
+
+		/**
+		 * Generates the list table rows.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public function display_rows() {
+			foreach ( self::$items_collected as $item ) {
+				$this->single_row( $item );
+			}
 		}
 	}
 }
