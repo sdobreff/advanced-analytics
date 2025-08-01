@@ -242,4 +242,3 @@ if ( ! function_exists( 'str_starts_with' ) ) {
 		return 0 === strpos( $haystack, $needle );
 	}
 }
-

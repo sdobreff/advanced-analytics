@@ -587,10 +587,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				case 'message':
 					$message  = '<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
-					<div>
+						<div>
 						</div>
 						<div class=""><span title="' . __( 'Copy to clipboard', '0-day-analytics' ) . '" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="' . __( 'Share', '0-day-analytics' ) . '" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
-				</div>';
+					</div>';
 					$message .= '<span class="error_message">' . \esc_html( $item[ $column_name ] ) . '</span>';
 					if ( isset( $item['sub_items'] ) && ! empty( $item['sub_items'] ) ) {
 						$message .= '<div style="margin-top:10px;"><input type="button" class="button button-primary show_log_details" value="' . __( 'Show details', '0-day-analytics' ) . '"></div>';
