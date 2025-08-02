@@ -1143,7 +1143,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class="checkbox-wrapper-2">
 						<?php
-						foreach ( Settings::get_option( 'severities' ) as $name => $severity ) {
+						$severities = Settings::get_option( 'severities' );
+						foreach ( $severities as $name => $severity ) {
 							?>
 							<input type="checkbox"  class="sc-gJwTLC ikxBAC severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
 								
@@ -1156,7 +1157,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					</div>
 				</div>
 				<div>
-				<select id="table_filter_<?php echo \esc_attr( $which ); ?>" class="table_filter" name="table_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-table" style="font-family: dashicons;">
+				<label for="single_severity_filter_<?php echo \esc_attr( $which ); ?>">
+					<?php echo \esc_html__( 'or choose single everity to filter for: ', '0-day-analytics' ); ?>
+				</label>
+				<select id="single_severity_filter_<?php echo \esc_attr( $which ); ?>" name="single_severity_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-single-severity">
+				<option value="none_selected"><?php \esc_html_e( '-- Choose --', '0-day-analytics' ); ?></option>
+					<?php
+					foreach ( $severities as $name => $severity ) {
+						?>
+							<option value="<?php echo \esc_attr( $name ); ?>"><?php echo \esc_attr( $name ); ?></option>
+							<?php
+					}
+					?>
 				</select>
 				</div>
 				<script>
@@ -1193,6 +1205,44 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						} catch (error) {
 							throw error;
+						}
+					}
+
+					let singleSeverity = document.getElementsByClassName("advan-filter-single-severity");
+
+					let lenSingleSeverity = singleSeverity.length;
+
+					// call updateCost() function to onclick event on every checkbox
+					for (var i = 0; i < lenSingleSeverity; i++) {
+
+						singleSeverity[i].addEventListener('change', setSingleSeverity);
+
+					}
+
+					async function setSingleSeverity(e) {
+
+						let severityName = e.target.value;
+
+						if ( -1 !== e.target.value ) {
+							let attResp;
+
+							try {
+								attResp = await wp.apiFetch({
+									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/single_severity/' + severityName + '/',
+									method: 'GET',
+									cache: 'no-cache'
+								});
+
+								if (attResp.success) {
+									
+									location.reload();
+								} else if (attResp.message) {
+									jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
+								}
+
+							} catch (error) {
+								throw error;
+							}
 						}
 					}
 
@@ -1525,6 +1575,49 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					__( 'Invalid status.', '0-day-analytics' ),
 					array( 'status' => 400 )
 				);
+			}
+
+			return rest_ensure_response(
+				array(
+					'success' => true,
+				)
+			);
+		}
+
+		/**
+		 * Set showing single sevetiry.
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return \WP_REST_Response|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function set_single_severity( \WP_REST_Request $request ) {
+			$selected_severity = $request->get_param( 'severity_name' );
+
+			if ( ! in_array( $selected_severity, array_keys( Settings::get_current_options()['severities'] ), true ) || 'none_selected' !== $selected_severity ) {
+				return new \WP_Error(
+					'invalid_severity',
+					__( 'Invalid severity name.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( 'none_selected' === $selected_severity ) {
+				foreach ( array_keys( Settings::get_current_options()['severities'] )as $severity ) {
+
+					Settings::enable_severity( $severity );
+
+				}
+			} else {
+				foreach ( array_keys( Settings::get_current_options()['severities'] )as $severity ) {
+					if ( $selected_severity === $severity ) {
+						Settings::enable_severity( $severity );
+					} else {
+						Settings::disable_severity( $severity );
+					}
+				}
 			}
 
 			return rest_ensure_response(

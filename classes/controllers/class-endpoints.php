@@ -89,6 +89,30 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
+				'single_severity'   => array(
+					'class'     => Logs_List::class,
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<severity_name>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'set_single_severity',
+								),
+								'args'             => array(
+									'severity_name' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Severity name',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
 				'requests'       => array(
 					'class'     => Requests_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
