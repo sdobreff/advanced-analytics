@@ -401,8 +401,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							$is_excluded = false;
 
 							if ( ! $more_to_error ) {
-								if ( isset( $parsed_data['severity'] ) && \in_array( $parsed_data['severity'], Settings::get_disabled_severities() ) ) {
+								$done = false;
+								if ( isset( $parsed_data['severity'] ) && \in_array( $parsed_data['severity'], Settings::get_disabled_severities(), true ) ) {
 									$is_excluded = true;
+
+									$done = true; // Error is removed - no need to check it again.
+								}
+
+								if ( ! $done && isset( $parsed_data['severity'] ) && count( Settings::get_enabled_severities() ) === 1 ) {
+									$enabled = Settings::get_enabled_severities();
+									if ( reset( $enabled ) !== $parsed_data['severity'] ) {
+										$is_excluded = true;
+									}
 								}
 							}
 
@@ -427,9 +437,20 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						$last_error = end( $errors );
 
+						$done = false;
+
 						if ( isset( $last_error['severity'] ) && \in_array( $last_error['severity'], $disabled, true ) ) {
 							// Remove the last error if it is disabled.
 							array_pop( $errors );
+
+							$done = true; // Error is removed - no need to check it again.
+						}
+
+						if ( ! $done && isset( $last_error['severity'] ) && count( Settings::get_enabled_severities() ) === 1 ) {
+							$enabled = Settings::get_enabled_severities();
+							if ( reset( $enabled ) !== $last_error['severity'] ) {
+								array_pop( $errors );
+							}
 						}
 					}
 
@@ -494,7 +515,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							return '<span class="badge dark-badge">' . \esc_html( $item['severity'] ) . '</span>';
 						}
 					} else {
-						return '<span class="badge dark-badge">' . __( 'not set', '0-day-analytics' ) . '</span>';
+						return '<span class="badge dark-badge" style="color: ' . Settings::get_option( 'severities' )['not set']['color'] . ' !important;">' . \esc_html( 'not set' ) . '</span>';
 					}
 					break;
 				case 'timestamp':
@@ -1146,7 +1167,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						$severities = Settings::get_option( 'severities' );
 						foreach ( $severities as $name => $severity ) {
 							?>
-							<input type="checkbox"  class="sc-gJwTLC ikxBAC severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
+							<input type="checkbox"  class="sc-gJwTLC ikxBAC severity-filter" name="severity_filter[]" value="<?php echo \esc_attr( $name ); ?>" id="severity_filter_<?php echo \esc_attr( $name ); ?>" <?php \checked( ! in_array( $name, Settings::get_disabled_severities(), true ) ); ?>>
 								
 							<label for="severity_filter_<?php echo \esc_attr( $name ); ?>" class="badge dark-badge" style="color: <?php echo \esc_attr( $severity['color'] ); ?> !important;">
 								<?php echo \esc_html( $name ); ?>
@@ -1156,21 +1177,32 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						?>
 					</div>
 				</div>
-				<div>
-				<label for="single_severity_filter_<?php echo \esc_attr( $which ); ?>">
-					<?php echo \esc_html__( 'or choose single everity to filter for: ', '0-day-analytics' ); ?>
-				</label>
-				<select id="single_severity_filter_<?php echo \esc_attr( $which ); ?>" name="single_severity_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-single-severity">
-				<option value="none_selected"><?php \esc_html_e( '-- Choose --', '0-day-analytics' ); ?></option>
+				<div style="margin: 1em;>
+					<label for="single_severity_filter_<?php echo \esc_attr( $which ); ?>">
+						<?php echo \esc_html__( 'or choose single everity to filter for: ', '0-day-analytics' ); ?>
+					</label>
 					<?php
-					foreach ( $severities as $name => $severity ) {
-						?>
-							<option value="<?php echo \esc_attr( $name ); ?>"><?php echo \esc_attr( $name ); ?></option>
-							<?php
-					}
+						$enabled_severities = Settings::get_enabled_severities();
+						$enabled            = ( count( $enabled_severities ) === 1 ) ? \reset( $enabled_severities ) : '';
 					?>
-				</select>
+					<select id="single_severity_filter_<?php echo \esc_attr( $which ); ?>" name="single_severity_filter_<?php echo \esc_attr( $which ); ?>" class="advan-filter-single-severity">
+					<option value="none_selected"><?php \esc_html_e( '-- Choose --', '0-day-analytics' ); ?></option>
+						<?php
+						foreach ( $severities as $name => $severity ) {
+							$selected = '';
+							if ( ! empty( $enabled ) && $enabled === $name ) {
+								$selected = ' selected="selected"';
+							}
+							?>
+								<option <?php echo ( $selected ); ?> value="<?php echo \esc_attr( $name ); ?>"><?php echo \esc_attr( $name );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></option>
+								<?php
+						}
+						?>
+					</select>
 				</div>
+				<p>
+					<?php \esc_html_e( 'Note: Important info to keep in mind - if you don\'t use only ONE filter, you will see more severities, outside filters, because error log may contain all kinds of errors and it is impossible for any software to have\'em all, because there are no strict standards.' ); ?>
+				</p>
 				<script>
 					let severities = document.getElementsByClassName("severity-filter");
 
@@ -1596,7 +1628,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public static function set_single_severity( \WP_REST_Request $request ) {
 			$selected_severity = $request->get_param( 'severity_name' );
 
-			if ( ! in_array( $selected_severity, array_keys( Settings::get_current_options()['severities'] ), true ) || 'none_selected' !== $selected_severity ) {
+			if ( ! in_array( $selected_severity, array_keys( Settings::get_current_options()['severities'] ), true ) && 'none_selected' !== $selected_severity ) {
 				return new \WP_Error(
 					'invalid_severity',
 					__( 'Invalid severity name.', '0-day-analytics' ),

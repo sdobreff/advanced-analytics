@@ -79,6 +79,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		private static $disabled_severities = null;
 
 		/**
+		 * Holds cache for enabled severity levels
+		 *
+		 * @var array
+		 *
+		 * @since 1.1.0
+		 */
+		private static $enabled_severities = null;
+
+		/**
 		 * Default wp_config.php writer configs
 		 *
 		 * @var array
@@ -506,6 +515,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						'user'       => array(
 							'name'    => __( 'User', '0-day-analytics' ),
 							'color'   => '#85b395',
+							'display' => true,
+						),
+						'not set'       => array(
+							'name'    => __( 'Not Set', '0-day-analytics' ),
+							'color'   => '#7a6f72',
+							'display' => true,
+						),
+						'request'       => array(
+							'name'    => __( 'Request', '0-day-analytics' ),
+							'color'   => '#759b71',
+							'display' => true,
+						),
+						'rest_no_route'       => array(
+							'name'    => __( 'Rest No Route', '0-day-analytics' ),
+							'color'   => '#759b71',
+							'display' => true,
+						),
+						'rest_forbidden'       => array(
+							'name'    => __( 'Rest Forbidden', '0-day-analytics' ),
+							'color'   => '#759b71',
 							'display' => true,
 						),
 					),
@@ -1680,6 +1709,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			return self::$disabled_severities;
+		}
+
+		/**
+		 * Returns the enabled severities levels and stores them in the internal class cache.
+		 *
+		 * @return array
+		 *
+		 * @since 1.1.0
+		 */
+		public static function get_enabled_severities(): array {
+			if ( null === self::$enabled_severities ) {
+				self::$enabled_severities = array();
+				foreach ( self::get_option( 'severities' ) as $name => $severity ) {
+					if ( $severity['display'] ) {
+						self::$enabled_severities[] = $name;
+					}
+				}
+			}
+
+			return self::$enabled_severities;
 		}
 
 

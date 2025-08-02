@@ -43,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'live'           => array(
+				'live'            => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -60,7 +60,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'severity'       => array(
+				'severity'        => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'single_severity'   => array(
+				'single_severity' => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -113,7 +113,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'requests'       => array(
+				'requests'        => array(
 					'class'     => Requests_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -130,7 +130,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 										'type'        => 'string',
 										'description' => 'Request type',
 									),
-									'status'        => array(
+									'status'       => array(
 										'required'    => true,
 										'type'        => 'string',
 										'description' => 'Severity status',
@@ -142,7 +142,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'drop_table'     => array(
+				'drop_table'      => array(
 					'class'     => Common_Table::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -167,7 +167,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'truncate_table' => array(
+				'truncate_table'  => array(
 					'class'     => Common_Table::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
