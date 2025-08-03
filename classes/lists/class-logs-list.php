@@ -408,6 +408,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 									$done = true; // Error is removed - no need to check it again.
 								}
 
+								// If only one severity is selected - remove all others (otherwise plugin shows other non-defined / custom severities coming from unknown or 3rd party sources).
 								if ( ! $done && isset( $parsed_data['severity'] ) && count( Settings::get_enabled_severities() ) === 1 ) {
 									$enabled = Settings::get_enabled_severities();
 									if ( reset( $enabled ) !== $parsed_data['severity'] ) {
@@ -446,6 +447,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							$done = true; // Error is removed - no need to check it again.
 						}
 
+						// If only one severity is selected - remove all others (otherwise plugin shows other non-defined / custom severities coming from unknown or 3rd party sources).
 						if ( ! $done && isset( $last_error['severity'] ) && count( Settings::get_enabled_severities() ) === 1 ) {
 							$enabled = Settings::get_enabled_severities();
 							if ( reset( $enabled ) !== $last_error['severity'] ) {
@@ -1201,7 +1203,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					</select>
 				</div>
 				<p>
-					<?php \esc_html_e( 'Note: Important info to keep in mind - if you don\'t use only ONE filter, you will see more severities, outside filters, because error log may contain all kinds of errors and it is impossible for any software to have\'em all, because there are no strict standards.' ); ?>
+					<?php \esc_html_e( 'Note: Filtering is expensive (in terms of resources) operation, so use it with care. Important info to keep in mind - if you don\'t use only ONE severity for filtering, you will see more severities, outside selected ones for filtering, because error log may contain all kinds of errors and it is impossible for any software to have\'em all, because there are no strict standards. It is implemented this way because during few severities filtering there may be more important ones (errors in log) which are not covered from the plugin, and it is best not to miss them.' ); ?>
 				</p>
 				<script>
 					let severities = document.getElementsByClassName("severity-filter");

@@ -43,7 +43,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	 */
 	class Settings {
 
-		public const OPTIONS_VERSION = '14'; // Incremented when the options array changes.
+		public const OPTIONS_VERSION = '15'; // Incremented when the options array changes.
 
 		public const MENU_SLUG = 'advan_logs';
 

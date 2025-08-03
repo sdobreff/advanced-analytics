@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.8.0
+Stable tag: 2.8.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -97,6 +97,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 2.8.1 =
+Option to copy and share Request / Response from the request details. Code optimizations. Error log filtering enhancements.
 
 = 2.8.0 =
 REST API calls monitoring in the request viewer, logic improvements. Plugin own REST API name endpoint change.
