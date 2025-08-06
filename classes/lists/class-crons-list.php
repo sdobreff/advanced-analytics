@@ -17,6 +17,7 @@ namespace ADVAN\Lists;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
+use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Lists\Traits\List_Trait;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -50,6 +51,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		public const NONCE_NAME = 'advana_crons_manager';
 
 		public const SEARCH_INPUT = 'sgp';
+
+		public const CRON_MENU_SLUG = 'advan_cron_jobs';
 
 		/**
 		 * Format for the file link.
@@ -146,6 +149,42 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			self::$columns = self::manage_columns( array() );
 
 			self::$table_name = 'advanced_crons';
+		}
+
+		/**
+		 * Inits the module hook.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function hooks_init() {
+
+			\add_action( 'admin_print_styles-' . self::PAGE_SLUG, array( Settings::class, 'print_styles' ) );
+			\add_action( 'admin_post_' . self::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
+			\add_action( 'admin_post_' . self::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
+		}
+
+		public static function menu_add() {
+
+			/* Crons */
+			$cron_hook = \add_submenu_page(
+				Settings::MENU_SLUG,
+				\esc_html__( 'WP Control', '0-day-analytics' ),
+				\esc_html__( 'Crons viewer', '0-day-analytics' ),
+				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
+				self::CRON_MENU_SLUG,
+				array( Crons_View::class, 'analytics_cron_page' ),
+				1
+			);
+
+			self::add_screen_options( $cron_hook );
+
+			\add_filter( 'manage_' . $cron_hook . '_columns', array( self::class, 'manage_columns' ) );
+
+			\add_action( 'load-' . $cron_hook, array( Settings::class, 'aadvana_common_help' ) );
+
+			/* Crons end */
 		}
 
 		/**
@@ -544,7 +583,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					\add_query_arg(
 						array(
 							self::SEARCH_INPUT => self::escaped_search_input(),
-							'page'             => Settings::CRON_MENU_SLUG,
+							'page'             => self::CRON_MENU_SLUG,
 						),
 						\admin_url( 'admin.php' )
 					)
@@ -582,7 +621,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					\add_query_arg(
 						array(
 							self::SEARCH_INPUT => self::escaped_search_input(),
-							'page'             => Settings::CRON_MENU_SLUG,
+							'page'             => self::CRON_MENU_SLUG,
 						),
 						\admin_url( 'admin.php' )
 					)

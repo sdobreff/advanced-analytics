@@ -128,7 +128,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Default class constructor.
 		 *
-		 * @param stdClass $query_args Events query arguments.
+		 * @param stdClass $query_args - Events query arguments.
 		 *
 		 * @since 1.1.0
 		 */
@@ -148,6 +148,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			self::$table_name = 'php_error_logs';
 		}
+
 
 		/**
 		 * Displays the search box.

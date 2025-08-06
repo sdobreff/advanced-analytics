@@ -37,6 +37,16 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Disable plugin module', '0-day-analytics' ),
+			'id'      => 'cron_module_disable',
+			'type'    => 'checkbox',
+			'hint' => \esc_html__( 'If you enable this, the entire plugin module will be disabled. The rest of the settings are global for your WP and they are separate from the module.', '0-day-analytics' ),
+			'default' => Settings::get_current_options()['cron_module_disable'],
+		)
+	);
+
 	if ( ! is_writable( File_Helper::get_wp_config_file_path() ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 		Settings::build_option(
 			array(
@@ -49,7 +59,7 @@ Settings::set_current_options( $settings );
 
 		Settings::build_option(
 			array(
-				'name'    => \esc_html__( 'WP Cron disabled', '0-day-analytics' ),
+				'name'    => \esc_html__( 'Global WP Cron disabled', '0-day-analytics' ),
 				'id'      => 'wp_cron_disable',
 				'type'    => 'checkbox',
 				'default' => System_Status::environment_info()['wp_cron_disable'],

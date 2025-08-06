@@ -49,8 +49,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
 
-		public const CRON_MENU_SLUG = 'advan_cron_jobs';
-
 		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
 
 		public const REQUESTS_MENU_SLUG = 'advan_requests';
@@ -204,13 +202,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			}
 
 			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
-			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
+
+			/* Crons start */
+			if ( !self::get_option('cron_module_disable'))
+			Crons_List::hooks_init();
+			/* Crons end */
 
 			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( Transients_View::class, 'update_transient' ) );
 			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
 			\add_action( 'load-' . Transients_List::PAGE_SLUG, array( Transients_View::class, 'page_load' ) );
-			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
-			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
 
 			\add_action( 'admin_post_' . Table_List::SWITCH_ACTION, array( Table_View::class, 'switch_action' ) );
 			\add_action( 'load-' . Table_List::PAGE_SLUG, array( Table_View::class, 'page_load' ) );
@@ -459,6 +459,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
 					'plugin_version_switch_count'     => 3,
+					'cron_module_disable' => false,
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -626,23 +627,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* Requests end */
 
-				/* Crons */
-				$cron_hook = \add_submenu_page(
-					self::MENU_SLUG,
-					\esc_html__( 'WP Control', '0-day-analytics' ),
-					\esc_html__( 'Cron viewer', '0-day-analytics' ),
-					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::CRON_MENU_SLUG,
-					array( Crons_View::class, 'analytics_cron_page' ),
-					1
-				);
-
-				Crons_List::add_screen_options( $cron_hook );
-
-				\add_filter( 'manage_' . $cron_hook . '_columns', array( Crons_List::class, 'manage_columns' ) );
-
-				\add_action( 'load-' . $cron_hook, array( __CLASS__, 'aadvana_common_help' ) );
-
+				/* Crons start */
+				if ( !self::get_option('cron_module_disable'))
+				Crons_List::menu_add();
 				/* Crons end */
 
 				/* Transients */
@@ -1051,7 +1038,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_crons_page_link() {
 			if ( '' === self::$settings_crons_link ) {
-				self::$settings_crons_link = \add_query_arg( 'page', self::CRON_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_crons_link = \add_query_arg( 'page', Crons_List::CRON_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_crons_link;
@@ -1413,7 +1400,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || self::REQUESTS_MENU_SLUG === $current_page;
+			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || self::REQUESTS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1608,6 +1595,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					),
 				)
 			) : 3;
+
+			// Modules start.
+			$advanced_options['cron_module_disable'] = ( array_key_exists( 'cron_module_disable', $post_array ) ) ? filter_var( $post_array['cron_module_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			// Modules end.
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 

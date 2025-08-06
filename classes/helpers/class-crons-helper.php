@@ -326,7 +326,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 						array( 'deleted' ),
 						\add_query_arg(
 							array(
-								'page'                   => Settings::CRON_MENU_SLUG,
+								'page'                   => Crons_List::CRON_MENU_SLUG,
 								Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
 								'updated'                => false,
 								'cron_name'              => rawurlencode( $cron['hook'] ),
