@@ -17,6 +17,7 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
+use ADVAN\Lists\Views\Table_View;
 use ADVAN\Lists\Traits\List_Trait;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -47,6 +48,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_table_list';
 
 		public const SEARCH_INPUT = 's';
+
+		public const TABLE_MENU_SLUG = 'advan_table';
 
 		/**
 		 * The table to show
@@ -98,6 +101,44 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 					'ajax'     => false,      // If true, the parent class will call the _js_vars() method in the footer.
 				)
 			);
+		}
+
+		/**
+		 * Inits the module hook.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function hooks_init() {
+			\add_action( 'admin_post_' . self::SWITCH_ACTION, array( Table_View::class, 'switch_action' ) );
+			\add_action( 'load-' . self::PAGE_SLUG, array( Table_View::class, 'page_load' ) );
+		}
+
+		/**
+		 * Adds the module to the main plugin menu
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function menu_add() {
+
+			$table_hook = \add_submenu_page(
+				Settings::MENU_SLUG,
+				\esc_html__( 'WP Control', '0-day-analytics' ),
+				\esc_html__( 'Table viewer', '0-day-analytics' ),
+				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
+				self::TABLE_MENU_SLUG,
+				array( Table_View::class, 'analytics_table_page' ),
+				4
+			);
+
+				self::add_screen_options( $table_hook );
+
+				// \add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
+
+				\add_action( 'load-' . $table_hook, array( Settings::class, 'aadvana_common_help' ) );
 		}
 
 		/**
@@ -449,7 +490,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 								array(
 									self::SEARCH_INPUT => self::escaped_search_input(),
 									'paged'            => $_REQUEST['paged'] ?? 1,
-									'page'             => Settings::TABLE_MENU_SLUG,
+									'page'             => self::TABLE_MENU_SLUG,
 									'show_table'       => self::$table::get_name(),
 								),
 								\admin_url( 'admin.php' )

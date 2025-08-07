@@ -331,7 +331,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 							array( 'deleted' ),
 							\add_query_arg(
 								array(
-									'page'       => Settings::TABLE_MENU_SLUG,
+									'page'       => Table_List::TABLE_MENU_SLUG,
 									Table_List::SEARCH_INPUT => Table_List::escaped_search_input(),
 									'show_table' => rawurlencode( $table ),
 								),

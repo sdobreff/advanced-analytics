@@ -112,7 +112,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		 * @since 1.7.0
 		 */
 		public static function is_site_wide( $transient_name = '' ): bool {
-			return ( false !== strpos( $transient_name, '_site_transient' ) );
+			return ( false !== strpos( (string) $transient_name, '_site_transient' ) );
 		}
 
 		/**

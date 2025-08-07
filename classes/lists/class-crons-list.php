@@ -156,7 +156,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.8.1
 		 */
 		public static function hooks_init() {
 
@@ -165,6 +165,13 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			\add_action( 'admin_post_' . self::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
 		}
 
+		/**
+		 * Adds the module to the main plugin menu
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
 		public static function menu_add() {
 
 			/* Crons */

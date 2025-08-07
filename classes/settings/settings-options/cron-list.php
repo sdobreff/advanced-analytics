@@ -11,15 +11,6 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Helpers\System_Status;
 
-$settings = Settings::get_current_options();
-
-foreach ( $settings['severities'] as $name => $severity ) {
-	$settings[ 'severity_colors_' . $name . '_color' ] = $severity['color'];
-	$settings[ 'severity_show_' . $name . '_display' ] = $severity['display'];
-}
-
-Settings::set_current_options( $settings );
-
 	Settings::build_option(
 		array(
 			'title' => esc_html__( 'Cron Options', '0-day-analytics' ),
@@ -39,11 +30,11 @@ Settings::set_current_options( $settings );
 
 	Settings::build_option(
 		array(
-			'name'    => \esc_html__( 'Disable plugin module', '0-day-analytics' ),
-			'id'      => 'cron_module_disable',
+			'name'    => \esc_html__( 'Enable cron module', '0-day-analytics' ),
+			'id'      => 'cron_module_enabled',
 			'type'    => 'checkbox',
-			'hint' => \esc_html__( 'If you enable this, the entire plugin module will be disabled. The rest of the settings are global for your WP and they are separate from the module.', '0-day-analytics' ),
-			'default' => Settings::get_current_options()['cron_module_disable'],
+			'hint'    => \esc_html__( 'If you disable this, the entire plugin cron module will be disabled. The rest of the settings are global for your WP and they are separate from the module, so you can still change them. This applies only for the plugin module (if you are not using it and don\'t want it to take unnecessarily resources, your WP will continue working as before.', '0-day-analytics' ),
+			'default' => Settings::get_option( 'cron_module_enabled' ),
 		)
 	);
 

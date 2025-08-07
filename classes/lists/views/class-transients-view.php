@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists\Views;
 
-use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Transients_Helper;
@@ -63,20 +62,34 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 				? absint( $_REQUEST['trans_id'] )
 				: 0;
 				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
-				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
-				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
 
-				if ( 0 !== $expiration ) {
+				if ( null !== $transient ) {
 
-					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
-					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+					$name       = Transients_Helper::get_transient_name( $transient['option_name'] );
+					$expiration = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
+
+					if ( 0 !== $expiration ) {
+
+						$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
+						$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+						$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+					}
 				}
-
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
+
+					<?php
+
+					if ( null === $transient ) {
+						?>
+						<div id="advaa-status-notice" class="notice notice-info">
+							<p><?php esc_html_e( 'Transient does not exists or it has been expired / removed', '0-day-analytics' ); ?></p>
+						</div>
+						<?php
+					} else {
+						?>
 
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
@@ -165,6 +178,9 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 							<?php \submit_button( '', 'primary', '', false ); ?>
 						</p>
 					</form>
+						<?php
+					}
+					?>
 				</div>
 				<?php
 			} elseif ( ! empty( $action ) && ( 'new_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
@@ -232,7 +248,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
-					<?php echo '<a href="' . \esc_url( \admin_url( 'admin.php?page=' . Settings::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
+					<?php echo '<a href="' . \esc_url( \admin_url( 'admin.php?page=' . Transients_List::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
 					<hr class="wp-header-end">
 					<form id="transients-filter" method="get">
 					<?php
@@ -309,7 +325,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 					array( 'deleted' ),
 					add_query_arg(
 						array(
-							'page'                        => Settings::TRANSIENTS_MENU_SLUG,
+							'page'                        => Transients_List::TRANSIENTS_MENU_SLUG,
 							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
 							'updated'                     => true,
 						),
@@ -347,7 +363,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 					array( 'deleted' ),
 					add_query_arg(
 						array(
-							'page'                        => Settings::TRANSIENTS_MENU_SLUG,
+							'page'                        => Transients_List::TRANSIENTS_MENU_SLUG,
 							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),
 							'updated'                     => true,
 						),

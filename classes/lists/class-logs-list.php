@@ -121,7 +121,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.8.1
 		 */
 		private static $items_collected = array();
 
@@ -1626,7 +1626,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
-		 * @since latest
+		 * @since 2.8.1
 		 */
 		public static function set_single_severity( \WP_REST_Request $request ) {
 			$selected_severity = $request->get_param( 'severity_name' );
@@ -1780,7 +1780,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		/**
 		 * Determines whether the table has items to display or not
 		 *
-		 * @since latest
+		 * @since 2.8.1
 		 *
 		 * @return bool
 		 */
@@ -1793,7 +1793,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.8.1
 		 */
 		public function display_rows() {
 			foreach ( self::$items_collected as $item ) {
