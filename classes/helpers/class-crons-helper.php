@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Crons_List;
-use ADVAN\Helpers\Settings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {

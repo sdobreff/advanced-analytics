@@ -37,7 +37,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function init() {
-			// Add custom schedules for WSAL early otherwise they won't work.
 			\add_filter( 'cron_schedules', array( __CLASS__, 'recurring_schedules' ), PHP_INT_MAX );
 			\add_filter( 'after_setup_theme', array( __CLASS__, 'initialize_hooks' ), 30000 );
 		}
@@ -56,7 +55,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 
 			return $schedules;
 		}
-
 
 		/**
 		 * Initializes the plugin cron jobs.
@@ -84,7 +82,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 					if ( isset( $parameters['next_run'] ) ) {
 						$ve = \get_option( 'gmt_offset' ) > 0 ? ' -' : ' +';
 
-						$time = strtotime( $parameters['next_run'] . $ve . get_option( 'gmt_offset' ) . ' HOURS' );
+						$time = strtotime( $parameters['next_run'] . $ve . \get_option( 'gmt_offset' ) . ' HOURS' );
 					}
 
 					Crons_Helper::schedule_event(

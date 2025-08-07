@@ -115,6 +115,17 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		}
 
 		/**
+		 * Inits class hooks.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function init() {
+			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+		}
+
+		/**
 		 * Adds the module to the main plugin menu
 		 *
 		 * @return void
@@ -909,7 +920,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		}
 
 		/**
-		 * Returns translatet text for per page option
+		 * Returns translated text for per page option
 		 *
 		 * @return string
 		 *

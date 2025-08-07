@@ -461,6 +461,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'requests_module_enabled'         => true,
 					'transients_module_enabled'       => true,
 					'tables_module_enabled'           => true,
+					'advana_rest_requests_clear'           => 'weekly',
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',

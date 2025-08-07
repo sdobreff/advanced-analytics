@@ -45,7 +45,7 @@ Settings::set_current_options( $settings );
 			'default' => Settings::get_option( 'requests_module_enabled' ),
 		)
 	);
-?>
+	?>
 <div id="advana_requests_settings-item">
 	<?php
 	Settings::build_option(
@@ -77,5 +77,23 @@ Settings::set_current_options( $settings );
 			'default' => Settings::get_current_options()['advana_rest_requests_disable'],
 		)
 	);
-?>
+
+	$schedules = \wp_get_schedules();
+	$options   = array(
+		'' => esc_html__( 'Never', 'wp-security-audit-log' ),
+	);
+	foreach ( $schedules as $schedule => $text ) {
+		$options[ $schedule ] = $text['display'];
+	}
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Clear requests table every', '0-day-analytics' ),
+			'id'      => 'advana_rest_requests_clear',
+			'type'    => 'select',
+			'options' => $options,
+			'default' => Settings::get_option( 'advana_rest_requests_clear' ),
+		)
+	);
+	?>
 </div>
