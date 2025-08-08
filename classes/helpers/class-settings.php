@@ -1724,7 +1724,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'<a href="%1$s" target="_blank">' . ADVAN_NAME . '</a> ' . __( 'is developed and maintained by', 'wp-security-audit-log' ) . ' <a href="%2$s" target="_blank">Stoil Dobreff</a>.',
 					$footer_link,
 					$link
-				) . '<br><br>' . sprintf(
+				) . '<br>' . sprintf(
 				/* translators: 1: Plugin Name, 3: Plugin review URL */
 					__( 'If you like <strong><ins>%1$s</ins></strong>. please leave us a <a target="_blank" style="color:#f9b918" href="%2$s">★★★★★</a> rating. A huge thank you in advance!', 'error-log-viewer-wp' ),
 					\esc_attr( ADVAN_NAME ),

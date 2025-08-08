@@ -126,6 +126,39 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		}
 
 		/**
+		 * Adds a cron job for truncating the records in the requests table
+		 *
+		 * @param array $crons - The array with all the crons associated with the plugin.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
+		public static function add_cron_job( $crons ) {
+			if ( '' !== Settings::get_option( 'advana_rest_requests_clear' ) ) {
+				$crons['aadvana_request_table_clear'] = array(
+					'time' => Settings::get_option( 'advana_rest_requests_clear' ),
+					'hook' => array( __CLASS__, 'truncate_requests_table' ),
+					'args' => array(),
+				// 'next_run' => '00:00 first day of next month',
+				);
+			}
+
+			return $crons;
+		}
+
+		/**
+		 * Truncates the requests table from CRON job
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function truncate_requests_table() {
+			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name());
+		}
+
+		/**
 		 * Adds the module to the main plugin menu
 		 *
 		 * @return void

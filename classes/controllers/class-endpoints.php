@@ -262,7 +262,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		}
 
 		/**
-		 * Global method to check permissions for API endpoints - this one checks if the user has read capability.
+		 * Global method to check permissions for API endpoints - this one checks if the user has admin capability.
 		 *
 		 * @return bool
 		 *
