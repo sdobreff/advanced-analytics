@@ -164,6 +164,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		}
 
 		/**
+		 * Executes a cron event
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return bool|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function run_cron_api( ?\WP_REST_Request $request = null ) {
+			if ( null !== $request ) {
+				$cron_hash = $request->get_param( 'cron_hash' );
+
+				$result = self::execute_event( $cron_hash );
+				if ( ! $result ) {
+					return new \WP_Error(
+						'cron_execute',
+						__( 'Can not execute, cron not found.', '0-day-analytics' ),
+						array( 'status' => 400 )
+					);
+				} else {
+					return \rest_ensure_response(
+						array(
+							'success' => true,
+						)
+					);
+				}
+			} else {
+				return new \WP_Error(
+					'cron_execute',
+					__( 'Can not execute, request not provided.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		/**
 		 * Returns a cron event by its hash
 		 *
 		 * @param string $hash - The hash of the event to retrieve.
@@ -479,7 +515,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function add_cron_from_array( array $cron_job ) {
-			
 		}
 
 		/**

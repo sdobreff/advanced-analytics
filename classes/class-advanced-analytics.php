@@ -101,13 +101,14 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				// );
 			// }
 			if ( \is_admin() ) {
-				Cron_Jobs::init();
-
-				if ( Settings::get_option( 'requests_module_enabled' ) ) {
-					Requests_List::init();
-				}
-
 				Ajax_Helper::init();
+			}
+
+			// Always execute section.
+			Cron_Jobs::init();
+
+			if ( Settings::get_option( 'requests_module_enabled' ) ) {
+				Requests_List::init();
 			}
 		}
 
