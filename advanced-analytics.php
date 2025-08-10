@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants.
-if ( ! defined( ADVAN_VERSION ) ) {
+if ( ! defined( 'ADVAN_VERSION' ) ) {
 	define( 'ADVAN_VERSION', '2.8.2' );
 	define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 	define( 'ADVAN_NAME', 'WP Control' );
