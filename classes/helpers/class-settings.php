@@ -675,6 +675,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
 
 					\delete_option( ADVAN_SETTINGS_NAME );
+					\get_option( self::SETTINGS_VERSION );
 
 					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
 					Crons_Helper::clear_events( ADVAN_PREFIX . 'error_log_clear' );
