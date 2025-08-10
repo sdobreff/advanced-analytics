@@ -34,6 +34,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		private static $plugins = array();
 
 		/**
+		 * Holds cache of the plugins base (directory of the plugins) installed
+		 *
+		 * @var array
+		 *
+		 * @since 2.8.2
+		 */
+		private static $plugins_bases = array();
+
+		/**
 		 * Holds cache of the themes installed
 		 *
 		 * @var array
@@ -52,6 +61,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		private static $theme_path = '';
 
 		/**
+		 * Class cache for checked paths and their belonging to plugins.
+		 *
+		 * @var array
+		 *
+		 * @since 2.8.2
+		 */
+		private static $paths_to_plugins = array();
+
+		/**
 		 * Fulfills the inner array of plugins with data if not already loaded.
 		 *
 		 * @return array
@@ -67,6 +85,29 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		}
 
 		/**
+		 * Fulfills the inner array of plugins with data if not already loaded.
+		 *
+		 * @return array
+		 *
+		 * @since 2.8.2
+		 */
+		public static function get_plugins_bases(): array {
+			if ( empty( self::$plugins_bases ) ) {
+				$plugins = self::get_plugins();
+
+				foreach ( array_keys( $plugins ) as $plugin ) {
+					$split_plugin = explode( \DIRECTORY_SEPARATOR, $plugin );
+
+					if ( ! empty( $split_plugin ) ) {
+						self::$plugins_bases[ $split_plugin[0] ] = $split_plugin[0];
+					}
+				}
+			}
+
+			return self::$plugins_bases;
+		}
+
+		/**
 		 * Extracts plugin from just given path (the one after the (default) plugin/<directory>) and searches that against the plugins array stored in given WP
 		 *
 		 * @param string $path_name - The name of the directory where the plugin is stored - no trailing slash - this method will add one to he string.
@@ -76,8 +117,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function get_plugin_from_path( string $path_name ): array {
+			if ( isset( self::$paths_to_plugins[ $path_name ] ) ) {
+				return self::$paths_to_plugins[ $path_name ];
+			}
 			foreach ( self::get_plugins() as $path => $plugin ) {
 				if ( \str_starts_with( $path, $path_name . \DIRECTORY_SEPARATOR ) ) {
+					self::$paths_to_plugins[ $path_name ] = $plugin;
 					return $plugin;
 				}
 			}

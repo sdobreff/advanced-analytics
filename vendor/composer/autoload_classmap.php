@@ -41,6 +41,7 @@ return array(
     'ADVAN\\Lists\\Traits\\List_Trait' => $baseDir . '/classes/lists/traits/class-list-trait.php',
     'ADVAN\\Lists\\Transients_List' => $baseDir . '/classes/lists/class-transients-list.php',
     'ADVAN\\Lists\\Views\\Crons_View' => $baseDir . '/classes/lists/views/class-crons-view.php',
+    'ADVAN\\Lists\\Views\\Logs_List_View' => $baseDir . '/classes/lists/views/class-logs-list-view.php',
     'ADVAN\\Lists\\Views\\Requests_View' => $baseDir . '/classes/lists/views/class-requests-view.php',
     'ADVAN\\Lists\\Views\\Table_View' => $baseDir . '/classes/lists/views/class-table-view.php',
     'ADVAN\\Lists\\Views\\Transients_View' => $baseDir . '/classes/lists/views/class-transients-view.php',

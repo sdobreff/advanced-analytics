@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ADVAN\Helpers;
 
 use ADVAN\Lists\Crons_List;
-use ADVAN\Helpers\Settings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -162,6 +161,46 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			}
 
 			return false;
+		}
+
+		/**
+		 * Executes a cron event
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return bool|\WP_Error
+		 *
+		 * @since 2.8.2
+		 */
+		public static function run_cron_api( ?\WP_REST_Request $request = null ) {
+			if ( null !== $request ) {
+				$cron_hash = $request->get_param( 'cron_hash' );
+
+				if ( ! defined( 'DOING_CRON' ) ) {
+					define( 'DOING_CRON', true );
+				}
+
+				$result = self::execute_event( $cron_hash );
+				if ( ! $result ) {
+					return new \WP_Error(
+						'cron_execute',
+						__( 'Can not execute, cron not found.', '0-day-analytics' ),
+						array( 'status' => 400 )
+					);
+				} else {
+					return \rest_ensure_response(
+						array(
+							'success' => true,
+						)
+					);
+				}
+			} else {
+				return new \WP_Error(
+					'cron_execute',
+					__( 'Can not execute, request not provided.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 
 		/**
@@ -326,7 +365,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 						array( 'deleted' ),
 						\add_query_arg(
 							array(
-								'page'                   => Settings::CRON_MENU_SLUG,
+								'page'                   => Crons_List::CRON_MENU_SLUG,
 								Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
 								'updated'                => false,
 								'cron_name'              => rawurlencode( $cron['hook'] ),
@@ -480,7 +519,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 * @since 1.9.2
 		 */
 		public static function add_cron_from_array( array $cron_job ) {
-			
 		}
 
 		/**

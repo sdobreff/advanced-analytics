@@ -14,11 +14,13 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\Helpers\Transients_Helper;
+use ADVAN\Lists\Views\Transients_View;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -51,6 +53,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		public const NONCE_NAME = 'advana_transients_manager';
 
 		public const SEARCH_INPUT = 'sgp';
+
+		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
 
 		/**
 		 * Format for the file link.
@@ -149,6 +153,47 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		}
 
 		/**
+		 * Inits the module hook.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function hooks_init() {
+			\add_action( 'admin_print_styles-' . self::PAGE_SLUG, array( Settings::class, 'print_styles' ) );
+
+			\add_action( 'admin_post_' . self::UPDATE_ACTION, array( Transients_View::class, 'update_transient' ) );
+			\add_action( 'admin_post_' . self::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
+			\add_action( 'load-' . self::PAGE_SLUG, array( Transients_View::class, 'page_load' ) );
+		}
+
+		/**
+		 * Adds the module to the main plugin menu
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function menu_add() {
+
+			$transients_hook = \add_submenu_page(
+				Logs_List::MENU_SLUG,
+				\esc_html__( 'WP Control', '0-day-analytics' ),
+				\esc_html__( 'Transients viewer', '0-day-analytics' ),
+				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
+				self::TRANSIENTS_MENU_SLUG,
+				array( Transients_View::class, 'analytics_transients_page' ),
+				2
+			);
+
+			self::add_screen_options( $transients_hook );
+
+			\add_filter( 'manage_' . $transients_hook . '_columns', array( self::class, 'manage_columns' ) );
+
+			\add_action( 'load-' . $transients_hook, array( Settings::class, 'aadvana_common_help' ) );
+		}
+
+		/**
 		 * Displays the search box.
 		 *
 		 * @since 1.7.0
@@ -167,7 +212,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			<p class="search-box" style="position:relative">
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo \esc_html( $text ); ?>:</label>
 
-				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="<?php echo \esc_attr( ADVAN_PREFIX ); ?>search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
 				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
@@ -617,7 +662,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 								});
 
 								var data = {
-									'action': 'aadvana_delete_transient',
+									'action': '<?php echo ADVAN_PREFIX; ?>delete_transient',
 									'post_type': 'GET',
 									'_wpnonce': jQuery(this).data('nonce'),
 									'id': jQuery(this).data('id'),

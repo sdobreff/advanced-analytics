@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Lists\Table_List;
@@ -25,10 +26,10 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Lists\Views\Table_View;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Lists\Views\Logs_List_View;
 use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
-use Requests;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -45,25 +46,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public const OPTIONS_VERSION = '15'; // Incremented when the options array changes.
 
-		public const MENU_SLUG = 'advan_logs';
-
 		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
-
-		public const CRON_MENU_SLUG = 'advan_cron_jobs';
-
-		public const TRANSIENTS_MENU_SLUG = 'advan_transients';
-
-		public const REQUESTS_MENU_SLUG = 'advan_requests';
-
-		public const TABLE_MENU_SLUG = 'advan_table';
 
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
-		public const SETTINGS_FILE_FIELD = 'aadvana_import_file';
+		public const SETTINGS_FILE_FIELD = ADVAN_PREFIX . 'import_file';
 
-		public const SETTINGS_FILE_UPLOAD_FIELD = 'aadvana_import_upload';
+		public const SETTINGS_FILE_UPLOAD_FIELD = ADVAN_PREFIX . 'import_upload';
 
-		public const SETTINGS_VERSION = 'aadvana_plugin_version';
+		public const SETTINGS_VERSION = ADVAN_PREFIX . 'plugin_version';
 
 		public const PAGE_SLUG = 'wp-control_page_advan_logs_settings';
 
@@ -203,22 +194,30 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
 			}
 
-			\add_action( 'admin_print_styles-' . Transients_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
-			\add_action( 'admin_print_styles-' . Crons_List::PAGE_SLUG, array( __CLASS__, 'print_styles' ) );
+			/* Crons start */
+			if ( self::get_option( 'cron_module_enabled' ) ) {
+				Crons_List::hooks_init();
+			}
+			/* Crons end */
 
-			\add_action( 'admin_post_' . Transients_List::UPDATE_ACTION, array( Transients_View::class, 'update_transient' ) );
-			\add_action( 'admin_post_' . Transients_List::NEW_ACTION, array( Transients_View::class, 'new_transient' ) );
-			\add_action( 'load-' . Transients_List::PAGE_SLUG, array( Transients_View::class, 'page_load' ) );
-			\add_action( 'admin_post_' . Crons_List::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
-			\add_action( 'admin_post_' . Crons_List::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
+			/* Transients start */
+			if ( self::get_option( 'transients_module_enabled' ) ) {
+				Transients_List::hooks_init();
+			}
+			/* Transients end */
 
-			\add_action( 'admin_post_' . Table_List::SWITCH_ACTION, array( Table_View::class, 'switch_action' ) );
-			\add_action( 'load-' . Table_List::PAGE_SLUG, array( Table_View::class, 'page_load' ) );
+			/* Tables start */
+			if ( self::get_option( 'tables_module_enabled' ) ) {
+				Table_List::hooks_init();
+			}
+			/* Tables end */
+
+			Logs_List::hooks_init();
 
 			/**
 			 * Draws the save button in the settings
 			 */
-			\add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
+			\add_action( ADVAN_PREFIX . 'settings_save_button', array( __CLASS__, 'save_button' ) );
 		}
 
 		/**
@@ -246,7 +245,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							else {
 
 								var data = {
-									'action': 'aadvana_get_notification_data',
+									'action': '<?php echo ADVAN_PREFIX; ?>get_notification_data',
 									'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' ); ?>',
 								};
 
@@ -459,6 +458,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'no_wp_die_monitor'               => false,
 					'keep_error_log_records_truncate' => 10,
 					'plugin_version_switch_count'     => 3,
+					'cron_module_enabled'             => true,
+					'requests_module_enabled'         => true,
+					'transients_module_enabled'       => true,
+					'tables_module_enabled'           => true,
+					'advana_rest_requests_clear'      => 'weekly',
+					'advana_error_log_clear'          => '-1',
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -472,67 +477,67 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						),
 					),
 					'severities'                      => array(
-						'deprecated' => array(
+						'deprecated'     => array(
 							'name'    => __( 'Deprecated', '0-day-analytics' ),
 							'color'   => '#c4b576',
 							'display' => true,
 						),
-						'error'      => array(
+						'error'          => array(
 							'name'    => __( 'Error', '0-day-analytics' ),
 							'color'   => '#ffb3b3',
 							'display' => true,
 						),
-						'success'    => array(
+						'success'        => array(
 							'name'    => __( 'Success', '0-day-analytics' ),
 							'color'   => '#00ff00',
 							'display' => true,
 						),
-						'info'       => array(
+						'info'           => array(
 							'name'    => __( 'Info', '0-day-analytics' ),
 							'color'   => '#aeaeec',
 							'display' => true,
 						),
-						'notice'     => array(
+						'notice'         => array(
 							'name'    => __( 'Notice', '0-day-analytics' ),
 							'color'   => '#feeb8e',
 							'display' => true,
 						),
-						'warning'    => array(
+						'warning'        => array(
 							'name'    => __( 'Warning', '0-day-analytics' ),
 							'color'   => '#ffff00',
 							'display' => true,
 						),
-						'fatal'      => array(
+						'fatal'          => array(
 							'name'    => __( 'Fatal', '0-day-analytics' ),
 							'color'   => '#f09595',
 							'display' => true,
 						),
-						'parse'      => array(
+						'parse'          => array(
 							'name'    => __( 'Parse', '0-day-analytics' ),
 							'color'   => '#e3bb8d',
 							'display' => true,
 						),
-						'user'       => array(
+						'user'           => array(
 							'name'    => __( 'User', '0-day-analytics' ),
 							'color'   => '#85b395',
 							'display' => true,
 						),
-						'not set'       => array(
+						'not set'        => array(
 							'name'    => __( 'Not Set', '0-day-analytics' ),
 							'color'   => '#7a6f72',
 							'display' => true,
 						),
-						'request'       => array(
+						'request'        => array(
 							'name'    => __( 'Request', '0-day-analytics' ),
 							'color'   => '#759b71',
 							'display' => true,
 						),
-						'rest_no_route'       => array(
+						'rest_no_route'  => array(
 							'name'    => __( 'Rest No Route', '0-day-analytics' ),
 							'color'   => '#759b71',
 							'display' => true,
 						),
-						'rest_forbidden'       => array(
+						'rest_forbidden' => array(
 							'name'    => __( 'Rest Forbidden', '0-day-analytics' ),
 							'color'   => '#759b71',
 							'display' => true,
@@ -578,8 +583,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'WP Control', '0-day-analytics' ) . self::get_updates_count_html(),
 					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ),
-					self::MENU_SLUG,
-					array( __CLASS__, 'analytics_options_page' ),
+					Logs_List::MENU_SLUG,
+					array( Logs_List_View::class, 'render' ),
 					'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 					3
 				);
@@ -598,89 +603,37 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 
 				\add_submenu_page(
-					self::MENU_SLUG,
+					Logs_List::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Error Log viewer', '0-day-analytics' ),
 					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::MENU_SLUG,
-					array( __CLASS__, 'analytics_options_page' ),
+					Logs_List::MENU_SLUG,
+					array( Logs_List_View::class, 'render' ),
 					1
 				);
 
 				/* Requests start */
-				$requests_hook = \add_submenu_page(
-					self::MENU_SLUG,
-					\esc_html__( 'WP Control', '0-day-analytics' ),
-					\esc_html__( 'Requests viewer', '0-day-analytics' ),
-					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::REQUESTS_MENU_SLUG,
-					array( Requests_View::class, 'analytics_requests_page' ),
-					3
-				);
-
-				Requests_List::add_screen_options( $requests_hook );
-
-				\add_filter( 'manage_' . $requests_hook . '_columns', array( Requests_List::class, 'manage_columns' ) );
-
-				\add_action( 'load-' . $requests_hook, array( __CLASS__, 'aadvana_common_help' ) );
-
+				if ( self::get_option( 'requests_module_enabled' ) ) {
+					Requests_List::menu_add();
+				}
 				/* Requests end */
 
-				/* Crons */
-				$cron_hook = \add_submenu_page(
-					self::MENU_SLUG,
-					\esc_html__( 'WP Control', '0-day-analytics' ),
-					\esc_html__( 'Cron viewer', '0-day-analytics' ),
-					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::CRON_MENU_SLUG,
-					array( Crons_View::class, 'analytics_cron_page' ),
-					1
-				);
-
-				Crons_List::add_screen_options( $cron_hook );
-
-				\add_filter( 'manage_' . $cron_hook . '_columns', array( Crons_List::class, 'manage_columns' ) );
-
-				\add_action( 'load-' . $cron_hook, array( __CLASS__, 'aadvana_common_help' ) );
-
+				/* Crons start */
+				if ( self::get_option( 'cron_module_enabled' ) ) {
+					Crons_List::menu_add();
+				}
 				/* Crons end */
 
 				/* Transients */
-				$transients_hook = \add_submenu_page(
-					self::MENU_SLUG,
-					\esc_html__( 'WP Control', '0-day-analytics' ),
-					\esc_html__( 'Transients viewer', '0-day-analytics' ),
-					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::TRANSIENTS_MENU_SLUG,
-					array( Transients_View::class, 'analytics_transients_page' ),
-					2
-				);
-
-				Transients_List::add_screen_options( $transients_hook );
-
-				\add_filter( 'manage_' . $transients_hook . '_columns', array( Transients_List::class, 'manage_columns' ) );
-
-				\add_action( 'load-' . $transients_hook, array( __CLASS__, 'aadvana_common_help' ) );
-
+				if ( self::get_option( 'transients_module_enabled' ) ) {
+					Transients_List::menu_add();
+				}
 				/* Transients end */
 
 				/* Table */
-				$table_hook = \add_submenu_page(
-					self::MENU_SLUG,
-					\esc_html__( 'WP Control', '0-day-analytics' ),
-					\esc_html__( 'Table viewer', '0-day-analytics' ),
-					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::TABLE_MENU_SLUG,
-					array( Table_View::class, 'analytics_table_page' ),
-					4
-				);
-
-				Table_List::add_screen_options( $table_hook );
-
-				// \add_filter( 'manage_' . $table_hook . '_columns', array( Table_List::class, 'manage_columns' ) );
-
-				\add_action( 'load-' . $table_hook, array( __CLASS__, 'aadvana_common_help' ) );
-
+				if ( self::get_option( 'tables_module_enabled' ) ) {
+					Table_List::menu_add();
+				}
 				/* Table end */
 
 				if ( ! is_a( WP_Helper::check_debug_status(), '\WP_Error' ) && ! is_a( WP_Helper::check_debug_log_status(), '\WP_Error' ) && self::get_option( 'live_notifications_admin_bar' ) ) {
@@ -703,7 +656,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				$settings_hook = \add_submenu_page(
-					self::MENU_SLUG,
+					Logs_List::MENU_SLUG,
 					\esc_html__( 'Settings', '0-day-analytics' ),
 					\esc_html__( 'Settings', '0-day-analytics' ),
 					'manage_options', // No capability requirement.
@@ -722,12 +675,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
 
 					\delete_option( ADVAN_SETTINGS_NAME );
+					\get_option( self::SETTINGS_VERSION );
+
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'error_log_clear' );
 
 					// Redirect to the plugin settings page.
 					\wp_safe_redirect(
 						\add_query_arg(
 							array(
-								'page'  => self::MENU_SLUG,
+								'page'  => Logs_List::MENU_SLUG,
 								'reset' => 'true',
 							),
 							\admin_url( 'admin.php' )
@@ -775,7 +732,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\wp_safe_redirect(
 						\add_query_arg(
 							array(
-								'page'   => self::MENU_SLUG,
+								'page'   => Logs_List::MENU_SLUG,
 								'import' => 'true',
 							),
 							\admin_url( 'admin.php' )
@@ -802,54 +759,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			);
 
 			return $count_html;
-		}
-
-		/**
-		 * Options Page
-		 *
-		 * Get the options and display the page
-		 *
-		 * @since 1.1.0
-		 */
-		public static function analytics_options_page() {
-			self::render();
-		}
-
-		/**
-		 * Displays the settings page.
-		 *
-		 * @return void
-		 *
-		 * @since 1.1.0
-		 */
-		public static function render() {
-
-			\add_thickbox();
-
-			?>
-			<script>
-				if( 'undefined' != typeof localStorage ){
-					var skin = localStorage.getItem('aadvana-backend-skin');
-					if( skin == 'dark' ){
-
-						var element = document.getElementsByTagName("html")[0];
-						element.classList.add("aadvana-darkskin");
-					}
-				}
-			</script>
-			<?php
-			$events_list = new Logs_List( array() );
-			$events_list->prepare_items();
-			?>
-			<div class="wrap">
-			<h1 class="wp-heading-inline"><?php \esc_html_e( 'Error logs', '0-day-analytics' ); ?></h1>
-			<form id="error-logs-filter" method="get">
-				<?php
-				$events_list->display();
-				?>
-				</form>
-			</div>
-			<?php
 		}
 
 		/**
@@ -1036,7 +945,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_settings_page_link() {
 			if ( '' === self::$settings_page_link ) {
-				self::$settings_page_link = \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_page_link = \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_page_link;
@@ -1051,7 +960,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_crons_page_link() {
 			if ( '' === self::$settings_crons_link ) {
-				self::$settings_crons_link = \add_query_arg( 'page', self::CRON_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_crons_link = \add_query_arg( 'page', Crons_List::CRON_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_crons_link;
@@ -1066,7 +975,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_tables_page_link() {
 			if ( '' === self::$settings_table_link ) {
-				self::$settings_table_link = \add_query_arg( 'page', self::TABLE_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_table_link = \add_query_arg( 'page', Table_List::TABLE_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_table_link;
@@ -1081,7 +990,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_error_log_page_link() {
 			if ( '' === self::$settings_error_logs_link ) {
-				self::$settings_error_logs_link = \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_error_logs_link = \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_error_logs_link;
@@ -1096,7 +1005,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_transients_page_link() {
 			if ( '' === self::$settings_transients_link ) {
-				self::$settings_transients_link = \add_query_arg( 'page', self::TRANSIENTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_transients_link = \add_query_arg( 'page', Transients_List::TRANSIENTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_transients_link;
@@ -1111,7 +1020,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_requests_page_link() {
 			if ( '' === self::$settings_requests_link ) {
-				self::$settings_requests_link = \add_query_arg( 'page', self::REQUESTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_requests_link = \add_query_arg( 'page', Requests_List::REQUESTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_requests_link;
@@ -1217,7 +1126,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				<div class="aadvana-panel-content">
 
-					<form method="post" name="aadvana_form" id="aadvana_form" enctype="multipart/form-data">
+					<form method="post" name="<?php echo \esc_attr( ADVAN_PREFIX ); ?>form" id="<?php echo \esc_attr( ADVAN_PREFIX ); ?>form" enctype="multipart/form-data">
 
 						<div class="aadvana-tab-head">
 							<div id="aadvana-options-search-wrap">
@@ -1229,7 +1138,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 							<div class="awefpanel-head-elements">
 
-							<?php \do_action( 'aadvana_settings_save_button' ); ?>
+							<?php \do_action( ADVAN_PREFIX . 'settings_save_button' ); ?>
 
 							
 								<ul>
@@ -1266,7 +1175,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 								<?php
 								include_once \ADVAN_PLUGIN_ROOT . 'classes/settings/settings-options/' . $tab . '.php';
 
-								\do_action( 'aadvana_plugin_options_tab_' . $tab );
+								\do_action( ADVAN_PREFIX . 'plugin_options_tab_' . $tab );
 								?>
 
 							</div>
@@ -1276,11 +1185,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						?>
 
 						<?php \wp_nonce_field( 'aadvana-plugin-data', 'aadvana-security' ); ?>
-						<input type="hidden" name="action" value="aadvana_plugin_data_save" />
+						<input type="hidden" name="action" value="<?php echo \esc_attr( ADVAN_PREFIX ); ?>plugin_data_save" />
 
 						<div class="aadvana-footer">
 
-						<?php \do_action( 'aadvana_settings_save_button' ); ?>
+						<?php \do_action( ADVAN_PREFIX . 'settings_save_button' ); ?>
 						</div>
 					</form>
 
@@ -1317,47 +1226,61 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				// 'title' => esc_html__( 'Export/Import', '0-day-analytics' ),
 				// ),
 
-				'head-error-log-list' => esc_html__( 'Error Log', '0-day-analytics' ),
+				'head-error-log-list'  => esc_html__( 'Error Log', '0-day-analytics' ),
 
-				'error-log-list'      => array(
+				'error-log-list'       => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Error Log Listing', '0-day-analytics' ),
 				),
 
-				'head-cron-list'      => esc_html__( 'Cron Log', '0-day-analytics' ),
+				'head-cron-list'       => esc_html__( 'Cron Log', '0-day-analytics' ),
 
-				'cron-list'           => array(
+				'cron-list'            => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Cron options', '0-day-analytics' ),
 				),
 
-				'head-requests-list'  => esc_html__( 'Requests Log', '0-day-analytics' ),
+				'head-transients-list' => esc_html__( 'Transients Log', '0-day-analytics' ),
 
-				'request-list'        => array(
+				'transient-list'       => array(
+					'icon'  => 'list-view',
+					'title' => esc_html__( 'Transient options', '0-day-analytics' ),
+				),
+
+				'head-requests-list'   => esc_html__( 'Requests Log', '0-day-analytics' ),
+
+				'request-list'         => array(
 					'icon'  => 'list-view',
 					'title' => esc_html__( 'Request options', '0-day-analytics' ),
 				),
 
-				'head-notifications'  => esc_html__( 'Notifications', '0-day-analytics' ),
+				'head-table-list'      => esc_html__( 'Tables Viewer', '0-day-analytics' ),
 
-				'notifications'       => array(
+				'table-list'           => array(
+					'icon'  => 'editor-table',
+					'title' => esc_html__( 'Tables options', '0-day-analytics' ),
+				),
+
+				'head-notifications'   => esc_html__( 'Notifications', '0-day-analytics' ),
+
+				'notifications'        => array(
 					'icon'  => 'bell',
 					'title' => esc_html__( 'Notification options', '0-day-analytics' ),
 				),
 
-				'head-advanced'       => esc_html__( 'Advanced', '0-day-analytics' ),
+				'head-advanced'        => esc_html__( 'Advanced', '0-day-analytics' ),
 
-				'advanced'            => array(
+				'advanced'             => array(
 					'icon'  => 'admin-tools',
 					'title' => esc_html__( 'Advanced', '0-day-analytics' ),
 				),
 
-				'backup'              => array(
+				'backup'               => array(
 					'icon'  => 'migrate',
 					'title' => \esc_html__( 'Export/Import', '0-day-analytics' ),
 				),
 
-				'system-info'         => array(
+				'system-info'          => array(
 					'icon'  => 'wordpress-alt',
 					'title' => esc_html__( 'System Info', '0-day-analytics' ),
 				),
@@ -1413,7 +1336,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || self::CRON_MENU_SLUG === $current_page || self::TRANSIENTS_MENU_SLUG === $current_page || self::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || self::REQUESTS_MENU_SLUG === $current_page;
+			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1462,7 +1385,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array(
 						'id'    => 'aadvan-menu',
 						'title' => '',
-						'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
+						'href'  => \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 						'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
 					)
 				);
@@ -1609,6 +1532,33 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				)
 			) : 3;
 
+			// Modules start.
+			$advanced_options['cron_module_enabled']       = ( array_key_exists( 'cron_module_enabled', $post_array ) ) ? filter_var( $post_array['cron_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['requests_module_enabled']   = ( array_key_exists( 'requests_module_enabled', $post_array ) ) ? filter_var( $post_array['requests_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['transients_module_enabled'] = ( array_key_exists( 'transients_module_enabled', $post_array ) ) ? filter_var( $post_array['transients_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['tables_module_enabled']     = ( array_key_exists( 'tables_module_enabled', $post_array ) ) ? filter_var( $post_array['tables_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			// Modules end.
+
+			// Crons.
+			$advanced_options['advana_rest_requests_clear'] = ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) ? ( in_array( $post_array['advana_rest_requests_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_rest_requests_clear'] : self::get_option( 'advana_rest_requests_clear' ) ) : self::get_option( 'advana_rest_requests_clear' );
+
+			$advanced_options['advana_error_log_clear'] = ( array_key_exists( 'advana_error_log_clear', $post_array ) ) ? ( in_array( $post_array['advana_error_log_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_error_log_clear'] : self::get_option( 'advana_error_log_clear' ) ) : self::get_option( 'advana_error_log_clear' );
+
+			if ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) {
+				if ( -1 === (int) $post_array['advana_rest_requests_clear'] ) {
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
+					$advanced_options['advana_rest_requests_clear'] = '-1';
+				}
+			}
+
+			if ( array_key_exists( 'advana_error_log_clear', $post_array ) ) {
+				if ( -1 === (int) $post_array['advana_error_log_clear'] ) {
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'error_log_clear' );
+					$advanced_options['advana_error_log_clear'] = '-1';
+				}
+			}
+			// Crons end.
+
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 
 				$wp_debug_enable = ( array_key_exists( 'wp_debug_enable', $post_array ) ) ? filter_var( $post_array['wp_debug_enable'], FILTER_VALIDATE_BOOLEAN ) : false;
@@ -1752,7 +1702,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'<a href="%1$s" target="_blank">' . ADVAN_NAME . '</a> ' . __( 'is developed and maintained by', 'wp-security-audit-log' ) . ' <a href="%2$s" target="_blank">Stoil Dobreff</a>.',
 					$footer_link,
 					$link
-				) . '<br><br>' . sprintf(
+				) . '<br>' . sprintf(
 				/* translators: 1: Plugin Name, 3: Plugin review URL */
 					__( 'If you like <strong><ins>%1$s</ins></strong>. please leave us a <a target="_blank" style="color:#f9b918" href="%2$s">★★★★★</a> rating. A huge thank you in advance!', 'error-log-viewer-wp' ),
 					\esc_attr( ADVAN_NAME ),

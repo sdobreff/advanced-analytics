@@ -17,6 +17,7 @@ namespace ADVAN\ControllersApi;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Entities\Common_Table;
+use ADVAN\Helpers\Crons_Helper;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
@@ -134,6 +135,30 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 										'required'    => true,
 										'type'        => 'string',
 										'description' => 'Severity status',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'cron_run'        => array(
+					'class'     => Crons_Helper::class,
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<cron_hash>\w+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'run_cron_api',
+								),
+								'args'             => array(
+									'cron_hash' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'description' => 'Cron has to execute',
 									),
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
@@ -262,7 +287,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		}
 
 		/**
-		 * Global method to check permissions for API endpoints - this one checks if the user has read capability.
+		 * Global method to check permissions for API endpoints - this one checks if the user has admin capability.
 		 *
 		 * @return bool
 		 *

@@ -16,7 +16,6 @@ namespace ADVAN\Lists\Views;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
-use ADVAN\Helpers\Settings;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,15 +29,15 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 	 * @since 1.9.8.1
 	 */
 	class Crons_View {
-				/**
-				 * Options Help
-				 *
-				 * Return help text for options screen
-				 *
-				 * @return string  Help Text
-				 *
-				 * @since 1.9.8.1
-				 */
+		/**
+		 * Options Help
+		 *
+		 * Return help text for options screen
+		 *
+		 * @return string  Help Text
+		 *
+		 * @since 1.9.8.1
+		 */
 		public static function add_help_content_crons() {
 
 			$help_text  = '<p>' . __( 'This screen allows you to see all the crons on your WordPress site.', '0-day-analytics' ) . '</p>';
@@ -238,7 +237,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
-					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . Settings::CRON_MENU_SLUG . '&action=new_cron&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Cron', '0-day-analytics' ) . '</a>'; ?>
+					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . Crons_List::CRON_MENU_SLUG . '&action=new_cron&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Cron', '0-day-analytics' ) . '</a>'; ?>
 					<form id="crons-filter" method="get">
 					<?php
 
@@ -333,7 +332,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					array( 'deleted' ),
 					add_query_arg(
 						array(
-							'page'                   => Settings::CRON_MENU_SLUG,
+							'page'                   => Crons_List::CRON_MENU_SLUG,
 							Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
 							'updated'                => true,
 						),
@@ -365,7 +364,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					array( 'deleted' ),
 					add_query_arg(
 						array(
-							'page'                   => Settings::CRON_MENU_SLUG,
+							'page'                   => Crons_List::CRON_MENU_SLUG,
 							Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
 							'updated'                => true,
 						),

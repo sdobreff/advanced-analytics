@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
+use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Lists\Traits\List_Trait;
+use ADVAN\ControllersApi\Endpoints;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -50,6 +53,8 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		public const NONCE_NAME = 'advana_crons_manager';
 
 		public const SEARCH_INPUT = 'sgp';
+
+		public const CRON_MENU_SLUG = 'advan_cron_jobs';
 
 		/**
 		 * Format for the file link.
@@ -149,6 +154,49 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
+		 * Inits the module hook.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function hooks_init() {
+
+			\add_action( 'admin_print_styles-' . self::PAGE_SLUG, array( Settings::class, 'print_styles' ) );
+			\add_action( 'admin_post_' . self::UPDATE_ACTION, array( Crons_View::class, 'update_cron' ) );
+			\add_action( 'admin_post_' . self::NEW_ACTION, array( Crons_View::class, 'new_cron' ) );
+		}
+
+		/**
+		 * Adds the module to the main plugin menu
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function menu_add() {
+
+			/* Crons */
+			$cron_hook = \add_submenu_page(
+				Logs_List::MENU_SLUG,
+				\esc_html__( 'WP Control', '0-day-analytics' ),
+				\esc_html__( 'Crons viewer', '0-day-analytics' ),
+				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
+				self::CRON_MENU_SLUG,
+				array( Crons_View::class, 'analytics_cron_page' ),
+				1
+			);
+
+			self::add_screen_options( $cron_hook );
+
+			\add_filter( 'manage_' . $cron_hook . '_columns', array( self::class, 'manage_columns' ) );
+
+			\add_action( 'load-' . $cron_hook, array( Settings::class, 'aadvana_common_help' ) );
+
+			/* Crons end */
+		}
+
+		/**
 		 * Displays the search box.
 		 *
 		 * @since 1.1.0
@@ -167,7 +215,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			<p class="search-box" style="position:relative">
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo \esc_html( $text ); ?>:</label>
 
-				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="<?php echo \esc_attr( ADVAN_PREFIX ); ?>search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
 				<?php \submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
@@ -544,7 +592,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					\add_query_arg(
 						array(
 							self::SEARCH_INPUT => self::escaped_search_input(),
-							'page'             => Settings::CRON_MENU_SLUG,
+							'page'             => self::CRON_MENU_SLUG,
 						),
 						\admin_url( 'admin.php' )
 					)
@@ -582,7 +630,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					\add_query_arg(
 						array(
 							self::SEARCH_INPUT => self::escaped_search_input(),
-							'page'             => Settings::CRON_MENU_SLUG,
+							'page'             => self::CRON_MENU_SLUG,
 						),
 						\admin_url( 'admin.php' )
 					)
@@ -673,7 +721,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 								});
 
 								var data = {
-									'action': 'aadvana_delete_cron',
+									'action': '<?php echo ADVAN_PREFIX; ?>delete_cron',
 									'post_type': 'GET',
 									'_wpnonce': jQuery(this).data('nonce'),
 									'hash': jQuery(this).data('hash'),
@@ -716,45 +764,78 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 								"cursor": "default"
 							});
 
-							var data = {
-								'action': 'aadvana_run_cron',
-								'post_type': 'GET',
-								'_wpnonce': jQuery(this).data('nonce'),
-								'hash': jQuery(this).data('hash'),
-							};
 
-							jQuery.get(ajaxurl, data, function(response) {
-								if ( 2 === response['data'] || 0 === response['data'] ) {
+							try {
+								attResp = wp.apiFetch({
+									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/cron_run/' + jQuery(this).data('hash'),
+									method: 'GET',
+									cache: 'no-cache'
+								}).then( ( attResp ) => {
+									
+									if (attResp.success) {
 
 										let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
 										let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
 										dynRun.next('tr').fadeOut( 5000, function() {
 											dynRun.next('tr').remove();
 										});
-									
-								} else {
-									let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
-									dynRun.next('tr').fadeOut( 5000, function() {
-										dynRun.next('tr').remove();
-									});
-								}
-							}, 'json').fail(function(xhr, status, error) {
-								if ( xhr.responseJSON && xhr.responseJSON.data ) {
-									errorMessage = xhr.responseJSON.data;
-									jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
-								} else {
-									if ( error ) {
-										errorMessage = error + ' Check your browser console for more information.';
-										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
-									}
-								}
-							}).always(function() {
 
+									}
+								} ).catch(
+									( error ) => {
+										if (error.message) {
+											jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
+										}
+									}
+								);
+							} catch (error) {
+								throw error;
+							} finally {
 								jQuery(that).css({
 									"pointer-events": "",
 									"cursor": ""
 								})
-							});
+							}
+
+							// var data = {
+							// 	'action': 'aadvana_run_cron',
+							// 	'post_type': 'GET',
+							// 	'_wpnonce': jQuery(this).data('nonce'),
+							// 	'hash': jQuery(this).data('hash'),
+							// };
+
+							// jQuery.get(ajaxurl, data, function(response) {
+							// 	if ( 2 === response['data'] || 0 === response['data'] ) {
+
+							// 			let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
+							// 			let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
+							// 			dynRun.next('tr').fadeOut( 5000, function() {
+							// 				dynRun.next('tr').remove();
+							// 			});
+									
+							// 	} else {
+							// 		let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
+							// 		dynRun.next('tr').fadeOut( 5000, function() {
+							// 			dynRun.next('tr').remove();
+							// 		});
+							// 	}
+							// }, 'json').fail(function(xhr, status, error) {
+							// 	if ( xhr.responseJSON && xhr.responseJSON.data ) {
+							// 		errorMessage = xhr.responseJSON.data;
+							// 		jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+							// 	} else {
+							// 		if ( error ) {
+							// 			errorMessage = error + ' Check your browser console for more information.';
+							// 			jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+							// 		}
+							// 	}
+							// }).always(function() {
+
+							// 	jQuery(that).css({
+							// 		"pointer-events": "",
+							// 		"cursor": ""
+							// 	})
+							// });
 
 						});
 					});

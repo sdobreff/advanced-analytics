@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace ADVAN;
 
+use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
@@ -25,6 +26,7 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Display_Environment_Type;
+use ADVAN\Controllers\Error_Log;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Lists\Table_List;
 
@@ -37,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 	 */
 	class Advanced_Analytics {
 
-		public const REDIRECT_OPTION_NAME = 'aadvana_plugin_do_activation_redirect';
+		public const REDIRECT_OPTION_NAME = ADVAN_PREFIX . 'plugin_do_activation_redirect';
 
 		/**
 		 * Inits the class and hooks
@@ -102,6 +104,15 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( \is_admin() ) {
 				Ajax_Helper::init();
 			}
+
+			// Always execute section.
+			Cron_Jobs::init();
+
+			if ( Settings::get_option( 'requests_module_enabled' ) ) {
+				Requests_List::init();
+			}
+
+			Logs_list::init();
 		}
 
 		/**
@@ -252,7 +263,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( \get_option( self::REDIRECT_OPTION_NAME, false ) ) {
 				\delete_option( self::REDIRECT_OPTION_NAME );
 				if ( ! isset( $_REQUEST['activate-multi'] ) ) {
-					\wp_safe_redirect( \add_query_arg( 'page', Settings::MENU_SLUG, \network_admin_url( \get_current_blog_id(), 'admin.php' ) ) );
+					\wp_safe_redirect( \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( \get_current_blog_id(), 'admin.php' ) ) );
 				}
 			}
 		}

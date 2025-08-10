@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
+use ADVAN\Helpers\File_Helper;
+use ADVAN\Helpers\Log_Line_Parser;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -259,6 +262,51 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 		public static function get_error_log_file(): string {
 
 			return (string) self::$log_file;
+		}
+
+		/**
+		 * Truncates error log file but keeps the last (settings) errors.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function truncate_and_keep_errors() {
+
+			self::suppress_error_logging();
+
+			$file_and_path = self::autodetect();
+
+			$dirname = pathinfo( $file_and_path, PATHINFO_DIRNAME );
+			$dirname = realpath( $dirname );
+
+			$temp_file = File_Helper::generate_random_file_name() . '.log';
+
+			$new_log_file = \trailingslashit( $dirname ) . $temp_file;
+
+			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
+
+			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
+
+			self::clear( $file_and_path );
+			Log_Line_Parser::delete_last_parsed_timestamp();
+
+			File_Helper::remove_empty_lines_low_memory( $new_log_file );
+
+			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
+
+			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
+
+			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
+
+			self::clear( $file_and_path );
+			Log_Line_Parser::delete_last_parsed_timestamp();
+
+			File_Helper::remove_empty_lines_low_memory( $new_log_file );
+
+			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
+
+			self::enable_error_logging();
 		}
 	}
 }

@@ -162,6 +162,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * Checks if give table exists
 		 *
 		 * @param string $table_name - The table to check for. If empty checks for the current table.
+		 * @param \wpdb  $connection - \wpdb connection to be used for name extraction.
 		 *
 		 * @return boolean
 		 *
@@ -257,10 +258,10 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			}
 
 			if ( ! \in_array( $table_name, self::get_wp_core_tables(), true )
-			&& \in_array( $table_name, self::get_tables($_wpdb), true ) ) {
+			&& \in_array( $table_name, self::get_tables( $_wpdb ), true ) ) {
 
 				self::execute_query( 'DROP TABLE IF EXISTS ' . $table_name, $_wpdb );
-			} elseif ( null !== $request ) {
+			} elseif ( null !== $request ) { // Call is coming from REST API.
 				return new \WP_Error(
 					'core_table',
 					__( 'Can not delete core table.', '0-day-analytics' ),
@@ -268,7 +269,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				);
 			}
 
-			if ( null !== $request ) {
+			if ( null !== $request ) { // Call is coming from REST API.
 				return rest_ensure_response(
 					array(
 						'success' => true,
@@ -306,10 +307,19 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				$table_name = static::get_name();
 			}
 
-			if ( \in_array( $table_name, self::get_tables($_wpdb), true ) ) {
+			if ( \in_array( $table_name, self::get_tables( $_wpdb ), true ) ) {
 
-				self::execute_query( 'TRUNCATE TABLE ' . $table_name, $_wpdb );
-			} elseif ( null !== $request ) {
+				// if ( ! \in_array( $table_name, self::get_wp_core_tables(), true ) ) {
+
+					self::execute_query( 'TRUNCATE TABLE ' . $table_name, $_wpdb );
+				// } else {
+				// 	return new \WP_Error(
+				// 		'truncate_table',
+				// 		__( 'You are not allowed to truncate WP Core table.', '0-day-analytics' ),
+				// 		array( 'status' => 400 )
+				// 	);
+				// }
+			} elseif ( null !== $request ) { // Call is coming from REST API.
 				return new \WP_Error(
 					'truncate_table',
 					__( 'Can not truncate table.', '0-day-analytics' ),
@@ -317,7 +327,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				);
 			}
 
-			if ( null !== $request ) {
+			if ( null !== $request ) { // Call is coming from REST API.
 				return rest_ensure_response(
 					array(
 						'success' => true,

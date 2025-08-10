@@ -201,7 +201,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		public static function after_plugin_row_meta( $plugin_file, $plugin_data ) {
 			if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
 				if ( isset( $plugin_data['slug'] ) && ! empty( $plugin_data['slug'] ) ) {
-					echo '<div style="margin-top:10px;"><input type="button" class="button button-primary switch_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch plugin version', '0-day-analytics' ) . '"><select id="aadvana_' . \esc_attr( $plugin_data['slug'] ) . '" style="display:none"></select><input id="aadvana_switch_plugin_to_version_' . \esc_attr( $plugin_data['slug'] ) . '" style="display:none" type="button" class="button button-primary switch_to_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch version', '0-day-analytics' ) . '"></div>';
+					echo '<div style="margin-top:10px;"><input type="button" class="button button-primary switch_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch plugin version', '0-day-analytics' ) . '"><select id="' . \esc_attr( ADVAN_PREFIX.$plugin_data['slug'] ) . '" style="display:none"></select><input id="'.ADVAN_PREFIX.'switch_plugin_to_version_' . \esc_attr( $plugin_data['slug'] ) . '" style="display:none" type="button" class="button button-primary switch_to_plugin_version" data-plugin-slug="' . \esc_attr( $plugin_data['slug'] ) . '" value="' . \esc_html__( 'Switch version', '0-day-analytics' ) . '"></div>';
 				}
 			}
 			echo '<div style="margin-top:10px;">' . \esc_attr( \trailingslashit( WP_PLUGIN_DIR ) ) . '<b>' . \esc_attr( $plugin_file ) . '</b></div>';
@@ -377,7 +377,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 					window.addEventListener("load", () => {
 						jQuery( '.switch_plugin_version' ).on( 'click', function(e) {
 							var data = {
-								'action': 'aadvana_extract_plugin_versions',
+								'action': '<?php echo ADVAN_PREFIX; ?>extract_plugin_versions',
 								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
 								'plugin_slug': jQuery(this).data('plugin-slug')
 							};
@@ -394,8 +394,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 									// if nothing returns then it means no notification available for now
 									if (jQuery.trim(data.data)) {
 										
-										jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).html(data.data).show();
-										jQuery('#aadvana_switch_plugin_to_version_' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>switch_plugin_to_version_' + jQuery(that).data('plugin-slug')).html(data.data).show();
 										that.remove();
 									}
 								},
@@ -408,7 +408,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 						jQuery( '.switch_to_plugin_version' ).on( 'click', function(e) {
 							let that = this;
 
-							var selectedVersion = jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).find(":selected").val();
+							var selectedVersion = jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).find(":selected").val();
 
 							if ( ! selectedVersion ) {
 								alert('<?php echo esc_js( __( 'Please select a version to switch.', '0-day-analytics' ) ); ?>');
@@ -416,10 +416,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 							}
 
 							jQuery( that ).addClass( 'disabled' );
-							jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).addClass( 'disabled' );
+							jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).addClass( 'disabled' );
 					
 							var data = {
-								'action': 'aadvana_switch_plugin_version',
+								'action': '<?php echo \esc_attr( ADVAN_PREFIX ); ?>switch_plugin_version',
 								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
 								'plugin_slug': jQuery(this).data('plugin-slug'),
 								'version': selectedVersion
@@ -433,7 +433,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 								},
 								error: function(jqXHR, textStatus, errorThrown) { 
 									jQuery( that ).removeClass( 'disabled' );
-									jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).removeClass( 'disabled' );
+									jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).removeClass( 'disabled' );
 								}
 							});
 						});

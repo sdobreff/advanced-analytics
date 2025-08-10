@@ -388,7 +388,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 													<div>
 														<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
 													</div>
-													<div class=""><span title="<?= __( 'Copy to clipboard', '0-day-analytics' ) ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?= __( 'Share', '0-day-analytics' ) ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+													<div class=""><span title="<?php echo __( 'Copy to clipboard', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
 												</div>
 												<div class="http-request-args aadvana-pre-300"></div>
 											</div>
@@ -397,7 +397,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 													<div>
 														<h3><?php \esc_html_e( 'Response:', '0-day-analytics' ); ?></h3>
 													</div>
-													<div class=""><span title="<?= __( 'Copy to clipboard', '0-day-analytics' ) ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?= __( 'Share', '0-day-analytics' ) ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+													<div class=""><span title="<?php echo __( 'Copy to clipboard', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
 												</div>
 												<div class="http-response aadvana-pre-300"></div>
 											</div>						

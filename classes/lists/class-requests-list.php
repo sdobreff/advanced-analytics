@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\ControllersApi\Endpoints;
+use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Entities\Requests_Log_Entity;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -49,6 +51,8 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_requests_list';
 
 		public const SEARCH_INPUT = 's';
+
+		public const REQUESTS_MENU_SLUG = 'advan_requests';
 
 		/**
 		 * The table to show
@@ -109,6 +113,74 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					'ajax'     => false,      // If true, the parent class will call the _js_vars() method in the footer.
 				)
 			);
+		}
+
+		/**
+		 * Inits class hooks. That is called every time - not in some specific environment set.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function init() {
+			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+		}
+
+		/**
+		 * Adds a cron job for truncating the records in the requests table
+		 *
+		 * @param array $crons - The array with all the crons associated with the plugin.
+		 *
+		 * @return array
+		 *
+		 * @since 2.8.2
+		 */
+		public static function add_cron_job( $crons ) {
+			if ( -1 !== (int) Settings::get_option( 'advana_rest_requests_clear' ) ) {
+				$crons[ ADVAN_PREFIX . 'request_table_clear' ] = array(
+					'time' => Settings::get_option( 'advana_rest_requests_clear' ),
+					'hook' => array( __CLASS__, 'truncate_requests_table' ),
+					'args' => array(),
+				);
+			}
+
+			return $crons;
+		}
+
+		/**
+		 * Truncates the requests table from CRON job
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function truncate_requests_table() {
+			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name() );
+		}
+
+		/**
+		 * Adds the module to the main plugin menu
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.1
+		 */
+		public static function menu_add() {
+			$requests_hook = \add_submenu_page(
+				Logs_List::MENU_SLUG,
+				\esc_html__( 'WP Control', '0-day-analytics' ),
+				\esc_html__( 'Requests viewer', '0-day-analytics' ),
+				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
+				self::REQUESTS_MENU_SLUG,
+				array( Requests_View::class, 'analytics_requests_page' ),
+				3
+			);
+
+			self::add_screen_options( $requests_hook );
+
+			\add_filter( 'manage_' . $requests_hook . '_columns', array( self::class, 'manage_columns' ) );
+
+			\add_action( 'load-' . $requests_hook, array( Settings::class, 'aadvana_common_help' ) );
 		}
 
 		/**
@@ -577,7 +649,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 							array(
 								self::SEARCH_INPUT => self::escaped_search_input(),
 								'paged'            => $_REQUEST['paged'] ?? 1,
-								'page'             => Settings::REQUESTS_MENU_SLUG,
+								'page'             => self::REQUESTS_MENU_SLUG,
 								'show_table'       => self::$table::get_name(),
 							),
 							\admin_url( 'admin.php' )
@@ -881,7 +953,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		}
 
 		/**
-		 * Returns translatet text for per page option
+		 * Returns translated text for per page option
 		 *
 		 * @return string
 		 *
