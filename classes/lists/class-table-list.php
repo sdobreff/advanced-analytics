@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
@@ -104,7 +105,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		}
 
 		/**
-		 * Inits the module hook.
+		 * Inits the module hooks.
 		 *
 		 * @return void
 		 *
@@ -125,7 +126,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		public static function menu_add() {
 
 			$table_hook = \add_submenu_page(
-				Settings::MENU_SLUG,
+				Logs_List::MENU_SLUG,
 				\esc_html__( 'WP Control', '0-day-analytics' ),
 				\esc_html__( 'Table viewer', '0-day-analytics' ),
 				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.

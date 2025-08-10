@@ -7,6 +7,7 @@
  * @since 1.1.0
  */
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\System_Status;
 
@@ -104,6 +105,6 @@ Settings::build_option(
 	?>
 
 	<div class="option-item">
-		<a id="aadvana-reset-settings" class="aadvana-primary-button button button-primary button-hero aadvana-button-red" href="<?php print \esc_url( \wp_nonce_url( \admin_url( 'admin.php?page=' . self::MENU_SLUG . '&reset-settings' ), 'reset-plugin-settings', 'reset_nonce' ) ); ?>" data-message="<?php esc_html_e( 'This action can not be undone. Clicking "OK" will reset your plugin options to the default installation. Click "Cancel" to stop this operation.', '0-day-analytics' ); ?>"><?php esc_html_e( 'Reset All Settings', '0-day-analytics' ); ?></a>
+		<a id="aadvana-reset-settings" class="aadvana-primary-button button button-primary button-hero aadvana-button-red" href="<?php print \esc_url( \wp_nonce_url( \admin_url( 'admin.php?page=' . Logs_List::MENU_SLUG . '&reset-settings' ), 'reset-plugin-settings', 'reset_nonce' ) ); ?>" data-message="<?php esc_html_e( 'This action can not be undone. Clicking "OK" will reset your plugin options to the default installation. Click "Cancel" to stop this operation.', '0-day-analytics' ); ?>"><?php esc_html_e( 'Reset All Settings', '0-day-analytics' ); ?></a>
 	</div>
 

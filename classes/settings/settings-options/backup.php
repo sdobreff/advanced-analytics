@@ -7,6 +7,7 @@
  * @since 1.1.0
  */
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
@@ -49,7 +50,7 @@ use ADVAN\Helpers\Settings;
 			<?php
 			print \esc_url(
 				\wp_nonce_url(
-					\admin_url( 'admin.php?page=' . Settings::MENU_SLUG . '&export-settings' ),
+					\admin_url( 'admin.php?page=' . Logs_List::MENU_SLUG . '&export-settings' ),
 					'export-plugin-settings',
 					'export_nonce'
 				)

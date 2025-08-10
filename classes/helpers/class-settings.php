@@ -25,10 +25,10 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Lists\Views\Crons_View;
 use ADVAN\Lists\Views\Table_View;
 use ADVAN\Controllers\Telegram_API;
+use ADVAN\Lists\Views\Logs_List_View;
 use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
-use Requests;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -44,8 +44,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 	class Settings {
 
 		public const OPTIONS_VERSION = '15'; // Incremented when the options array changes.
-
-		public const MENU_SLUG = 'advan_logs';
 
 		public const SETTINGS_MENU_SLUG = 'advan_logs_settings';
 
@@ -212,6 +210,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				Table_List::hooks_init();
 			}
 			/* Tables end */
+
+			Logs_List::hooks_init();
 
 			/**
 			 * Draws the save button in the settings
@@ -461,7 +461,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'requests_module_enabled'         => true,
 					'transients_module_enabled'       => true,
 					'tables_module_enabled'           => true,
-					'advana_rest_requests_clear'           => 'weekly',
+					'advana_rest_requests_clear'      => 'weekly',
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -581,8 +581,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'WP Control', '0-day-analytics' ) . self::get_updates_count_html(),
 					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ),
-					self::MENU_SLUG,
-					array( __CLASS__, 'analytics_options_page' ),
+					Logs_List::MENU_SLUG,
+					array( Logs_List_View::class, 'render' ),
 					'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 					3
 				);
@@ -601,12 +601,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 
 				\add_submenu_page(
-					self::MENU_SLUG,
+					Logs_List::MENU_SLUG,
 					\esc_html__( 'WP Control', '0-day-analytics' ),
 					\esc_html__( 'Error Log viewer', '0-day-analytics' ),
 					( ( self::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-					self::MENU_SLUG,
-					array( __CLASS__, 'analytics_options_page' ),
+					Logs_List::MENU_SLUG,
+					array( Logs_List_View::class, 'render' ),
 					1
 				);
 
@@ -654,7 +654,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				$settings_hook = \add_submenu_page(
-					self::MENU_SLUG,
+					Logs_List::MENU_SLUG,
 					\esc_html__( 'Settings', '0-day-analytics' ),
 					\esc_html__( 'Settings', '0-day-analytics' ),
 					'manage_options', // No capability requirement.
@@ -678,7 +678,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\wp_safe_redirect(
 						\add_query_arg(
 							array(
-								'page'  => self::MENU_SLUG,
+								'page'  => Logs_List::MENU_SLUG,
 								'reset' => 'true',
 							),
 							\admin_url( 'admin.php' )
@@ -726,7 +726,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					\wp_safe_redirect(
 						\add_query_arg(
 							array(
-								'page'   => self::MENU_SLUG,
+								'page'   => Logs_List::MENU_SLUG,
 								'import' => 'true',
 							),
 							\admin_url( 'admin.php' )
@@ -753,54 +753,6 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			);
 
 			return $count_html;
-		}
-
-		/**
-		 * Options Page
-		 *
-		 * Get the options and display the page
-		 *
-		 * @since 1.1.0
-		 */
-		public static function analytics_options_page() {
-			self::render();
-		}
-
-		/**
-		 * Displays the settings page.
-		 *
-		 * @return void
-		 *
-		 * @since 1.1.0
-		 */
-		public static function render() {
-
-			\add_thickbox();
-
-			?>
-			<script>
-				if( 'undefined' != typeof localStorage ){
-					var skin = localStorage.getItem('aadvana-backend-skin');
-					if( skin == 'dark' ){
-
-						var element = document.getElementsByTagName("html")[0];
-						element.classList.add("aadvana-darkskin");
-					}
-				}
-			</script>
-			<?php
-			$events_list = new Logs_List( array() );
-			$events_list->prepare_items();
-			?>
-			<div class="wrap">
-			<h1 class="wp-heading-inline"><?php \esc_html_e( 'Error logs', '0-day-analytics' ); ?></h1>
-			<form id="error-logs-filter" method="get">
-				<?php
-				$events_list->display();
-				?>
-				</form>
-			</div>
-			<?php
 		}
 
 		/**
@@ -987,7 +939,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_settings_page_link() {
 			if ( '' === self::$settings_page_link ) {
-				self::$settings_page_link = \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_page_link = \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_page_link;
@@ -1032,7 +984,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_error_log_page_link() {
 			if ( '' === self::$settings_error_logs_link ) {
-				self::$settings_error_logs_link = \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_error_logs_link = \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_error_logs_link;
@@ -1378,7 +1330,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return self::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page;
+			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1427,7 +1379,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					array(
 						'id'    => 'aadvan-menu',
 						'title' => '',
-						'href'  => \add_query_arg( 'page', self::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
+						'href'  => \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( 'admin.php' ) ),
 						'meta'  => array( 'class' => 'aadvan-live-notif-item' ),
 					)
 				);

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Crons_Helper;
@@ -176,7 +177,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		public static function menu_add() {
 
 			$transients_hook = \add_submenu_page(
-				Settings::MENU_SLUG,
+				Logs_List::MENU_SLUG,
 				\esc_html__( 'WP Control', '0-day-analytics' ),
 				\esc_html__( 'Transients viewer', '0-day-analytics' ),
 				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.

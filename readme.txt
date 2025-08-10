@@ -31,6 +31,8 @@ Note: Every time fatal is thrown, for security reasons new link is generated, ev
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
+You can completely disable individual modules (if you are not using them) or enable them only when needed.
+
 You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?preview=1&networking=yes "WP Playground") or use the "Live Preview" button on the WordPress plugin page.
 
 **Key Features**:
@@ -97,6 +99,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 2.8.2 =
+As of this version you can disable individual modules (if you are not using them) or enable them only when needed. Cron job introduced for auto clearing the requests table. Switched cron execution from AJAX to REST API.
 
 = 2.8.1 =
 Option to copy and share Request / Response from the request details. Code optimizations. Error log filtering enhancements.

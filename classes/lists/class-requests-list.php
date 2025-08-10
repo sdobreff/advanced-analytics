@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists;
 
+use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
@@ -119,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		public static function init() {
 			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
@@ -132,7 +133,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		public static function add_cron_job( $crons ) {
 			if ( '' !== Settings::get_option( 'advana_rest_requests_clear' ) ) {
@@ -152,7 +153,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		public static function truncate_requests_table() {
 			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name());
@@ -167,7 +168,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		public static function menu_add() {
 			$requests_hook = \add_submenu_page(
-				Settings::MENU_SLUG,
+				Logs_List::MENU_SLUG,
 				\esc_html__( 'WP Control', '0-day-analytics' ),
 				\esc_html__( 'Requests viewer', '0-day-analytics' ),
 				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.

@@ -260,7 +260,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( \get_option( self::REDIRECT_OPTION_NAME, false ) ) {
 				\delete_option( self::REDIRECT_OPTION_NAME );
 				if ( ! isset( $_REQUEST['activate-multi'] ) ) {
-					\wp_safe_redirect( \add_query_arg( 'page', Settings::MENU_SLUG, \network_admin_url( \get_current_blog_id(), 'admin.php' ) ) );
+					\wp_safe_redirect( \add_query_arg( 'page', Logs_List::MENU_SLUG, \network_admin_url( \get_current_blog_id(), 'admin.php' ) ) );
 				}
 			}
 		}

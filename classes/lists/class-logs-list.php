@@ -21,6 +21,7 @@ use ADVAN\Controllers\Error_Log;
 use ADVAN\Helpers\Log_Line_Parser;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\ControllersApi\Endpoints;
+use ADVAN\Lists\Views\Logs_List_View;
 use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Controllers\Reverse_Line_Reader;
 
@@ -47,6 +48,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_logs_list';
 
 		public const PAGE_SLUG = 'toplevel_page_advan_logs';
+
+		public const MENU_SLUG = 'advan_logs';
 
 		public const SEARCH_INPUT = 'sgp';
 
@@ -86,7 +89,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 *
 		 * @since 1.8.0
 		 */
-		private static $sources = array();
+		private static $sources = array(
+			'plugins' => array(),
+			'themes'  => array(),
+		);
 
 		/**
 		 * Events Query Arguments.
@@ -126,6 +132,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		private static $items_collected = array();
 
 		/**
+		 * Inits the module hooks.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function hooks_init() {
+
+			\add_action( 'load-' . self::PAGE_SLUG, array( Logs_List_View::class, 'page_load' ) );
+		}
+
+		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args - Events query arguments.
@@ -148,7 +166,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			self::$table_name = 'php_error_logs';
 		}
-
 
 		/**
 		 * Displays the search box.
@@ -457,6 +474,16 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						}
 					}
 
+					$last_error = end( $errors );
+					// Add plugin data but only if that is not request for the first error.
+					if ( ! empty( $last_error ) && ! $first_only ) {
+						$plugin = self::add_plugin_info_to_collected_item( $last_error );
+
+						if ( $plugin ) {
+							$errors[ \array_key_last( $errors ) ]['plugin'] = $plugin;
+						}
+					}
+
 					if ( $first_only && ! empty( $errors ) ) {
 						// If we only want the first item, return it.
 						return array( reset( $errors ) );
@@ -470,12 +497,71 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			Log_Line_Parser::store_last_parsed_timestamp();
 
+			if ( ! empty( self::$query_args ) && isset( self::$query_args['plugin_filter'] ) && ! empty( self::$query_args['plugin_filter'] ) ) {
+				$s = self::$query_args['plugin_filter'];
+
+				$errors = array_filter(
+					$errors,
+					function ( $error ) use ( $s ) {
+						if ( isset( $error['plugin'] ) ) {
+							return ( false !== strpos( $error['plugin'], $s ) );
+						} else {
+							return false;
+						}
+					}
+				);
+			}
+
 			self::$items_collected = $errors;
 
 			$errors = null;
 			unset( $errors );
 
 			return self::$items_collected;
+		}
+
+		/**
+		 * Populates plugin name in the collected errors array
+		 *
+		 * @param array $last_error - Array with the last collected error data.
+		 *
+		 * @return bool|string
+		 *
+		 * @since 2.8.2
+		 */
+		public static function add_plugin_info_to_collected_item( array $last_error ) {
+			$message              = $last_error['message'] ?? '';
+			$plugins_dir_basename = basename( \WP_PLUGIN_DIR );
+
+			if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+				$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
+
+				$next        = false;
+				$plugin_base = '';
+				foreach ( $split_plugin as $part ) {
+					if ( $next ) {
+						$plugin_base = $part;
+						break;
+					}
+					if ( $plugins_dir_basename === $part ) {
+						$next = true;
+					}
+				}
+
+				if ( isset( self::$sources['plugins'][ $plugin_base ] ) ) {
+					return $plugin_base;
+				} else {
+
+					$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+					if ( ! empty( $plugin ) ) {
+						self::$sources['plugins'][ $plugin_base ] = $plugin;
+						return $plugin_base;
+					}
+				}
+			}
+
+			return false;
 		}
 
 		/**
@@ -687,41 +773,45 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 						$title = __( 'Viewing: ', '0-day-analytics' ) . $item['error_file'];
 
-						$source_link = '<div> <a href="' . $view_url . '" title = "' . $title . '" class="thickbox view-source gray_lab badge">' . __( 'view source', '0-day-analytics' ) . '</a></div>';
+						$source_link = '<div> <a href="' . $view_url . '" title = "' . $title . '" class="thickbox view-source gray_lab badge">' . __( 'view error source', '0-day-analytics' ) . '</a></div>';
 					}
 
 					$message = \esc_html( $item['message'] );
 
-					$plugins_dir_basename = basename( \WP_PLUGIN_DIR );
-
-					if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
-
-						$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
-
-						$next        = false;
-						$plugin_base = '';
-						foreach ( $split_plugin as $part ) {
-							if ( $next ) {
-								$plugin_base = $part;
-								break;
-							}
-							if ( $plugins_dir_basename === $part ) {
-								$next = true;
-							}
-						}
-
-						if ( isset( self::$sources[ $plugin_base ] ) ) {
-							return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources[ $plugin_base ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
-						} else {
-
-							$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
-
-							if ( ! empty( $plugin ) ) {
-								self::$sources[ $plugin_base ] = $plugin;
-								return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( $plugin['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
-							}
-						}
+					if ( isset( $item['plugin'] ) && ! empty( $item['plugin'] ) ) {
+						return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources['plugins'][ $item['plugin'] ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources['plugins'][ $item['plugin'] ]['Version'] . $source_link;
 					}
+
+					// $plugins_dir_basename = basename( \WP_PLUGIN_DIR );
+
+					// if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+					// $split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
+
+					// $next        = false;
+					// $plugin_base = '';
+					// foreach ( $split_plugin as $part ) {
+					// if ( $next ) {
+					// $plugin_base = $part;
+					// break;
+					// }
+					// if ( $plugins_dir_basename === $part ) {
+					// $next = true;
+					// }
+					// }
+
+					// if ( isset( self::$sources[ $plugin_base ] ) ) {
+					// return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources[ $plugin_base ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
+					// } else {
+
+					// $plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+					// if ( ! empty( $plugin ) ) {
+					// self::$sources[ $plugin_base ] = $plugin;
+					// return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( $plugin['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources[ $plugin_base ]['Version'] . $source_link;
+					// }
+					// }
+					// }
 
 					$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
 
@@ -743,8 +833,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 							}
 						}
 
-						if ( isset( self::$sources[ $theme_base ] ) ) {
-							return __( 'Theme: ', '0-day-analytics' ) . '<b>' . esc_html( self::$sources[ $theme_base ] ) . '</b>' . $source_link;
+						if ( isset( self::$sources['themes'][ $theme_base ] ) ) {
+							return __( 'Theme: ', '0-day-analytics' ) . '<b>' . esc_html( self::$sources['themes'][ $theme_base ] ) . '</b>' . $source_link;
 						} else {
 
 							$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
@@ -768,7 +858,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 								}
 								$name .= (string) $parent;
 
-								self::$sources[ $theme_base ] = $name;
+								self::$sources['themes'][ $theme_base ] = $name;
 								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
 							}
 						}
@@ -903,7 +993,6 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			}
 
 			if ( 'top' === $which ) {
-				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security' );
 
 				?>
 				<script>
@@ -1088,6 +1177,25 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				if ( 'top' === $which ) {
 					?>
 
+				<div class="">
+					<?php
+					if ( ! empty( self::$sources['plugins'] ) ) {
+						?>
+							<select name="plugin_filter">
+								<option value="-1"><?php \esc_html_e( 'Filter by plugin' ); ?></option>
+								<?php
+								foreach ( self::$sources['plugins'] as $plugin_base => $plugin ) {
+									?>
+								<option value="<?php echo $plugin_base; ?>"><?php echo $plugin['Name']; ?></option>
+									<?php
+								}
+								?>
+							</select>
+							<input type="submit" name="filter_action" id="doaction" class="button action" value="Apply">
+							<?php
+					}
+					?>
+				</div>
 				<style>
 					.checkbox-wrapper-2 label{
 						margin-right: 7px !important;
@@ -1180,7 +1288,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						?>
 					</div>
 				</div>
-				<div style="margin: 1em;>
+				<div style="margin: 1em;">
 					<label for="single_severity_filter_<?php echo \esc_attr( $which ); ?>">
 						<?php echo \esc_html__( 'or choose single everity to filter for: ', '0-day-analytics' ); ?>
 					</label>
@@ -1313,17 +1421,17 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 */
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {
-				\wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security', false );
 			}
 			?>
 			<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
-				<?php if ( $this->has_items() ) : ?>
+				<?php if ( $this->has_items() ) { ?>
 				<div class="alignleft actions bulkactions">
 						<?php $this->bulk_actions( $which ); ?>
 				</div>
 						<?php
-						endif;
+				}
 				?>
 
 				<br class="clear" />

@@ -52,6 +52,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		private static $theme_path = '';
 
 		/**
+		 * Class cache for checked paths and their belonging to plugins.
+		 *
+		 * @var array
+		 *
+		 * @since 2.8.2
+		 */
+		private static $paths_to_plugins = array();
+
+		/**
 		 * Fulfills the inner array of plugins with data if not already loaded.
 		 *
 		 * @return array
@@ -76,8 +85,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 * @since 1.1.0
 		 */
 		public static function get_plugin_from_path( string $path_name ): array {
+			if ( isset( self::$paths_to_plugins[ $path_name ] ) ) {
+				return self::$paths_to_plugins[ $path_name ];
+			}
 			foreach ( self::get_plugins() as $path => $plugin ) {
 				if ( \str_starts_with( $path, $path_name . \DIRECTORY_SEPARATOR ) ) {
+					self::$paths_to_plugins[ $path_name ] = $plugin;
 					return $plugin;
 				}
 			}

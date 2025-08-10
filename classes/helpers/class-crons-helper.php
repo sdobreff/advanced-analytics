@@ -170,11 +170,15 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 		 *
 		 * @return bool|\WP_Error
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		public static function run_cron_api( ?\WP_REST_Request $request = null ) {
 			if ( null !== $request ) {
 				$cron_hash = $request->get_param( 'cron_hash' );
+
+				if ( ! defined( 'DOING_CRON' ) ) {
+					define( 'DOING_CRON', true );
+				}
 
 				$result = self::execute_event( $cron_hash );
 				if ( ! $result ) {
