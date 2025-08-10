@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		private static $plugins_bases = array();
 
@@ -89,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 2.8.2
 		 */
 		public static function get_plugins_bases(): array {
 			if ( empty( self::$plugins_bases ) ) {

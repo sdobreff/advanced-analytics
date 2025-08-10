@@ -377,7 +377,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 					window.addEventListener("load", () => {
 						jQuery( '.switch_plugin_version' ).on( 'click', function(e) {
 							var data = {
-								'action': 'aadvana_extract_plugin_versions',
+								'action': '<?php echo ADVAN_PREFIX; ?>extract_plugin_versions',
 								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
 								'plugin_slug': jQuery(this).data('plugin-slug')
 							};
@@ -394,8 +394,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 									// if nothing returns then it means no notification available for now
 									if (jQuery.trim(data.data)) {
 										
-										jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).html(data.data).show();
-										jQuery('#aadvana_switch_plugin_to_version_' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).html(data.data).show();
+										jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>switch_plugin_to_version_' + jQuery(that).data('plugin-slug')).html(data.data).show();
 										that.remove();
 									}
 								},
@@ -416,10 +416,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 							}
 
 							jQuery( that ).addClass( 'disabled' );
-							jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).addClass( 'disabled' );
+							jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).addClass( 'disabled' );
 					
 							var data = {
-								'action': 'aadvana_switch_plugin_version',
+								'action': '<?php echo \esc_attr( ADVAN_PREFIX ); ?>switch_plugin_version',
 								'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>',
 								'plugin_slug': jQuery(this).data('plugin-slug'),
 								'version': selectedVersion
@@ -433,7 +433,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 								},
 								error: function(jqXHR, textStatus, errorThrown) { 
 									jQuery( that ).removeClass( 'disabled' );
-									jQuery('#aadvana_' + jQuery(that).data('plugin-slug')).removeClass( 'disabled' );
+									jQuery('#<?php echo \esc_attr( ADVAN_PREFIX ); ?>' + jQuery(that).data('plugin-slug')).removeClass( 'disabled' );
 								}
 							});
 						});

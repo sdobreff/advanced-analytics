@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
+use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Lists\Table_List;
@@ -49,11 +50,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public const OPTIONS_PAGE_SLUG = 'analytics-options-page';
 
-		public const SETTINGS_FILE_FIELD = 'aadvana_import_file';
+		public const SETTINGS_FILE_FIELD = ADVAN_PREFIX . 'import_file';
 
-		public const SETTINGS_FILE_UPLOAD_FIELD = 'aadvana_import_upload';
+		public const SETTINGS_FILE_UPLOAD_FIELD = ADVAN_PREFIX . 'import_upload';
 
-		public const SETTINGS_VERSION = 'aadvana_plugin_version';
+		public const SETTINGS_VERSION = ADVAN_PREFIX . 'plugin_version';
 
 		public const PAGE_SLUG = 'wp-control_page_advan_logs_settings';
 
@@ -216,7 +217,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			/**
 			 * Draws the save button in the settings
 			 */
-			\add_action( 'aadvana_settings_save_button', array( __CLASS__, 'save_button' ) );
+			\add_action( ADVAN_PREFIX . 'settings_save_button', array( __CLASS__, 'save_button' ) );
 		}
 
 		/**
@@ -244,7 +245,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 							else {
 
 								var data = {
-									'action': 'aadvana_get_notification_data',
+									'action': '<?php echo ADVAN_PREFIX; ?>get_notification_data',
 									'_wpnonce': '<?php echo \wp_create_nonce( 'advan-plugin-data', 'advanced-analytics-security' ); ?>',
 								};
 
@@ -462,6 +463,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'transients_module_enabled'       => true,
 					'tables_module_enabled'           => true,
 					'advana_rest_requests_clear'      => 'weekly',
+					'advana_error_log_clear'          => '-1',
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -673,6 +675,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				if ( isset( $_REQUEST['reset-settings'] ) && \check_admin_referer( 'reset-plugin-settings', 'reset_nonce' ) ) {
 
 					\delete_option( ADVAN_SETTINGS_NAME );
+
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'error_log_clear' );
 
 					// Redirect to the plugin settings page.
 					\wp_safe_redirect(
@@ -1120,7 +1125,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				<div class="aadvana-panel-content">
 
-					<form method="post" name="aadvana_form" id="aadvana_form" enctype="multipart/form-data">
+					<form method="post" name="<?php echo \esc_attr( ADVAN_PREFIX ); ?>form" id="<?php echo \esc_attr( ADVAN_PREFIX ); ?>form" enctype="multipart/form-data">
 
 						<div class="aadvana-tab-head">
 							<div id="aadvana-options-search-wrap">
@@ -1132,7 +1137,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 							<div class="awefpanel-head-elements">
 
-							<?php \do_action( 'aadvana_settings_save_button' ); ?>
+							<?php \do_action( ADVAN_PREFIX . 'settings_save_button' ); ?>
 
 							
 								<ul>
@@ -1169,7 +1174,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 								<?php
 								include_once \ADVAN_PLUGIN_ROOT . 'classes/settings/settings-options/' . $tab . '.php';
 
-								\do_action( 'aadvana_plugin_options_tab_' . $tab );
+								\do_action( ADVAN_PREFIX . 'plugin_options_tab_' . $tab );
 								?>
 
 							</div>
@@ -1179,11 +1184,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						?>
 
 						<?php \wp_nonce_field( 'aadvana-plugin-data', 'aadvana-security' ); ?>
-						<input type="hidden" name="action" value="aadvana_plugin_data_save" />
+						<input type="hidden" name="action" value="<?php echo \esc_attr( ADVAN_PREFIX ); ?>plugin_data_save" />
 
 						<div class="aadvana-footer">
 
-						<?php \do_action( 'aadvana_settings_save_button' ); ?>
+						<?php \do_action( ADVAN_PREFIX . 'settings_save_button' ); ?>
 						</div>
 					</form>
 
@@ -1532,6 +1537,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			$advanced_options['transients_module_enabled'] = ( array_key_exists( 'transients_module_enabled', $post_array ) ) ? filter_var( $post_array['transients_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['tables_module_enabled']     = ( array_key_exists( 'tables_module_enabled', $post_array ) ) ? filter_var( $post_array['tables_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			// Modules end.
+
+			// Crons.
+			$advanced_options['advana_rest_requests_clear'] = ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) ? ( in_array( $post_array['advana_rest_requests_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_rest_requests_clear'] : self::get_option( 'advana_rest_requests_clear' ) ) : self::get_option( 'advana_rest_requests_clear' );
+
+			$advanced_options['advana_error_log_clear'] = ( array_key_exists( 'advana_error_log_clear', $post_array ) ) ? ( in_array( $post_array['advana_error_log_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_error_log_clear'] : self::get_option( 'advana_error_log_clear' ) ) : self::get_option( 'advana_error_log_clear' );
+
+			if ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) {
+				if ( -1 === (int) $post_array['advana_rest_requests_clear'] ) {
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
+					$advanced_options['advana_rest_requests_clear'] = '-1';
+				}
+			}
+
+			if ( array_key_exists( 'advana_error_log_clear', $post_array ) ) {
+				if ( -1 === (int) $post_array['advana_error_log_clear'] ) {
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'error_log_clear' );
+					$advanced_options['advana_error_log_clear'] = '-1';
+				}
+			}
+			// Crons end.
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 

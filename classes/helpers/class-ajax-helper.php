@@ -16,7 +16,6 @@ use ADVAN\Controllers\Slack;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
-use ADVAN\Controllers\Reverse_Line_Reader;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Controllers\Telegram_API;
 use ADVAN\Lists\Logs_List;
@@ -62,42 +61,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				/**
 				 * Save Options
 				 */
-				\add_action( 'wp_ajax_aadvana_plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
 
 				/**
 				 * Delete Cron
 				 */
-				\add_action( 'wp_ajax_aadvana_delete_cron', array( __CLASS__, 'delete_cron' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'delete_cron', array( __CLASS__, 'delete_cron' ) );
 
 				/**
 				 * Run Cron
 				 */
-				\add_action( 'wp_ajax_aadvana_run_cron', array( __CLASS__, 'run_cron' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'run_cron', array( __CLASS__, 'run_cron' ) );
 
 				/**
 				 * Delete Cron
 				 */
-				\add_action( 'wp_ajax_aadvana_delete_transient', array( __CLASS__, 'delete_transient' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'delete_transient', array( __CLASS__, 'delete_transient' ) );
 
 				/**
 				 * Store Slack API key
 				 */
-				\add_action( 'wp_ajax_aadvana_store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
 
 				/**
 				 * Send Slack test message
 				 */
-				\add_action( 'wp_ajax_aadvana_send_test_slack', array( __CLASS__, 'slack_test_message_ajax' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'send_test_slack', array( __CLASS__, 'slack_test_message_ajax' ) );
 
 				/**
 				 * Send telegram test message
 				 */
-				\add_action( 'wp_ajax_aadvana_send_test_telegram', array( __CLASS__, 'telegram_test_message_ajax' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'send_test_telegram', array( __CLASS__, 'telegram_test_message_ajax' ) );
 
 				/**
 				 * Store Telegram API key
 				 */
-				\add_action( 'wp_ajax_aadvana_store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
 
 				/**
 				 * Show the code source
@@ -115,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 *
 				 * @since 1.9.3
 				 */
-				\add_action( 'wp_ajax_aadvana_get_notification_data', array( __CLASS__, 'get_notification_data' ) );
+				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'get_notification_data', array( __CLASS__, 'get_notification_data' ) );
 
 				if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
 					/**
@@ -125,7 +124,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @since 1.9.7
 					 */
-					\add_action( 'wp_ajax_aadvana_extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
+					\add_action( 'wp_ajax_'.ADVAN_PREFIX.'extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
 
 					/**
 					 * Switch plugin versions
@@ -134,7 +133,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @since 1.9.7
 					 */
-					\add_action( 'wp_ajax_aadvana_switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
+					\add_action( 'wp_ajax_'.ADVAN_PREFIX.'switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
 				}
 			}
 		}
@@ -165,43 +164,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 		public static function truncate_and_keep_log_file() {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
+			// Suppress the ouptut which plugin generates during internal operations.
 			\ob_start();
-
-			Error_Log::suppress_error_logging();
-
-			$file_and_path = Error_Log::autodetect();
-
-			$dirname = pathinfo( $file_and_path, PATHINFO_DIRNAME );
-			$dirname = realpath( $dirname );
-
-			$temp_file = File_Helper::generate_random_file_name() . '.log';
-
-			$new_log_file = trailingslashit( $dirname ) . $temp_file;
-
-			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
-
-			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
-
-			Error_Log::clear( $file_and_path );
-			Log_Line_Parser::delete_last_parsed_timestamp();
-
-			File_Helper::remove_empty_lines_low_memory( $new_log_file );
-
-			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
-
-			Reverse_Line_Reader::set_temp_handle_from_file_path( $new_log_file );
-
-			$items = Logs_List::get_error_items( true, Settings::get_option( 'keep_error_log_records_truncate' ) );
-
-			Error_Log::clear( $file_and_path );
-			Log_Line_Parser::delete_last_parsed_timestamp();
-
-			File_Helper::remove_empty_lines_low_memory( $new_log_file );
-
-			rename( $new_log_file, $file_and_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
-
-			Error_Log::enable_error_logging();
-
+			Error_Log::truncate_and_keep_errors();
 			\ob_clean();
 
 			\wp_send_json_success( 2 );

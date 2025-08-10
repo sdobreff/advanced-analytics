@@ -212,7 +212,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			<p class="search-box" style="position:relative">
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo \esc_html( $text ); ?>:</label>
 
-				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="<?php echo \esc_attr( ADVAN_PREFIX ); ?>search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
 				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
@@ -662,7 +662,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 								});
 
 								var data = {
-									'action': 'aadvana_delete_transient',
+									'action': '<?php echo ADVAN_PREFIX; ?>delete_transient',
 									'post_type': 'GET',
 									'_wpnonce': jQuery(this).data('nonce'),
 									'id': jQuery(this).data('id'),

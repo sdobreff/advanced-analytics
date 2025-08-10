@@ -721,7 +721,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 								});
 
 								var data = {
-									'action': 'aadvana_delete_cron',
+									'action': '<?php echo ADVAN_PREFIX; ?>delete_cron',
 									'post_type': 'GET',
 									'_wpnonce': jQuery(this).data('nonce'),
 									'hash': jQuery(this).data('hash'),

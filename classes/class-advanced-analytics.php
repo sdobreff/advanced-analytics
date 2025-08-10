@@ -26,6 +26,7 @@ use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Display_Environment_Type;
+use ADVAN\Controllers\Error_Log;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Lists\Table_List;
 
@@ -38,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 	 */
 	class Advanced_Analytics {
 
-		public const REDIRECT_OPTION_NAME = 'aadvana_plugin_do_activation_redirect';
+		public const REDIRECT_OPTION_NAME = ADVAN_PREFIX . 'plugin_do_activation_redirect';
 
 		/**
 		 * Inits the class and hooks
@@ -110,6 +111,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( Settings::get_option( 'requests_module_enabled' ) ) {
 				Requests_List::init();
 			}
+
+			Logs_list::init();
 		}
 
 		/**

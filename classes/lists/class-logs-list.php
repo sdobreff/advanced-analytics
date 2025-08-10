@@ -144,6 +144,17 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		}
 
 		/**
+		 * Inits class hooks. That is called every time - not in some specific environment set.
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function init() {
+			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+		}
+
+		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args - Events query arguments.
@@ -186,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			<p class="search-box" style="position:relative">
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo \esc_html( $text ); ?>:</label>
 
-				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="aadvana_search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" class="<?php echo \esc_attr( ADVAN_PREFIX ); ?>search_input" name="<?php echo \esc_attr( self::SEARCH_INPUT ); ?>" value="<?php echo \esc_attr( self::escaped_search_input() ); ?>" />
 
 			<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
 			</p>
@@ -1919,6 +1930,42 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			foreach ( self::$items_collected as $item ) {
 				$this->single_row( $item );
 			}
+		}
+
+		/**
+		 * Adds a cron job for truncating the records in the requests table
+		 *
+		 * @param array $crons - The array with all the crons associated with the plugin.
+		 *
+		 * @return array
+		 *
+		 * @since 2.8.2
+		 */
+		public static function add_cron_job( $crons ) {
+			if ( -1 !== (int) Settings::get_option( 'advana_error_log_clear' ) ) {
+				$crons[ ADVAN_PREFIX . 'error_log_clear' ] = array(
+					'time' => Settings::get_option( 'advana_error_log_clear' ),
+					'hook' => array( __CLASS__, 'truncate_error_log' ),
+					'args' => array(),
+				);
+			}
+
+			return $crons;
+		}
+
+		/**
+		 * Truncates the requests table from CRON job
+		 *
+		 * @return void
+		 *
+		 * @since 2.8.2
+		 */
+		public static function truncate_error_log() {
+
+			// Suppress the output which plugin generates during internal operations.
+			\ob_start();
+			Error_Log::truncate_and_keep_errors();
+			\ob_clean();
 		}
 	}
 }

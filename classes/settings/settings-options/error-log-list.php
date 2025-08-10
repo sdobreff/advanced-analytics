@@ -215,6 +215,25 @@ Settings::set_current_options( $settings );
 		)
 	);
 
+	$schedules = \wp_get_schedules();
+	$options   = array(
+		'-1' => esc_html__( 'Never', 'wp-security-audit-log' ),
+	);
+	foreach ( $schedules as $schedule => $text ) {
+		$options[ $schedule ] = $text['display'];
+	}
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Clear error log every', '0-day-analytics' ),
+			'id'      => 'advana_error_log_clear',
+			'type'    => 'select',
+			'hint'    => \esc_html__( 'That will clear the log but will leave last results selected in the settings above.', '0-day-analytics' ),
+			'options' => $options,
+			'default' => Settings::get_option( 'advana_error_log_clear' ),
+		)
+	);
+
 	// Columns of types of errors showing.
 	Settings::build_option(
 		array(

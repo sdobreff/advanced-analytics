@@ -101,7 +101,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 2.8.2 =
-As of this version you can disable individual modules (if you are not using them) or enable them only when needed. Cron job introduced for auto clearing the requests table. Switched cron execution from AJAX to REST API.
+As of this version you can disable individual modules (if you are not using them) or enable them only when needed. Cron job introduced for auto clearing the requests table. Switched cron execution from AJAX to REST API. Filter error log results by Plugin (if there are results). Cron job introduced for auto clearing the error log file (leaving last records based on the selected value from settings). 
 
 = 2.8.1 =
 Option to copy and share Request / Response from the request details. Code optimizations. Error log filtering enhancements.

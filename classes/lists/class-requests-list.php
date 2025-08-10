@@ -116,7 +116,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		}
 
 		/**
-		 * Inits class hooks.
+		 * Inits class hooks. That is called every time - not in some specific environment set.
 		 *
 		 * @return void
 		 *
@@ -136,12 +136,11 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @since 2.8.2
 		 */
 		public static function add_cron_job( $crons ) {
-			if ( '' !== Settings::get_option( 'advana_rest_requests_clear' ) ) {
-				$crons['aadvana_request_table_clear'] = array(
+			if ( -1 !== (int) Settings::get_option( 'advana_rest_requests_clear' ) ) {
+				$crons[ ADVAN_PREFIX . 'request_table_clear' ] = array(
 					'time' => Settings::get_option( 'advana_rest_requests_clear' ),
 					'hook' => array( __CLASS__, 'truncate_requests_table' ),
 					'args' => array(),
-				// 'next_run' => '00:00 first day of next month',
 				);
 			}
 
@@ -156,7 +155,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @since 2.8.2
 		 */
 		public static function truncate_requests_table() {
-			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name());
+			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name() );
 		}
 
 		/**

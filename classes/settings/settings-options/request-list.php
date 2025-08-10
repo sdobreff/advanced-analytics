@@ -80,7 +80,7 @@ Settings::set_current_options( $settings );
 
 	$schedules = \wp_get_schedules();
 	$options   = array(
-		'' => esc_html__( 'Never', 'wp-security-audit-log' ),
+		'-1' => esc_html__( 'Never', 'wp-security-audit-log' ),
 	);
 	foreach ( $schedules as $schedule => $text ) {
 		$options[ $schedule ] = $text['display'];
