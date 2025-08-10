@@ -497,7 +497,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 			Log_Line_Parser::store_last_parsed_timestamp();
 
-			if ( ! empty( self::$query_args ) && isset( self::$query_args['plugin_filter'] ) && ! empty( self::$query_args['plugin_filter'] ) ) {
+			if ( ! empty( self::$query_args ) && isset( self::$query_args['plugin_filter'] ) && ! empty( self::$query_args['plugin_filter'] ) && -1 !== (int) self::$query_args['plugin_filter'] ) {
 				$s = self::$query_args['plugin_filter'];
 
 				$errors = array_filter(
@@ -1182,11 +1182,18 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					if ( ! empty( self::$sources['plugins'] ) ) {
 						?>
 							<select name="plugin_filter">
-								<option value="-1"><?php \esc_html_e( 'Filter by plugin' ); ?></option>
+								<option value="-1"><?php \esc_html_e( '- Choose plugin to filter -' ); ?></option>
 								<?php
 								foreach ( self::$sources['plugins'] as $plugin_base => $plugin ) {
+
+									$selected = '';
+
+									if ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] && $plugin_base === $_REQUEST['plugin_filter'] ) {
+
+										$selected = 'selected="selected"';
+									}
 									?>
-								<option value="<?php echo $plugin_base; ?>"><?php echo $plugin['Name']; ?></option>
+								<option <?php echo $selected; ?> value="<?php echo $plugin_base; ?>"><?php echo $plugin['Name']; ?></option>
 									<?php
 								}
 								?>
@@ -1537,7 +1544,12 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 
 				</style>
+					<?php
+					if ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) {
+					} else {
+						?>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
+					<?php } ?>
 				
 				<div class="tooltip"><?php \esc_html_e( 'Copied', '0-day-analytics' ); ?></div>
 					

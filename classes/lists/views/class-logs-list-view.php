@@ -15,6 +15,7 @@ namespace ADVAN\Lists\Views;
 
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\WP_Helper;
+use ADVAN\Helpers\Plugin_Theme_Helper;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -85,6 +86,15 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Logs_List_View' ) ) {
 		public static function page_load() {
 			if ( ! empty( $_GET['single_severity_filter_top'] ) ) {
 				WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
+
+				if ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) {
+					if ( ! \in_array( $_REQUEST['plugin_filter'], ( Plugin_Theme_Helper::get_plugins_bases() ) ) ) {
+						\wp_redirect(
+							\remove_query_arg( array( 'severity_filter', 'bulk_action', 'single_severity_filter_top', 'filter_action', 'plugin_filter' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
+						);
+						exit;
+					}
+				}
 
 				\wp_redirect(
 					\remove_query_arg( array( 'severity_filter', 'bulk_action', 'single_severity_filter_top', 'filter_action' ), \wp_unslash( $_SERVER['REQUEST_URI'] ) )
