@@ -358,8 +358,29 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			}
 
+			if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
+
+				$s = sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) );
+				if ( 'single_event' === $s ) {
+					$s                = '';
+					self::$read_items = array_filter(
+						self::$read_items,
+						function ( $event ) use ( $s ) {
+							return ( $s === $event['recurrence'] );
+						}
+					);
+				} else {
+					self::$read_items = array_filter(
+						self::$read_items,
+						function ( $event ) use ( $s ) {
+							return ( false !== strpos( $event['recurrence'], $s ) );
+						}
+					);
+				}
+			}
+
 			if ( ! empty( $_REQUEST[ self::SEARCH_INPUT ] ) && is_string( $_REQUEST[ self::SEARCH_INPUT ] ) ) {
-				$s = sanitize_text_field( wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) );
+				$s = sanitize_text_field( \wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) );
 
 				self::$read_items = array_filter(
 					self::$read_items,
@@ -702,7 +723,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {
-				wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+				\wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 
 				?>
 				<script>
@@ -853,13 +874,50 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			?>
 			<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
-					<?php if ( $this->has_items() ) : ?>
+			<?php
+			if ( $this->has_items() ) {
+				?>
 				<div class="alignleft actions bulkactions">
 						<?php $this->bulk_actions( $which ); ?>
 				</div>
-						<?php
-					endif;
+
+				<?php
+			}
+				if ( 'top' === $which ) {
 					?>
+				<div class="alignleft actions">
+					<select class="schedules-filter" name="schedules_filter">
+						<?php
+						$schedules = \wp_get_schedules();
+						uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
+						?>
+						<option value=""><?php esc_html_e( 'All Schedules', '0-day-analytics' ); ?></option>
+							<?php
+							foreach ( $schedules as $schedule_id => $schedule ) {
+
+								$selected = '';
+
+								if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
+									if ( $schedule_id === $_REQUEST['schedules_filter'] ) {
+										$selected = 'selected="selected"';
+									}
+								}
+								?>
+							<option value="<?php echo esc_attr( $schedule_id ); ?>" <?php echo $selected; ?>><?php echo esc_html( $schedule['display'] ); ?></option>
+						<?php } ?>
+						<option value="single_event" <?php echo ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) && 'single_event' === $_REQUEST['schedules_filter'] ) ? 'selected="selected"' : ''; ?>><?php \esc_html_e( 'Single event', '0-day-analytics' ); ?></option>
+					</select>
+					<?php \submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'schedules-submit' ) ); ?>
+				</div>
+				<?php } 
+			if ( $this->has_items() ) {?>
+				<div class="tablenav-pages one-page">
+					<span class="displaying-num"><?php echo \esc_html( count( self::get_cron_items() ) . ' ' . __( 'events', '0-day-analytics' ) ); ?></span>
+				</div>
+
+				<?php
+			}
+			?>
 
 				<br class="clear" />
 			</div>
@@ -870,7 +928,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				$schedules = \wp_get_schedules();
 				uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
 				?>
-				<h2><?php esc_html_e( 'Available schedules', '0-day-analytics' ); ?></h2>
+				<h2><?php \esc_html_e( 'Available schedules', '0-day-analytics' ); ?></h2>
 				<table class="widefat striped" style="width:auto">
 					<thead>
 						<tr>

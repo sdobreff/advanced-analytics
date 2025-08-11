@@ -231,12 +231,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function load_custom_wp_admin_style( $hook ) {
 			?>
+			<?php if ( ! self::get_option( 'browser_notifications_not_send' ) ) { ?>
 				<script>
 					window.addEventListener("load", () => {
 
 						if ( ( "Notification" in window ) && Notification.permission === "granted" ) {
 							// following makes an AJAX call to PHP to get notification every 10 secs
-							setInterval(function() { pushNotify(); }, 10000);
+							setInterval(function() { pushNotify(); }, <?php echo (int) ( (int) self::get_option( 'browser_notifications_seconds' ) * 1000 ); ?>);
 						}
 
 						function pushNotify() {
@@ -284,6 +285,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 					});
 				</script>
+
+				<?php } ?>
 
 			<?php
 
@@ -464,6 +467,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'tables_module_enabled'           => true,
 					'advana_rest_requests_clear'      => 'weekly',
 					'advana_error_log_clear'          => '-1',
+					'browser_notifications_seconds'   => 10,
+					'browser_notifications_not_send'  => false,
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -1510,8 +1515,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['no_wp_die_monitor'] = ( array_key_exists( 'no_wp_die_monitor', $post_array ) ) ? filter_var( $post_array['no_wp_die_monitor'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
+			$advanced_options['browser_notifications_not_send'] = ( array_key_exists( 'browser_notifications_not_send', $post_array ) ) ? filter_var( $post_array['browser_notifications_not_send'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
 			$advanced_options['keep_error_log_records_truncate'] = ( array_key_exists( 'keep_error_log_records_truncate', $post_array ) ) ? filter_var(
 				$post_array['keep_error_log_records_truncate'],
+				\FILTER_VALIDATE_INT,
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 100,
+					),
+				)
+			) : 10;
+
+			$advanced_options['browser_notifications_seconds'] = ( array_key_exists( 'browser_notifications_seconds', $post_array ) ) ? filter_var(
+				$post_array['browser_notifications_seconds'],
 				\FILTER_VALIDATE_INT,
 				array(
 					'options' => array(
@@ -1730,8 +1748,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
 					self::get_error_log_page_link(),
 					__( 'Error Log', 'wp-security-audit-log' ),
-					( self::get_option( 'crons_module_enabled' ) ) ? self::get_crons_page_link() : '',
-					( self::get_option( 'crons_module_enabled' ) ) ? __( 'Crons', 'wp-security-audit-log' ) : '',
+					( self::get_option( 'cron_module_enabled' ) ) ? self::get_crons_page_link() : '',
+					( self::get_option( 'cron_module_enabled' ) ) ? __( 'Crons', 'wp-security-audit-log' ) : '',
 					( self::get_option( 'tables_module_enabled' ) ) ? self::get_tables_page_link() : '',
 					( self::get_option( 'tables_module_enabled' ) ) ? __( 'Tables', 'wp-security-audit-log' ) : '',
 					( self::get_option( 'transients_module_enabled' ) ) ? self::get_transients_page_link() : '',

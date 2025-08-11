@@ -1,6 +1,6 @@
 <?php
 /**
- * Requests log class - showing the pointers where necessary.
+ * Requests log class - captures the requests and fulfills the log table with the results.
  *
  * @package 0-day-analytics
  *

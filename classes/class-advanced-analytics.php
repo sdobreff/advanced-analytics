@@ -21,12 +21,10 @@ use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Migration\Migration;
 use ADVAN\Controllers\Pointers;
-use ADVAN\Helpers\Review_Plugin;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Display_Environment_Type;
-use ADVAN\Controllers\Error_Log;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Lists\Table_List;
 
@@ -87,20 +85,6 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				}
 			}
 
-			// if ( \WP_DEBUG ) {
-				// \set_error_handler( '\ADVAN\Helpers\WP_Error_Handler::handle_error' );
-
-				// \register_shutdown_function(
-				// function() {
-				// $error = error_get_last();
-				// if ( $error && 1 === $error['type'] ) {
-				// Implement notifications here.
-
-				// Advanced_Analytics::shutdown();
-				// }
-				// }
-				// );
-			// }
 			if ( \is_admin() ) {
 				Ajax_Helper::init();
 			}
@@ -130,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		public static function add_settings_link( $links, $file ) {
 			if ( ADVAN_PLUGIN_BASENAME === $file ) {
 
-				if ( ( Settings::get_option( 'crons_module_enabled' ) ) ) {
+				if ( ( Settings::get_option( 'cron_module_enabled' ) ) ) {
 					$settings_link = '<a href="' . esc_url( Settings::get_crons_page_link() ) . '">' . \esc_html__( 'Cron Jobs', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
@@ -158,8 +142,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 *
 		 * Add options to plugin meta line
 		 *
-		 * @param string $links  Current links.
-		 * @param string $file   File in use.
+		 * @param string $links  - Current links.
+		 * @param string $file   - File in use.
 		 *
 		 * @return string Links, now with settings added.
 		 *
@@ -236,16 +220,11 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		 */
 		public static function powered_by() {
 			if ( Context_Helper::is_front() ) {
-				?><!--
-				<?php
 				printf(
 					/* Translators: Plugin link. */
 					esc_html__( 'Proudly powered by %s', '0-day-analytics' ),
-					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/awesome-footnotes/', '0-day-analytics' ) ) . '" rel="nofollow">' . esc_attr( ADVAN_NAME ) . '</a>'
+					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/0-day-analytics/', '0-day-analytics' ) ) . '" rel="nofollow">' . esc_attr( ADVAN_NAME ) . '</a>'
 				);
-				?>
-				-->
-				<?php
 			}
 		}
 
@@ -279,13 +258,13 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Action for _doing_it_wrong() calls.
 		 *
-		 * @since 1.9.2.2
-		 *
 		 * @param string $function_name The function that was called.
 		 * @param string $message       A message explaining what has been done incorrectly.
 		 * @param string $version       The version of WordPress where the message was added.
 		 *
 		 * @return void
+		 *
+		 * @since 1.9.2.2
 		 */
 		public static function action_doing_it_wrong_run( $function_name, $message, $version ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
@@ -322,14 +301,14 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Filter for _doing_it_wrong() calls.
 		 *
-		 * @since 1.9.2.2
-		 *
 		 * @param bool|mixed $trigger       Whether to trigger the error for _doing_it_wrong() calls. Default true.
 		 * @param string     $function_name The function that was called.
 		 * @param string     $message       A message explaining what has been done incorrectly.
 		 * @param string     $version       The version of WordPress where the message was added.
 		 *
 		 * @return bool
+		 *
+		 * @since 1.9.2.2
 		 */
 		public static function filter_doing_it_wrong_trigger_error( $trigger, $function_name, $message, $version ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
@@ -343,12 +322,12 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		/**
 		 * Whether it is the just_in_time_error for 0-Day-related domains.
 		 *
-		 * @since 1.9.2.2
-		 *
 		 * @param string $function_name Function name.
 		 * @param string $message       Message.
 		 *
 		 * @return bool
+		 *
+		 * @since 1.9.2.2
 		 */
 		public static function is_just_in_time_for_0_day_domain( string $function_name, string $message ): bool {
 			return '_load_textdomain_just_in_time' === $function_name && strpos( $message, '<code>' . ADVAN_TEXTDOMAIN ) !== false;

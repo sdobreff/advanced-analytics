@@ -863,7 +863,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		 */
 		public static function is_admin_page(): bool {
 
-			return \is_admin() && ( Settings::is_plugin_settings_page() );
+			return \is_admin() && ! \wp_doing_ajax() && ( Settings::is_plugin_settings_page() );
 		}
 	}
 }

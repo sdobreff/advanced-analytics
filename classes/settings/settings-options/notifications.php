@@ -242,8 +242,30 @@ Settings::set_current_options( $settings );
 				'name'    => \esc_html__( 'Push notifications info', '0-day-analytics' ),
 				'id'      => 'info_push_notifications',
 				'type'    => 'message',
-				'text'    => \esc_html__( 'Push notifications are enabled for this browser, if you want to disable them, refer to the browser documentation.', '0-day-analytics' ),
+				'text'    => \esc_html__( 'Push notifications are enabled for this browser, if you want to disable them (for this browser), refer to the browser documentation.', '0-day-analytics' ),
 				'default' => \esc_html__( 'Enable push notifications', '0-day-analytics' ),
+			)
+		);
+
+		Settings::build_option(
+			array(
+				'name'    => \esc_html__( 'Do not send browser notifications', '0-day-analytics' ),
+				'id'      => 'browser_notifications_not_send',
+				'type'    => 'checkbox',
+				'hint'    => \esc_html__( 'Enabling this will prevent plugin from sending notifications, but they will still be enabled for this site in this browser.', '0-day-analytics' ),
+				'default' => Settings::get_option( 'browser_notifications_not_send' ),
+			)
+		);
+
+		Settings::build_option(
+			array(
+				'name'    => \esc_html__( 'How many seconds to wait before check for now errors?', '0-day-analytics' ),
+				'id'      => 'browser_notifications_seconds',
+				'type'    => 'number',
+				'min'     => 1,
+				'max'     => 100,
+				'hint'    => \esc_html__( 'Set how seconds before checking for new errors and sending notification. Maximum allowed number is 100, minimum is 1.', '0-day-analytics' ),
+				'default' => Settings::get_option( 'browser_notifications_seconds' ),
 			)
 		);
 
