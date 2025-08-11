@@ -390,6 +390,15 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				);
 			}
 
+			if ( ! empty( $_REQUEST['event_type'] ) && is_string( $_REQUEST['event_type'] ) ) {
+				$hooks_type = \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) );
+				$filtered   = self::get_filtered_events( self::$read_items );
+
+				if ( isset( $filtered[ $hooks_type ] ) ) {
+					self::$read_items = $filtered[ $hooks_type ];
+				}
+			}
+
 			if ( null !== self::$read_items ) {
 				uasort( self::$read_items, array( __CLASS__, 'uasort_order_events' ) );
 			}
@@ -883,34 +892,38 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 				<?php
 			}
-				if ( 'top' === $which ) {
-					?>
+			if ( 'top' === $which ) {
+				?>
 				<div class="alignleft actions">
 					<select class="schedules-filter" name="schedules_filter">
-						<?php
-						$schedules = \wp_get_schedules();
-						uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
-						?>
+					<?php
+					$schedules = \wp_get_schedules();
+					uasort( $schedules, array( __CLASS__, 'sort_schedules' ) );
+					?>
 						<option value=""><?php esc_html_e( 'All Schedules', '0-day-analytics' ); ?></option>
-							<?php
-							foreach ( $schedules as $schedule_id => $schedule ) {
+						<?php
+						foreach ( $schedules as $schedule_id => $schedule ) {
 
-								$selected = '';
+							$selected = '';
 
-								if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
-									if ( $schedule_id === $_REQUEST['schedules_filter'] ) {
-										$selected = 'selected="selected"';
-									}
+							if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
+								if ( $schedule_id === $_REQUEST['schedules_filter'] ) {
+									$selected = 'selected="selected"';
 								}
-								?>
+							}
+							?>
 							<option value="<?php echo esc_attr( $schedule_id ); ?>" <?php echo $selected; ?>><?php echo esc_html( $schedule['display'] ); ?></option>
 						<?php } ?>
 						<option value="single_event" <?php echo ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) && 'single_event' === $_REQUEST['schedules_filter'] ) ? 'selected="selected"' : ''; ?>><?php \esc_html_e( 'Single event', '0-day-analytics' ); ?></option>
 					</select>
 					<?php \submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'schedules-submit' ) ); ?>
 				</div>
-				<?php } 
-			if ( $this->has_items() ) {?>
+					<?php $this->views(); ?>
+
+				<?php
+			}
+			if ( $this->has_items() ) {
+				?>
 				<div class="tablenav-pages one-page">
 					<span class="displaying-num"><?php echo \esc_html( count( self::get_cron_items() ) . ' ' . __( 'events', '0-day-analytics' ) ); ?></span>
 				</div>
@@ -1227,6 +1240,107 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			}
 
 			return $compare;
+		}
+
+		/**
+		 * Display the list of hook types.
+		 *
+		 * @return array<string,string>
+		 *
+		 * @since latest
+		 */
+		public function get_views() {
+
+			$views      = array();
+			$hooks_type = ( $_REQUEST['event_type'] ) ?? '';
+
+			$types = array(
+				// 'all'      => __( 'All events', '0-day-analytics' ),
+				'noaction' => __( 'Events with no action', '0-day-analytics' ),
+				'core'     => __( 'WordPress core events', '0-day-analytics' ),
+				'custom'   => __( 'Custom events', '0-day-analytics' ),
+			// 'url'      => __( 'URL events', '0-day-analytics' ),
+			);
+
+			$filtered = self::get_filtered_events( self::get_cron_items() );
+
+			/**
+			 * @var array<string,string> $types
+			 */
+			foreach ( $types as $key => $type ) {
+				if ( ! isset( $filtered[ $key ] ) ) {
+					continue;
+				}
+
+				$count = count( $filtered[ $key ] );
+
+				if ( ! $count ) {
+					continue;
+				}
+
+				$url = \add_query_arg(
+					array(
+						'page'             => self::CRON_MENU_SLUG,
+						self::SEARCH_INPUT => self::escaped_search_input(),
+						'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+						'event_type'       => $key,
+					),
+					\admin_url( 'admin.php' )
+				);
+
+				$views[ $key ] = sprintf(
+					'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
+					\esc_url( $url ),
+					$hooks_type === $key ? ' class="current"' : '',
+					\esc_html( $type ),
+					\esc_html( \number_format_i18n( $count ) )
+				);
+			}
+
+			return $views;
+		}
+
+		/**
+		 * Returns events filtered by various parameters
+		 *
+		 * @param array<string,stdClass> $events The list of all events.
+		 * @return array<string,array<string,stdClass>> Array of filtered events keyed by filter name.
+		 *
+		 * @since latest
+		 */
+		public static function get_filtered_events( array $events ) {
+
+			$filtered['noaction'] = array_filter(
+				$events,
+				function ( $event ) {
+					$hook_callbacks = $hook_callbacks = Crons_Helper::get_cron_callbacks( $event['hook'] );
+
+					return empty( $hook_callbacks );
+				}
+			);
+
+			$filtered['core'] = array_filter(
+				$events,
+				function ( $event ) {
+					return ( in_array( $event['hook'], Crons_Helper::WP_CORE_CRONS ) );
+				}
+			);
+
+			$filtered['custom'] = array_filter(
+				$events,
+				function ( $event ) {
+					return ( ! in_array( $event['hook'], Crons_Helper::WP_CORE_CRONS ) );
+				}
+			);
+
+			// $filtered['url'] = array_filter(
+			// $events,
+			// function ( $event ) {
+			// return ( 'crontrol_url_cron_job' === $event->hook );
+			// }
+			// );
+
+			return $filtered;
 		}
 	}
 }

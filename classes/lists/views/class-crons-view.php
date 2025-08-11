@@ -117,6 +117,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 							<input type="hidden" name="hash" value="<?php echo esc_attr( $cron_hash ); ?>" />
 							<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
 							<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::UPDATE_ACTION ); ?>" />
+							<?php
+							printf(
+								'<input type="hidden" name="event_type" value="%s"/>',
+								\esc_attr( isset( $_REQUEST['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) ) : '' )
+							);
+							?>
 							<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
 
 							<table class="form-table">
@@ -182,6 +188,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="<?php echo \esc_attr( Crons_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( Crons_List::escaped_search_input() ); ?>" />
 						<input type="hidden" name="action" value="<?php echo \esc_attr( Crons_List::NEW_ACTION ); ?>" />
+						<?php
+							printf(
+								'<input type="hidden" name="event_type" value="%s"/>',
+								\esc_attr( isset( $_REQUEST['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) ) : '' )
+							);
+						?>
 						<?php \wp_nonce_field( Crons_List::NONCE_NAME ); ?>
 
 						<table class="form-table">
@@ -268,12 +280,22 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 						}
 					}
 
-					$page  = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
-					$paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
+					$page = ( isset( $_GET['page'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['page'] ) ) : 1;
+					// $paged = ( isset( $_GET['paged'] ) ) ? filter_input( INPUT_GET, 'paged', FILTER_SANITIZE_NUMBER_INT ) : 1;
 
 					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
-					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
+					// printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
 
+					printf(
+						'<input type="hidden" name="event_type" value="%s"/>',
+						\esc_attr( isset( $_REQUEST['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) ) : '' )
+					);
+
+				?>
+
+						<hr class="wp-header-end">
+
+				<?php
 					echo '<div style="clear:both; float:right">';
 					$events_list->search_box(
 						__( 'Search', '0-day-analytics' ),
@@ -349,7 +371,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 			\wp_safe_redirect(
 				\remove_query_arg(
 					array( 'deleted' ),
-					add_query_arg(
+					\add_query_arg(
 						array(
 							'page'                   => Crons_List::CRON_MENU_SLUG,
 							Crons_List::SEARCH_INPUT => Crons_List::escaped_search_input(),
