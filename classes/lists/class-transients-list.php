@@ -120,15 +120,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		private static $query_order = array();
 
 		/**
-		 * Holds the read lines from error log.
-		 *
-		 * @var array
-		 *
-		 * @since 1.7.0
-		 */
-		private static $read_items = null;
-
-		/**
 		 * Default class constructor.
 		 *
 		 * @param stdClass $query_args Events query arguments.
@@ -334,6 +325,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 * @return array
 		 */
 		protected function get_sortable_columns() {
+			// Currently there is no way to implement sorting because of the way they are stored in the database.
 			return array(
 				// 'transient_name' => array( 'transient_name', false ),
 				// 'schedule'       => array( 'schedule', false, null, null, 'asc' ),
@@ -364,7 +356,54 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 			$this->items = Transients_Helper::get_transient_items( $args );
 
+			// if ( is_array( $this->items ) && ! empty( $this->items ) ) {
+
+			// 	uasort( $this->items, array( __CLASS__, 'uasort_order_events' ) );
+			// }
+
 			return $this->items;
+		}
+
+		/**
+		 * Sorts the events by the selected column.
+		 *
+		 * @param array $a - First item to compare.
+		 * @param array $b - Second item to compare.
+		 *
+		 * @return int
+		 *
+		 * @since 1.4.0
+		 */
+		private static function uasort_order_events( $a, $b ) {
+			$orderby = ( ! empty( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['orderby'] ) ) : 'crontrol_next';
+			$order   = ( ! empty( $_GET['order'] ) && is_string( $_GET['order'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['order'] ) ) : 'asc';
+			$compare = 0;
+
+			switch ( $orderby ) {
+				case 'transient_name':
+					if ( 'asc' === $order ) {
+						$compare = strcmp( $a['transient_name'], $b['transient_name'] );
+					} else {
+						$compare = strcmp( $b['transient_name'], $a['transient_name'] );
+					}
+					break;
+				case 'schedule':
+					if ( 'asc' === $order ) {
+						$compare = ( $a['schedule'] ?? 0 ) <=> ( $b['schedule'] ?? 0 );
+					} else {
+						$compare = ( $b['schedule'] ?? 0 ) <=> ( $a['schedule'] ?? 0 );
+					}
+					break;
+				default:
+					if ( 'asc' === $order ) {
+						$compare = $a['schedule'] <=> $b['schedule'];
+					} else {
+						$compare = $b['schedule'] <=> $a['schedule'];
+					}
+					break;
+			}
+
+			return $compare;
 		}
 
 		/**
@@ -586,7 +625,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 						array(
 							self::SEARCH_INPUT => self::escaped_search_input(),
 							'paged'            => $_REQUEST['paged'] ?? 1,
-							'page'             => Settings::TRANSIENTS_MENU_SLUG,
+							'page'             => self::TRANSIENTS_MENU_SLUG,
 						),
 						\admin_url( 'admin.php' )
 					)

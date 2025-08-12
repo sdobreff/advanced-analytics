@@ -115,22 +115,22 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( ADVAN_PLUGIN_BASENAME === $file ) {
 
 				if ( ( Settings::get_option( 'cron_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . esc_url( Settings::get_crons_page_link() ) . '">' . \esc_html__( 'Cron Jobs', '0-day-analytics' ) . '</a>';
+					$settings_link = '<a href="' . \esc_url( Settings::get_crons_page_link() ) . '">' . \esc_html__( 'Cron Jobs', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
 				if ( ( Settings::get_option( 'transients_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . esc_url( Settings::get_transients_page_link() ) . '">' . \esc_html__( 'Transients', '0-day-analytics' ) . '</a>';
+					$settings_link = '<a href="' . \esc_url( Settings::get_transients_page_link() ) . '">' . \esc_html__( 'Transients', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
 				if ( ( Settings::get_option( 'requests_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . esc_url( Settings::get_requests_page_link() ) . '">' . \esc_html__( 'Requests', '0-day-analytics' ) . '</a>';
+					$settings_link = '<a href="' . \esc_url( Settings::get_requests_page_link() ) . '">' . \esc_html__( 'Requests', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
 				if ( ( Settings::get_option( 'tables_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . esc_url( Settings::get_tables_page_link() ) . '">' . \esc_html__( 'Tables', '0-day-analytics' ) . '</a>';
+					$settings_link = '<a href="' . \esc_url( Settings::get_tables_page_link() ) . '">' . \esc_html__( 'Tables', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
-				$settings_link = '<a href="' . esc_url( Settings::get_settings_page_link() ) . '">' . \esc_html__( 'Error Logs', '0-day-analytics' ) . '</a>';
+				$settings_link = '<a href="' . \esc_url( Settings::get_settings_page_link() ) . '">' . \esc_html__( 'Error Logs', '0-day-analytics' ) . '</a>';
 				array_unshift( $links, $settings_link );
 			}
 
@@ -152,7 +152,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		public static function plugin_meta( $links, $file ) {
 
 			if ( false !== strpos( $file, 'advanced-analytics.php' ) ) {
-				$links = array_merge( $links, array( '<a target="_blank" href="https://wordpress.org/support/plugin/0-day-analytics">' . esc_html__( 'Support', '0-day-analytics' ) . '</a>' ) );
+				$links = array_merge( $links, array( '<a target="_blank" href="https://wordpress.org/support/plugin/0-day-analytics">' . \esc_html__( 'Support', '0-day-analytics' ) . '</a>' ) );
 			}
 
 			return $links;

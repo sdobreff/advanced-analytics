@@ -411,25 +411,25 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 				$offset = absint( $parsed_args['offset'] );
 				$number = absint( $parsed_args['number'] );
 
-				if ( ! empty( $parsed_args['orderby'] ) && \in_array( $parsed_args['orderby'], array( 'transient_name' ) ) ) {
+				// if ( ! empty( $parsed_args['orderby'] ) && \in_array( $parsed_args['orderby'], array( 'transient_name' ) ) ) {
 
-					$orderby = 'option_name';
+				// 	$orderby = 'option_name';
 
-					$order = 'DESC';
+				// 	$order = 'DESC';
 
-					if ( ! empty( $parsed_args['order'] ) && \in_array( $parsed_args['order'], array( 'ASC', 'DESC', 'asc', 'desc' ) ) ) {
+				// 	if ( ! empty( $parsed_args['order'] ) && \in_array( $parsed_args['order'], array( 'ASC', 'DESC', 'asc', 'desc' ) ) ) {
 
-						$order = $parsed_args['order'];
-					}
+				// 		$order = $parsed_args['order'];
+				// 	}
 
-					$sql[] = $wpdb->prepare(
-						'ORDER BY ' . \esc_sql( $orderby ) . ' ' . \esc_sql( $order ) . ' LIMIT %d, %d',
-						$offset,
-						$number
-					);
-				} else {
+				// 	$sql[] = $wpdb->prepare(
+				// 		'ORDER BY ' . \esc_sql( $orderby ) . ' ' . \esc_sql( $order ) . ' LIMIT %d, %d',
+				// 		$offset,
+				// 		$number
+				// 	);
+				// } else {
 					$sql[] = $wpdb->prepare( 'ORDER BY option_id DESC LIMIT %d, %d', $offset, $number );
-				}
+				// }
 			}
 
 			// Combine the SQL parts.

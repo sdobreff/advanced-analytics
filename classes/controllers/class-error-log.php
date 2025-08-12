@@ -103,7 +103,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						sprintf(
 						// translators: the name of the log file.
 							__( 'The current error_log value <code>%s</code> is not supported. Please change it to an absolute path.', '0-day-analytics' ),
-							esc_html( self::$log_file )
+							\esc_html( self::$log_file )
 						)
 					);
 					return self::$last_error;
@@ -114,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						sprintf(
 						// translators: the name of the log file.
 							__( 'The log file <code>%s</code> does not exists.', '0-day-analytics' ),
-							esc_html( self::$log_file )
+							\esc_html( self::$log_file )
 						)
 					);
 					return self::$last_error;
@@ -124,7 +124,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						sprintf(
 						// translators: the name of the log file.
 							__( 'The log file <code>%s</code> exists, but is not writable. Please check file permissions.', '0-day-analytics' ),
-							esc_html( self::$log_file )
+							\esc_html( self::$log_file )
 						)
 					);
 					return self::$last_error;
@@ -134,7 +134,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Error_Log' ) ) {
 						sprintf(
 						// translators: the name of the log file.
 							__( 'The log file <code>%s</code> exists, but is not accessible. Please check file permissions.', '0-day-analytics' ),
-							esc_html( self::$log_file )
+							\esc_html( self::$log_file )
 						)
 					);
 					return self::$last_error;

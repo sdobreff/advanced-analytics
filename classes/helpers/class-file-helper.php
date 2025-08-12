@@ -95,7 +95,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 						sprintf(
 								/* translators: %s: Directory path. */
 							__( 'Unable to create directory %s. Is its parent directory writable by the server?' ),
-							esc_html( $result )
+							\esc_html( $result )
 						)
 					);
 
@@ -117,7 +117,7 @@ if ( ! class_exists( '\ADVAN\Helpers\File_Helper' ) ) {
 					sprintf(
 								/* translators: %s: Directory path. */
 						__( 'Trying to write to the file %s failed.' ),
-						esc_html( $file_path )
+						\esc_html( $file_path )
 					)
 				);
 			}
