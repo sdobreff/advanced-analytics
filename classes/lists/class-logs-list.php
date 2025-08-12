@@ -914,7 +914,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			return sprintf(
 				'<label class="screen-reader-text" for="' . self::$table_name . '_' . $item['id'] . '">' . sprintf(
 				// translators: The column name.
-					__( 'Select %s' ),
+					__( 'Select %s', '0-day-analytics' ),
 					'id'
 				) . '</label>'
 				. '<input type="checkbox" name="' . self::$table_name . '[]" id="' . self::$table_name . '_' . $item['id'] . '" value="' . $item['id'] . '" />'

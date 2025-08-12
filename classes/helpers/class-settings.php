@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ADVAN\Helpers;
 
-use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Crons_List;
 use ADVAN\Lists\Table_List;
@@ -30,6 +29,8 @@ use ADVAN\Lists\Views\Logs_List_View;
 use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
+use ADVAN\Lists\Views\WP_Mail_View;
+use ADVAN\Lists\WP_Mail_list;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -463,6 +464,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'plugin_version_switch_count'     => 3,
 					'cron_module_enabled'             => true,
 					'requests_module_enabled'         => true,
+					'wp_mail_module_enabled'          => true,
 					'transients_module_enabled'       => true,
 					'tables_module_enabled'           => true,
 					'advana_rest_requests_clear'      => 'weekly',
@@ -622,6 +624,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					Requests_List::menu_add();
 				}
 				/* Requests end */
+
+
+				/* WP Mail start */
+				if ( self::get_option( 'wp_mail_module_enabled' ) ) {
+					WP_Mail_list::menu_add();
+				}
+				/* WP Mail end */
+
 
 				/* Crons start */
 				if ( self::get_option( 'cron_module_enabled' ) ) {
@@ -852,6 +862,24 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
+			if ( WP_Mail_list::PAGE_SLUG . $suffix === $screen->base || WP_Mail_list::PAGE_SLUG === $screen->base ) {
+
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-help-tab',
+						'title'   => __( 'WP Mail Log Table Info', '0-day-analytics' ),
+						'content' => WP_Mail_View::add_config_content_table(),
+					)
+				);
+				$screen->add_help_tab(
+					array(
+						'id'      => 'advanced-analytics-info-tab',
+						'title'   => __( 'Help', '0-day-analytics' ),
+						'content' => WP_Mail_View::add_help_content_table(),
+					)
+				);
+			}
+
 			$screen->set_help_sidebar( self::add_sidebar_content() );
 		}
 
@@ -1026,6 +1054,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		public static function get_requests_page_link() {
 			if ( '' === self::$settings_requests_link ) {
 				self::$settings_requests_link = \add_query_arg( 'page', Requests_List::REQUESTS_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			}
+
+			return self::$settings_requests_link;
+		}
+
+		/**
+		 * Returns the link to the WP admin settings page, based on the current WP install
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_wp_mail_page_link() {
+			if ( '' === self::$settings_requests_link ) {
+				self::$settings_requests_link = \add_query_arg( 'page', WP_Mail_list::WP_MAIL_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_requests_link;
@@ -1341,7 +1384,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page;
+			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page || WP_Mail_list::WP_MAIL_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1784,12 +1827,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::PAGE_SLUG . $suffix,
 					Logs_List::PAGE_SLUG . $suffix,
 					Requests_List::PAGE_SLUG . $suffix,
+					WP_Mail_list::PAGE_SLUG . $suffix,
 					Transients_List::PAGE_SLUG . $suffix,
 					Crons_List::PAGE_SLUG . $suffix,
 					Table_List::PAGE_SLUG . $suffix,
 					self::PAGE_SLUG,
 					Logs_List::PAGE_SLUG,
 					Requests_List::PAGE_SLUG,
+					WP_Mail_list::PAGE_SLUG,
 					Transients_List::PAGE_SLUG,
 					Crons_List::PAGE_SLUG,
 					Table_List::PAGE_SLUG,

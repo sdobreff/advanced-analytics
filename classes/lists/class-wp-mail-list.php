@@ -1,10 +1,10 @@
 <?php
 /**
- * Responsible for the requests view
+ * Responsible for the wp-mails view
  *
  * @package    advana
  * @subpackage lists
- * @since      1.1
+ * @since      latest
  * @license    https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link       https://wordpress.org/plugins/0-day-analytics/
  */
@@ -20,8 +20,7 @@ use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\ControllersApi\Endpoints;
-use ADVAN\Lists\Views\Requests_View;
-use ADVAN\Entities\Requests_Log_Entity;
+use ADVAN\Entities\WP_Mail_Entity;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -33,31 +32,31 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 /**
  * Base list table class
  */
-if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
+if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 
 	/**
 	 * Responsible for rendering base table for manipulation
 	 *
-	 * @since 2.1.0
+	 * @since latest
 	 */
-	class Requests_List extends \WP_List_Table {
+	class WP_Mail_list extends \WP_List_Table {
 
 		use List_Trait;
 
-		public const PAGE_SLUG = 'wp-control_page_advan_requests';
+		public const PAGE_SLUG = 'wp-control_page_advan_wp_mail';
 
-		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_requests_list';
+		public const SCREEN_OPTIONS_SLUG = 'advanced_analytics_wp_mail_list';
 
 		public const SEARCH_INPUT = 's';
 
-		public const REQUESTS_MENU_SLUG = 'advan_requests';
+		public const WP_MAIL_MENU_SLUG = 'advan_wp_mail';
 
 		/**
 		 * The table to show
 		 *
 		 * @var Common_Table
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		private static $table;
 
@@ -66,7 +65,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		protected $count;
 
@@ -75,7 +74,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		protected static $rows_per_page = 20;
 
@@ -84,7 +83,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		protected static $admin_columns = array();
 
@@ -93,16 +92,14 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @param string $table_name - The name of the table to use for the listing.
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		public function __construct( string $table_name = '' ) {
 
 			$class = Common_Table::class;
 
-			Common_Table::init( Requests_Log_Entity::get_table_name() );
+			Common_Table::init( WP_Mail_Entity::get_table_name() );
 			self::$table = $class;
-
-			// \add_filter( 'manage_' . WP_Helper::get_wp_screen()->id . '_columns', array( $class, 'manage_columns' ) );
 
 			parent::__construct(
 				array(
@@ -118,10 +115,10 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.8.2
+		 * @since latest
 		 */
 		public static function init() {
-			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+			// \add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
 		}
 
 		/**
@@ -131,7 +128,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since 2.8.2
+		 * @since latest
 		 */
 		public static function add_cron_job( $crons ) {
 			if ( -1 !== (int) Settings::get_option( 'advana_rest_requests_clear' ) ) {
@@ -150,10 +147,10 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.8.2
+		 * @since latest
 		 */
-		public static function truncate_requests_table() {
-			Common_Table::truncate_table( null, Requests_Log_Entity::get_table_name() );
+		public static function truncate_wp_mail_table() {
+			Common_Table::truncate_table( null, WP_Mail_Entity::get_table_name() );
 		}
 
 		/**
@@ -161,24 +158,24 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since 2.8.1
+		 * @since latest
 		 */
 		public static function menu_add() {
-			$requests_hook = \add_submenu_page(
+			$wp_mail_hook = \add_submenu_page(
 				Logs_List::MENU_SLUG,
 				\esc_html__( 'WP Control', '0-day-analytics' ),
-				\esc_html__( 'Requests viewer', '0-day-analytics' ),
+				\esc_html__( 'Mail viewer', '0-day-analytics' ),
 				( ( Settings::get_option( 'menu_admins_only' ) ) ? 'manage_options' : 'read' ), // No capability requirement.
-				self::REQUESTS_MENU_SLUG,
-				array( Requests_View::class, 'analytics_requests_page' ),
+				self::WP_MAIL_MENU_SLUG,
+				array( WP_Mail_View::class, 'analytics_wp_mail_page' ),
 				3
 			);
 
-			self::add_screen_options( $requests_hook );
+			self::add_screen_options( $wp_mail_hook );
 
-			\add_filter( 'manage_' . $requests_hook . '_columns', array( self::class, 'manage_columns' ) );
+			\add_filter( 'manage_' . $wp_mail_hook . '_columns', array( self::class, 'manage_columns' ) );
 
-			\add_action( 'load-' . $requests_hook, array( Settings::class, 'aadvana_common_help' ) );
+			\add_action( 'load-' . $wp_mail_hook, array( Settings::class, 'aadvana_common_help' ) );
 		}
 
 		/**
@@ -186,7 +183,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		public static function get_table_name(): string {
 			return self::$table::get_name();
@@ -248,7 +245,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @return array
 		 */
 		protected function get_sortable_columns() {
-			$first6_columns = array_keys( Requests_Log_Entity::get_column_names_admin() );
+			$first6_columns = array_keys( WP_Mail_Entity::get_column_names_admin() );
 
 			/**
 			 * Actual sorting still needs to be done by prepare_items.
@@ -300,7 +297,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			if ( '' !== $search_string ) {
 				$search_sql = 'AND (id LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
-				foreach ( array_keys( Requests_Log_Entity::get_column_names_admin() ) as $value ) {
+				foreach ( array_keys( WP_Mail_Entity::get_column_names_admin() ) as $value ) {
 					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
 				}
 				$search_sql .= ') ';
@@ -311,13 +308,13 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : 'id';
 			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
 			$query   = 'SELECT
-				' . implode( ', ', \array_keys( Requests_Log_Entity::get_fields() ) ) . '
+				' . implode( ', ', \array_keys( WP_Mail_Entity::get_fields() ) ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 
 			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
 
 			// query output_type will be an associative array with ARRAY_A.
-			$query_results = Requests_Log_Entity::get_results( $query );
+			$query_results = WP_Mail_Entity::get_results( $query );
 
 			$this->count = $wpdb->get_var( 'SELECT COUNT(id) FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql );
 
@@ -412,7 +409,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 						$extra_info = ' <span class="status-control-error"><span class="dashicons dashicons-warning" aria-hidden="true"></span> ' . \esc_html( $item['response'] ) . '</span>';
 						$style      = 'style="color:rgb(235, 131, 55) !important;"';
 					}
-					return '<code class="badge dark-badge" id="advana-request-' . $column_name . '-' . $item['id'] . '" ' . $style . '>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info . self::format_trace( $item['trace'] );
+					return '<code class="badge dark-badge" id="advana-request-' . $column_name . '-' . $item['id'] . '" ' . $style . '>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info ;
 
 				case 'request_group':
 				case 'request_source':
@@ -436,10 +433,9 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
 
 					$data  = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . \esc_html( var_export( self::get_formatted_string( $item['request_args'] ), true ) ) . '</pre>';
-					$data .= '</div>';
+					
 					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
-					$data .= '<pre style="overflow-y: hidden;">' . \esc_html( var_export( self::get_formatted_string( $item['response'] ), true ) ) . '</pre>';
+					
 					$data .= '</div>';
 
 					$time_format = 'g:i a';
@@ -535,7 +531,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @return string Text to be placed inside the column < td > .
 		 *
-		 * @since 2.1.0
+		 * @since latest
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
@@ -647,7 +643,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 							array(
 								self::SEARCH_INPUT => self::escaped_search_input(),
 								'paged'            => $_REQUEST['paged'] ?? 1,
-								'page'             => self::REQUESTS_MENU_SLUG,
+								'page'             => self::WP_MAIL_MENU_SLUG,
 								'show_table'       => self::$table::get_name(),
 							),
 							\admin_url( 'admin.php' )
@@ -972,7 +968,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			if ( empty( self::$admin_columns ) ) {
 
-				$admin_columns = Requests_Log_Entity::get_column_names_admin();
+				$admin_columns = WP_Mail_Entity::get_column_names_admin();
 
 				$screen_options = $admin_columns;
 
@@ -984,156 +980,6 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 			}
 
 			return self::$admin_columns;
-		}
-
-		/**
-		 * Formats the trace from the request log.
-		 *
-		 * @param string $trace - JSON encoded trace.
-		 *
-		 * @return string
-		 *
-		 * @since 2.7.0
-		 */
-		public static function format_trace( string $trace ): string {
-
-			if ( empty( $trace ) ) {
-				return '';
-			}
-
-			$trace = \json_decode( $trace, true );
-
-			$defaults = array(
-				'line'     => '',
-				'file'     => '',
-				'class'    => '',
-				'function' => '',
-			);
-
-			$out = '';
-
-			if ( \is_array( $trace ) && ! empty( $trace ) ) {
-
-				$query_array = array(
-					'_wpnonce' => \wp_create_nonce( 'source-view' ),
-					'action'   => 'log_source_view',
-				);
-
-				$counter = count( $trace ) - 6;
-				for ( $i = 1; $i < $counter; $i++ ) {
-					$sf    = (object) shortcode_atts( $defaults, $trace[ $i + 6 ] );
-					$index = $i - 1;
-					$file  = $sf->file;
-
-					$caller = '';
-					if ( ! empty( $sf->class ) && ! empty( $sf->function ) ) {
-						$caller = $sf->class . '::' . $sf->function . '()';
-					} elseif ( ! empty( $sf->function ) ) {
-						$caller = $sf->function . '()';
-					}
-
-					$source_link = '';
-
-					if ( isset( $file ) && ! empty( $file ) ) {
-						$query_array['error_file'] = $file;
-						$query_array['error_line'] = 1;
-
-						if ( isset( $sf->line ) && ! empty( $sf->line ) ) {
-							$query_array['error_line'] = $sf->line;
-						}
-
-						$query_array['TB_iframe'] = 'true';
-
-						$view_url = \esc_url_raw(
-							\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
-						);
-
-						$title = __( 'Viewing: ', '0-day-analytics' ) . $query_array['error_file'];
-
-						$source_link = ' <a href="' . $view_url . '" title="' . $title . '" class="thickbox view-source">' . $file . '(' . $sf->line . ')</a>';
-
-					}
-
-					$out .= "#$index {$source_link}: $caller" . '<br>';
-				}
-			}
-
-			return $out;
-		}
-
-		/**
-		 * Checks string format and decodes it if it is a valid JSON.
-		 *
-		 * @param string $string - The string to check and decode.
-		 *
-		 * @return string
-		 *
-		 * @since 2.7.0
-		 */
-		public static function get_formatted_string( $string ) {
-			$encoded = json_decode( $string, true, 512, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
-			if ( json_last_error() === JSON_ERROR_NONE ) {
-
-				foreach ( $encoded as $key => $value ) {
-					if ( ! empty( $value ) && is_string( $value ) && ! is_numeric( $value ) ) {
-						$encoded[ $key ] = self::get_formatted_string( $value );
-						// if ( is_array( $encoded[ $key ] ) ) {
-						// $encoded[ $key ] = array_map( 'htmlspecialchars', $encoded[ $key ] );
-						// }
-					}
-				}
-
-				return $encoded;
-			} else {
-				return $string;
-			}
-		}
-
-		/**
-		 * Sets the request type status.
-		 *
-		 * @param \WP_REST_Request $request - The request object.
-		 *
-		 * @return \WP_REST_Response|\WP_Error
-		 *
-		 * @since 2.8.0
-		 */
-		public static function set_request_status( \WP_REST_Request $request ) {
-			$request_type = $request->get_param( 'request_type' );
-			$status       = $request->get_param( 'status' );
-
-			if ( ! in_array( $request_type, array( 'http', 'rest' ), true ) ) {
-				return new \WP_Error(
-					'invalid_request_type',
-					__( 'Invalid request type name.', '0-day-analytics' ),
-					array( 'status' => 400 )
-				);
-			}
-
-			$request_type = 'advana_' . $request_type . '_requests_disable';
-
-			$settings = Settings::get_current_options();
-
-			if ( 'enable' === $status ) {
-				$settings[ $request_type ] = true;
-			} elseif ( 'disable' === $status ) {
-				$settings[ $request_type ] = false;
-			} else {
-				return new \WP_Error(
-					'invalid_status',
-					__( 'Invalid status.', '0-day-analytics' ),
-					array( 'status' => 400 )
-				);
-			}
-
-			Settings::store_options( $settings );
-			Settings::set_current_options( $settings );
-
-			return rest_ensure_response(
-				array(
-					'success' => true,
-				)
-			);
 		}
 	}
 }

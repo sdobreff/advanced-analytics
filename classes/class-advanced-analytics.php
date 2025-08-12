@@ -14,19 +14,20 @@ declare(strict_types=1);
 
 namespace ADVAN;
 
-use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
+use ADVAN\Lists\Table_List;
 use ADVAN\Helpers\WP_Helper;
+use ADVAN\Lists\WP_Mail_list;
 use ADVAN\Helpers\Ajax_Helper;
+use ADVAN\Lists\Requests_List;
 use ADVAN\Migration\Migration;
 use ADVAN\Controllers\Pointers;
+use ADVAN\Controllers\Cron_Jobs;
 use ADVAN\Lists\Transients_List;
 use ADVAN\Helpers\Context_Helper;
 use ADVAN\Helpers\Upgrade_Notice;
 use ADVAN\Controllers\Display_Environment_Type;
-use ADVAN\Lists\Requests_List;
-use ADVAN\Lists\Table_List;
 
 if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
@@ -57,6 +58,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				\add_filter( 'set-screen-option', array( Transients_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'set-screen-option', array( Requests_List::class, 'set_screen_option' ), 10, 3 );
+
+				\add_filter( 'set-screen-option', array( WP_Mail_list::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'set-screen-option', array( Table_List::class, 'set_screen_option' ), 10, 3 );
 
@@ -94,6 +97,10 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 			if ( Settings::get_option( 'requests_module_enabled' ) ) {
 				Requests_List::init();
+			}
+
+			if ( Settings::get_option( 'wp_mail_module_enabled' ) ) {
+				WP_Mail_list::init();
 			}
 
 			Logs_list::init();

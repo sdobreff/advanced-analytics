@@ -548,7 +548,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			return sprintf(
 				'<label class="screen-reader-text" for="' . $item['hash'] . '">' . sprintf(
 					// translators: The column name.
-					__( 'Select %s' ),
+					__( 'Select %s', '0-day-analytics' ),
 					'id'
 				) . '</label>'
 				. '<input type="checkbox" name="' . self::$table_name . '[]" id="' . $item['hash'] . '" value="' . $item['hash'] . '" />'
@@ -564,7 +564,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 */
 		public function get_bulk_actions() {
 			/**
-			 * On hitting apply in bulk actions the url paramas are set as
+			 * On hitting apply in bulk actions the url params are set as
 			 * ?action=bulk-download&paged=1&action2=-1.
 			 *
 			 * Action and action2 are set based on the triggers above or below the table
