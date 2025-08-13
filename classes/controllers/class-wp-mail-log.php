@@ -19,16 +19,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_log' ) ) {
+if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 	/**
-	 * Responsible for collecting the requests.
+	 * Responsible for collecting the amils.
 	 *
 	 * @since latest
 	 */
-	class WP_Mail_log {
+	class WP_Mail_Log {
 
 		/**
-		 * Class cache for the last inserted request ID.
+		 * Class cache for the type of the mail message.
 		 *
 		 * @var integer
 		 *

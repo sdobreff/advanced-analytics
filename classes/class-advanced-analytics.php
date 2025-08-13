@@ -18,7 +18,7 @@ use ADVAN\Lists\Logs_List;
 use ADVAN\Helpers\Settings;
 use ADVAN\Lists\Table_List;
 use ADVAN\Helpers\WP_Helper;
-use ADVAN\Lists\WP_Mail_list;
+use ADVAN\Lists\WP_Mail_List;
 use ADVAN\Helpers\Ajax_Helper;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Migration\Migration;
@@ -59,7 +59,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 
 				\add_filter( 'set-screen-option', array( Requests_List::class, 'set_screen_option' ), 10, 3 );
 
-				\add_filter( 'set-screen-option', array( WP_Mail_list::class, 'set_screen_option' ), 10, 3 );
+				\add_filter( 'set-screen-option', array( WP_Mail_List::class, 'set_screen_option' ), 10, 3 );
 
 				\add_filter( 'set-screen-option', array( Table_List::class, 'set_screen_option' ), 10, 3 );
 
@@ -100,7 +100,7 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			}
 
 			if ( Settings::get_option( 'wp_mail_module_enabled' ) ) {
-				WP_Mail_list::init();
+				WP_Mail_List::init();
 			}
 
 			Logs_list::init();

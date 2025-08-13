@@ -30,7 +30,7 @@ use ADVAN\Lists\Views\Requests_View;
 use ADVAN\Settings\Settings_Builder;
 use ADVAN\Lists\Views\Transients_View;
 use ADVAN\Lists\Views\WP_Mail_View;
-use ADVAN\Lists\WP_Mail_list;
+use ADVAN\Lists\WP_Mail_List;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -628,7 +628,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 				/* WP Mail start */
 				if ( self::get_option( 'wp_mail_module_enabled' ) ) {
-					WP_Mail_list::menu_add();
+					WP_Mail_List::menu_add();
 				}
 				/* WP Mail end */
 
@@ -862,7 +862,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				);
 			}
 
-			if ( WP_Mail_list::PAGE_SLUG . $suffix === $screen->base || WP_Mail_list::PAGE_SLUG === $screen->base ) {
+			if ( WP_Mail_List::PAGE_SLUG . $suffix === $screen->base || WP_Mail_List::PAGE_SLUG === $screen->base ) {
 
 				$screen->add_help_tab(
 					array(
@@ -1068,7 +1068,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 */
 		public static function get_wp_mail_page_link() {
 			if ( '' === self::$settings_requests_link ) {
-				self::$settings_requests_link = \add_query_arg( 'page', WP_Mail_list::WP_MAIL_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+				self::$settings_requests_link = \add_query_arg( 'page', WP_Mail_List::WP_MAIL_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
 			return self::$settings_requests_link;
@@ -1384,7 +1384,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$current_page = ! empty( $_REQUEST['page'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page || WP_Mail_list::WP_MAIL_MENU_SLUG === $current_page;
+			return Logs_List::MENU_SLUG === $current_page || self::OPTIONS_PAGE_SLUG === $current_page || Crons_List::CRON_MENU_SLUG === $current_page || Transients_List::TRANSIENTS_MENU_SLUG === $current_page || Table_List::TABLE_MENU_SLUG === $current_page || self::SETTINGS_MENU_SLUG === $current_page || Requests_List::REQUESTS_MENU_SLUG === $current_page || WP_Mail_List::WP_MAIL_MENU_SLUG === $current_page;
 		}
 
 		/**
@@ -1827,14 +1827,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					self::PAGE_SLUG . $suffix,
 					Logs_List::PAGE_SLUG . $suffix,
 					Requests_List::PAGE_SLUG . $suffix,
-					WP_Mail_list::PAGE_SLUG . $suffix,
+					WP_Mail_List::PAGE_SLUG . $suffix,
 					Transients_List::PAGE_SLUG . $suffix,
 					Crons_List::PAGE_SLUG . $suffix,
 					Table_List::PAGE_SLUG . $suffix,
 					self::PAGE_SLUG,
 					Logs_List::PAGE_SLUG,
 					Requests_List::PAGE_SLUG,
-					WP_Mail_list::PAGE_SLUG,
+					WP_Mail_List::PAGE_SLUG,
 					Transients_List::PAGE_SLUG,
 					Crons_List::PAGE_SLUG,
 					Table_List::PAGE_SLUG,

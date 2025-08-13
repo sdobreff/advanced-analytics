@@ -18,6 +18,7 @@ use ADVAN\Lists\Logs_List;
 use ADVAN\Lists\Requests_List;
 use ADVAN\Entities\Common_Table;
 use ADVAN\Helpers\Crons_Helper;
+use ADVAN\Lists\WP_Mail_List;
 
 defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
@@ -209,6 +210,31 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 										'type'        => 'string',
 										'pattern'     => '\w+',
 										'description' => 'Table name',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'mail_body'  => array(
+					'class'     => WP_Mail_List::class,
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<id>\d+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'get_mail_body_api',
+								),
+								'args'             => array(
+									'id' => array(
+										'required'    => true,
+										'type'        => 'int',
+										'pattern'     => '\d+',
+										'description' => 'ID of the mail record which body needs to be extracted',
 									),
 								),
 								'checkPermissions' => array( __CLASS__, 'check_permissions' ),

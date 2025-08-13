@@ -18,6 +18,7 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
+use ADVAN\Controllers\WP_Mail_Log;
 use ADVAN\Entities\WP_Mail_Entity;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\Lists\Views\WP_Mail_View;
@@ -33,14 +34,14 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 /**
  * Base list table class
  */
-if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
+if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 	/**
 	 * Responsible for rendering base table for manipulation
 	 *
 	 * @since latest
 	 */
-	class WP_Mail_list extends \WP_List_Table {
+	class WP_Mail_List extends \WP_List_Table {
 
 		use List_Trait;
 
@@ -952,6 +953,45 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 			}
 
 			return self::$admin_columns;
+		}
+
+		/**
+		 * Retrieves mail body by given record ID.
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return \WP_REST_Response|\WP_Error|string
+		 *
+		 * @since latest
+		 */
+		public static function get_mail_body_api( \WP_REST_Request $request ) {
+			$id = abs( (int) $request->get_param( 'id' ) );
+
+			$record = WP_Mail_Entity::load( 'id=%d', array( $id ) );
+
+			if ( is_array( $record ) && ! empty( $record ) ) {
+				//header( 'Content-Type: text/html' );
+
+				if ( isset( $record['is_html'] ) && (bool) $record['is_html'] ) {
+					$message =  WP_Mail_Log::filter_html( $record['message'] );
+				} else {
+					$message =  $record['message'];
+				}
+
+				return rest_ensure_response(
+				array(
+					'success' => true,
+					'mail_body' => $message,
+				)
+			);
+
+			} else {
+				return new \WP_Error(
+					'empty_mail_record',
+					__( 'No record found.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 	}
 }

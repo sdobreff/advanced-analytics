@@ -333,15 +333,34 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
 							e.preventDefault();
 							let id = jQuery( this ).data( 'details-id' );
-							// jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
-							// jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
+							let that = this;
+							try {
+								attResp = wp.apiFetch({
+									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/mail_body/' + id,
+									method: 'GET',
+									cache: 'no-cache'
+								}).then( ( attResp ) => {
 
-							// jQuery('.http-request-status').html( jQuery('#advana-request-request_status-' + id ).clone() );
-							// jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
-							// jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
-							// jQuery('.http-request-domain').html( jQuery('#advana-request-domain-' + id ).clone() );
-							// jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone().html(jQuery('#advana-request-page_url-' + id ).attr('title') ) );
-							// jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone().html(jQuery('#advana-request-url-' + id ).attr('title') ) );
+									//console.log(attResp);
+
+									jQuery('.media-modal .http-request-args').html(attResp.mail_body);
+									
+									
+								} ).catch(
+									( error ) => {
+										if (error.message) {
+											jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
+										}
+									}
+								);
+							} catch (error) {
+								throw error;
+							} finally {
+								jQuery(that).css({
+									"pointer-events": "",
+									"cursor": ""
+								})
+							}
 
 							jQuery('.media-modal').addClass('open');
 							jQuery('.media-modal-backdrop').addClass('open');
