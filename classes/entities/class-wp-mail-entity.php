@@ -16,11 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
+if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 	/**
 	 * Responsible for the events metadata.
 	 */
-	class WP_Mail_entity extends Abstract_Entity {
+	class WP_Mail_Entity extends Abstract_Entity {
 		/**
 		 * Contains the table name.
 		 *
@@ -28,7 +28,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
 		 *
 		 * @since latest
 		 */
-		protected static $table = ADVAN_PREFIX . 'wp-mail-log';
+		protected static $table = ADVAN_PREFIX . 'wp_mail_log';
 
 		/**
 		 * Keeps the info about the columns of the table - name, type.
@@ -38,21 +38,17 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
 		 * @since latest
 		 */
 		protected static $fields = array(
-			'id'             => 'int',
-			'type'           => 'string',
-			'url'            => 'string',
-			'page_url'       => 'string',
-			'domain'         => 'string',
-			'user_id'        => 'int',
-			'runtime'        => 'float',
-			'request_status' => 'string',
-			'request_group'  => 'string',
-			'request_source' => 'string',
-			'request_args'   => 'string',
-			'response'       => 'string',
-			'date_added'     => 'string',
-			'requests'       => 'int',
-			'trace'          => 'string',
+			'id'                 => 'int',
+			'time'               => 'string',
+			'email_to'           => 'string',
+			'subject'            => 'string',
+			'message'            => 'string',
+			'backtrace_segment'  => 'string',
+			'status'             => 'int',
+			'is_html'            => 'int',
+			'error'              => 'string',
+			'attachments'        => 'string',
+			'additional_headers' => 'string',
 		);
 
 		/**
@@ -63,21 +59,17 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
 		 * @since latest
 		 */
 		protected static $fields_values = array(
-			'id'             => 0,
-			'type'           => '',
-			'url'            => '',
-			'page_url'       => '',
-			'domain'         => '',
-			'user_id'        => 0,
-			'runtime'        => 0,
-			'request_status' => '',
-			'request_group'  => '',
-			'request_source' => '',
-			'request_args'   => '',
-			'response'       => '',
-			'date_added'     => '',
-			'requests'       => 0,
-			'trace'          => '',
+			'id'                 => 0,
+			'time'               => '',
+			'email_to'           => '',
+			'subject'            => '',
+			'message'            => '',
+			'backtrace_segment'  => '',
+			'status'             => 0,
+			'is_html'            => 0,
+			'error'              => '',
+			'attachments'        => '',
+			'additional_headers' => '',
 		);
 
 		/**
@@ -106,6 +98,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
 					message MEDIUMTEXT DEFAULT NULL,
 					backtrace_segment MEDIUMTEXT NOT NULL,
 					status BOOL DEFAULT 1 NOT NULL,
+					is_html BOOL DEFAULT 1 NOT NULL,
 					error TEXT DEFAULT NULL,
 					attachments MEDIUMTEXT DEFAULT NULL,
 					additional_headers TEXT DEFAULT NULL,
@@ -125,14 +118,10 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_entity' ) ) {
 		 */
 		public static function get_column_names_admin(): array {
 			return array(
-				'date_added'     => __( 'Date', '0-day-analytics' ),
-				'type'           => __( 'Type', '0-day-analytics' ),
-				'request_status' => __( 'Status', '0-day-analytics' ),
-				'url'            => __( 'URL', '0-day-analytics' ),
-				'page_url'       => __( 'Page', '0-day-analytics' ),
-				'domain'         => __( 'Domain', '0-day-analytics' ),
-				'user_id'        => __( 'User', '0-day-analytics' ),
-				'runtime'        => __( 'Runtime', '0-day-analytics' ),
+				'email_to'          => __( 'To', '0-day-analytics' ),
+				'subject'           => __( 'Subject', '0-day-analytics' ),
+				'time'              => __( 'Date', '0-day-analytics' ),
+				'backtrace_segment' => __( 'Source', '0-day-analytics' ),
 			);
 		}
 	}

@@ -80,24 +80,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
-					<?php
-					if ( ! Settings::get_option( 'advana_wp_mail_enable' ) ) {
-						?>
-					<div id="advana-status-error" class="notice notice-error">
-						<?php
-						printf(
-							'<p>%1$s</p>',
-							sprintf(
-								/* translators: %s: Link to wp_mail settings. */
-								esc_html__( 'The wp_mail logging is disabled. To enable it go to : %s', '0-day-analytics' ),
-								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-wp-mail-list">' . __( 'settings', '0-day-analytics' ) . '</a>',
-							)
-						);
-						?>
-					</div>
-						<?php
-					}
-					?>
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
 						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
 						<input type="hidden" name="<?php echo \esc_attr( WP_Mail_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( WP_Mail_List::escaped_search_input() ); ?>" />
@@ -195,24 +177,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Mail Logs', '0-day-analytics' ); ?></h1>
 
 					<hr class="wp-header-end">
-					<?php
-					if ( ! Settings::get_option( 'advana_wp_mail_enable' ) ) {
-						?>
-					<div id="advana-status-error" class="notice notice-error">
-						<?php
-						printf(
-							'<p>%1$s</p>',
-							sprintf(
-								/* translators: %s: Link to wp_mail settings. */
-								\esc_html__( 'The wp_mail logging is disabled. To enable it go to : %s', '0-day-analytics' ),
-								'<a href="' . \add_query_arg( array( 'page' => Settings::SETTINGS_MENU_SLUG ), network_admin_url( 'admin.php' ) ) . '#aadvana-options-tab-wp-mail-list">' . __( 'settings', '0-day-analytics' ) . '</a>',
-							)
-						);
-						?>
-					</div>
-						<?php
-					}
-					?>
 					<form id="wp-mail-filter" method="get">
 					<?php
 
@@ -341,14 +305,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 							</div>
 							<div class="media-frame-content">
 								<div class="modal-content-wrap">
-									<p>
-										<b><?php \esc_html_e( 'Mail: ', '0-day-analytics' ); ?> </b><span class="http-request-type"></span> | <span class="http-request-status"></span> | <span class="http-request-runtime"></span> | <?php \esc_html_e( 'Domain: ', '0-day-analytics' ); ?><span class="http-request-domain"></span>
-									</p>
-									<p>
-										<b><?php \esc_html_e( 'Page:', '0-day-analytics' ); ?>:</b> 
-										<span class="http-request-page"></span><br>
-										<b><?php \esc_html_e( 'Request URL:', '0-day-analytics' ); ?>:</b> <span class="http-request-url"></span>
-									</p>
 									<div class="aadvana-panel-wrapper">
 										<div class="aadvana-request-response aadvana-panel-active wrapper">
 											<div class="box">
@@ -358,17 +314,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 													</div>
 													<div class=""><span title="<?php echo __( 'Copy to clipboard', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
 												</div>
-												<div class="http-request-args aadvana-pre-300"></div>
-											</div>
-											<div class="box">
-												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
-													<div>
-														<h3><?php \esc_html_e( 'Response:', '0-day-analytics' ); ?></h3>
-													</div>
-													<div class=""><span title="<?php echo __( 'Copy to clipboard', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+												<div class="http-request-args aadvana-pre-300">
+
 												</div>
-												<div class="http-response aadvana-pre-300"></div>
-											</div>						
+											</div>
+											
 										</div>
 									</div>
 								</div>
@@ -383,15 +333,15 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
 							e.preventDefault();
 							let id = jQuery( this ).data( 'details-id' );
-							jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
-							jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
+							// jQuery('.http-request-args').html( jQuery('#advana-request-details-' + id ).html() );
+							// jQuery('.http-response').html( jQuery('#advana-response-details-' + id ).html() );
 
-							jQuery('.http-request-status').html( jQuery('#advana-request-request_status-' + id ).clone() );
-							jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
-							jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
-							jQuery('.http-request-domain').html( jQuery('#advana-request-domain-' + id ).clone() );
-							jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone().html(jQuery('#advana-request-page_url-' + id ).attr('title') ) );
-							jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone().html(jQuery('#advana-request-url-' + id ).attr('title') ) );
+							// jQuery('.http-request-status').html( jQuery('#advana-request-request_status-' + id ).clone() );
+							// jQuery('.http-request-runtime').html( jQuery('#advana-request-runtime-' + id ).clone() );
+							// jQuery('.http-request-type').html( jQuery('#advana-request-type-' + id ).clone() );
+							// jQuery('.http-request-domain').html( jQuery('#advana-request-domain-' + id ).clone() );
+							// jQuery('.http-request-page').html( jQuery('#advana-request-page_url-' + id ).clone().html(jQuery('#advana-request-page_url-' + id ).attr('title') ) );
+							// jQuery('.http-request-url').html( jQuery('#advana-request-url-' + id ).clone().html(jQuery('#advana-request-url-' + id ).attr('title') ) );
 
 							jQuery('.media-modal').addClass('open');
 							jQuery('.media-modal-backdrop').addClass('open');

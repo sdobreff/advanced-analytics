@@ -18,9 +18,10 @@ use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Helpers\File_Helper;
 use ADVAN\Entities\Common_Table;
-use ADVAN\Lists\Traits\List_Trait;
-use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Entities\WP_Mail_Entity;
+use ADVAN\Lists\Traits\List_Trait;
+use ADVAN\Lists\Views\WP_Mail_View;
+use ADVAN\Helpers\Plugin_Theme_Helper;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/template.php';
@@ -88,6 +89,18 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 		protected static $admin_columns = array();
 
 		/**
+		 * Holds the array with all of the collected sources.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $sources = array(
+			'plugins' => array(),
+			'themes'  => array(),
+		);
+
+		/**
 		 * Default class constructor
 		 *
 		 * @param string $table_name - The name of the table to use for the listing.
@@ -103,8 +116,8 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 
 			parent::__construct(
 				array(
-					'plural'   => $table_name,    // Plural value used for labels and the objects being listed.
-					'singular' => $table_name,     // Singular label for an object being listed, e.g. 'post'.
+					'plural'   => WP_Mail_Entity::get_table_name(),    // Plural value used for labels and the objects being listed.
+					'singular' => WP_Mail_Entity::get_table_name(),     // Singular label for an object being listed, e.g. 'post'.
 					'ajax'     => false,      // If true, the parent class will call the _js_vars() method in the footer.
 				)
 			);
@@ -350,6 +363,52 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 		}
 
 		/**
+		 * Generates the table navigation above or below the table
+		 *
+		 * @param string $which - Holds info about the top and bottom navigation.
+		 *
+		 * @since 1.1.0
+		 */
+		public function display_tablenav( $which ) {
+			if ( 'top' === $which ) {
+
+				?>
+
+				<style>
+					.wp-control_page_advan_wp_mail .<?php echo WP_Mail_Entity::get_table_name(); ?> .late th:nth-child(1) {
+						border-left: 7px solid #dd9192 !important;
+					}
+					.wp-control_page_advan_wp_mail .<?php echo WP_Mail_Entity::get_table_name(); ?> .on-time th:nth-child(1) {
+						border-left: 7px solid rgb(49, 179, 45) !important;
+					}
+				</style>
+				<?php
+			}
+			parent::display_tablenav( $which );
+		}
+
+		/**
+		 * Generates content for a single row of the table.
+		 *
+		 * @param object|array $item - The current item.
+		 *
+		 * @since 1.1.0
+		 */
+		public function single_row( $item ) {
+			$late = $item['status'] ?? 0;
+
+			if ( $late ) {
+				$classes = ' on-time';
+			} else {
+				$classes = ' late';
+			}
+
+			echo '<tr class="' . \esc_attr( $classes ) . '">';
+			$this->single_row_columns( $item );
+			echo '</tr>';
+		}
+
+		/**
 		 * Render a column when no column specific method exists.
 		 *
 		 * Use that method for common rendering and separate columns logic in different methods. See below.
@@ -401,21 +460,121 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 					// Escape & wrap in <code> tag.
 					return '<code id="advana-request-' . $column_name . '-' . $item['id'] . '">' . \esc_html( \number_format( (float) $item[ $column_name ], 3 ) ) . 's</code>';
 
-				case 'request_status':
-					// Escape & wrap in <code> tag.
-					$extra_info = '';
-					$style      = 'style="color: #00ff00 !important;"';
-					if ( 'error' === $item[ $column_name ] ) {
-						$extra_info = ' <span class="status-control-error"><span class="dashicons dashicons-warning" aria-hidden="true"></span> ' . \esc_html( $item['response'] ) . '</span>';
-						$style      = 'style="color:rgb(235, 131, 55) !important;"';
-					}
-					return '<code class="badge dark-badge" id="advana-request-' . $column_name . '-' . $item['id'] . '" ' . $style . '>' . \esc_html( $item[ $column_name ] ) . '</code></br>' . $extra_info ;
-
-				case 'request_group':
-				case 'request_source':
+				case 'subject':
+				case 'email_to':
 					// Escape & wrap in <code> tag.
 					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
-				case 'date_added':
+				case 'backtrace_segment':
+					$source_link = '';
+
+					$query_array = array(
+						'_wpnonce' => \wp_create_nonce( 'source-view' ),
+						'action'   => 'log_source_view',
+					);
+
+					$source = \json_decode( $item['backtrace_segment'], true );
+
+					if ( isset( $source['file'] ) ) {
+						$item['error_file'] = $source['file'];
+						if ( isset( $source['line'] ) ) {
+							$item['error_line'] = $source['line'];
+						}
+					}
+					unset( $source );
+
+					if ( isset( $item['error_file'] ) && ! empty( $item['error_file'] ) ) {
+						$query_array['error_file'] = $item['error_file'];
+
+						if ( isset( $item['error_line'] ) && ! empty( $item['error_line'] ) ) {
+							$query_array['error_line'] = $item['error_line'];
+						}
+
+						$query_array['TB_iframe'] = 'true';
+
+						$view_url = \esc_url_raw(
+							\add_query_arg( $query_array, \admin_url( 'admin-ajax.php' ) )
+						);
+
+						$title = __( 'Viewing: ', '0-day-analytics' ) . $item['error_file'];
+
+						$source_link = '<div> <a href="' . $view_url . '" title = "' . $title . '" class="thickbox view-source gray_lab badge">' . __( 'view mail source', '0-day-analytics' ) . '</a></div>';
+					}
+
+					if ( isset( $item['error_file'] ) ) {
+
+						$item['plugin'] = Plugin_Theme_Helper::get_plugin_from_path( $item['error_file'] );
+
+						if ( isset( $item['plugin'] ) && ! empty( $item['plugin'] ) ) {
+							return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources['plugins'][ $item['plugin'] ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources['plugins'][ $item['plugin'] ]['Version'] . $source_link;
+						}
+
+						$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
+
+						if ( false !== \mb_strpos( $item['error_file'], $theme_root . \DIRECTORY_SEPARATOR ) ) {
+
+							$theme_dir_basename = basename( $theme_root );
+
+							$split_theme = explode( \DIRECTORY_SEPARATOR, $item['error_file'] );
+
+							$next       = false;
+							$theme_base = '';
+							foreach ( $split_theme as $part ) {
+								if ( $next ) {
+									$theme_base = $part;
+									break;
+								}
+								if ( $theme_dir_basename === $part ) {
+									$next = true;
+								}
+							}
+
+							if ( isset( self::$sources['themes'][ $theme_base ] ) ) {
+								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . esc_html( self::$sources['themes'][ $theme_base ] ) . '</b>' . $source_link;
+							} else {
+
+								$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
+
+								if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
+									$name = $theme->get( 'Name' );
+
+									$version = $theme->get( 'Version' );
+									$version = ( ! empty( $version ) ) ? '<br>' . __( 'Current version: ', '0-day-analytics' ) . $version : '<br>' . __( 'Unknown version', '0-day-analytics' );
+
+									$name = ( ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' ) ) . $version;
+
+									$parent = $theme->parent(); // ( 'parent_theme' );
+									if ( $parent ) {
+										$parent = $theme->parent()->get( 'Name' );
+
+										$parent_version = $theme->parent()->get( 'Version' );
+										$parent_version = ( ! empty( $parent_version ) ) ? $parent_version : __( 'Unknown version', '0-day-analytics' );
+
+										$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '<br>' . __( 'Parent Current Version: ', '0-day-analytics' ) . $parent_version . '</div>' : '';
+									}
+									$name .= (string) $parent;
+
+									self::$sources['themes'][ $theme_base ] = $name;
+									return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
+								}
+							}
+						}
+
+						if ( false !== \mb_strpos( $item['error_file'], ABSPATH . WPINC . \DIRECTORY_SEPARATOR ) ) {
+							return '<span><span class="dashicons dashicons-wordpress" aria-hidden="true"></span> ' . __( 'WP Core', '0-day-analytics' ) . $source_link;
+						}
+
+						$admin_path = str_replace( \get_home_url( 1 ) . '/', ABSPATH, \network_admin_url() );
+
+						if ( false !== \mb_strpos( $item['error_file'], $admin_path ) ) {
+							return '<span><span class="dashicons dashicons-wordpress" aria-hidden="true"></span></span> ' . __( 'WP Admin Core', '0-day-analytics' ) . $source_link;
+						} else {
+							return ' ' . __( 'Source', '0-day-analytics' ) . $source_link;
+						}
+					}
+
+					return '';
+
+				case 'time':
 					$query_args_view_data             = array();
 					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
 					$delete_url                       =
@@ -432,15 +591,15 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 
 					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
 
-					$data  = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
-					
+					$data = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
+
 					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
-					
+
 					$data .= '</div>';
 
 					$time_format = 'g:i a';
 
-					$item['date_added'] = (int) $item['date_added'];
+					$item['date_added'] = (int) $item['time'];
 
 					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['date_added'] );
 
@@ -701,194 +860,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 		 * @since 1.1.0
 		 */
 		public function extra_tablenav( $which ) {
-
-			if ( 'top' === $which ) {
-				?>
-				<style>
-					.flex {
-						display:flex;
-					}
-					.flex-row {
-						flex-direction:row;
-					}
-					.grow-0 {
-						flex-grow:0;
-					}
-					.p-2 {
-						padding:8px;
-					}
-					.w-full {
-						width:auto;
-					}
-					.border-t {
-						border-bottom-width:1px;
-					}
-					.justify-between {
-						justify-content:space-between;
-					}
-					.italic {
-						font-style: italic;
-					}
-					.text-lg {
-						font-size: 1.1em;
-						font-weight: bold;
-					}
-					#wpwrap {
-						overflow-x: hidden !important;
-					}
-					.wp-list-table {
-						white-space: nowrap;
-						display: block;
-						overflow-x: auto;
-					}
-					/* .wp-list-table {
-						display: block;
-						overflow-x: auto;
-						white-space: nowrap;
-					}
-					.wp-list-table tbody {
-						display: table;
-						width: 100%;
-					}
-					.wp-list-table thead {
-						position: sticky;
-						z-index: 2;
-						top: 0;
-					} */
-					.checkbox-wrapper-2 label{
-						margin-right: 7px !important;
-						cursor: pointer !important;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC {
-						appearance: none;
-						background-color: #dfe1e4;
-						border-radius: 72px;
-						border-style: none;
-						flex-shrink: 0;
-						height: 20px;
-						margin: 0;
-						position: relative;
-						width: 30px;
-						cursor: pointer !important;
-						border: 1px solid #cec6c6;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC::before {
-						bottom: -6px !important;
-						content: "" !important;
-						left: -6px !important;
-						position: absolute !important;
-						right: -6px !important;
-						top: -6px !important;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC,
-					.checkbox-wrapper-2 .ikxBAC::after {
-						transition: all 100ms ease-out;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC::after {
-						background-color: #e68a6e;
-						border-radius: 50%;
-						content: "";
-						height: 14px;
-						left: 3px;
-						position: absolute;
-						top: 3px;
-						width: 14px;
-					}
-
-					.checkbox-wrapper-2 input[type=checkbox] {
-						cursor: default;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC:hover {
-						background-color: #c9cbcd;
-						transition-duration: 0s;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC:checked {
-						background-color: #d3f9d6;
-					}
-
-					html.aadvana-darkskin .checkbox-wrapper-2 .ikxBAC:checked {
-						background-color:rgb(27, 27, 28) !important;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC:checked::after {
-						background-color: #17c622;
-						left: 13px;
-					}
-
-					.checkbox-wrapper-2 :focus:not(.focus-visible) {
-						outline: 0;
-					}
-
-					.checkbox-wrapper-2 .ikxBAC:checked:hover {
-						background-color: #dfe1e4;
-					}
-
-					.tablenav {
-						height: auto !important;
-					}
-				</style>
-				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
-					<div class="checkbox-wrapper-2">
-					
-						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="http" id="advana_http_requests_disable" <?php \checked( Settings::get_option( 'advana_http_requests_disable' ), true ); ?>>
-							
-						<label for="advana_http_requests_disable" class="badge dark-badge">
-						<?php \esc_html_e( 'Disable HTTP monitoring', '0-day-analytics' ); ?>
-						</label>
-					
-						<input type="checkbox"  class="sc-gJwTLC ikxBAC requests-monitoring-filter" name="disable_monitoring[]" value="rest" id="advana_rest_requests_disable" <?php \checked( Settings::get_option( 'advana_rest_requests_disable' ), true ); ?>>
-							
-						<label for="advana_rest_requests_disable" class="badge dark-badge">
-						<?php \esc_html_e( 'Disable REST API monitoring', '0-day-analytics' ); ?>
-						</label>
-						<script>
-							let requests_disable = document.getElementsByClassName("requests-monitoring-filter");
-
-							let len = requests_disable.length;
-
-							// call updateCost() function to onclick event on every checkbox
-							for (var i = 0; i < len; i++) {
-								if (requests_disable[i].type === 'checkbox') {
-									requests_disable[i].onclick = setMonitoring;
-								}
-							}
-
-							async function setMonitoring(e) {
-
-								let monitoringName = e.target.value;
-								let monitoringStatus = e.target.checked;
-								let attResp;
-
-								try {
-									attResp = await wp.apiFetch({
-										path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/requests/' + monitoringName + '/' + ( monitoringStatus ? 'enable' : 'disable' ),
-										method: 'GET',
-										cache: 'no-cache'
-									});
-
-									if (attResp.success) {
-										
-										location.reload();
-									} else if (attResp.message) {
-										jQuery('#wp-admin-bar-aadvan-menu .ab-item').html('<b><i>' + attResp.message + '</i></b>');
-									}
-
-								} catch (error) {
-									throw error;
-								}
-							}
-
-						</script>
-					</div>
-				</div>
-
-						<?php } ?>
+			?>
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 
@@ -932,7 +904,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_list' ) ) {
 						
 					</div>
 				</div>
-					<?php
+			<?php
 		}
 
 		/**

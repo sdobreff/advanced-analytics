@@ -184,7 +184,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 				if ( ! $result ) {
 					return new \WP_Error(
 						'cron_execute',
-						__( 'Can not execute, cron not found.', '0-day-analytics' ),
+						__( 'Can not execute, cron not found. No longer exists maybe ? Try refreshing the page.', '0-day-analytics' ),
 						array( 'status' => 400 )
 					);
 				} else {

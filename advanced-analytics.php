@@ -28,6 +28,7 @@ use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Requests_Log;
+use ADVAN\Controllers\WP_Mail_log;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -127,7 +128,6 @@ if ( ! Settings::get_option( 'no_rest_api_monitor' ) ) {
 \add_action( 'plugin_loaded', 'advana_remove_plugins' );
 \add_action( 'network_plugin_loaded', 'advana_remove_plugins' );
 
-
 if ( ! WP_Helper::is_multisite() && \wp_is_recovery_mode() ) {
 	\add_action(
 		'plugin_loaded',
@@ -197,6 +197,7 @@ if ( ! WP_Helper::is_multisite() && \wp_is_recovery_mode() ) {
 \add_filter( 'det_display_environment_type', '__return_false' );
 
 Requests_Log::init();
+WP_Mail_log::init();
 Endpoints::init();
 
 if ( ! function_exists( 'advana_remove_plugins' ) ) {
