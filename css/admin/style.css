@@ -2367,6 +2367,14 @@ input:not(:checked) + span.switchery {
 
 /* Dark Skin */
 
+html.aadvana-darkskin .subsubsub a .count, html.aadvana-darkskin .subsubsub a.current .count {
+  color: #c9d2db;
+}
+
+html.aadvana-darkskin .ac_match, html.aadvana-darkskin  .subsubsub a.current {
+  color: #c6bebe;
+}
+
 html.aadvana-darkskin .wrap .add-new-h2:hover, html.aadvana-darkskin .wrap .page-title-action:hover {
   background: #140a47;
   color: #abadaf;

@@ -61,42 +61,42 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				/**
 				 * Save Options
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'plugin_data_save', array( __CLASS__, 'save_settings_ajax' ) );
 
 				/**
 				 * Delete Cron
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'delete_cron', array( __CLASS__, 'delete_cron' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'delete_cron', array( __CLASS__, 'delete_cron' ) );
 
 				/**
 				 * Run Cron
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'run_cron', array( __CLASS__, 'run_cron' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'run_cron', array( __CLASS__, 'run_cron' ) );
 
 				/**
 				 * Delete Cron
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'delete_transient', array( __CLASS__, 'delete_transient' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'delete_transient', array( __CLASS__, 'delete_transient' ) );
 
 				/**
 				 * Store Slack API key
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'store_slack_api_key', array( __CLASS__, 'store_slack_api_key_ajax' ) );
 
 				/**
 				 * Send Slack test message
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'send_test_slack', array( __CLASS__, 'slack_test_message_ajax' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'send_test_slack', array( __CLASS__, 'slack_test_message_ajax' ) );
 
 				/**
 				 * Send telegram test message
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'send_test_telegram', array( __CLASS__, 'telegram_test_message_ajax' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'send_test_telegram', array( __CLASS__, 'telegram_test_message_ajax' ) );
 
 				/**
 				 * Store Telegram API key
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'store_telegram_api_key', array( __CLASS__, 'store_telegram_api_key_ajax' ) );
 
 				/**
 				 * Show the code source
@@ -114,7 +114,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				 *
 				 * @since 1.9.3
 				 */
-				\add_action( 'wp_ajax_'.ADVAN_PREFIX.'get_notification_data', array( __CLASS__, 'get_notification_data' ) );
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'get_notification_data', array( __CLASS__, 'get_notification_data' ) );
 
 				if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
 					/**
@@ -124,7 +124,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @since 1.9.7
 					 */
-					\add_action( 'wp_ajax_'.ADVAN_PREFIX.'extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
+					\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'extract_plugin_versions', array( __CLASS__, 'extract_plugin_versions' ) );
 
 					/**
 					 * Switch plugin versions
@@ -133,7 +133,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 *
 					 * @since 1.9.7
 					 */
-					\add_action( 'wp_ajax_'.ADVAN_PREFIX.'switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
+					\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
 				}
 			}
 		}
@@ -229,7 +229,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			} elseif ( \is_wp_error( $result ) ) {
 				\wp_send_json_error( $result->get_error_message(), 500 );
 			} else {
-				\wp_send_json_error( __( 'Unable to delete cron.', '0-day-analytics' ), 500 );
+				\wp_send_json_error( __( 'Unable to delete cron (no longer exists maybe ? Try refreshing the page).', '0-day-analytics' ), 500 );
 			}
 		}
 
@@ -423,6 +423,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 			WP_Helper::verify_admin_nonce( 'advan-plugin-data', 'advanced-analytics-security' );
 
 			$data = Logs_List::get_notification_data();
+
+			if ( null !== Error_Log::get_last_error() ) {
+
+				// Some error with error log file - do not bother the user with endless notifications.
+				\wp_send_json_success();
+
+				\wp_die();
+			}
 
 			if ( empty( $data ) ) {
 				\wp_send_json_success();

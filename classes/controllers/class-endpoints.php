@@ -230,16 +230,6 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		public static function init() {
 
 			\add_action( 'rest_api_init', array( __CLASS__, 'init_endpoints' ) );
-
-			// $api_classes = Classes_Helper::get_classes_by_namespace( 'WP2FA\Admin\Controllers\API' );
-
-			// if ( \is_array( $api_classes ) && ! empty( $api_classes ) ) {
-			// foreach ( $api_classes as $class ) {
-			// if ( \method_exists( $class, 'init' ) ) {
-			// $class::init();
-			// }
-			// }
-			// }
 		}
 
 		/**

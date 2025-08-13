@@ -344,15 +344,18 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		}
 
 		/**
-		 * Collect error items.
+		 * Collect cron items.
+		 *
+		 * @param bool $no_type_filtering - When true, events returned are without type filtering applied.
 		 *
 		 * @return array
 		 *
 		 * @since 1.1.0
+		 * @since 2.9.0 - Introduced flag getting the events wihtout the type filtering
 		 */
-		public static function get_cron_items(): array {
+		public static function get_cron_items( bool $no_type_filtering = false ): array {
 
-			if ( null === self::$read_items ) {
+			if ( null === self::$read_items || $no_type_filtering ) {
 
 				self::$read_items = Crons_Helper::get_events();
 
@@ -360,7 +363,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
 
-				$s = sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) );
+				$s = \sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) );
 				if ( 'single_event' === $s ) {
 					$s                = '';
 					self::$read_items = array_filter(
@@ -390,12 +393,14 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 				);
 			}
 
-			if ( ! empty( $_REQUEST['event_type'] ) && is_string( $_REQUEST['event_type'] ) ) {
-				$hooks_type = \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) );
-				$filtered   = self::get_filtered_events( self::$read_items );
+			if ( ! $no_type_filtering ) {
+				if ( ! empty( $_REQUEST['event_type'] ) && is_string( $_REQUEST['event_type'] ) ) {
+					$hooks_type = \sanitize_text_field( \wp_unslash( $_REQUEST['event_type'] ) );
+					$filtered   = self::get_filtered_events( self::$read_items );
 
-				if ( isset( $filtered[ $hooks_type ] ) ) {
-					self::$read_items = $filtered[ $hooks_type ];
+					if ( isset( $filtered[ $hooks_type ] ) ) {
+						self::$read_items = $filtered[ $hooks_type ];
+					}
 				}
 			}
 
@@ -907,12 +912,12 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 							$selected = '';
 
 							if ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ) {
-								if ( $schedule_id === $_REQUEST['schedules_filter'] ) {
+								if ( \sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) ) === $schedule_id ) {
 									$selected = 'selected="selected"';
 								}
 							}
 							?>
-							<option value="<?php echo esc_attr( $schedule_id ); ?>" <?php echo $selected; ?>><?php echo esc_html( $schedule['display'] ); ?></option>
+							<option value="<?php echo \esc_attr( $schedule_id ); ?>" <?php echo $selected; ?>><?php echo \esc_html( $schedule['display'] ); ?></option>
 						<?php } ?>
 						<option value="single_event" <?php echo ( isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) && 'single_event' === $_REQUEST['schedules_filter'] ) ? 'selected="selected"' : ''; ?>><?php \esc_html_e( 'Single event', '0-day-analytics' ); ?></option>
 					</select>
@@ -1247,7 +1252,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 *
 		 * @return array<string,string>
 		 *
-		 * @since latest
+		 * @since 2.9.0
 		 */
 		public function get_views() {
 
@@ -1262,7 +1267,23 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 			// 'url'      => __( 'URL events', '0-day-analytics' ),
 			);
 
-			$filtered = self::get_filtered_events( self::get_cron_items() );
+			$url = \add_query_arg(
+				array(
+					'page' => self::CRON_MENU_SLUG,
+					// self::SEARCH_INPUT => self::escaped_search_input(),
+					// 'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+				),
+				\admin_url( 'admin.php' )
+			);
+
+			$views['all'] = sprintf(
+				'<a href="%1$s">%2$s <span class="count">(%3$s)</span></a>',
+				\esc_url( $url ),
+				\esc_html__( 'All events (no filters)', '0-day-analytics' ),
+				\esc_html( \number_format_i18n( count( Crons_Helper::get_events() ) ) )
+			);
+
+			$filtered = self::get_filtered_events( self::get_cron_items( true ) );
 
 			/**
 			 * @var array<string,string> $types
@@ -1282,7 +1303,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					array(
 						'page'             => self::CRON_MENU_SLUG,
 						self::SEARCH_INPUT => self::escaped_search_input(),
-						'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+						'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) ) : '',
 						'event_type'       => $key,
 					),
 					\admin_url( 'admin.php' )
@@ -1306,14 +1327,14 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 		 * @param array<string,stdClass> $events The list of all events.
 		 * @return array<string,array<string,stdClass>> Array of filtered events keyed by filter name.
 		 *
-		 * @since latest
+		 * @since 2.9.0
 		 */
 		public static function get_filtered_events( array $events ) {
 
 			$filtered['noaction'] = array_filter(
 				$events,
 				function ( $event ) {
-					$hook_callbacks = $hook_callbacks = Crons_Helper::get_cron_callbacks( $event['hook'] );
+					$hook_callbacks = Crons_Helper::get_cron_callbacks( $event['hook'] );
 
 					return empty( $hook_callbacks );
 				}
