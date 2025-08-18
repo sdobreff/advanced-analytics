@@ -312,7 +312,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 													<div>
 														<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
 													</div>
-													<div class=""><span title="<?php echo __( 'Copy to clipboard', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;" aria-hidden="true"></span></div>
+													<div class=""><span title="<?php echo __( 'Copy to clipboard (as raw HTML)', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span></div>
 												</div>
 												<div class="http-request-args aadvana-pre-300">
 
@@ -341,11 +341,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 									cache: 'no-cache'
 								}).then( ( attResp ) => {
 
-									//console.log(attResp);
-
 									jQuery('.media-modal .http-request-args').html(attResp.mail_body);
-									
-									
+
 								} ).catch(
 									( error ) => {
 										if (error.message) {
@@ -375,12 +372,14 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 
 						jQuery( document ).on( 'click', '.dashicons.dashicons-clipboard', function( e ) {
 
-							if ( jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').length ) {
-								let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').html();
+							if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
+								let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
 
-								selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
-								selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
-								selectedText = jQuery(selectedText).text();
+								console.log(jQuery(this).parent().parent().next('.aadvana-pre-300').html())
+
+								// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+								// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+								// selectedText = jQuery(selectedText).text();
 
 								navigator.clipboard.writeText(selectedText);
 							}
@@ -393,12 +392,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 
 							jQuery( document ).on( 'click', '.dashicons.dashicons-share', function( e ) {
 
-								if ( jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').length ) {
-									let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').children('pre').html();
+								if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
+									let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
 
-									selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
-									selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
-									selectedText = jQuery(selectedText).text();
+									// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+									// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+									// selectedText = jQuery(selectedText).text();
 
 									const shareData = {
 										text: selectedText + '\n\n' + "<?php echo \get_site_url(); ?>",

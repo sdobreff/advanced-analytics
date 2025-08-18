@@ -425,22 +425,6 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 			switch ( $column_name ) {
 
-				case 'type':
-					return '<span id="advana-request-type-' . $item['id'] . '" class="dark-badge badge">' . \esc_html( $item[ $column_name ] ) . '</span>';
-
-				case 'url':
-				case 'page_url':
-					$value = \str_replace( array( 'http://', 'https://' ), '', $item[ $column_name ] );
-					$value = \str_replace( WP_Helper::get_blog_domain(), '', $value );
-
-					$title = \esc_html( $value );
-
-					$value = substr( $value, 0, 70 );
-
-					// Escape & wrap in <code> tag.
-					$value = '<code id="advana-request-' . $column_name . '-' . $item['id'] . '" title="' . $title . '">' . \esc_html( $value ) . '</code>';
-					return $value;
-
 				case 'user_id':
 					if ( isset( $item[ $column_name ] ) && ! empty( $item[ $column_name ] ) && 0 !== $item[ $column_name ] ) {
 						$user = \get_user_by( 'id', $item[ $column_name ] );
@@ -452,14 +436,6 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					} else {
 						return \esc_html__( 'WP System or Anonymous user', '0-day-analytics' );
 					}
-
-				case 'domain':
-					// Escape & wrap in <code> tag.
-					return '<code id="advana-request-' . $column_name . '-' . $item['id'] . '">' . \esc_html( $item[ $column_name ] ) . '</code>';
-
-				case 'runtime':
-					// Escape & wrap in <code> tag.
-					return '<code id="advana-request-' . $column_name . '-' . $item['id'] . '">' . \esc_html( \number_format( (float) $item[ $column_name ], 3 ) ) . 's</code>';
 
 				case 'subject':
 				case 'email_to':
@@ -503,12 +479,44 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 					if ( isset( $item['error_file'] ) ) {
 
-						$item['plugin'] = Plugin_Theme_Helper::get_plugin_from_path( $item['error_file'] );
+						$plugins_dir_basename = basename( \WP_PLUGIN_DIR );
 
-						if ( isset( $item['plugin'] ) && ! empty( $item['plugin'] ) ) {
-							return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( self::$sources['plugins'][ $item['plugin'] ]['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . self::$sources['plugins'][ $item['plugin'] ]['Version'] . $source_link;
+						if ( false !== \mb_strpos( $item['error_file'], $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+							$split_plugin = explode( \DIRECTORY_SEPARATOR, $item['error_file'] );
+
+							$next        = false;
+							$plugin_base = '';
+							foreach ( $split_plugin as $part ) {
+								if ( $next ) {
+									$plugin_base = $part;
+									break;
+								}
+								if ( $plugins_dir_basename === $part ) {
+									$next = true;
+								}
+							}
+
+							// if ( isset( self::$sources['plugins'][ $plugin_base ] ) ) {
+							// return $plugin_base;
+							// } else {
+
+								// $plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+								// if ( ! empty( $plugin ) ) {
+								// self::$sources['plugins'][ $plugin_base ] = $plugin;
+								// return $plugin_base;
+								// }
+							// }
+
+							if ( isset( $plugin_base ) && ! empty( $plugin_base ) ) {
+
+								$item['plugin'] = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+
+								if ( isset( $item['plugin'] ) && ! empty( $item['plugin'] ) ) {
+									return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( $item['plugin']['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . $item['plugin']['Version'] . $source_link;
+								}
+							}
 						}
-
 						$theme_root = Plugin_Theme_Helper::get_default_path_for_themes();
 
 						if ( false !== \mb_strpos( $item['error_file'], $theme_root . \DIRECTORY_SEPARATOR ) ) {
@@ -529,34 +537,29 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 								}
 							}
 
-							if ( isset( self::$sources['themes'][ $theme_base ] ) ) {
-								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . esc_html( self::$sources['themes'][ $theme_base ] ) . '</b>' . $source_link;
-							} else {
-
 								$theme = Plugin_Theme_Helper::get_theme_from_path( $theme_base );
 
-								if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
-									$name = $theme->get( 'Name' );
+							if ( ! empty( $theme ) && is_a( $theme, '\WP_Theme' ) ) {
+								$name = $theme->get( 'Name' );
 
-									$version = $theme->get( 'Version' );
-									$version = ( ! empty( $version ) ) ? '<br>' . __( 'Current version: ', '0-day-analytics' ) . $version : '<br>' . __( 'Unknown version', '0-day-analytics' );
+								$version = $theme->get( 'Version' );
+								$version = ( ! empty( $version ) ) ? '<br>' . __( 'Current version: ', '0-day-analytics' ) . $version : '<br>' . __( 'Unknown version', '0-day-analytics' );
 
-									$name = ( ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' ) ) . $version;
+								$name = ( ( ! empty( $name ) ) ? $name : __( 'Unknown theme', '0-day-analytics' ) ) . $version;
 
-									$parent = $theme->parent(); // ( 'parent_theme' );
-									if ( $parent ) {
-										$parent = $theme->parent()->get( 'Name' );
+								$parent = $theme->parent(); // ( 'parent_theme' );
+								if ( $parent ) {
+									$parent = $theme->parent()->get( 'Name' );
 
-										$parent_version = $theme->parent()->get( 'Version' );
-										$parent_version = ( ! empty( $parent_version ) ) ? $parent_version : __( 'Unknown version', '0-day-analytics' );
+									$parent_version = $theme->parent()->get( 'Version' );
+									$parent_version = ( ! empty( $parent_version ) ) ? $parent_version : __( 'Unknown version', '0-day-analytics' );
 
-										$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '<br>' . __( 'Parent Current Version: ', '0-day-analytics' ) . $parent_version . '</div>' : '';
-									}
-									$name .= (string) $parent;
-
-									self::$sources['themes'][ $theme_base ] = $name;
-									return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
+									$parent = ( ! empty( $parent ) ) ? '<div>' . __( 'Parent theme: ', '0-day-analytics' ) . $parent . '<br>' . __( 'Parent Current Version: ', '0-day-analytics' ) . $parent_version . '</div>' : '';
 								}
+								$name .= (string) $parent;
+
+								
+								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
 							}
 						}
 
@@ -970,20 +973,18 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 			$record = WP_Mail_Entity::load( 'id=%d', array( $id ) );
 
 			if ( is_array( $record ) && ! empty( $record ) ) {
-				//header( 'Content-Type: text/html' );
-
 				if ( isset( $record['is_html'] ) && (bool) $record['is_html'] ) {
-					$message =  WP_Mail_Log::filter_html( $record['message'] );
+					$message = WP_Mail_Log::filter_html( $record['message'] );
 				} else {
-					$message =  $record['message'];
+					$message = $record['message'];
 				}
 
 				return rest_ensure_response(
-				array(
-					'success' => true,
-					'mail_body' => $message,
-				)
-			);
+					array(
+						'success'   => true,
+						'mail_body' => $message,
+					)
+				);
 
 			} else {
 				return new \WP_Error(

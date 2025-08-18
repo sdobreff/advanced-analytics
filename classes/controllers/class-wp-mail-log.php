@@ -51,6 +51,15 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			}
 		}
 
+		/**
+		 * Extracts all of the mail information and stores it in the DB
+		 *
+		 * @param array $args - Array with all of the mail arguments.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function record_mail( $args ) {
 
 			if ( \is_array( $args ) ) {
@@ -70,6 +79,15 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			}
 		}
 
+		/**
+		 * Stores class constant about the typo of the email - HTML or plain text.
+		 *
+		 * @param string $content_type - The current content type of the mail.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function save_is_html( $content_type ) {
 
 			self::$is_html = ( 'text/html' === $content_type ) ? 1 : 0;
@@ -77,12 +95,33 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			return $content_type;
 		}
 
+		/**
+		 * Filters HTML content of the mail.
+		 *
+		 * @param string $value - The mail body.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function filter_html( $value ): string {
+
+			$value = preg_replace( '~<!--(?!<!)[^\[>].*?-->~s', '', $value );
+
 			$value = htmlspecialchars_decode( (string) $value );
 
-			return wp_kses( $value, self::get_allowed_tags() );
+			$string = \wp_kses( $value, self::get_allowed_tags() );
+
+			return $string;
 		}
 
+		/**
+		 * What tags are allowed in the content of the mail.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
 		private static function get_allowed_tags(): array {
 			$tags          = wp_kses_allowed_html( 'post' );
 			$tags['style'] = array();
@@ -90,6 +129,16 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			return $tags;
 		}
 
+		/**
+		 * Converts array to string (inner method)
+		 *
+		 * @param array  $pieces - The array to convert.
+		 * @param string $glue - The glue which to use when converting to string.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
 		public static function array_to_string( $pieces, $glue = ', ' ) {
 			$result = self::flatten( $pieces );
 
@@ -143,7 +192,11 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		/**
 		 * Get the details of the method that originally triggered wp_mail
 		 *
+		 * @param string $function_name - The name of the function to search for in the backtrace.
+		 *
 		 * @return array a single element of the debug_backtrace function
+		 *
+		 * @since latest
 		 */
 		private static function get_backtrace( $function_name = 'wp_mail' ): ?array {
 			// $backtrace_segment = null;
@@ -164,9 +217,11 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 * Convert attachment ids or urls into a format to be usable
 		 * by the logs
 		 *
-		 * @param array | string $attachments either array of attachment ids or their urls
+		 * @param array | string $attachments either array of attachment ids or their urls.
 		 *
 		 * @return array [id, url] of attachments
+		 *
+		 * @since latest
 		 */
 		protected static function get_attachment_locations( $attachments ): array {
 			if ( empty( $attachments ) ) {
@@ -214,6 +269,15 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			return $result;
 		}
 
+		/**
+		 * Extracts attachment IDs from the url.
+		 *
+		 * @param array|string $urls - The URLs to use for IDs extraction.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function get_attachment_ids_from_url( $urls ) {
 			if ( empty( $urls ) ) {
 				return array();

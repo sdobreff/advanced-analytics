@@ -118,9 +118,9 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 */
 		public static function get_column_names_admin(): array {
 			return array(
+				'time'              => __( 'Date', '0-day-analytics' ),
 				'email_to'          => __( 'To', '0-day-analytics' ),
 				'subject'           => __( 'Subject', '0-day-analytics' ),
-				'time'              => __( 'Date', '0-day-analytics' ),
 				'backtrace_segment' => __( 'Source', '0-day-analytics' ),
 			);
 		}
