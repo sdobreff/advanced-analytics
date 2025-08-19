@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 2.9.0
+Stable tag: 3.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -100,6 +100,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.0.0 =
+Mail logger introduced.
 
 = 2.9.0 =
 Option to disable browser notifications from settings (in plugin not in the browser). Implemented different sorting options for crons viewer. Code improvements and bug fixes.

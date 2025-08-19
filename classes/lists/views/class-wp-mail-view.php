@@ -6,7 +6,7 @@
  *
  * @package advanced-analytics
  *
- * @since latest
+ * @since 3.0.0
  */
 
 declare(strict_types=1);
@@ -29,7 +29,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 	/**
 	 * Responsible for proper context determination.
 	 *
-	 * @since latest
+	 * @since 3.0.0
 	 */
 	class WP_Mail_View {
 
@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function analytics_wp_mail_page() {
 			\add_thickbox();
@@ -273,7 +273,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						margin-bottom: 1rem;
 						display: inline-block;
 						vertical-align: top;
-						width: 48%;
 						box-sizing: border-box;
 					}
 					html.aadvana-darkskin .wrapper .box {
@@ -283,10 +282,21 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 					html.aadvana-darkskin .media-frame-content {
 						background-color: #1d456b !important;
 					}
+
+					.wrapper #attachments {
+						width: 10%;
+					}
+					.wrapper #mail-body {
+						width: 70%;
+					}
 					@media screen and (max-width: 782px) {
 
 						.wrapper .box{
 							display: block;
+							width: auto;
+						}
+
+						.wrapper #attachments, .wrapper #mail-body {
 							width: auto;
 						}
 
@@ -305,20 +315,34 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 							</div>
 							<div class="media-frame-content">
 								<div class="modal-content-wrap">
+									<p>
+										<b><?php \esc_html_e( 'To', '0-day-analytics' ); ?>:</b> 
+										<span class="http-mail-to"></span><br>
+										<b><?php \esc_html_e( 'Subject', '0-day-analytics' ); ?>:</b> <span class="http-mail-subject"></span><br>
+										<b><?php \esc_html_e( 'Additional headers', '0-day-analytics' ); ?>:</b> <span class="http-mail-headers"></span>
+									</p>
 									<div class="aadvana-panel-wrapper">
 										<div class="aadvana-request-response aadvana-panel-active wrapper">
-											<div class="box">
+											<div class="box" id="mail-body">
 												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 													<div>
-														<h3><?php \esc_html_e( 'Request:', '0-day-analytics' ); ?></h3>
+														<h3><?php \esc_html_e( 'Mail body:', '0-day-analytics' ); ?></h3>
 													</div>
-													<div class=""><span title="<?php echo __( 'Copy to clipboard (as raw HTML)', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span> <span title="<?php echo __( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span></div>
+													<div class=""><span title="<?php echo __( 'Copy to clipboard (as raw HTML)', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span> <span title="<?php esc_html_e( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span></div>
 												</div>
-												<div class="http-request-args aadvana-pre-300">
-
+												<div class="http-request-args aadvana-pre-300" style="background: #fff;color:#000;">
+													<?php
+													\esc_html_e( 'Loading please wait...', '0-day-analytics' );
+													?>
+														
 												</div>
 											</div>
-											
+											<div class="box" id="attachments" style="display:none;">
+												<div>
+													<h3><?php \esc_html_e( 'Attachments:', '0-day-analytics' ); ?></h3>
+													</div>
+												<div class="http-response aadvana-pre-300"></div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -342,6 +366,14 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 								}).then( ( attResp ) => {
 
 									jQuery('.media-modal .http-request-args').html(attResp.mail_body);
+									jQuery('.media-modal .http-mail-to').html(attResp.email_to);
+									jQuery('.media-modal .http-mail-subject').html(attResp.subject);
+									jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
+
+									if ( attResp.attachments ) {
+										jQuery('.media-modal #attachments').show();
+										jQuery('.media-modal .http-response').html(attResp.attachments);
+									}
 
 								} ).catch(
 									( error ) => {
@@ -364,7 +396,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						});
 
 						jQuery(document).on('click', '.media-modal-close', function () {
-							jQuery('.media-modal .http-request-args').html('');
+							jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
+							jQuery('.media-modal .http-mail-to').html('');
+							jQuery('.media-modal .http-mail-subject').html('');
+							jQuery('.media-modal .http-mail-headers').html('');
+							jQuery('.media-modal #attachments').hide();
 							jQuery('.media-modal .http-response').html('');
 							jQuery('.media-modal').removeClass('open');
 							jQuery('.media-modal-backdrop').removeClass('open');
@@ -428,11 +464,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function add_help_content_table() {
 
-			$help_text  = '<p>' . __( 'This screen allows you to see all the wp_mail where your WordPress site is currently running.', '0-day-analytics' ) . '</p>';
+			$help_text  = '<p>' . __( 'This screen allows you to see all the mails sent from your WordPress site.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You can specify how many rows to be shown, or filter and search for given value(s).', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'You can delete rows - keep in mind that this operation is destructive and can not be undone - make a backup first.', '0-day-analytics' ) . '</p>';
 			$help_text .= '<p>' . __( 'Bulk operations are supported.', '0-day-analytics' ) . '</p>';
@@ -447,7 +483,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 		 *
 		 * @return string  Help Text
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function add_config_content_table() {
 
@@ -577,7 +613,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function page_load() {
 			if ( ! empty( $_GET['_wp_http_referer'] ) ) {

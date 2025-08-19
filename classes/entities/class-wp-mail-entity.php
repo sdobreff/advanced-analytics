@@ -4,7 +4,7 @@
  *
  * @package advan
  *
- * @since latest
+ * @since 3.0.0
  */
 
 declare(strict_types=1);
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 	/**
-	 * Responsible for the events metadata.
+	 * Responsible for the mail metadata.
 	 */
 	class WP_Mail_Entity extends Abstract_Entity {
 		/**
@@ -26,7 +26,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @var string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static $table = ADVAN_PREFIX . 'wp_mail_log';
 
@@ -35,7 +35,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static $fields = array(
 			'id'                 => 'int',
@@ -56,7 +56,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static $fields_values = array(
 			'id'                 => 0,
@@ -77,7 +77,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @param \wpdb $connection - \wpdb connection to be used for name extraction.
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function create_table( $connection = null ): bool {
 			if ( null !== $connection ) {
@@ -91,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			$table_name    = self::get_table_name( $connection );
 			$wp_entity_sql = '
 				CREATE TABLE `' . $table_name . '` (
-					id BIGINT NOT NULL AUTO_INCREMENT,
+					id BIGINT unsigned not null auto_increment,
 					time DOUBLE NOT NULL DEFAULT 0,
 					email_to TEXT DEFAULT NULL,
 					subject TEXT DEFAULT NULL,
@@ -114,13 +114,15 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function get_column_names_admin(): array {
 			return array(
 				'time'              => __( 'Date', '0-day-analytics' ),
 				'email_to'          => __( 'To', '0-day-analytics' ),
 				'subject'           => __( 'Subject', '0-day-analytics' ),
+				'is_html'           => __( 'Is HTML', '0-day-analytics' ),
+				'attachments'       => __( 'Attachments', '0-day-analytics' ),
 				'backtrace_segment' => __( 'Source', '0-day-analytics' ),
 			);
 		}

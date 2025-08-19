@@ -168,6 +168,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		private static $settings_requests_link = '';
 
 		/**
+		 * The link to the WP admin settings page
+		 *
+		 * @var string
+		 */
+		private static $settings_wp_mails_link = '';
+
+		/**
 		 * The current version of the plugin
 		 *
 		 * @var string
@@ -625,13 +632,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				}
 				/* Requests end */
 
-
 				/* WP Mail start */
 				if ( self::get_option( 'wp_mail_module_enabled' ) ) {
 					WP_Mail_List::menu_add();
 				}
 				/* WP Mail end */
-
 
 				/* Crons start */
 				if ( self::get_option( 'cron_module_enabled' ) ) {
@@ -1064,14 +1069,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function get_wp_mail_page_link() {
-			if ( '' === self::$settings_requests_link ) {
-				self::$settings_requests_link = \add_query_arg( 'page', WP_Mail_List::WP_MAIL_MENU_SLUG, \network_admin_url( 'admin.php' ) );
+			if ( '' === self::$settings_wp_mails_link ) {
+				self::$settings_wp_mails_link = \add_query_arg( 'page', WP_Mail_List::WP_MAIL_MENU_SLUG, \network_admin_url( 'admin.php' ) );
 			}
 
-			return self::$settings_requests_link;
+			return self::$settings_wp_mails_link;
 		}
 
 		/**
@@ -1596,6 +1601,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// Modules start.
 			$advanced_options['cron_module_enabled']       = ( array_key_exists( 'cron_module_enabled', $post_array ) ) ? filter_var( $post_array['cron_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['requests_module_enabled']   = ( array_key_exists( 'requests_module_enabled', $post_array ) ) ? filter_var( $post_array['requests_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['wp_mail_module_enabled']   = ( array_key_exists( 'wp_mail_module_enabled', $post_array ) ) ? filter_var( $post_array['wp_mail_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['transients_module_enabled'] = ( array_key_exists( 'transients_module_enabled', $post_array ) ) ? filter_var( $post_array['transients_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['tables_module_enabled']     = ( array_key_exists( 'tables_module_enabled', $post_array ) ) ? filter_var( $post_array['tables_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			// Modules end.
@@ -1788,7 +1794,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			if ( WP_Helper::get_wp_screen() && ( in_array( WP_Helper::get_wp_screen()->base, self::get_plugin_page_slugs(), true ) ) ) {
 
 				return sprintf(
-					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
+					'<a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; <a href="%s">%s</a> &#8729; %s %s',
 					self::get_error_log_page_link(),
 					__( 'Error Log', 'wp-security-audit-log' ),
 					( self::get_option( 'cron_module_enabled' ) ) ? self::get_crons_page_link() : '',
@@ -1799,6 +1805,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					( self::get_option( 'transients_module_enabled' ) ) ? __( 'Transients', 'wp-security-audit-log' ) : '',
 					( self::get_option( 'requests_module_enabled' ) ) ? self::get_requests_page_link() : '',
 					( self::get_option( 'requests_module_enabled' ) ) ? __( 'Requests', 'wp-security-audit-log' ) : '',
+					( self::get_option( 'wp_mail_module_enabled' ) ) ? self::get_wp_mail_page_link() : '',
+					( self::get_option( 'wp_mail_module_enabled' ) ) ? __( 'Mails', 'wp-security-audit-log' ) : '',
 					__( 'Version ', 'wp-security-audit-log' ),
 					ADVAN_VERSION
 				);

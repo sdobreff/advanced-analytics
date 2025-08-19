@@ -121,12 +121,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 		public static function add_settings_link( $links, $file ) {
 			if ( ADVAN_PLUGIN_BASENAME === $file ) {
 
-				if ( ( Settings::get_option( 'cron_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . \esc_url( Settings::get_crons_page_link() ) . '">' . \esc_html__( 'Cron Jobs', '0-day-analytics' ) . '</a>';
-					array_unshift( $links, $settings_link );
-				}
-				if ( ( Settings::get_option( 'transients_module_enabled' ) ) ) {
-					$settings_link = '<a href="' . \esc_url( Settings::get_transients_page_link() ) . '">' . \esc_html__( 'Transients', '0-day-analytics' ) . '</a>';
+				if ( ( Settings::get_option( 'wp_mail_module_enabled' ) ) ) {
+					$settings_link = '<a href="' . \esc_url( Settings::get_wp_mail_page_link() ) . '">' . \esc_html__( 'Mails', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
 				if ( ( Settings::get_option( 'requests_module_enabled' ) ) ) {
@@ -135,6 +131,14 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 				}
 				if ( ( Settings::get_option( 'tables_module_enabled' ) ) ) {
 					$settings_link = '<a href="' . \esc_url( Settings::get_tables_page_link() ) . '">' . \esc_html__( 'Tables', '0-day-analytics' ) . '</a>';
+					array_unshift( $links, $settings_link );
+				}
+				if ( ( Settings::get_option( 'transients_module_enabled' ) ) ) {
+					$settings_link = '<a href="' . \esc_url( Settings::get_transients_page_link() ) . '">' . \esc_html__( 'Transients', '0-day-analytics' ) . '</a>';
+					array_unshift( $links, $settings_link );
+				}
+				if ( ( Settings::get_option( 'cron_module_enabled' ) ) ) {
+					$settings_link = '<a href="' . \esc_url( Settings::get_crons_page_link() ) . '">' . \esc_html__( 'Cron Jobs', '0-day-analytics' ) . '</a>';
 					array_unshift( $links, $settings_link );
 				}
 				$settings_link = '<a href="' . \esc_url( Settings::get_settings_page_link() ) . '">' . \esc_html__( 'Error Logs', '0-day-analytics' ) . '</a>';

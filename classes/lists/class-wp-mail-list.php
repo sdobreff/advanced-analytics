@@ -4,7 +4,7 @@
  *
  * @package    advana
  * @subpackage lists
- * @since      latest
+ * @since 3.0.0
  * @license    https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  * @link       https://wordpress.org/plugins/0-day-analytics/
  */
@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 	/**
 	 * Responsible for rendering base table for manipulation
 	 *
-	 * @since latest
+	 * @since 3.0.0
 	 */
 	class WP_Mail_List extends \WP_List_Table {
 
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @var Common_Table
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		private static $table;
 
@@ -67,7 +67,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @var int
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected $count;
 
@@ -76,7 +76,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static $rows_per_page = 20;
 
@@ -85,7 +85,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static $admin_columns = array();
 
@@ -94,7 +94,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		private static $sources = array(
 			'plugins' => array(),
@@ -106,7 +106,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @param string $table_name - The name of the table to use for the listing.
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public function __construct( string $table_name = '' ) {
 
@@ -129,7 +129,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function init() {
 			// \add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
@@ -142,7 +142,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function add_cron_job( $crons ) {
 			if ( -1 !== (int) Settings::get_option( 'advana_rest_requests_clear' ) ) {
@@ -161,7 +161,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function truncate_wp_mail_table() {
 			Common_Table::truncate_table( null, WP_Mail_Entity::get_table_name() );
@@ -172,7 +172,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function menu_add() {
 			$wp_mail_hook = \add_submenu_page(
@@ -197,7 +197,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function get_table_name(): string {
 			return self::$table::get_name();
@@ -558,7 +558,6 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 								}
 								$name .= (string) $parent;
 
-								
 								return __( 'Theme: ', '0-day-analytics' ) . '<b>' . ( $name ) . '</b>' . $source_link;
 							}
 						}
@@ -578,6 +577,73 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 					return '';
 
+				case 'is_html':
+					$icon = ( $item['is_html'] ) ? 'saved' : 'minus';
+					return '<span><span class="dashicons dashicons-' . $icon . '" aria-hidden="true"></span></span>';
+
+				case 'attachments':
+					$item['attachments'] = json_decode( $item['attachments'], true );
+					if ( isset( $item['attachments'] ) && ! empty( $item['attachments'] ) && is_array( $item['attachments'] ) ) {
+						$item['attachments'] = array_map(
+							function ( $attachment ) {
+								if ( ! isset( $attachment['id'] ) || -1 === $attachment['id'] ) {
+									$attachment['note'] = __( 'Attachment not in media library', '0-day-analytics' );
+									return $attachment;
+								}
+
+								if ( empty( $attachment['alt'] ) ) {
+									$attachment['alt'] = $attachment['url'];
+								}
+
+								return $attachment;
+							},
+							$item['attachments']
+						);
+						// $item['attachments'] = array_column( $item['attachments'], 'url' );
+						// $item['attachments'] = WP_Mail_Log::array_to_string(
+						// $item['attachments'],
+						// ' | '
+						// );
+					} else {
+						$item['attachments'] = null;
+					}
+					if ( empty( $item['attachments'] ) ) {
+							return _e( 'No', '0-day-analytics' );
+					} else {
+						\ob_start();
+						?>
+						<ul>
+							<?php
+							foreach ( $item['attachments'] as $attachment ) {
+								?>
+									<li class="attachment-container">
+										<?php
+										if ( isset( $attachment['note'] ) ) {
+											echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+											continue;
+										}
+
+										if ( \wp_attachment_is_image( $attachment['id'] ) ) {
+											?>
+
+											<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"><img src="<?php echo $attachment['url']; ?>" alt="<?php echo \esc_attr( $attachment['alt'] ); ?>" title="<?php echo \esc_attr( $attachment['alt'] ); ?>" 
+											class="attachment-item"
+											style=" display:block; width:35px; height: 35px;"/></a>
+											<?php
+										} else {
+											?>
+
+										<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+											class="attachment-item"
+											style=" display:block; width:35px; height: 35px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											<?php } ?>
+									</li>
+								<?php } ?>
+							</ul>
+							<?php
+
+							return \ob_get_clean();
+					}
 				case 'time':
 					$query_args_view_data             = array();
 					$query_args_view_data['_wpnonce'] = \wp_create_nonce( 'bulk-' . $this->_args['plural'] );
@@ -694,7 +760,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return string Text to be placed inside the column < td > .
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected function column_cb( $item ) {
 			return sprintf(
@@ -965,7 +1031,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return \WP_REST_Response|\WP_Error|string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function get_mail_body_api( \WP_REST_Request $request ) {
 			$id = abs( (int) $request->get_param( 'id' ) );
@@ -979,10 +1045,73 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					$message = $record['message'];
 				}
 
+				$attachments = '';
+
+				$record['attachments'] = json_decode( $record['attachments'], true );
+				if ( isset( $record['attachments'] ) && ! empty( $record['attachments'] ) && is_array( $record['attachments'] ) ) {
+					$record['attachments'] = array_map(
+						function ( $attachment ) {
+							if ( ! isset( $attachment['id'] ) || -1 === $attachment['id'] ) {
+								$attachment['note'] = __( 'Attachment not in media library', '0-day-analytics' );
+								return $attachment;
+							}
+
+							if ( empty( $attachment['alt'] ) ) {
+								$attachment['alt'] = $attachment['url'];
+							}
+
+							return $attachment;
+						},
+						$record['attachments']
+					);
+
+				} else {
+					$record['attachments'] = null;
+				}
+				if ( ! empty( $record['attachments'] ) ) {
+					\ob_start();
+					?>
+						<ul>
+						<?php
+						foreach ( $record['attachments'] as $attachment ) {
+							?>
+									<li class="attachment-container">
+									<?php
+									if ( isset( $attachment['note'] ) ) {
+										echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										continue;
+									}
+
+									if ( \wp_attachment_is_image( $attachment['id'] ) ) {
+										?>
+
+											<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"><img src="<?php echo $attachment['url']; ?>" alt="<?php echo \esc_attr( $attachment['alt'] ); ?>" title="<?php echo \esc_attr( $attachment['alt'] ); ?>" 
+											class="attachment-item"
+											style=" display:block; width:50px; height: 50px;"/></a>
+											<?php
+									} else {
+										?>
+
+										<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+											class="attachment-item"
+											style=" display:block; width:50px; height: 50px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											<?php } ?>
+									</li>
+								<?php } ?>
+							</ul>
+							<?php
+
+							$attachments = \ob_get_clean();
+				}
+
 				return rest_ensure_response(
 					array(
-						'success'   => true,
-						'mail_body' => $message,
+						'success'            => true,
+						'mail_body'          => $message,
+						'email_to'           => $record['email_to'],
+						'subject'            => $record['subject'],
+						'additional_headers' => $record['additional_headers'] ?? esc_html__( 'No additional headers', '0-day-analytics' ),
+						'attachments'        => $attachments,
 					)
 				);
 

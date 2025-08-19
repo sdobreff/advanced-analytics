@@ -4,7 +4,7 @@
  *
  * @package 0-day-analytics
  *
- * @since latest
+ * @since 3.0.0
  */
 
 declare(strict_types=1);
@@ -23,7 +23,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 	/**
 	 * Responsible for collecting the amils.
 	 *
-	 * @since latest
+	 * @since 3.0.0
 	 */
 	class WP_Mail_Log {
 
@@ -32,7 +32,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @var integer
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		private static $is_html = 0;
 
@@ -41,7 +41,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function init() {
 			if ( Settings::get_option( 'wp_mail_module_enabled' ) ) {
@@ -58,7 +58,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function record_mail( $args ) {
 
@@ -86,7 +86,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function save_is_html( $content_type ) {
 
@@ -102,7 +102,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function filter_html( $value ): string {
 
@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		private static function get_allowed_tags(): array {
 			$tags          = wp_kses_allowed_html( 'post' );
@@ -137,7 +137,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function array_to_string( $pieces, $glue = ', ' ) {
 			$result = self::flatten( $pieces );
@@ -158,7 +158,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return array Flattened array to one level
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		public static function flatten( $array, $separator = '.', $parent = null ) {
 			if ( ! is_array( $array ) ) {
@@ -196,7 +196,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return array a single element of the debug_backtrace function
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		private static function get_backtrace( $function_name = 'wp_mail' ): ?array {
 			// $backtrace_segment = null;
@@ -221,7 +221,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return array [id, url] of attachments
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
 		protected static function get_attachment_locations( $attachments ): array {
 			if ( empty( $attachments ) ) {
@@ -259,14 +259,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				return array();
 			}
 
-			for ( $i = 0, $iMax = count( $attachments ); $i < $iMax; $i++ ) {
-				$result[] = array(
-					'id'  => $attachment_ids[ $i ],
-					'url' => \wp_upload_dir()['url'] . $attachments[ $i ],
-				);
-			}
-
-			return $result;
+			return $attachment_ids;
 		}
 
 		/**
@@ -274,49 +267,52 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @param array|string $urls - The URLs to use for IDs extraction.
 		 *
-		 * @return void
+		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.0.0
 		 */
-		public static function get_attachment_ids_from_url( $urls ) {
+		public static function get_attachment_ids_from_url( $urls ): array {
 			if ( empty( $urls ) ) {
 				return array();
 			}
 
 			global $wpdb;
 
-			$sql = 'SELECT DISTINCT post_id
+			$attachment_ids = array();
+
+			if ( ! \is_array( $urls ) ) {
+				$urls = array( $urls );
+			}
+
+			foreach ( $urls as &$url ) {
+				$sql = 'SELECT DISTINCT post_id
                 FROM ' . $wpdb->prefix . 'postmeta
 				WHERE meta_value LIKE %s';
 
-			if ( is_array( $urls ) && count( $urls ) > 1 ) {
-				foreach ( $urls as $url ) {
-					// Skip first url as it's covered above.
-					if ( $url === $urls[0] ) {
-						continue;
-					}
+				$sql .= " AND meta_key = '_wp_attached_file'";
 
-					$sql .= ' OR meta_value LIKE %s';
+				$url = '%' . $url . '%';
+
+				$results = $wpdb->get_results( $wpdb->prepare( $sql, $url), ARRAY_N );
+
+				if ( isset( $results[0] ) ) {
+					$attachment_ids[] = array(
+						'id'        => (int) $results[0][0],
+						'url'       => \wp_get_attachment_url( (int) $results[0][0] ),
+						'src'       => \wp_mime_type_icon( (int) $results[0][0] ),
+						'alt'       => \get_post_meta( (int) $results[0][0], '_wp_attachment_image_alt', true ),
+						'mime_type' => \get_post_mime_type( (int) $results[0][0] ),
+					);
+				} else {
+					$attachment_ids[] = array(
+						'id' => -1,
+						'url' => $url,
+					);
 				}
 			}
+			unset($url);
 
-			$sql .= " AND meta_key = '_wp_attached_file'";
-
-			$urls = array_map(
-				function ( $url ) {
-					return '%' . $url . '%';
-				},
-				$urls
-			);
-
-			$sql     = $wpdb->prepare( $sql, $urls );
-			$results = $wpdb->get_results( $sql, ARRAY_N );
-
-			if ( isset( $results[0] ) ) {
-				return array_column( $results, 0 );
-			}
-
-			return array();
+			return $attachment_ids;
 		}
 	}
 }
