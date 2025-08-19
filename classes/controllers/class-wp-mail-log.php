@@ -37,6 +37,15 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		private static $is_html = 0;
 
 		/**
+		 * Class cache for the last inserted mail log ID.
+		 *
+		 * @var integer
+		 *
+		 * @since 3.0.0
+		 */
+		private static $last_id = 0;
+
+		/**
 		 * Inits the class.
 		 *
 		 * @return void
@@ -46,7 +55,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		public static function init() {
 			if ( Settings::get_option( 'wp_mail_module_enabled' ) ) {
 				\add_filter( 'wp_mail', array( __CLASS__, 'record_mail' ), PHP_INT_MAX );
-				\add_action( 'wp_mail_failed', array( __CLASS__, 'record_error' ), PHP_INT_MAX );
+				\add_action( 'wp_mail_failed', array( __CLASS__, 'record_error' ), PHP_INT_MAX, 2 );
 				\add_filter( 'wp_mail_content_type', array( __CLASS__, 'save_is_html' ), PHP_INT_MAX );
 			}
 		}
@@ -75,8 +84,25 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 					'is_html'            => (int) self::$is_html,
 				);
 
-				WP_Mail_Entity::insert( $log_entry );
+				self::$last_id = WP_Mail_Entity::insert( $log_entry );
 			}
+		}
+
+		/**
+		 * Records the error information for a failed email.
+		 *
+		 * @param \WP_Error $error - The error triggered.
+		 *
+		 * @return void
+		 *
+		 * @since 3.0.0
+		 */
+		public static function record_error( $error ) {
+			$log_entry           = WP_Mail_Entity::load( 'id=%d', array( self::$last_id ) );
+			$log_entry['status'] = 0;
+			$log_entry['error']  = $error->get_error_message();
+
+			WP_Mail_Entity::insert( $log_entry );
 		}
 
 		/**
@@ -152,9 +178,9 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		/**
 		 * Flattens an array to dot notation.
 		 *
-		 * @param array  $array An array
-		 * @param string $separator The character to flatten with
-		 * @param string $parent The parent passed to the child (private)
+		 * @param array  $array - An array.
+		 * @param string $separator - The character to flatten with.
+		 * @param string $parent - The parent passed to the child.
 		 *
 		 * @return array Flattened array to one level
 		 *
@@ -232,8 +258,6 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				$attachments = (array) $attachments;
 			}
 
-			$result = array();
-
 			array_walk(
 				$attachments,
 				function ( &$value ) {
@@ -241,8 +265,8 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				}
 			);
 
-			if ( isset( $_POST['attachment_ids'] ) ) {
-				$attachment_ids = array_values( array_filter( $_POST['attachment_ids'] ) );
+			if ( isset( $_POST['attachment_ids'] ) && \is_array( $_POST['attachment_ids'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$attachment_ids = array_map( 'intval', array_values( array_filter( $_POST['attachment_ids'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			} else {
 				$attachment_ids = self::get_attachment_ids_from_url( $attachments );
 
@@ -293,7 +317,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 
 				$url = '%' . $url . '%';
 
-				$results = $wpdb->get_results( $wpdb->prepare( $sql, $url), ARRAY_N );
+				$results = $wpdb->get_results( $wpdb->prepare( $sql, $url ), ARRAY_N ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 				if ( isset( $results[0] ) ) {
 					$attachment_ids[] = array(
@@ -305,12 +329,12 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 					);
 				} else {
 					$attachment_ids[] = array(
-						'id' => -1,
+						'id'  => -1,
 						'url' => $url,
 					);
 				}
 			}
-			unset($url);
+			unset( $url );
 
 			return $attachment_ids;
 		}

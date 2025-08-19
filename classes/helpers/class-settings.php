@@ -1314,6 +1314,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'Tables options', '0-day-analytics' ),
 				),
 
+				'head-mail-list'      => esc_html__( 'Mails Viewer', '0-day-analytics' ),
+
+				'mail-list'           => array(
+					'icon'  => 'editor-table',
+					'title' => esc_html__( 'Mail options', '0-day-analytics' ),
+				),
+
 				'head-notifications'   => esc_html__( 'Notifications', '0-day-analytics' ),
 
 				'notifications'        => array(

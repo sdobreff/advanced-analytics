@@ -18,6 +18,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 - **Cron manager** at the tip of your fingers (edit / delete / run).
 - **Transient manager** - all (stored in the DB) transients (edit / delete).
 - **Requests manager** - all requests which your WP install is making (edit / delete).
+- **Mail logger** - all mails which your WP sends are recorder and accessible from here (edit / delete).
 - **SQL tables manager** - From here you can see and delete records from all the tables currently present in the Database.
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
@@ -45,6 +46,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Built-in fully functional Transients manager.
 - Built-in Table manager.
 - Built-in Requests viewer.
+- Built-in Mail logger.
 - Built-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
 - Easily plugin version switch (the ones from official WP marketstore).

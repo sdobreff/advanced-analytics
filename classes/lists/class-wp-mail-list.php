@@ -595,6 +595,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 									$attachment['alt'] = $attachment['url'];
 								}
 
+								if ( empty( $attachment['src'] ) ) {
+									$attachment['src'] = 'data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M832%20384H576V128H192v768h640V384zm-26.496-64L640%20154.496V320h165.504zM160%2064h480l256%20256v608a32%2032%200%200%201-32%2032H160a32%2032%200%200%201-32-32V96a32%2032%200%200%201%2032-32zm160%20448h384v64H320v-64zm0-192h160v64H320v-64zm0%20384h384v64H320v-64z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E';
+								}
+
 								return $attachment;
 							},
 							$item['attachments']
@@ -661,11 +665,11 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 					$actions['details'] = '<a href="#" class="aadvan-request-show-details" data-details-id="' . $item['id'] . '">' . \esc_html__( 'Details' ) . '</a>';
 
-					$data = '<div id="advana-request-details-' . $item['id'] . '" style="display: none;">';
+					$data = '';
 
-					$data .= '<div id="advana-response-details-' . $item['id'] . '" style="display: none;">';
-
-					$data .= '</div>';
+					if ( 0 === (int) $item['status'] ) {
+						$data = '<div>' . __( 'Error occurred:', '0-day-analytics' ) . '<br><span class="badge dark-badge" style="color: #ffb3b3 !important;">' . $item['error'] . '</span></div>';
+					}
 
 					$time_format = 'g:i a';
 
@@ -1060,6 +1064,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 								$attachment['alt'] = $attachment['url'];
 							}
 
+							if ( empty( $attachment['src'] ) ) {
+								$attachment['src'] = 'data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M832%20384H576V128H192v768h640V384zm-26.496-64L640%20154.496V320h165.504zM160%2064h480l256%20256v608a32%2032%200%200%201-32%2032H160a32%2032%200%200%201-32-32V96a32%2032%200%200%201%2032-32zm160%20448h384v64H320v-64zm0-192h160v64H320v-64zm0%20384h384v64H320v-64z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E';
+							}
+
 							return $attachment;
 						},
 						$record['attachments']
@@ -1075,7 +1083,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						<?php
 						foreach ( $record['attachments'] as $attachment ) {
 							?>
-									<li class="attachment-container">
+							<li class="attachment-container">
 									<?php
 									if ( isset( $attachment['note'] ) ) {
 										echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -1096,9 +1104,9 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 											class="attachment-item"
 											style=" display:block; width:50px; height: 50px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
 											<?php } ?>
-									</li>
+							</li>
 								<?php } ?>
-							</ul>
+						</ul>
 							<?php
 
 							$attachments = \ob_get_clean();
