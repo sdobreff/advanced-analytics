@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 * @since latest
 		 */
 		public static function alter_table_301() {
-			$sql = 'ALTER TABLE `gitpod_aadvana_wp_mail_log` ADD `email_from` TEXT NOT NULL AFTER `email_to`;';
+			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `email_from` TEXT NOT NULL AFTER `email_to`;';
 
 			return Common_Table::execute_query( $sql );
 		}
