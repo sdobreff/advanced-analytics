@@ -41,6 +41,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			'id'                 => 'int',
 			'time'               => 'string',
 			'email_to'           => 'string',
+			'email_from'         => 'string',
 			'subject'            => 'string',
 			'message'            => 'string',
 			'backtrace_segment'  => 'string',
@@ -62,6 +63,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			'id'                 => 0,
 			'time'               => '',
 			'email_to'           => '',
+			'email_from'         => '',
 			'subject'            => '',
 			'message'            => '',
 			'backtrace_segment'  => '',
@@ -94,6 +96,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 					id BIGINT unsigned not null auto_increment,
 					time DOUBLE NOT NULL DEFAULT 0,
 					email_to TEXT DEFAULT NULL,
+					email_from TEXT NOT NULL,
 					subject TEXT DEFAULT NULL,
 					message MEDIUMTEXT DEFAULT NULL,
 					backtrace_segment MEDIUMTEXT NOT NULL,
@@ -110,6 +113,19 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		}
 
 		/**
+		 * Responsible for adding the from email column to the table (version 3.0.1).
+		 *
+		 * @return array|bool
+		 *
+		 * @since latest
+		 */
+		public static function alter_table_301() {
+			$sql = 'ALTER TABLE `gitpod_aadvana_wp_mail_log` ADD `email_from` TEXT NOT NULL AFTER `email_to`;';
+
+			return Common_Table::execute_query( $sql );
+		}
+
+		/**
 		 * Returns the table CMS admin fields
 		 *
 		 * @return array
@@ -120,6 +136,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			return array(
 				'time'              => __( 'Date', '0-day-analytics' ),
 				'email_to'          => __( 'To', '0-day-analytics' ),
+				'email_from'        => __( 'From', '0-day-analytics' ),
 				'subject'           => __( 'Subject', '0-day-analytics' ),
 				'is_html'           => __( 'Is HTML', '0-day-analytics' ),
 				'attachments'       => __( 'Attachments', '0-day-analytics' ),

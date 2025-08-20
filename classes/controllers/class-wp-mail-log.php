@@ -57,6 +57,8 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				\add_filter( 'wp_mail', array( __CLASS__, 'record_mail' ), PHP_INT_MAX );
 				\add_action( 'wp_mail_failed', array( __CLASS__, 'record_error' ), PHP_INT_MAX, 2 );
 				\add_filter( 'wp_mail_content_type', array( __CLASS__, 'save_is_html' ), PHP_INT_MAX );
+
+				\add_filter( 'phpmailer_init', array( __CLASS__, 'extract_more_mail_info' ), \PHP_INT_MAX );
 			}
 		}
 
@@ -85,6 +87,32 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				);
 
 				self::$last_id = WP_Mail_Entity::insert( $log_entry );
+			}
+		}
+
+		/**
+		 * Tries to extract more information from the PHPMailer object.
+		 *
+		 * @param \PHPMailer $phpmailer - The PHPMailer initialized object from WP.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function extract_more_mail_info( $phpmailer ) {
+
+			if ( \property_exists( $phpmailer, 'From' ) && ! empty( $phpmailer->From ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$log_entry = WP_Mail_Entity::load( 'id=%d', array( self::$last_id ) );
+
+				$from          = array();
+				$from['email'] = $phpmailer->From; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				if ( \property_exists( $phpmailer, 'FromName' ) && ! empty( $phpmailer->FromName ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					$from['name'] = $phpmailer->FromName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				}
+
+				$log_entry['email_from'] = self::array_to_string( $from );
+
+				WP_Mail_Entity::insert( $log_entry );
 			}
 		}
 

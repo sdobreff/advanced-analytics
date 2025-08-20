@@ -726,7 +726,16 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 			return $full_fields;
 		}
 
-
+		/**
+		 * Returns array with the results from the provided query.
+		 *
+		 * @param string $query - The SQL query to execute.
+		 * @param \epdb $connection - The DB connection object.
+		 *
+		 * @return array
+		 *
+		 * @since latest
+		 */
 		public static function get_results( string $query, $connection = null ): array {
 			if ( null !== $connection ) {
 				if ( $connection instanceof \wpdb ) {

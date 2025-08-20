@@ -318,6 +318,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 									<p>
 										<b><?php \esc_html_e( 'To', '0-day-analytics' ); ?>:</b> 
 										<span class="http-mail-to"></span><br>
+										<b><?php \esc_html_e( 'From', '0-day-analytics' ); ?>:</b> 
+										<span class="http-mail-from"></span><br>
 										<b><?php \esc_html_e( 'Subject', '0-day-analytics' ); ?>:</b> <span class="http-mail-subject"></span><br>
 										<b><?php \esc_html_e( 'Additional headers', '0-day-analytics' ); ?>:</b> <span class="http-mail-headers"></span>
 									</p>
@@ -367,6 +369,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 
 									jQuery('.media-modal .http-request-args').html(attResp.mail_body);
 									jQuery('.media-modal .http-mail-to').html(attResp.email_to);
+									jQuery('.media-modal .http-mail-from').html(attResp.email_from);
 									jQuery('.media-modal .http-mail-subject').html(attResp.subject);
 									jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
 
@@ -398,6 +401,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						jQuery(document).on('click', '.media-modal-close', function () {
 							jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
 							jQuery('.media-modal .http-mail-to').html('');
+							jQuery('.media-modal .http-mail-from').html('');
 							jQuery('.media-modal .http-mail-subject').html('');
 							jQuery('.media-modal .http-mail-headers').html('');
 							jQuery('.media-modal #attachments').hide();

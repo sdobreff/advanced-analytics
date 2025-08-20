@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Constants.
 if ( ! defined( 'ADVAN_VERSION' ) ) {
-	define( 'ADVAN_VERSION', '3.0,0' );
+	define( 'ADVAN_VERSION', '3.0.1' );
 	define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 	define( 'ADVAN_NAME', 'WP Control' );
 	define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );

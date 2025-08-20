@@ -439,6 +439,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 				case 'subject':
 				case 'email_to':
+				case 'email_from':
 					// Escape & wrap in <code> tag.
 					return '<code>' . \esc_html( $item[ $column_name ] ) . '</code>';
 				case 'backtrace_segment':
@@ -1117,6 +1118,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						'success'            => true,
 						'mail_body'          => $message,
 						'email_to'           => $record['email_to'],
+						'email_from'         => $record['email_from'],
 						'subject'            => $record['subject'],
 						'additional_headers' => $record['additional_headers'] ?? esc_html__( 'No additional headers', '0-day-analytics' ),
 						'attachments'        => $attachments,
