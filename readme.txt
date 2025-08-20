@@ -1,5 +1,5 @@
 === WP Control ===
-Tags: error log, debug, cron, transients, requests
+Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
@@ -49,7 +49,7 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Built-in Mail logger.
 - Built-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
-- Easily plugin version switch (the ones from official WP marketstore).
+- Easily plugin version switch (the ones from official WP marketplace).
 - Built-in dark mode.
 
 == Installation ==
