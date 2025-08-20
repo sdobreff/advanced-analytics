@@ -218,7 +218,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'mail_body'  => array(
+				'mail_body'       => array(
 					'class'     => WP_Mail_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 

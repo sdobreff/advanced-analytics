@@ -117,7 +117,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @return array|bool
 		 *
-		 * @since latest
+		 * @since 3.0.1
 		 */
 		public static function alter_table_301() {
 			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `email_from` TEXT DEFAULT NULL AFTER `email_to`;';

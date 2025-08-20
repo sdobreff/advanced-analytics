@@ -734,7 +734,7 @@ if ( ! class_exists( '\ADVAN\Entities\Abstract_Entity' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.0.1
 		 */
 		public static function get_results( string $query, $connection = null ): array {
 			if ( null !== $connection ) {

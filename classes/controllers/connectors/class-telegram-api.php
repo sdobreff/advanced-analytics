@@ -105,7 +105,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Telegram_API' ) ) {
 
 			$api_url = sprintf(
 				'https://api.telegram.org/bot%s/getMe',
-				urlencode( $token )
+				\rawurldecode( $token )
 			);
 
 			$response = \wp_remote_get( \esc_url_raw( $api_url ), array( 'timeout' => 15 ) );

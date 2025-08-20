@@ -97,7 +97,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.0.1
 		 */
 		public static function extract_more_mail_info( $phpmailer ) {
 
@@ -206,25 +206,25 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		/**
 		 * Flattens an array to dot notation.
 		 *
-		 * @param array  $array - An array.
+		 * @param array  $array_to_process - An array.
 		 * @param string $separator - The character to flatten with.
-		 * @param string $parent - The parent passed to the child.
+		 * @param string $parent_key - The parent passed to the child.
 		 *
 		 * @return array Flattened array to one level
 		 *
 		 * @since 3.0.0
 		 */
-		public static function flatten( $array, $separator = '.', $parent = null ) {
-			if ( ! is_array( $array ) ) {
-				return $array;
+		public static function flatten( $array_to_process, $separator = '.', $parent_key = null ) {
+			if ( ! is_array( $array_to_process ) ) {
+				return $array_to_process;
 			}
 
 			$_flattened = array();
 
 			// Rewrite keys.
-			foreach ( $array as $key => $value ) {
-				if ( $parent ) {
-					$key = $parent . $separator . $key;
+			foreach ( $array_to_process as $key => $value ) {
+				if ( $parent_key ) {
+					$key = $parent_key . $separator . $key;
 				}
 				$_flattened[ $key ] = self::flatten( $value, $separator, $key );
 			}
@@ -242,7 +242,6 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			return $flattened;
 		}
 
-
 		/**
 		 * Get the details of the method that originally triggered wp_mail
 		 *
@@ -253,8 +252,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 * @since 3.0.0
 		 */
 		private static function get_backtrace( $function_name = 'wp_mail' ): ?array {
-			// $backtrace_segment = null;
-			// $backtrace         = debug_backtrace();
+			$backtrace_segment = null;
 
 			$backtrace = ( new \Exception( '' ) )->getTrace();
 
@@ -345,7 +343,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 
 				$url = '%' . $url . '%';
 
-				$results = $wpdb->get_results( $wpdb->prepare( $sql, $url ), ARRAY_N ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				$results = $wpdb->get_results( $wpdb->prepare( $sql, $url ), ARRAY_N ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				if ( isset( $results[0] ) ) {
 					$attachment_ids[] = array(
