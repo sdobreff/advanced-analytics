@@ -232,7 +232,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 								'args'             => array(
 									'id' => array(
 										'required'    => true,
-										'type'        => 'int',
+										'type'        => 'integer',
 										'pattern'     => '\d+',
 										'description' => 'ID of the mail record which body needs to be extracted',
 									),

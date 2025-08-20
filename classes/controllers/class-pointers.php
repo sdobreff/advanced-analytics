@@ -89,7 +89,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Pointers' ) ) {
 									"<li>" + __( ' - Cron Jobs', '0-day-analytics' ) + "<\/li>" +
 									"<li>" + __( ' - Transients', '0-day-analytics' ) + "<\/li>" +
 									"<li>" + __( ' - Requests', '0-day-analytics' ) + "<\/li>" +
-									"<li>" + __( ' - Tables', '0-day-analytics' ) + "<\/li><\/ol>",
+									"<li>" + __( ' - Tables', '0-day-analytics' ) + "<\/li>" +
+									"<li>" + __( ' - Mail Logs', '0-day-analytics' ) + "<\/li><\/ol>",
 								position:
 									{
 										edge:  'left',
