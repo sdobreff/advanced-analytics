@@ -96,7 +96,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 					id BIGINT unsigned not null auto_increment,
 					time DOUBLE NOT NULL DEFAULT 0,
 					email_to TEXT DEFAULT NULL,
-					email_from TEXT NOT NULL,
+					email_from TEXT DEFAULT NULL,
 					subject TEXT DEFAULT NULL,
 					message MEDIUMTEXT DEFAULT NULL,
 					backtrace_segment MEDIUMTEXT NOT NULL,
@@ -120,7 +120,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 * @since latest
 		 */
 		public static function alter_table_301() {
-			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `email_from` TEXT NOT NULL AFTER `email_to`;';
+			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `email_from` TEXT DEFAULT NULL AFTER `email_to`;';
 
 			return Common_Table::execute_query( $sql );
 		}
