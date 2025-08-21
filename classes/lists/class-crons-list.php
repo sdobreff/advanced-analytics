@@ -802,7 +802,7 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 							try {
 								attResp = wp.apiFetch({
-									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/cron_run/' + jQuery(this).data('hash'),
+									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/cron_run/' + jQuery(this).data('hash') + '?aadvana_run_cron=1',
 									method: 'GET',
 									cache: 'no-cache'
 								}).then( ( attResp ) => {

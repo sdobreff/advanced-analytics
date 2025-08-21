@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Lists\Crons_List;
 use ADVAN\Helpers\Crons_Helper;
 
 // Exit if accessed directly.
@@ -40,6 +41,18 @@ if ( ! class_exists( '\ADVAN\Controllers\Cron_Jobs' ) ) {
 			// That is not needed for now as we are not adding any additional schedules.
 			// \add_filter( 'cron_schedules', array( __CLASS__, 'recurring_schedules' ), PHP_INT_MAX );
 			\add_action( 'after_setup_theme', array( __CLASS__, 'initialize_hooks' ), 30000 );
+
+			// Check if that is a cron job run request - if so - set the cron constant to true.
+			if ( isset( $_GET['aadvana_run_cron'] ) && 1 === (int) $_GET['aadvana_run_cron'] ) {
+				if ( ! defined( 'DOING_CRON' ) ) {
+					define( 'DOING_CRON', true );
+				}
+			}
+			if ( isset( $_GET['page'] ) && Crons_List::CRON_MENU_SLUG === $_GET['page'] && isset( $_GET['action'] ) && 'run' === $_GET['action'] ) {
+				if ( ! defined( 'DOING_CRON' ) ) {
+					define( 'DOING_CRON', true );
+				}
+			}
 		}
 
 		/**
