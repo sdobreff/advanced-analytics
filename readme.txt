@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.0.1
+Stable tag: 3.1.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -103,7 +103,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 
 == Changelog ==
 
-= 3.0.1 =
+= 3.1.0 =
 Added "From" in Mail logger module.
 
 = 3.0.0 =
