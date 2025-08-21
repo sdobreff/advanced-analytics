@@ -364,7 +364,15 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				$row_value = \esc_html( $item[ $column_name ] ) . $this->row_actions( $actions );
 
 			} else {
-				$row_value = \esc_html( $item[ $column_name ] );
+				$len = \mb_strlen( (string) $item[ $column_name ] );
+				$value = \mb_substr( (string) $item[ $column_name ], 0, 100 );
+
+				//   . '[&hellip;]'
+
+				// Escape & wrap in <code> tag.
+				$row_value = '<code>' . \esc_html( $value ) .((100 < $len)?'[&hellip;]':'') . '</code>';
+
+				//$row_value = \esc_html( $item[ $column_name ] );
 			}
 
 			return $row_value;
