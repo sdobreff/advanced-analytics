@@ -38,7 +38,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 		 * @since 1.7.0
 		 */
 		public static function analytics_transients_page() {
-
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

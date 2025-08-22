@@ -45,7 +45,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 		 */
 		public static $endpoints = array(
 			self::class => array(
-				'live'            => array(
+				'live'             => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -62,7 +62,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'severity'        => array(
+				'severity'         => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -91,7 +91,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'single_severity' => array(
+				'single_severity'  => array(
 					'class'     => Logs_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -115,7 +115,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'requests'        => array(
+				'requests'         => array(
 					'class'     => Requests_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -144,7 +144,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'cron_run'        => array(
+				'cron_run'         => array(
 					'class'     => Crons_Helper::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -168,7 +168,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'drop_table'      => array(
+				'drop_table'       => array(
 					'class'     => Common_Table::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -193,7 +193,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'truncate_table'  => array(
+				'truncate_table'   => array(
 					'class'     => Common_Table::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 
@@ -218,7 +218,38 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 						),
 					),
 				),
-				'mail_body'       => array(
+				'get_table_record' => array(
+					'class'     => Common_Table::class,
+					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
+
+					'endpoints' => array(
+						array(
+							'(?P<table_name>\w+)/(?P<id>\d+)/' => array(
+								'methods'          => array(
+									'method'   => \WP_REST_Server::READABLE,
+									'callback' => 'extract_row_data',
+								),
+								'args'             => array(
+									'table_name' => array(
+										'required'    => true,
+										'type'        => 'string',
+										'pattern'     => '\w+',
+										'description' => 'Table name',
+									),
+									'id'         => array(
+										'required'    => true,
+										'type'        => 'integer',
+										'pattern'     => '\d+',
+										'description' => 'ID of the table record which row needs to be shown',
+									),
+								),
+								'checkPermissions' => array( __CLASS__, 'check_permissions' ),
+								'showInIndex'      => false,
+							),
+						),
+					),
+				),
+				'mail_body'        => array(
 					'class'     => WP_Mail_List::class,
 					'namespace' => self::ENDPOINT_ROOT_NAME . '/v1',
 

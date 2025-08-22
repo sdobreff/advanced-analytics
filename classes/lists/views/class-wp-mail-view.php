@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ADVAN\Lists\Views;
 
-use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Lists\WP_Mail_List;
 use ADVAN\Entities\Common_Table;
@@ -43,6 +42,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 		public static function analytics_wp_mail_page() {
 			\add_thickbox();
 			\wp_enqueue_style( 'media-views' );
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -57,7 +57,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 			<?php
 
 			$action = ! empty( $_REQUEST['action'] )
-			? sanitize_key( $_REQUEST['action'] )
+			? \sanitize_key( $_REQUEST['action'] )
 			: '';
 
 			if ( ! empty( $action ) && ( 'edit_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
@@ -354,77 +354,77 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 				</div>
 				<div class="media-modal-backdrop"></div>
 
-					<script>
+				<script>
 
-						jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
-							e.preventDefault();
-							let id = jQuery( this ).data( 'details-id' );
-							let that = this;
-							try {
-								attResp = wp.apiFetch({
-									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/mail_body/' + id,
-									method: 'GET',
-									cache: 'no-cache'
-								}).then( ( attResp ) => {
+					jQuery(document).on('click', '.aadvan-request-show-details', function( e ) {
+						e.preventDefault();
+						let id = jQuery( this ).data( 'details-id' );
+						let that = this;
+						try {
+							attResp = wp.apiFetch({
+								path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/mail_body/' + id,
+								method: 'GET',
+								cache: 'no-cache'
+							}).then( ( attResp ) => {
 
-									jQuery('.media-modal .http-request-args').html(attResp.mail_body);
-									jQuery('.media-modal .http-mail-to').html(attResp.email_to);
-									jQuery('.media-modal .http-mail-from').html(attResp.email_from);
-									jQuery('.media-modal .http-mail-subject').html(attResp.subject);
-									jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
+								jQuery('.media-modal .http-request-args').html(attResp.mail_body);
+								jQuery('.media-modal .http-mail-to').html(attResp.email_to);
+								jQuery('.media-modal .http-mail-from').html(attResp.email_from);
+								jQuery('.media-modal .http-mail-subject').html(attResp.subject);
+								jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
 
-									if ( attResp.attachments ) {
-										jQuery('.media-modal #attachments').show();
-										jQuery('.media-modal .http-response').html(attResp.attachments);
+								if ( attResp.attachments ) {
+									jQuery('.media-modal #attachments').show();
+									jQuery('.media-modal .http-response').html(attResp.attachments);
+								}
+
+							} ).catch(
+								( error ) => {
+									if (error.message) {
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
 									}
+								}
+							);
+						} catch (error) {
+							throw error;
+						} finally {
+							jQuery(that).css({
+								"pointer-events": "",
+								"cursor": ""
+							})
+						}
 
-								} ).catch(
-									( error ) => {
-										if (error.message) {
-											jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
-										}
-									}
-								);
-							} catch (error) {
-								throw error;
-							} finally {
-								jQuery(that).css({
-									"pointer-events": "",
-									"cursor": ""
-								})
-							}
+						jQuery('.media-modal').addClass('open');
+						jQuery('.media-modal-backdrop').addClass('open');
+					});
 
-							jQuery('.media-modal').addClass('open');
-							jQuery('.media-modal-backdrop').addClass('open');
-						});
+					jQuery(document).on('click', '.media-modal-close', function () {
+						jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
+						jQuery('.media-modal .http-mail-to').html('');
+						jQuery('.media-modal .http-mail-from').html('');
+						jQuery('.media-modal .http-mail-subject').html('');
+						jQuery('.media-modal .http-mail-headers').html('');
+						jQuery('.media-modal #attachments').hide();
+						jQuery('.media-modal .http-response').html('');
+						jQuery('.media-modal').removeClass('open');
+						jQuery('.media-modal-backdrop').removeClass('open');
+					});
 
-						jQuery(document).on('click', '.media-modal-close', function () {
-							jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
-							jQuery('.media-modal .http-mail-to').html('');
-							jQuery('.media-modal .http-mail-from').html('');
-							jQuery('.media-modal .http-mail-subject').html('');
-							jQuery('.media-modal .http-mail-headers').html('');
-							jQuery('.media-modal #attachments').hide();
-							jQuery('.media-modal .http-response').html('');
-							jQuery('.media-modal').removeClass('open');
-							jQuery('.media-modal-backdrop').removeClass('open');
-						});
+					jQuery( document ).on( 'click', '.dashicons.dashicons-clipboard', function( e ) {
 
-						jQuery( document ).on( 'click', '.dashicons.dashicons-clipboard', function( e ) {
+						if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
+							let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
 
-							if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
-								let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
+							console.log(jQuery(this).parent().parent().next('.aadvana-pre-300').html())
 
-								console.log(jQuery(this).parent().parent().next('.aadvana-pre-300').html())
+							// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+							// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+							// selectedText = jQuery(selectedText).text();
 
-								// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
-								// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
-								// selectedText = jQuery(selectedText).text();
+							navigator.clipboard.writeText(selectedText);
+						}
 
-								navigator.clipboard.writeText(selectedText);
-							}
-
-						});
+					});
 					
 					jQuery( document ).ready( function() {
 
@@ -456,7 +456,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 							jQuery( '.dashicons.dashicons-share' ).remove();
 						}
 					});
-					</script>
+				</script>
 				<?php
 			}
 		}

@@ -39,7 +39,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Logs_List_View' ) ) {
 		 */
 		public static function render() {
 			\add_thickbox();
-
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

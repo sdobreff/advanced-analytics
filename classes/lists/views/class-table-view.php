@@ -40,6 +40,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 		 */
 		public static function analytics_table_page() {
 			\add_thickbox();
+			\wp_enqueue_style( 'media-views' );
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -94,7 +96,267 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					?>
 					</form>
 				</div>
-				<?php
+				<style>
+					/* modal */
+					.media-modal,
+					.media-modal-backdrop {
+						display: none;
+					}
+
+					.media-modal.open,
+					.media-modal-backdrop.open {
+						display: block;
+					}
+
+					#aadvana-modal.aadvana-modal .media-frame-title,
+					#aadvana-modal.aadvana-modal .media-frame-content {
+						left: 0;
+					}
+
+					.media-frame-router {
+						left: 10px;
+					}
+					#aadvana-modal.aadvana-modal
+					.media-frame-content {
+						top: 48px;
+						bottom: 0;
+						overflow: auto;
+					}
+
+					.button-link.media-modal-close {
+						cursor: pointer;
+						text-decoration: none;
+					}
+
+					.aadvana-modal-buttons{
+						position: absolute;
+						top: 0;
+						right: 0;
+					}
+					.aadvana-modal-buttons .media-modal-close{
+						position: relative;
+						width: auto;
+						padding: 0 .5rem;
+					}
+
+					.media-modal-close.prev .media-modal-icon::before {
+						content: "\f342";
+					}
+
+					.media-modal-close.next .media-modal-icon::before {
+						content: "\f346";
+					}
+
+					.modal-content-wrap {
+						padding: 16px;
+					}
+
+					/* tab and panel */
+					.aadvana-modal .nav-tab-active{
+						border-bottom: solid 1px white;
+						background-color: white;
+					}
+					.aadvana-panel-active{
+						display:block;
+						margin: 1rem 0;
+					}
+
+					.wrapper {
+						text-align: center;
+					}
+					.wrapper .box{
+						text-align: left;
+						background-color: #f4f5f6;
+						padding: .5rem;
+						border-radius: .5rem;
+						margin-bottom: 1rem;
+						display: inline-block;
+						vertical-align: top;
+						box-sizing: border-box;
+					}
+					html.aadvana-darkskin .wrapper .box {
+						background-color: #1d456b !important;
+						border: 1px solid #ccc;
+					}
+					html.aadvana-darkskin .media-frame-content {
+						background-color: #1d456b !important;
+					}
+
+					.wrapper #attachments {
+						width: 10%;
+					}
+					.wrapper #mail-body {
+						width: 70%;
+					}
+					@media screen and (max-width: 782px) {
+
+						.wrapper .box{
+							display: block;
+							width: auto;
+						}
+
+						.wrapper #attachments, .wrapper #mail-body {
+							width: auto;
+						}
+
+					}
+
+				</style>
+
+				<div id="aadvana-modal" class="media-modal aadvana-modal">
+					<div class="aadvana-modal-buttons">
+						<button class="button-link media-modal-close"><span class="media-modal-icon"></span></button>
+					</div>
+					<div class="media-modal-content">
+						<div class="media-frame">
+							<div class="media-frame-title">
+								<h1><?php \esc_html_e( 'Mail details:', '0-day-analytics' ); ?></h1>
+							</div>
+							<div class="media-frame-content">
+								<div class="modal-content-wrap">
+									<p>
+										<b><?php \esc_html_e( 'To', '0-day-analytics' ); ?>:</b> 
+										<span class="http-mail-to"></span><br>
+										<b><?php \esc_html_e( 'From', '0-day-analytics' ); ?>:</b> 
+										<span class="http-mail-from"></span><br>
+										<b><?php \esc_html_e( 'Subject', '0-day-analytics' ); ?>:</b> <span class="http-mail-subject"></span><br>
+										<b><?php \esc_html_e( 'Additional headers', '0-day-analytics' ); ?>:</b> <span class="http-mail-headers"></span>
+									</p>
+									<div class="aadvana-panel-wrapper">
+										<div class="aadvana-request-response aadvana-panel-active wrapper">
+											<div class="box" id="mail-body">
+												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
+													<div>
+														<h3><?php \esc_html_e( 'Mail body:', '0-day-analytics' ); ?></h3>
+													</div>
+													<div class=""><span title="<?php echo __( 'Copy to clipboard (as raw HTML)', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span> <span title="<?php esc_html_e( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span></div>
+												</div>
+												<div class="http-request-args aadvana-pre-300" style="background: #fff;color:#000;">
+													<?php
+													\esc_html_e( 'Loading please wait...', '0-day-analytics' );
+													?>
+														
+												</div>
+											</div>
+											<div class="box" id="attachments" style="display:none;">
+												<div>
+													<h3><?php \esc_html_e( 'Attachments:', '0-day-analytics' ); ?></h3>
+													</div>
+												<div class="http-response aadvana-pre-300"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="media-modal-backdrop"></div>
+
+				<script>
+
+					jQuery(document).on('click', '.aadvana-tablerow-view', function( e ) {
+						e.preventDefault();
+						let id = jQuery( this ).data( 'details-id' );
+						let that = this;
+						try {
+							attResp = wp.apiFetch({
+								path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/get_table_record/<?php echo $table_name ?>/' + id + '/',
+								method: 'GET',
+								cache: 'no-cache'
+							}).then( ( attResp ) => {
+
+								jQuery('.media-modal .http-request-args').html(attResp.mail_body);
+								jQuery('.media-modal .http-mail-to').html(attResp.email_to);
+								jQuery('.media-modal .http-mail-from').html(attResp.email_from);
+								jQuery('.media-modal .http-mail-subject').html(attResp.subject);
+								jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
+
+								if ( attResp.attachments ) {
+									jQuery('.media-modal #attachments').show();
+									jQuery('.media-modal .http-response').html(attResp.attachments);
+								}
+
+							} ).catch(
+								( error ) => {
+									if (error.message) {
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
+									}
+								}
+							);
+						} catch (error) {
+							throw error;
+						} finally {
+							jQuery(that).css({
+								"pointer-events": "",
+								"cursor": ""
+							})
+						}
+
+						jQuery('.media-modal').addClass('open');
+						jQuery('.media-modal-backdrop').addClass('open');
+					});
+
+					jQuery(document).on('click', '.media-modal-close', function () {
+						jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
+						jQuery('.media-modal .http-mail-to').html('');
+						jQuery('.media-modal .http-mail-from').html('');
+						jQuery('.media-modal .http-mail-subject').html('');
+						jQuery('.media-modal .http-mail-headers').html('');
+						jQuery('.media-modal #attachments').hide();
+						jQuery('.media-modal .http-response').html('');
+						jQuery('.media-modal').removeClass('open');
+						jQuery('.media-modal-backdrop').removeClass('open');
+					});
+
+					jQuery( document ).on( 'click', '.dashicons.dashicons-clipboard', function( e ) {
+
+						if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
+							let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
+
+							console.log(jQuery(this).parent().parent().next('.aadvana-pre-300').html())
+
+							// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+							// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+							// selectedText = jQuery(selectedText).text();
+
+							navigator.clipboard.writeText(selectedText);
+						}
+
+					});
+				
+					jQuery( document ).ready( function() {
+
+						if ( navigator.share ) {
+
+							jQuery( document ).on( 'click', '.dashicons.dashicons-share', function( e ) {
+
+								if ( jQuery(this).parent().parent().next('.aadvana-pre-300') ) {
+									let selectedText = jQuery(this).parent().parent().next('.aadvana-pre-300').html();
+
+									// selectedText = selectedText.replace(/<br\s*\/?>/gim, "\n");
+									// selectedText = jQuery.parseHTML(selectedText); //parseHTML return HTMLCollection
+									// selectedText = jQuery(selectedText).text();
+
+									const shareData = {
+										text: selectedText + '\n\n' + "<?php echo \get_site_url(); ?>",
+									};
+
+									try {
+										navigator.share(shareData);
+									} catch (err) {
+										jQuery(this).text( `Error: ${err}` );
+									}
+
+								}
+							});
+							
+						} else {
+							jQuery( '.dashicons.dashicons-share' ).remove();
+						}
+					});
+				</script>
+			<?php
 		}
 
 		/**

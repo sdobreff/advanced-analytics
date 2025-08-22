@@ -57,6 +57,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 		 */
 		public static function analytics_cron_page() {
 			\add_thickbox();
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

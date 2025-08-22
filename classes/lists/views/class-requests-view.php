@@ -43,6 +43,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 		public static function analytics_requests_page() {
 			\add_thickbox();
 			\wp_enqueue_style( 'media-views' );
+			\wp_enqueue_script( 'wp-api-fetch' );
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){

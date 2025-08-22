@@ -361,6 +361,8 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 				$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
+				$actions['view'] = '<a class="aadvana-tablerow-view" href="#" data-details-id="' . $item[self::$table::get_real_id_name()] . '">' . \esc_html__( 'View', '0-day-analytics' ) . '</a>';
+
 				$row_value = \esc_html( $item[ $column_name ] ) . $this->row_actions( $actions );
 
 			} else {

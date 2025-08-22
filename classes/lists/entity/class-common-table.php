@@ -313,11 +313,11 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 
 					self::execute_query( 'TRUNCATE TABLE ' . $table_name, $_wpdb );
 				// } else {
-				// 	return new \WP_Error(
-				// 		'truncate_table',
-				// 		__( 'You are not allowed to truncate WP Core table.', '0-day-analytics' ),
-				// 		array( 'status' => 400 )
-				// 	);
+				// return new \WP_Error(
+				// 'truncate_table',
+				// __( 'You are not allowed to truncate WP Core table.', '0-day-analytics' ),
+				// array( 'status' => 400 )
+				// );
 				// }
 			} elseif ( null !== $request ) { // Call is coming from REST API.
 				return new \WP_Error(
@@ -443,6 +443,8 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 * Getter for the collected table column info
 		 *
 		 * @return array
+		 *
+		 * @since latest
 		 */
 		public static function get_columns_info(): array {
 			global $wpdb;
@@ -926,6 +928,66 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			global $wpdb;
 
 			return $wpdb->prefix . 'options';
+		}
+
+		/**
+		 * Extracts single row data from given table and shows it in HTML format.
+		 *
+		 * @param \WP_REST_Request $request - The request object.
+		 *
+		 * @return \WP_REST_Response|\WP_Error
+		 *
+		 * @since latest
+		 */
+		public static function extract_row_data( \WP_REST_Request $request ) {
+			$table_name = $request->get_param( 'table_name' );
+
+			if ( '' === trim( $table_name ) ) {
+				return new \WP_Error(
+					'show_row',
+					__( 'Table name is not provided.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( ! self::check_table_exists( $table_name ) ) {
+				return new \WP_Error(
+					'show_row',
+					__( 'Table does not exist.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$id = (int) $request->get_param( 'id' );
+
+			if ( empty( $id ) ) {
+				return new \WP_Error(
+					'show_row',
+					__( 'ID is not provided or wrong.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			self::init( $table_name );
+
+			global $wpdb;
+
+			$query = $wpdb->prepare(
+				'SELECT * FROM `' . self::get_name() . '` WHERE `' . self::get_real_id_name() . '` = %d;',
+				$id
+			);
+
+			$wpdb->suppress_errors( true );
+
+			$results = $wpdb->get_results( $query, \ARRAY_A );
+
+			if ( '' !== $wpdb->last_error || null === $results ) {
+
+				$results = array();
+
+			}
+
+			$wpdb->suppress_errors( false );
 		}
 	}
 }
