@@ -144,7 +144,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 			// About to be implemented.
 
 			if ( empty( self::$themes ) ) {
-				self::$themes = wp_get_themes();
+				self::$themes = \wp_get_themes();
 			}
 			foreach ( self::$themes as $theme ) {
 				// $path = $theme->get_theme_root();

@@ -462,6 +462,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'environment_type_admin_bar'      => true,
 					'protected_config_source'         => true,
 					'keep_reading_error_log'          => false,
+					'plugin_debug_enable'             => false,
 					'advana_requests_enable'          => true,
 					'advana_http_requests_disable'    => false,
 					'advana_rest_requests_disable'    => false,
@@ -1560,6 +1561,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			$advanced_options['keep_reading_error_log'] = ( array_key_exists( 'keep_reading_error_log', $post_array ) ) ? filter_var( $post_array['keep_reading_error_log'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
+			$advanced_options['plugin_debug_enable'] = ( array_key_exists( 'plugin_debug_enable', $post_array ) ) ? filter_var( $post_array['plugin_debug_enable'], \FILTER_VALIDATE_BOOLEAN ) : false;
+
+			// If keep reading error log is diabled, plugin debug must be disabled too.
+			if ( false === $advanced_options['keep_reading_error_log'] ) {
+				$advanced_options['plugin_debug_enable'] = false;
+			}
+
 			$advanced_options['advana_requests_enable'] = ( array_key_exists( 'advana_requests_enable', $post_array ) ) ? filter_var( $post_array['advana_requests_enable'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			$advanced_options['advana_http_requests_disable'] = ( array_key_exists( 'advana_http_requests_disable', $post_array ) ) ? filter_var( $post_array['advana_http_requests_disable'], \FILTER_VALIDATE_BOOLEAN ) : false;
@@ -1697,6 +1705,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					// Clear the flag for keep reading the error log if WP settings are disabled (because at this point they are enabled).
 					$advanced_options['keep_reading_error_log'] = false;
+					$advanced_options['plugin_debug_enable'] = false;
 				}
 
 				$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;

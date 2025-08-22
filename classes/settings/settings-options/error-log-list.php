@@ -171,6 +171,16 @@ Settings::set_current_options( $settings );
 					'default' => Settings::get_current_options()['keep_reading_error_log'],
 				)
 			);
+
+			Settings::build_option(
+				array(
+					'name'    => \esc_html__( 'Enable PHP debug', '0-day-analytics' ),
+					'id'      => 'plugin_debug_enable',
+					'type'    => 'checkbox',
+					'hint'    => \esc_html__( 'Check this if you want plugin to try to set its own debugging (if there is no other option like wp-confing is not writable, no other plugin set that, or file system is unaccessible otherwise).', '0-day-analytics' ),
+					'default' => Settings::get_option( 'plugin_debug_enable' ),
+				)
+			);
 		}
 	}
 

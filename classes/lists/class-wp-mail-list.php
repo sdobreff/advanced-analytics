@@ -589,6 +589,11 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 							function ( $attachment ) {
 								if ( ! isset( $attachment['id'] ) || -1 === $attachment['id'] ) {
 									$attachment['note'] = __( 'Attachment not in media library', '0-day-analytics' );
+
+									if ( empty( $attachment['src'] ) ) {
+										$attachment['src'] = 'data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M832%20384H576V128H192v768h640V384zm-26.496-64L640%20154.496V320h165.504zM160%2064h480l256%20256v608a32%2032%200%200%201-32%2032H160a32%2032%200%200%201-32-32V96a32%2032%200%200%201%2032-32zm160%20448h384v64H320v-64zm0-192h160v64H320v-64zm0%20384h384v64H320v-64z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E';
+									}
+
 									return $attachment;
 								}
 
@@ -625,6 +630,11 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 										<?php
 										if ( isset( $attachment['note'] ) ) {
 											echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+											?>
+											<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+											class="attachment-item"
+											style=" display:block; width:35px; height: 35px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											<?php
 											continue;
 										}
 
@@ -1058,6 +1068,11 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						function ( $attachment ) {
 							if ( ! isset( $attachment['id'] ) || -1 === $attachment['id'] ) {
 								$attachment['note'] = __( 'Attachment not in media library', '0-day-analytics' );
+
+								if ( empty( $attachment['src'] ) ) {
+									$attachment['src'] = 'data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%201024%201024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20fill%3D%22currentColor%22%20d%3D%22M832%20384H576V128H192v768h640V384zm-26.496-64L640%20154.496V320h165.504zM160%2064h480l256%20256v608a32%2032%200%200%201-32%2032H160a32%2032%200%200%201-32-32V96a32%2032%200%200%201%2032-32zm160%20448h384v64H320v-64zm0-192h160v64H320v-64zm0%20384h384v64H320v-64z%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E';
+								}
+
 								return $attachment;
 							}
 
@@ -1088,7 +1103,12 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 									<?php
 									if ( isset( $attachment['note'] ) ) {
 										echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-										continue;
+										?>
+										<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+											class="attachment-item"
+											style=" display:block; width:35px; height: 35px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											<?php
+											continue;
 									}
 
 									if ( \wp_attachment_is_image( $attachment['id'] ) ) {

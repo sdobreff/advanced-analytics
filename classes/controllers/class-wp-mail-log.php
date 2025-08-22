@@ -177,7 +177,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 * @since 3.0.0
 		 */
 		private static function get_allowed_tags(): array {
-			$tags          = wp_kses_allowed_html( 'post' );
+			$tags          = \wp_kses_allowed_html( 'post' );
 			$tags['style'] = array();
 
 			return $tags;
@@ -334,7 +334,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				$urls = array( $urls );
 			}
 
-			foreach ( $urls as &$url ) {
+			foreach ( $urls as $name => &$url ) {
 				$sql = 'SELECT DISTINCT post_id
                 FROM ' . $wpdb->prefix . 'postmeta
 				WHERE meta_value LIKE %s';
@@ -354,9 +354,16 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 						'mime_type' => \get_post_mime_type( (int) $results[0][0] ),
 					);
 				} else {
+					$url        = trim( $url, '%' );
+					$upload_dir = \wp_upload_dir();
+					$full_url   = $url;
+					if ( \file_exists( \trailingslashit( $upload_dir['basedir'] ) . ( $url ) ) ) {
+						$full_url = \trailingslashit( $upload_dir['baseurl'] ) . ( $url );
+					}
 					$attachment_ids[] = array(
 						'id'  => -1,
-						'url' => $url,
+						'url' => $full_url,
+						'alt' => ( ( is_string( $name ) ) ? $name : $url ),
 					);
 				}
 			}

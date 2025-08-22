@@ -165,8 +165,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_LOG ) {
-				error_log( $out );
+			if ( WP_DEBUG_LOG || Settings::get_option( 'plugin_debug_enable' ) || Settings::get_option( 'keep_reading_error_log' ) ) {
+				\error_log( $out );
 			}
 
 			return true;
@@ -517,7 +517,7 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
 
-			if ( WP_DEBUG_LOG ) {
+			if ( WP_DEBUG_LOG || Settings::get_option( 'plugin_debug_enable' ) || Settings::get_option( 'keep_reading_error_log' ) ) {
 				\error_log( $out );
 			}
 		}
@@ -645,8 +645,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				$out .= '#' . ( ++$index ) . ' {main}' . PHP_EOL;
 			}
 			$out .= '  thrown in ' . $thrown_file . ' on line ' . $thrown_line;
-			if ( WP_DEBUG_LOG ) {
-				error_log( $out );
+			if ( WP_DEBUG_LOG || Settings::get_option( 'plugin_debug_enable' ) || Settings::get_option( 'keep_reading_error_log' ) ) {
+				\error_log( $out );
 			}
 		}
 

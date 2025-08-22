@@ -799,79 +799,82 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 								"cursor": "default"
 							});
 
+							if (typeof wp.apiFetch === 'function') {
 
-							try {
-								attResp = wp.apiFetch({
-									path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/cron_run/' + jQuery(this).data('hash') + '?aadvana_run_cron=1',
-									method: 'GET',
-									cache: 'no-cache'
-								}).then( ( attResp ) => {
-									
-									if (attResp.success) {
+								try {
+									attResp = wp.apiFetch({
+										path: '/<?php echo Endpoints::ENDPOINT_ROOT_NAME; ?>/v1/cron_run/' + jQuery(this).data('hash') + '?aadvana_run_cron=1',
+										method: 'GET',
+										cache: 'no-cache'
+									}).then( ( attResp ) => {
+										
+										if (attResp.success) {
 
-										let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
-										let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
+											let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
+											let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
+											dynRun.next('tr').fadeOut( 5000, function() {
+												dynRun.next('tr').remove();
+											});
+
+										}
+									} ).catch(
+										( error ) => {
+											if (error.message) {
+												jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
+											}
+										}
+									);
+								} catch (error) {
+									throw error;
+								} finally {
+									jQuery(that).css({
+										"pointer-events": "",
+										"cursor": ""
+									})
+								}
+							} else {
+
+								var data = {
+									'action': 'aadvana_run_cron',
+									'post_type': 'GET',
+									'_wpnonce': jQuery(this).data('nonce'),
+									'hash': jQuery(this).data('hash'),
+								};
+
+								jQuery.get(ajaxurl, data, function(response) {
+									if ( 2 === response['data'] || 0 === response['data'] ) {
+
+											let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
+											let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
+											dynRun.next('tr').fadeOut( 5000, function() {
+												dynRun.next('tr').remove();
+											});
+										
+									} else {
+										let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
 										dynRun.next('tr').fadeOut( 5000, function() {
 											dynRun.next('tr').remove();
 										});
-
 									}
-								} ).catch(
-									( error ) => {
-										if (error.message) {
-											jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + error.message + '</div></td></tr>');
+								}, 'json').fail(function(xhr, status, error) {
+									if ( xhr.responseJSON && xhr.responseJSON.data ) {
+										errorMessage = xhr.responseJSON.data;
+										jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
+									} else {
+										if ( error ) {
+											errorMessage = error + ' Check your browser console for more information.';
+											jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
 										}
 									}
-								);
-							} catch (error) {
-								throw error;
-							} finally {
-								jQuery(that).css({
-									"pointer-events": "",
-									"cursor": ""
-								})
+								}).always(function() {
+
+									jQuery(that).css({
+										"pointer-events": "",
+										"cursor": ""
+									})
+								});
+
 							}
-
-							// var data = {
-							// 	'action': 'aadvana_run_cron',
-							// 	'post_type': 'GET',
-							// 	'_wpnonce': jQuery(this).data('nonce'),
-							// 	'hash': jQuery(this).data('hash'),
-							// };
-
-							// jQuery.get(ajaxurl, data, function(response) {
-							// 	if ( 2 === response['data'] || 0 === response['data'] ) {
-
-							// 			let success = '<?php echo \esc_html__( 'Successfully run', '0-day-analytics' ); ?>';
-							// 			let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="updated" style="background:#fff; color:#000;"> ' + success + '</div></td></tr>');
-							// 			dynRun.next('tr').fadeOut( 5000, function() {
-							// 				dynRun.next('tr').remove();
-							// 			});
-									
-							// 	} else {
-							// 		let dynRun = jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + response['data'] + '</div></td></tr>');
-							// 		dynRun.next('tr').fadeOut( 5000, function() {
-							// 			dynRun.next('tr').remove();
-							// 		});
-							// 	}
-							// }, 'json').fail(function(xhr, status, error) {
-							// 	if ( xhr.responseJSON && xhr.responseJSON.data ) {
-							// 		errorMessage = xhr.responseJSON.data;
-							// 		jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
-							// 	} else {
-							// 		if ( error ) {
-							// 			errorMessage = error + ' Check your browser console for more information.';
-							// 			jQuery(that).closest("tr").after('<tr><td style="overflow:hidden;" colspan="'+(jQuery(that).closest("tr").find("td").length+1)+'"><div class="error" style="background:#fff; color:#000;"> ' + errorMessage + '</div></td></tr>');
-							// 		}
-							// 	}
-							// }).always(function() {
-
-							// 	jQuery(that).css({
-							// 		"pointer-events": "",
-							// 		"cursor": ""
-							// 	})
-							// });
-
 						});
 					});
 				</script>
