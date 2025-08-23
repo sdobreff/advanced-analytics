@@ -224,7 +224,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 
 					'endpoints' => array(
 						array(
-							'(?P<table_name>\w+)/(?P<id>\d+)/' => array(
+							'(?P<table_name>\w+)/(?P<id>\w+)/' => array(
 								'methods'          => array(
 									'method'   => \WP_REST_Server::READABLE,
 									'callback' => 'extract_row_data',
@@ -238,8 +238,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Api\Endpoints' ) ) {
 									),
 									'id'         => array(
 										'required'    => true,
-										'type'        => 'integer',
-										'pattern'     => '\d+',
+										'type'        => 'string',
+										'pattern'     => '\w+',
 										'description' => 'ID of the table record which row needs to be shown',
 									),
 								),

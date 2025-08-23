@@ -958,7 +958,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 				);
 			}
 
-			$id = (int) $request->get_param( 'id' );
+			$id = $request->get_param( 'id' );
 
 			if ( empty( $id ) ) {
 				return new \WP_Error(
@@ -973,7 +973,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			global $wpdb;
 
 			$query = $wpdb->prepare(
-				'SELECT * FROM `' . self::get_name() . '` WHERE `' . self::get_real_id_name() . '` = %d;',
+				'SELECT * FROM `' . self::get_name() . '` WHERE `' . self::get_real_id_name() . '` = %s;',
 				$id
 			);
 
@@ -988,6 +988,54 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 			}
 
 			$wpdb->suppress_errors( false );
+
+			if ( ! empty( $results ) ) {
+				\ob_start();
+
+				?>
+				<table class="widefat striped table-view-list" style="max-width:100%;table-layout: fixed;">
+					<col width="20%" />
+    				<col width="80%" />
+					<thead>
+						<tr>
+							<th style="max-width:30%">
+								<?php echo \esc_html_e( 'Column name', '0-day-analytics' ); ?>
+							</th>
+							<th>
+								<?php echo \esc_html_e( 'Column value', '0-day-analytics' ); ?>
+							</th>
+						</tr>
+					</thead>
+				<?php
+
+				foreach ( $results[0] as $key => $value ) {
+					?>
+					<tr>
+						<td width="40%"><strong><?php echo \esc_html( $key ); ?></strong></td>
+						<td><?php echo \esc_html( $value ); ?></td>
+					</tr>
+					<?php
+				}
+				?>
+				</table>
+				<?php
+				$message = \ob_get_clean();
+
+				return rest_ensure_response(
+					array(
+						'success'   => true,
+						'mail_body' => $message,
+						'table_name' => $table_name,
+					)
+				);
+
+			} else {
+				return new \WP_Error(
+					'empty_row',
+					__( 'No record found.', '0-day-analytics' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 	}
 }

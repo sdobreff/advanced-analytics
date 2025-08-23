@@ -181,12 +181,8 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					html.aadvana-darkskin .media-frame-content {
 						background-color: #1d456b !important;
 					}
-
-					.wrapper #attachments {
-						width: 10%;
-					}
 					.wrapper #mail-body {
-						width: 70%;
+						width: 99%;
 					}
 					@media screen and (max-width: 782px) {
 
@@ -194,11 +190,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 							display: block;
 							width: auto;
 						}
-
-						.wrapper #attachments, .wrapper #mail-body {
-							width: auto;
-						}
-
 					}
 
 				</style>
@@ -210,24 +201,20 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 					<div class="media-modal-content">
 						<div class="media-frame">
 							<div class="media-frame-title">
-								<h1><?php \esc_html_e( 'Mail details:', '0-day-analytics' ); ?></h1>
+								<h1><?php \esc_html_e( 'Table row details:', '0-day-analytics' ); ?></h1>
 							</div>
 							<div class="media-frame-content">
 								<div class="modal-content-wrap">
 									<p>
-										<b><?php \esc_html_e( 'To', '0-day-analytics' ); ?>:</b> 
-										<span class="http-mail-to"></span><br>
-										<b><?php \esc_html_e( 'From', '0-day-analytics' ); ?>:</b> 
-										<span class="http-mail-from"></span><br>
-										<b><?php \esc_html_e( 'Subject', '0-day-analytics' ); ?>:</b> <span class="http-mail-subject"></span><br>
-										<b><?php \esc_html_e( 'Additional headers', '0-day-analytics' ); ?>:</b> <span class="http-mail-headers"></span>
+										<b><?php \esc_html_e( 'Table', '0-day-analytics' ); ?>:</b> 
+										<span class="table-name"><?php echo \esc_html($table_name); ?></span><br>
 									</p>
 									<div class="aadvana-panel-wrapper">
 										<div class="aadvana-request-response aadvana-panel-active wrapper">
 											<div class="box" id="mail-body">
 												<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 													<div>
-														<h3><?php \esc_html_e( 'Mail body:', '0-day-analytics' ); ?></h3>
+														<h3><?php \esc_html_e( 'Row data:', '0-day-analytics' ); ?></h3>
 													</div>
 													<div class=""><span title="<?php echo __( 'Copy to clipboard (as raw HTML)', '0-day-analytics' ); ?>" class="dashicons dashicons-clipboard" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span> <span title="<?php esc_html_e( 'Share', '0-day-analytics' ); ?>" class="dashicons dashicons-share" style="cursor:pointer;font-family: dashicons !important;" aria-hidden="true"></span></div>
 												</div>
@@ -237,12 +224,6 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 													?>
 														
 												</div>
-											</div>
-											<div class="box" id="attachments" style="display:none;">
-												<div>
-													<h3><?php \esc_html_e( 'Attachments:', '0-day-analytics' ); ?></h3>
-													</div>
-												<div class="http-response aadvana-pre-300"></div>
 											</div>
 										</div>
 									</div>
@@ -267,15 +248,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 							}).then( ( attResp ) => {
 
 								jQuery('.media-modal .http-request-args').html(attResp.mail_body);
-								jQuery('.media-modal .http-mail-to').html(attResp.email_to);
-								jQuery('.media-modal .http-mail-from').html(attResp.email_from);
-								jQuery('.media-modal .http-mail-subject').html(attResp.subject);
-								jQuery('.media-modal .http-mail-headers').html(attResp.additional_headers);
-
-								if ( attResp.attachments ) {
-									jQuery('.media-modal #attachments').show();
-									jQuery('.media-modal .http-response').html(attResp.attachments);
-								}
+								//jQuery('.media-modal .table-name').html(attResp.table_name);
 
 							} ).catch(
 								( error ) => {
@@ -299,12 +272,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Table_View' ) ) {
 
 					jQuery(document).on('click', '.media-modal-close', function () {
 						jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
-						jQuery('.media-modal .http-mail-to').html('');
-						jQuery('.media-modal .http-mail-from').html('');
-						jQuery('.media-modal .http-mail-subject').html('');
-						jQuery('.media-modal .http-mail-headers').html('');
-						jQuery('.media-modal #attachments').hide();
-						jQuery('.media-modal .http-response').html('');
+						//jQuery('.media-modal .table-name').html('');
 						jQuery('.media-modal').removeClass('open');
 						jQuery('.media-modal-backdrop').removeClass('open');
 					});
