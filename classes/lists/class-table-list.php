@@ -361,20 +361,20 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 
 				$actions['delete'] = '<a class="aadvana-transient-delete" href="' . $delete_url . ' "onclick="return confirm(\'' . \esc_html__( 'You sure you want to delete this record?', '0-day-analytics' ) . '\');">' . \esc_html__( 'Delete', '0-day-analytics' ) . '</a>';
 
-				$actions['view'] = '<a class="aadvana-tablerow-view" href="#" data-details-id="' . $item[self::$table::get_real_id_name()] . '">' . \esc_html__( 'View', '0-day-analytics' ) . '</a>';
+				$actions['view'] = '<a class="aadvana-tablerow-view" href="#" data-details-id="' . $item[ self::$table::get_real_id_name() ] . '">' . \esc_html__( 'View', '0-day-analytics' ) . '</a>';
 
 				$row_value = \esc_html( $item[ $column_name ] ) . $this->row_actions( $actions );
 
 			} else {
-				$len = \mb_strlen( (string) $item[ $column_name ] );
+				$len   = \mb_strlen( (string) $item[ $column_name ] );
 				$value = \mb_substr( (string) $item[ $column_name ], 0, 100 );
 
-				//   . '[&hellip;]'
+				// . '[&hellip;]'
 
 				// Escape & wrap in <code> tag.
-				$row_value = '<code>' . \esc_html( $value ) .((100 < $len)?'[&hellip;]':'') . '</code>';
+				$row_value = '<code>' . \esc_html( $value ) . ( ( 100 < $len ) ? '[&hellip;]' : '' ) . '</code>';
 
-				//$row_value = \esc_html( $item[ $column_name ] );
+				// $row_value = \esc_html( $item[ $column_name ] );
 			}
 
 			return $row_value;
@@ -544,7 +544,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 				'Error',
 				array(
 					'response'  => 403,
-					'back_link' => esc_url(
+					'back_link' => \esc_url(
 						\network_admin_url()
 					),
 				)
@@ -598,7 +598,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 						<?php
 						if ( 'top' === $which ) {
 							?>
-					<style>
+				<style>
 					.flex {
 						display:flex;
 					}
@@ -710,7 +710,7 @@ if ( ! class_exists( '\ADVAN\Lists\Table_List' ) ) {
 		}
 
 		/**
-		 * Returns translatet text for per page option
+		 * Returns translated text for per page option
 		 *
 		 * @return string
 		 *

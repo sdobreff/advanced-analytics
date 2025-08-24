@@ -444,7 +444,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return array
 		 *
-		 * @since latest
+		 * @since 3.2.0
 		 */
 		public static function get_columns_info(): array {
 			global $wpdb;
@@ -937,7 +937,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 		 *
 		 * @return \WP_REST_Response|\WP_Error
 		 *
-		 * @since latest
+		 * @since 3.2.0
 		 */
 		public static function extract_row_data( \WP_REST_Request $request ) {
 			$table_name = $request->get_param( 'table_name' );
@@ -998,7 +998,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
     				<col width="80%" />
 					<thead>
 						<tr>
-							<th style="max-width:30%">
+							<th>
 								<?php echo \esc_html_e( 'Column name', '0-day-analytics' ); ?>
 							</th>
 							<th>
@@ -1006,6 +1006,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 							</th>
 						</tr>
 					</thead>
+					<tbody>
 				<?php
 
 				foreach ( $results[0] as $key => $value ) {
@@ -1017,6 +1018,7 @@ if ( ! class_exists( '\ADVAN\Entities\Common_Table' ) ) {
 					<?php
 				}
 				?>
+				</tbody>
 				</table>
 				<?php
 				$message = \ob_get_clean();

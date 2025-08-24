@@ -945,7 +945,62 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public function extra_tablenav( $which ) {
-			?>
+			if ( 'top' === $which ) {
+				?>
+				<style>
+					.flex {
+						display:flex;
+					}
+					.flex-row {
+						flex-direction:row;
+					}
+					.grow-0 {
+						flex-grow:0;
+					}
+					.p-2 {
+						padding:8px;
+					}
+					.w-full {
+						width:auto;
+					}
+					.border-t {
+						border-bottom-width:1px;
+					}
+					.justify-between {
+						justify-content:space-between;
+					}
+					.italic {
+						font-style: italic;
+					}
+					.text-lg {
+						font-size: 1.1em;
+						font-weight: bold;
+					}
+					#wpwrap {
+						overflow-x: hidden !important;
+					}
+					.wp-list-table {
+						white-space: nowrap;
+						display: block;
+						overflow-x: auto;
+					}
+					/* .wp-list-table {
+						display: block;
+						overflow-x: auto;
+						white-space: nowrap;
+					}
+					.wp-list-table tbody {
+						display: table;
+						width: 100%;
+					}
+					.wp-list-table thead {
+						position: sticky;
+						z-index: 2;
+						top: 0;
+					} */
+
+				</style>
+			<?php } ?>
 				<div class="flex flex-row grow-0 p-2 w-full border-0 border-t border-solid justify-between">
 					<div class=""> <?php \esc_html_e( 'Size: ', '0-day-analytics' ); ?> <?php echo \esc_attr( File_Helper::show_size( Common_Table::get_table_size() ) ); ?>
 
@@ -1053,11 +1108,22 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 			$record = WP_Mail_Entity::load( 'id=%d', array( $id ) );
 
+			$message = '<table class="widefat striped table-view-list" style="max-width:100%;table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>
+							' . \esc_html__( 'Mail Content', '0-day-analytics' ) . '
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>';
 			if ( is_array( $record ) && ! empty( $record ) ) {
 				if ( isset( $record['is_html'] ) && (bool) $record['is_html'] ) {
-					$message = WP_Mail_Log::filter_html( $record['message'] );
+					$message .= WP_Mail_Log::filter_html( $record['message'] );
 				} else {
-					$message = $record['message'];
+					$message .= $record['message'];
 				}
 
 				$attachments = '';
@@ -1132,6 +1198,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 							$attachments = \ob_get_clean();
 				}
+				$message .= '</td></tr></tbody></table>';
 
 				return rest_ensure_response(
 					array(
