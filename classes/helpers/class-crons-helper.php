@@ -42,6 +42,16 @@ if ( ! class_exists( '\ADVAN\Helpers\Crons_Helper' ) ) {
 			'delete_expired_transients',
 			'wp_scheduled_auto_draft_delete',
 			'wp_site_health_scheduled_check',
+			'upgrader_scheduled_cleanup',
+			'do_pings', // 2.1.0
+			'publish_future_post', // 2.1.0
+			'importer_scheduled_cleanup', // 2.5.0
+			'wp_maybe_auto_update', // 3.7.0
+			'wp_split_shared_term_batch', // 4.3.0
+			'wp_update_comment_type_batch', // 5.5.0
+			'wp_delete_temp_updater_backups', // 6.3.0
+			'update_network_counts', // 3.1.0
+			'wp_https_detection', // 5.7.0
 		);
 
 		/**
