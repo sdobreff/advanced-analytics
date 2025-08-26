@@ -271,9 +271,9 @@ if ( ! class_exists( '\ADVAN\Helpers\System_Status' ) ) {
 			include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 
 			// Get both site plugins and network plugins.
-			$active_plugins = (array) get_option( 'active_plugins', array() );
+			$active_plugins = (array) \get_option( 'active_plugins', array() );
 
-			if ( is_multisite() ) {
+			if ( \is_multisite() ) {
 				$network_activated_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
 				$active_plugins            = array_merge( $active_plugins, $network_activated_plugins );
 			}

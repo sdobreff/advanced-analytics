@@ -295,6 +295,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					\set_transient( self::TIMESTAMP_TRANSIENT, self::$last_timestamp, 600 );
 				}
 
+				/*
+
 				if ( 1 <= ( $count = self::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 					?>
 					<script>
@@ -305,6 +307,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 					</script>
 					<?php
 				}
+					*/
 			}
 		}
 

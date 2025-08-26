@@ -674,6 +674,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					);
 				}
 
+				\add_action( 'shutdown', array( __CLASS__, 'show_error_count' ), \PHP_INT_MAX );
+
 				\add_action( 'load-' . self::$hook, array( __CLASS__, 'aadvana_common_help' ) );
 
 				$settings_hook = \add_submenu_page(
@@ -1902,6 +1904,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			self::$current_options['severities'][ $severity ]['display'] = false;
 
 			self::store_options( self::$current_options );
+		}
+
+		public static function show_error_count() {
+			if ( 1 <= ( $count = Log_Line_Parser::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
+					?>
+					<script>
+						if (jQuery('#advan-errors-menu .update-count').length) {
+							jQuery('#advan-errors-menu').show();
+							jQuery('#advan-errors-menu .update-count').html('<?php echo \esc_attr( \number_format_i18n( $count ) ); ?>');
+						}
+					</script>
+					<?php
+				}
 		}
 	}
 }
