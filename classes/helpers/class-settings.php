@@ -479,6 +479,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'advana_error_log_clear'          => '-1',
 					'browser_notifications_seconds'   => 10,
 					'browser_notifications_not_send'  => false,
+					'smtp_host'                       => '',
+					'smtp_port'                       => '',
+					'smtp_username'                   => '',
+					'smtp_password'                   => '',
+					'encryption_type'                 => 'none',
+					'bypass_ssl_verification'         => false,
 					'slack_notifications'             => array(
 						'all' => array(
 							'channel'    => '',
@@ -1317,9 +1323,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'title' => esc_html__( 'Tables options', '0-day-analytics' ),
 				),
 
-				'head-mail-list'      => esc_html__( 'Mails Viewer', '0-day-analytics' ),
+				'head-mail-list'       => esc_html__( 'Mails Viewer', '0-day-analytics' ),
 
-				'mail-list'           => array(
+				'mail-list'            => array(
 					'icon'  => 'editor-table',
 					'title' => esc_html__( 'Mail options', '0-day-analytics' ),
 				),
@@ -1517,6 +1523,29 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				$advanced_options['severities'][ $name ]['name'] = self::get_option( 'severities' )[ $name ]['name'];
 			}
 
+			// Email SMTP settings start.
+			$advanced_options['smtp_host'] = ( array_key_exists( 'smtp_host', $post_array ) && ! empty( $post_array['smtp_host'] ) ) ? \sanitize_text_field( $post_array['smtp_host'] ) : '';
+
+			$advanced_options['smtp_port'] = ( array_key_exists( 'smtp_port', $post_array ) && ! empty( $post_array['smtp_port'] ) ) ? filter_var(
+				$post_array['smtp_port'],
+				\FILTER_VALIDATE_INT,
+				array(
+					'options' => array(
+						'min_range' => 1,
+						'max_range' => 65535,
+					),
+				)
+			) : '';
+
+			$advanced_options['encryption_type'] = ( array_key_exists( 'encryption_type', $post_array ) && ! empty( $post_array['encryption_type'] ) ) ? ( in_array( $post_array['encryption_type'], array( 'none', 'ssl', 'tls' ) ) ? $post_array['encryption_type'] : self::get_option( 'encryption_type' ) ) : 'none';
+
+			$advanced_options['smtp_username'] = ( array_key_exists( 'smtp_username', $post_array ) && ! empty( $post_array['smtp_username'] ) ) ? \sanitize_text_field( $post_array['smtp_username'] ) : '';
+
+			$advanced_options['smtp_password'] = ( array_key_exists( 'smtp_password', $post_array ) && ! empty( $post_array['smtp_password'] ) ) ? \sanitize_text_field( $post_array['smtp_password'] ) : '';
+
+			$advanced_options['bypass_ssl_verification'] = ( array_key_exists( 'bypass_ssl_verification', $post_array ) ) ? filter_var( $post_array['bypass_ssl_verification'], FILTER_VALIDATE_BOOLEAN ) : false;
+			// Email SMTP settings end.
+
 			$advanced_options['slack_notifications']['all'] = array();
 
 			if ( array_key_exists( 'slack_notification_auth_token', $post_array ) ) {
@@ -1618,7 +1647,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// Modules start.
 			$advanced_options['cron_module_enabled']       = ( array_key_exists( 'cron_module_enabled', $post_array ) ) ? filter_var( $post_array['cron_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['requests_module_enabled']   = ( array_key_exists( 'requests_module_enabled', $post_array ) ) ? filter_var( $post_array['requests_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
-			$advanced_options['wp_mail_module_enabled']   = ( array_key_exists( 'wp_mail_module_enabled', $post_array ) ) ? filter_var( $post_array['wp_mail_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
+			$advanced_options['wp_mail_module_enabled']    = ( array_key_exists( 'wp_mail_module_enabled', $post_array ) ) ? filter_var( $post_array['wp_mail_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['transients_module_enabled'] = ( array_key_exists( 'transients_module_enabled', $post_array ) ) ? filter_var( $post_array['transients_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			$advanced_options['tables_module_enabled']     = ( array_key_exists( 'tables_module_enabled', $post_array ) ) ? filter_var( $post_array['tables_module_enabled'], \FILTER_VALIDATE_BOOLEAN ) : false;
 			// Modules end.
@@ -1707,7 +1736,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 					// Clear the flag for keep reading the error log if WP settings are disabled (because at this point they are enabled).
 					$advanced_options['keep_reading_error_log'] = false;
-					$advanced_options['plugin_debug_enable'] = false;
+					$advanced_options['plugin_debug_enable']    = false;
 				}
 
 				$wp_cron_disable = ( array_key_exists( 'wp_cron_disable', $post_array ) ) ? filter_var( $post_array['wp_cron_disable'], FILTER_VALIDATE_BOOLEAN ) : false;
@@ -1908,7 +1937,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 		public static function show_error_count() {
 			if ( 1 <= ( $count = Log_Line_Parser::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-					?>
+				?>
 					<script>
 						if (jQuery('#advan-errors-menu .update-count').length) {
 							jQuery('#advan-errors-menu').show();
@@ -1916,7 +1945,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 						}
 					</script>
 					<?php
-				}
+			}
 		}
 	}
 }

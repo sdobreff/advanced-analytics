@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Controllers;
 
+use ADVAN\Helpers\Settings;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 		 * @since latest
 		 */
 		public static function init() {
-			\add_action( 'phpmailer_init', array( __CLASS__, 'smtp_mailer_settings' ), 999999 );
+			\add_action( 'phpmailer_init', array( __CLASS__, 'deliver_email_via_smtp' ), 999999 );
 		}
 
 		/**
@@ -47,18 +49,13 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 		 * phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		 */
 		public static function deliver_email_via_smtp( $phpmailer ) {
-			$options                      = get_option( ASENHA_SLUG_U, array() );
-			$smtp_host                    = $options['smtp_host'];
-			$smtp_port                    = $options['smtp_port'];
-			$smtp_security                = $options['smtp_security'];
-			$smtp_authentication          = ( isset( $options['smtp_authentication'] ) ? $options['smtp_authentication'] : 'enable' );
-			$smtp_username                = $options['smtp_username'];
-			$smtp_password                = $options['smtp_password'];
-			$smtp_default_from_name       = $options['smtp_default_from_name'];
-			$smtp_default_from_email      = $options['smtp_default_from_email'];
-			$smtp_force_from              = $options['smtp_force_from'];
-			$smtp_bypass_ssl_verification = $options['smtp_bypass_ssl_verification'];
-			$smtp_debug                   = $options['smtp_debug'];
+			$smtp_host                    = Settings::get_option( 'smtp_host' );
+			$smtp_port                    = Settings::get_option( 'smtp_port' );
+			$smtp_security                = Settings::get_option( 'encryption_type' );
+			$smtp_username                = Settings::get_option( 'smtp_username' );
+			$smtp_password                = Settings::get_option( 'smtp_password' );
+			$smtp_authentication          = ( Settings::get_option( 'smtp_username' ) ) && ( Settings::get_option( 'smtp_username' ) );
+			$smtp_bypass_ssl_verification = Settings::get_option( 'smtp_bypass_ssl_verification' );
 			// Do nothing if host or password is empty
 			// if ( empty( $smtp_host ) || empty( $smtp_password ) ) {
 			// return;
@@ -67,17 +64,17 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			$from_name            = $phpmailer->FromName;
 			$from_email_beginning = substr( $phpmailer->From, 0, 9 );
 			// Get the first 9 characters of the current FROM email.
-			if ( $smtp_force_from ) {
-				$phpmailer->FromName = $smtp_default_from_name;
-				$phpmailer->From     = $smtp_default_from_email;
-			} else {
-				if ( 'WordPress' === $from_name && ! empty( $smtp_default_from_name ) ) {
-					$phpmailer->FromName = $smtp_default_from_name;
-				}
-				if ( 'WordPress' === $from_email_beginning && ! empty( $smtp_default_from_email ) ) {
-					$phpmailer->From = $smtp_default_from_email;
-				}
-			}
+			// if ( $smtp_force_from ) {
+			// $phpmailer->FromName = $smtp_default_from_name;
+			// $phpmailer->From     = $smtp_default_from_email;
+			// } else {
+			// if ( 'WordPress' === $from_name && ! empty( $smtp_default_from_name ) ) {
+			// $phpmailer->FromName = $smtp_default_from_name;
+			// }
+			// if ( 'WordPress' === $from_email_beginning && ! empty( $smtp_default_from_email ) ) {
+			// $phpmailer->From = $smtp_default_from_email;
+			// }
+			// }
 			// Only attempt to send via SMTP if all the required info is present. Otherwise, use default PHP Mailer settings as set by wp_mail().
 			if ( ! empty( $smtp_host ) && ! empty( $smtp_port ) && ! empty( $smtp_security ) ) {
 				// Send using SMTP.
@@ -92,7 +89,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 				}
 				// Set some other defaults.
 
-				$phpmailer->XMailer = 'Admin and Site Enhancements v' . ASENHA_VERSION . ' - a WordPress plugin';
+				$phpmailer->XMailer = ADVAN_NAME . ' v' . ADVAN_VERSION . ' - a WordPress plugin';
 
 				$phpmailer->Host = $smtp_host;
 
@@ -100,7 +97,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 
 				$phpmailer->SMTPSecure = $smtp_security;
 
-				if ( 'enable' == $smtp_authentication ) {
+				if ( $smtp_authentication ) {
 					$phpmailer->Username = trim( $smtp_username );
 
 					$phpmailer->Password = trim( $smtp_password );
@@ -120,12 +117,12 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			}
 			// If debug mode is enabled, send debug info (SMTP::DEBUG_CONNECTION) to WordPress debug.log file set in wp-config.php.
 			// Reference: https://github.com/PHPMailer/PHPMailer/wiki/SMTP-Debugging
-			if ( $smtp_debug ) {
-				$phpmailer->SMTPDebug = 4;
+			// if ( $smtp_debug ) {
+			// 	$phpmailer->SMTPDebug = 4;
 
-				$phpmailer->Debugoutput = 'error_log';
+			// 	$phpmailer->Debugoutput = 'error_log';
 
-			}
+			// }
 		}
 
 		/**

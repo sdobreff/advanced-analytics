@@ -36,37 +36,47 @@ use ADVAN\Helpers\Settings;
 		)
 	);
 
+	// Cron options.
 	Settings::build_option(
 		array(
-			'name' => esc_html__( 'Host: ', '0-day-analytics' ),
-			'id'   => 'slack_notification_auth_token',
-			'type' => 'text',
-			'hint' => esc_html__( 'Get your bot token from the application from the "OAuth & Permissions" section. Type ', '0-day-analytics' ) . 'REMOVE' . esc_html__( ' if you want to remove the token from settings', '0-day-analytics' ),
+			'title' => \esc_html__( 'External SMTP provider', '0-day-analytics' ),
+			'id'    => 'table-settings-options',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Host: ', '0-day-analytics' ),
+			'id'      => 'smtp_host',
+			'type'    => 'text',
+			'hint'    => \esc_html__( 'Here you can provide your custom SMTP host', '0-day-analytics' ),
+			'default' => Settings::get_option( 'smtp_host' ),
 		)
 	);
 
 	Settings::build_option(
 		array(
 			'name'    => \esc_html__( 'Port', '0-day-analytics' ),
-			'id'      => 'keep_error_log_records_truncate',
+			'id'      => 'smtp_port',
 			'type'    => 'number',
 			'min'     => 1,
-			'max'     => 100,
-			'hint'    => \esc_html__( 'Set how many records to keep if you want to truncate file (reduce the size) but keep the last records. Maximum allowed number is 100, minimum is 1.', '0-day-analytics' ),
-			'default' => Settings::get_current_options()['keep_error_log_records_truncate'],
+			'max'     => 65535,
+			'hint'    => \esc_html__( 'Set the port of you custom SMTP provider', '0-day-analytics' ),
+			'default' => Settings::get_option( 'smtp_port' ),
 		)
 	);
 
 	// ADD checkbox options - none, SSL, TLS.
 	Settings::build_option(
 		array(
-			'name'    => \esc_html( 'Encryption', '0-day-analytics' ),
+			'name'    => \esc_html__( 'Encryption', '0-day-analytics' ),
 			'id'      => 'encryption_type',
 			'type'    => 'radio',
 			'options' => array(
-				'none' => esc_html__( 'None', '0-day-analytics' ),
-				'ssl'  => esc_html__( 'SSL', '0-day-analytics' ),
-				'tls'  => esc_html__( 'TLS', '0-day-analytics' ),
+				'none' => \esc_html__( 'None', '0-day-analytics' ),
+				'ssl'  => \esc_html__( 'SSL', '0-day-analytics' ),
+				'tls'  => \esc_html__( 'TLS', '0-day-analytics' ),
 			),
 			'hint'    => \esc_html( 'Select the encryption type to use for SMTP connection.', '0-day-analytics' ),
 			'default' => Settings::get_option( 'encryption_type' ),
@@ -75,19 +85,22 @@ use ADVAN\Helpers\Settings;
 
 	Settings::build_option(
 		array(
-			'name' => esc_html__( 'Username: ', '0-day-analytics' ),
-			'id'   => 'slack_notification_auth_token',
-			'type' => 'text',
-			'hint' => esc_html__( 'Get your bot token from the application from the "OAuth & Permissions" section. Type ', '0-day-analytics' ) . 'REMOVE' . esc_html__( ' if you want to remove the token from settings', '0-day-analytics' ),
+			'name'    => \esc_html__( 'Username: ', '0-day-analytics' ),
+			'id'      => 'smtp_username',
+			'type'    => 'text',
+			'hint'    => \esc_html__( 'Provide the username for your custom SMTP provider.', '0-day-analytics' ),
+			'default' => Settings::get_option( 'smtp_username' ),
 		)
 	);
 
 	Settings::build_option(
 		array(
-			'name' => esc_html__( 'Password: ', '0-day-analytics' ),
-			'id'   => 'slack_notification_auth_token',
-			'type' => 'text',
-			'hint' => esc_html__( 'Get your bot token from the application from the "OAuth & Permissions" section. Type ', '0-day-analytics' ) . 'REMOVE' . esc_html__( ' if you want to remove the token from settings', '0-day-analytics' ),
+			'name'     => \esc_html__( 'Password: ', '0-day-analytics' ),
+			'id'       => 'smtp_password',
+			'type'     => 'text',
+			'validate' => 'password',
+			'hint'     => \esc_html__( 'Provide the password (if any) for your custom SMTP provider', '0-day-analytics' ),
+			'default'  => Settings::get_option( 'smtp_password' ),
 		)
 	);
 

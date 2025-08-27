@@ -29,6 +29,7 @@ use ADVAN\Helpers\WP_Error_Handler;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Requests_Log;
 use ADVAN\Controllers\WP_Mail_Log;
+use ADVAN\Controllers\Mail_SMTP_Settings;
 
 // If this file is called directly, abort.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -199,6 +200,7 @@ if ( ! WP_Helper::is_multisite() && \wp_is_recovery_mode() ) {
 Requests_Log::init();
 WP_Mail_Log::init();
 Endpoints::init();
+Mail_SMTP_Settings::init();
 
 if ( ! function_exists( 'advana_remove_plugins' ) ) {
 
