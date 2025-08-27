@@ -16,6 +16,7 @@ use ADVAN\Controllers\Slack;
 use ADVAN\Helpers\WP_Helper;
 use ADVAN\Controllers\Telegram;
 use ADVAN\Controllers\Error_Log;
+use ADVAN\Controllers\Mail_SMTP_Settings;
 use ADVAN\Controllers\Slack_API;
 use ADVAN\Controllers\Telegram_API;
 use ADVAN\Lists\Logs_List;
@@ -135,6 +136,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 					 */
 					\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'switch_plugin_version', array( __CLASS__, 'switch_plugin_version' ) );
 				}
+
+				\add_action( 'wp_ajax_' . ADVAN_PREFIX . 'send_test_email', array( __CLASS__, 'send_test_email' ) );
 			}
 		}
 
@@ -560,6 +563,75 @@ if ( ! class_exists( '\ADVAN\Helpers\Ajax_Helper' ) ) {
 				</script>
 				</body></html>
 			<?php
+		}
+
+		/**
+		 * Send a test email and use SMTP host if defined in settings
+		 *
+		 * @since 3.3.0
+		 */
+		public static function send_test_email() {
+			WP_Helper::verify_admin_nonce( Mail_SMTP_Settings::NONCE_NAME );
+
+			$content       = array(
+				array(
+					'title' => \esc_html__( 'Hey... are you getting this?', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Looks like you did!', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'There\'s a message for you...', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Here it is:', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Is it working?', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Yes, it\'s working!</strong>', '0-day-analytics' ) . '</p>',
+				),
+				array(
+					'title' => \esc_html__( 'Hope you\'re getting this...', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Looks like this was sent out just fine and you got it.', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Testing delivery configuration...', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Everything looks good!', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Testing email delivery', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Looks good!', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Config is looking good', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Seems like everything has been set up properly!', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'All set up', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Your configuration is working properly.', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Good to go', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Config is working great.', '0-day-analytics' ) . '</strong></p>',
+				),
+				array(
+					'title' => \esc_html__( 'Good job', '0-day-analytics' ),
+					'body'  => '<p><strong>' . \esc_html__( 'Everything is set.', '0-day-analytics' ) . '</strong></p>',
+				),
+			);
+			$random_number = rand( 0, count( $content ) - 1 );
+			$to            = esc_html( $_REQUEST['email'] );
+			$title         = $content[ $random_number ]['title'];
+			$body          = $content[ $random_number ]['body'] . '<p>This message was sent from <a href="' . \get_bloginfo( 'url' ) . '">' . \get_bloginfo( 'url' ) . '</a> on ' . \wp_date( 'F j, Y' ) . ' at ' . \wp_date( 'H:i:s' ) . ' via.' . ADVAN_NAME . '</p>';
+			$headers       = array( 'Content-Type: text/html; charset=UTF-8' );
+			$success       = \wp_mail(
+				$to,
+				$title,
+				$body,
+				$headers
+			);
+			if ( $success ) {
+				\wp_send_json_success();
+			} else {
+
+				\wp_send_json_error( __( 'Mail: Something is wrong with your configuration.', '0-day-analytics' ) );
+			}
 		}
 	}
 }

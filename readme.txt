@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.2.0
+Stable tag: 3.3.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -102,6 +102,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.3.0 =
+Added mail SMTP settings - gives option to configure your own SMTP server settings. Added option for test email settings. Code fixes.
 
 = 3.2.0 =
 Automatic fallback to AJAX if WP apiFetch function is missing for Cron calls. Inner PHP error logging mechanism if nothing else can be used (wp-config is not writable, and there is nothing else that enables the error logging, that will not enable inner WP logging which has dependency on WP_DEBUG to be set to true). Table view now trims the column values to 100 symbols, and provides View option which displays the content in new window. Mail viewer now handles different types of attachments outside from the media folder.

@@ -149,6 +149,8 @@ function attachAllDynamicPostTypes() {
 
 $doc.ready(function () {
 
+    var { __ } = wp.i18n;
+
     var $figaroBody = jQuery('body');
 
     /* DASHBORED COLOR
@@ -419,6 +421,44 @@ $doc.ready(function () {
         }
     });
 
+    /**
+     * Sends test mail delivery mail
+     */
+    $doc.on('click', '#mail_send_test_ajax', function (e) {
+        const nonceValue = jQuery('#mail_test_nonce').val();
+        const emailAddress = jQuery('#test_mail_address').val();
+
+        if ( ! emailAddress ) {
+            jQuery('#test_mail_address').focus();
+            alert( __('Please provide test email address to send mail to!', '0-day-analytics') );
+            return;
+        }
+
+        $figaroBody.addClass('has-overlay');
+
+        jQuery.ajax({
+            url: ajaxurl,
+            data: {
+                action: 'aadvana_send_test_email',
+                _wpnonce: nonceValue,
+                email: emailAddress
+            },
+            success: function (data) {
+                if (data.success) {
+
+                    $saveAlert.addClass('is-success').delay(900).fadeOut(700);
+                    setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                    
+                    alert( __('Mail sent - check your e-mail client for delivery', '0-day-analytics') );
+
+                } else {
+                    $saveAlert.addClass('is-failed').delay(900).fadeOut(700);
+                    setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
+                    alert(__('Something went wrong', '0-day-analytics'));
+                }
+            },
+        });
+    });
     
     /**
      * Stores the provided Slack API key

@@ -8,6 +8,7 @@
  */
 
 use ADVAN\Helpers\Settings;
+use ADVAN\Controllers\Mail_SMTP_Settings;
 
 	Settings::build_option(
 		array(
@@ -36,7 +37,7 @@ use ADVAN\Helpers\Settings;
 		)
 	);
 
-	// Cron options.
+	// Mail SMTP options.
 	Settings::build_option(
 		array(
 			'title' => \esc_html__( 'External SMTP provider', '0-day-analytics' ),
@@ -111,5 +112,39 @@ use ADVAN\Helpers\Settings;
 			'type'    => 'checkbox',
 			'hint'    => \esc_html( 'If enabled the plugin will bypass SSL certificate. This would be insecure if mail is delivered across the internet but could help in certain local and/or containerized WordPress scenarios.', '0-day-analytics' ),
 			'default' => Settings::get_option( 'bypass_ssl_verification' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'title' => \esc_html__( 'Test mail delivery', '0-day-analytics' ),
+			'id'    => 'mail-settings-options-test',
+			'type'  => 'header',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'     => \esc_html__( 'Mail address to send test mail to', '0-day-analytics' ),
+			'id'       => 'test_mail_address',
+			'type'     => 'text',
+			'validate' => 'email',
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'add_label' => true,
+			'id'        => 'mail_send_test_ajax',
+			'type'      => 'button',
+			'default'   => \esc_html__( 'Send test mail', '0-day-analytics' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'id'      => 'mail_test_nonce',
+			'type'    => 'hidden',
+			'default' => \wp_create_nonce( Mail_SMTP_Settings::NONCE_NAME ),
 		)
 	);
