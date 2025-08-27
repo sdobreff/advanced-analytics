@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 	/**
-	 * Responsible for collecting the amils.
+	 * Responsible for collecting the emails.
 	 *
 	 * @since 3.0.0
 	 */

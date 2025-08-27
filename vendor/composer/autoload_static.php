@@ -26,6 +26,7 @@ class ComposerStaticInit859286a6c2f540ddbd409e72c23a4ed6
         'ADVAN\\Controllers\\Cron_Jobs' => __DIR__ . '/../..' . '/classes/helpers/class-cron-jobs.php',
         'ADVAN\\Controllers\\Display_Environment_Type' => __DIR__ . '/../..' . '/classes/controllers/class-display-environment-type.php',
         'ADVAN\\Controllers\\Error_Log' => __DIR__ . '/../..' . '/classes/controllers/class-error-log.php',
+        'ADVAN\\Controllers\\Mail_SMTP_Settings' => __DIR__ . '/../..' . '/classes/controllers/class-mail-smtp-settings.php',
         'ADVAN\\Controllers\\Pointers' => __DIR__ . '/../..' . '/classes/controllers/class-pointers.php',
         'ADVAN\\Controllers\\Requests_Log' => __DIR__ . '/../..' . '/classes/controllers/class-requests-log.php',
         'ADVAN\\Controllers\\Reverse_Line_Reader' => __DIR__ . '/../..' . '/classes/controllers/class-reverse-line-reader.php',

@@ -11,6 +11,7 @@ return array(
     'ADVAN\\Controllers\\Cron_Jobs' => $baseDir . '/classes/helpers/class-cron-jobs.php',
     'ADVAN\\Controllers\\Display_Environment_Type' => $baseDir . '/classes/controllers/class-display-environment-type.php',
     'ADVAN\\Controllers\\Error_Log' => $baseDir . '/classes/controllers/class-error-log.php',
+    'ADVAN\\Controllers\\Mail_SMTP_Settings' => $baseDir . '/classes/controllers/class-mail-smtp-settings.php',
     'ADVAN\\Controllers\\Pointers' => $baseDir . '/classes/controllers/class-pointers.php',
     'ADVAN\\Controllers\\Requests_Log' => $baseDir . '/classes/controllers/class-requests-log.php',
     'ADVAN\\Controllers\\Reverse_Line_Reader' => $baseDir . '/classes/controllers/class-reverse-line-reader.php',
