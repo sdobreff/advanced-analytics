@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.3.0
+Stable tag: 3.3.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -102,6 +102,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.3.1 =
+Small maintenance update, addressed are mostly UI problems, non HTML mails viewer improvements.
 
 = 3.3.0 =
 Added mail SMTP settings - gives option to configure your own SMTP server settings. Added option for test email settings. Code fixes.

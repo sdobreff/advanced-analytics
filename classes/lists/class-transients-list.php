@@ -358,7 +358,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 			// if ( is_array( $this->items ) && ! empty( $this->items ) ) {
 
-			// 	uasort( $this->items, array( __CLASS__, 'uasort_order_events' ) );
+			// uasort( $this->items, array( __CLASS__, 'uasort_order_events' ) );
 			// }
 
 			return $this->items;
@@ -730,13 +730,13 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					});
 				</script>
 				<style>
-					.wp-control_page_advan_transients .generated-transients .persistent th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .generated-transients .persistent th:nth-child(1) {
 						border-left: 7px solid #d2ab0e !important;
 					}
-					.wp-control_page_advan_transients .generated-transients .late th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .generated-transients .late th:nth-child(1) {
 						border-left: 7px solid #dd9192 !important;
 					}
-					.wp-control_page_advan_transients .generated-transients .on-time th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .generated-transients .on-time th:nth-child(1) {
 						border-left: 7px solid rgb(49, 179, 45) !important;
 					}
 				</style>

@@ -879,10 +879,10 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					});
 				</script>
 				<style>
-					.wp-control_page_advan_cron_jobs .generated-crons .late th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .generated-crons .late th:nth-child(1) {
 						border-left: 7px solid #dd9192 !important;
 					}
-					.wp-control_page_advan_cron_jobs .generated-crons .on-time th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .generated-crons .on-time th:nth-child(1) {
 						border-left: 7px solid rgb(49, 179, 45) !important;
 					}
 				</style>

@@ -106,8 +106,8 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			parent::__construct(
 				array(
-					'plural'   => $table_name,    // Plural value used for labels and the objects being listed.
-					'singular' => $table_name,     // Singular label for an object being listed, e.g. 'post'.
+					'plural'   => Requests_Log_Entity::get_table_name(),    // Plural value used for labels and the objects being listed.
+					'singular' => Requests_Log_Entity::get_table_name(),     // Singular label for an object being listed, e.g. 'post'.
 					'ajax'     => false,      // If true, the parent class will call the _js_vars() method in the footer.
 				)
 			);
@@ -632,7 +632,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					 * Note: the nonce field is set by the parent class
 					 * wp_nonce_field( 'bulk-' . $this->_args['plural'] );
 					 */
-					if ( ! wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
+					if ( ! \wp_verify_nonce( $nonce, 'bulk-' . $this->_args['plural'] ) ) {
 						$this->invalid_nonce_redirect();
 					} elseif ( isset( $_REQUEST[ 'advan_' . self::$table::get_name() ] ) ) {
 						foreach ( (array) $_REQUEST[ 'advan_' . self::$table::get_name() ] as $id ) {
@@ -1134,6 +1134,65 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					'success' => true,
 				)
 			);
+		}
+
+		/**
+		 * Generates content for a single row of the table.
+		 *
+		 * @param object|array $item - The current item.
+		 *
+		 * @since latest
+		 */
+		public function single_row( $item ) {
+			$classes = '';
+			if ( isset( $item['request_status'] ) && ! empty( $item['request_status'] ) ) {
+				$classes .= ' ' . $item['request_status'];
+			}
+			echo '<tr class="' . \esc_attr( $classes ) . '">';
+			$this->single_row_columns( $item );
+			echo '</tr>';
+		}
+
+		/**
+		 * Generates the table navigation above or below the table
+		 *
+		 * @param string $which - Holds info about the top and bottom navigation.
+		 *
+		 * @since latest
+		 */
+		public function display_tablenav( $which ) {
+			if ( 'top' === $which ) {
+				\wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+
+				?>
+				<style>
+					
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .<?php echo esc_attr( Requests_Log_Entity::get_table_name() ); ?> .error th:nth-child(1) {
+						border-left: 7px solid #dd9192 !important;
+					}
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .<?php echo esc_attr( Requests_Log_Entity::get_table_name() ); ?> .success th:nth-child(1) {
+						border-left: 7px solid rgb(49, 179, 45) !important;
+					}
+				</style>
+				<?php
+			}
+			?>
+			<div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+			<?php if ( $this->has_items() ) { ?>
+				<div class="alignleft actions bulkactions">
+					<?php $this->bulk_actions( $which ); ?>
+				</div>
+				<?php
+			}
+			$this->extra_tablenav( $which );
+			$this->pagination( $which );
+
+			?>
+
+				<br class="clear" />
+			</div>
+			<?php
 		}
 	}
 }

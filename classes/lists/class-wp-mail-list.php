@@ -376,10 +376,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				?>
 
 				<style>
-					.wp-control_page_advan_wp_mail .<?php echo WP_Mail_Entity::get_table_name(); ?> .late th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .<?php echo WP_Mail_Entity::get_table_name(); ?> .late th:nth-child(1) {
 						border-left: 7px solid #dd9192 !important;
 					}
-					.wp-control_page_advan_wp_mail .<?php echo WP_Mail_Entity::get_table_name(); ?> .on-time th:nth-child(1) {
+					.<?php echo esc_attr( self::PAGE_SLUG ); ?> .<?php echo WP_Mail_Entity::get_table_name(); ?> .on-time th:nth-child(1) {
 						border-left: 7px solid rgb(49, 179, 45) !important;
 					}
 				</style>
