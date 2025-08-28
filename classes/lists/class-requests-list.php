@@ -1141,7 +1141,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @param object|array $item - The current item.
 		 *
-		 * @since latest
+		 * @since 3.3.1
 		 */
 		public function single_row( $item ) {
 			$classes = '';
@@ -1158,7 +1158,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 *
 		 * @param string $which - Holds info about the top and bottom navigation.
 		 *
-		 * @since latest
+		 * @since 3.3.1
 		 */
 		public function display_tablenav( $which ) {
 			if ( 'top' === $which ) {
