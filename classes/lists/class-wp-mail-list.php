@@ -1123,7 +1123,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				if ( isset( $record['is_html'] ) && (bool) $record['is_html'] ) {
 					$message .= WP_Mail_Log::filter_html( $record['message'] );
 				} else {
-					$message .= $record['message'];
+					$message .= \nl2br( $record['message'] );;
 				}
 
 				$attachments = '';

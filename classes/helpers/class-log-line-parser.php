@@ -341,6 +341,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			self::$last_parsed_timestamp = null;
 
 			\delete_transient( self::TIMESTAMP_TRANSIENT );
+			\delete_transient( self::LINES_TRANSIENT );
 		}
 
 		/**
