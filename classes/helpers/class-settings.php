@@ -1935,6 +1935,13 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			self::store_options( self::$current_options );
 		}
 
+		/**
+		 * Triggers JS to show the new errors count in the menu (if found)
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
 		public static function show_error_count() {
 			if ( 1 <= ( $count = Log_Line_Parser::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
 				?>

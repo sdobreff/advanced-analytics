@@ -497,6 +497,8 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 					if ( $first_only && ! empty( $errors ) ) {
 						// If we only want the first item, return it.
+						Log_Line_Parser::store_last_parsed_timestamp();
+
 						return array( reset( $errors ) );
 					}
 
