@@ -926,8 +926,6 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 					</select>
 					<?php \submit_button( __( 'Filter' ), '', 'filter_action', false, array( 'id' => 'schedules-submit' ) ); ?>
 				</div>
-					<?php $this->views(); ?>
-
 				<?php
 			}
 			if ( $this->has_items() ) {

@@ -407,7 +407,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			}
 
 			// Limits.
-			if ( empty( $parsed_args['count'] ) ) {
+			if ( empty( $parsed_args['count'] ) && empty( $parsed_args['all'] ) ) {
 				$offset = absint( $parsed_args['offset'] );
 				$number = absint( $parsed_args['number'] );
 

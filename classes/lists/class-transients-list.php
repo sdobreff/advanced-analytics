@@ -356,54 +356,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 			$this->items = Transients_Helper::get_transient_items( $args );
 
-			// if ( is_array( $this->items ) && ! empty( $this->items ) ) {
-
-			// uasort( $this->items, array( __CLASS__, 'uasort_order_events' ) );
-			// }
-
 			return $this->items;
-		}
-
-		/**
-		 * Sorts the events by the selected column.
-		 *
-		 * @param array $a - First item to compare.
-		 * @param array $b - Second item to compare.
-		 *
-		 * @return int
-		 *
-		 * @since 1.4.0
-		 */
-		private static function uasort_order_events( $a, $b ) {
-			$orderby = ( ! empty( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['orderby'] ) ) : 'crontrol_next';
-			$order   = ( ! empty( $_GET['order'] ) && is_string( $_GET['order'] ) ) ? \sanitize_text_field( \wp_unslash( $_GET['order'] ) ) : 'asc';
-			$compare = 0;
-
-			switch ( $orderby ) {
-				case 'transient_name':
-					if ( 'asc' === $order ) {
-						$compare = strcmp( $a['transient_name'], $b['transient_name'] );
-					} else {
-						$compare = strcmp( $b['transient_name'], $a['transient_name'] );
-					}
-					break;
-				case 'schedule':
-					if ( 'asc' === $order ) {
-						$compare = ( $a['schedule'] ?? 0 ) <=> ( $b['schedule'] ?? 0 );
-					} else {
-						$compare = ( $b['schedule'] ?? 0 ) <=> ( $a['schedule'] ?? 0 );
-					}
-					break;
-				default:
-					if ( 'asc' === $order ) {
-						$compare = $a['schedule'] <=> $b['schedule'];
-					} else {
-						$compare = $b['schedule'] <=> $a['schedule'];
-					}
-					break;
-			}
-
-			return $compare;
 		}
 
 		/**
@@ -525,7 +478,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					return '<span>' . $core_trans . '<b title="' . sprintf( \esc_attr__( 'Option ID: %d', '0-day-analytics' ), (int) $item['id'] ) . '">' . $item['transient_name'] . '</b></span>' . self::single_row_actions( $actions );
 				case 'schedule':
 					if ( 0 === $item['schedule'] ) {
-						return '&mdash;<br><span class="badge">' . esc_html__( 'Persistent', '0-day-analytics' ) . '</span>';
+						return '&mdash;<br><span class="badge">' . \esc_html__( 'Persistent', '0-day-analytics' ) . '</span>';
 					}
 
 					return WP_Helper::time_formatter( $item, \esc_html__( 'Expired', '0-day-analytics' ) );
@@ -815,6 +768,133 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 */
 		protected function get_table_classes() {
 			return array( 'widefat', 'striped', 'table-view-list', $this->_args['plural'] );
+		}
+
+		/**
+		 * Display the list of hook types.
+		 *
+		 * @return array<string,string>
+		 *
+		 * @since latest
+		 */
+		public function get_views() {
+
+			$views      = array();
+			$hooks_type = ( $_REQUEST['event_type'] ) ?? '';
+
+			$types = array(
+				// 'all'      => __( 'All events', '0-day-analytics' ),
+				'expired'         => __( 'Expired transients', '0-day-analytics' ),
+				'persistent'      => __( 'Persistent transients', '0-day-analytics' ),
+				'with_expiration' => __( 'Transients with expiration', '0-day-analytics' ),
+				'core'            => __( 'Core transients', '0-day-analytics' ),
+			// 'url'      => __( 'URL events', '0-day-analytics' ),
+			);
+
+			$url = \add_query_arg(
+				array(
+					'page' => self::TRANSIENTS_MENU_SLUG,
+					// self::SEARCH_INPUT => self::escaped_search_input(),
+					// 'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+				),
+				\admin_url( 'admin.php' )
+			);
+
+			$all_transients = Transients_Helper::get_transient_items( array( 'all' => true ) );
+
+			$views['all'] = sprintf(
+				'<a href="%1$s">%2$s <span class="count">(%3$s)</span></a>',
+				\esc_url( $url ),
+				\esc_html__( 'All transients (no filters)', '0-day-analytics' ),
+				\esc_html( \number_format_i18n( count( $all_transients ) ) )
+			);
+
+			$filtered = self::get_filtered_transients( $all_transients );
+
+			/**
+			 * @var array<string,string> $types
+			 */
+			foreach ( $types as $key => $type ) {
+				if ( ! isset( $filtered[ $key ] ) ) {
+					continue;
+				}
+
+				$count = count( $filtered[ $key ] );
+
+				if ( ! $count ) {
+					continue;
+				}
+
+				$url = \add_query_arg(
+					array(
+						'page'             => self::TRANSIENTS_MENU_SLUG,
+						self::SEARCH_INPUT => self::escaped_search_input(),
+						'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) ) : '',
+						'event_type'       => $key,
+					),
+					\admin_url( 'admin.php' )
+				);
+
+				$views[ $key ] = sprintf(
+					'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
+					\esc_url( $url ),
+					$hooks_type === $key ? ' class="current"' : '',
+					\esc_html( $type ),
+					\esc_html( \number_format_i18n( $count ) )
+				);
+			}
+
+			return $views;
+		}
+
+		/**
+		 * Returns events filtered by various parameters
+		 *
+		 * @param array<string,stdClass> $events The list of all events.
+		 * @return array<string,array<string,stdClass>> Array of filtered events keyed by filter name.
+		 *
+		 * @since latest
+		 */
+		public static function get_filtered_transients( array $events ) {
+
+			$filtered['persistent'] = array_filter(
+				$events,
+				function ( $event ) {
+					return ( 0 === $event['schedule'] );
+				}
+			);
+
+			$filtered['core'] = array_filter(
+				$events,
+				function ( $event ) {
+					if ( in_array( $event['transient_name'], Transients_Helper::WP_CORE_TRANSIENTS ) ) {
+						return true;
+					} else {
+						foreach ( Transients_Helper::WP_CORE_TRANSIENTS as $trans_name ) {
+							if ( \str_starts_with( $event['transient_name'], $trans_name ) ) {
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+			);
+
+			$filtered['custom'] = array_filter(
+				$events,
+				function ( $event ) {
+					return ( ! in_array( $event['hook'], Crons_Helper::WP_CORE_CRONS ) );
+				}
+			);
+
+			// $filtered['url'] = array_filter(
+			// $events,
+			// function ( $event ) {
+			// return ( 'crontrol_url_cron_job' === $event->hook );
+			// }
+			// );
+
+			return $filtered;
 		}
 	}
 }

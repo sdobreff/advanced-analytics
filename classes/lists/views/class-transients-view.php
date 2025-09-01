@@ -249,7 +249,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Transients', '0-day-analytics' ); ?></h1>
 					<?php echo '<a href="' . \esc_url( \admin_url( 'admin.php?page=' . Transients_List::TRANSIENTS_MENU_SLUG . '&action=new_transient&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Transient', '0-day-analytics' ) . '</a>'; ?>
+					
 					<hr class="wp-header-end">
+
+					<h2 class='screen-reader-text'><?php \esc_html_e( 'Filter transients list', '0-day-analytics' ); ?></h2>
+					<?php $transients->views(); ?>
+
 					<form id="transients-filter" method="get">
 					<?php
 

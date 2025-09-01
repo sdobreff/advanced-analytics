@@ -156,6 +156,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Reverse_Line_Reader' ) ) {
 				$max_lines = 0;
 
 				return false;
+			} else {
+				$line = \esc_html( $line );
 			}
 
 			if ( $temp_writer ) {

@@ -191,6 +191,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Log_Line_Parser' ) ) {
 			if ( ! isset( $context['parentEntryPosition'] ) ) {
 				$context['parentEntryPosition'] = 'next';
 			}
+
 			return $context;
 		}
 

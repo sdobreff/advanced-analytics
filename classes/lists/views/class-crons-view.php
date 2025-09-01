@@ -252,6 +252,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Cron Jobs', '0-day-analytics' ); ?></h1>
 					<?php echo '<a href="' . esc_url( admin_url( 'admin.php?page=' . Crons_List::CRON_MENU_SLUG . '&action=new_cron&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Add New Cron', '0-day-analytics' ) . '</a>'; ?>
+
+					<hr class="wp-header-end">
+
+					<h2 class='screen-reader-text'><?php \esc_html_e( 'Filter crons list', '0-day-analytics' ); ?></h2>
+					<?php $events_list->views(); ?>
 					<form id="crons-filter" method="get">
 					<?php
 
@@ -294,16 +299,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Crons_View' ) ) {
 					);
 
 				?>
-
-						<hr class="wp-header-end">
-
 				<?php
-					echo '<div style="clear:both; float:right">';
 					$events_list->search_box(
 						__( 'Search', '0-day-analytics' ),
 						strtolower( $events_list::get_table_name() ) . '-find'
 					);
-					echo '</div>';
 
 					$events_list->display();
 
