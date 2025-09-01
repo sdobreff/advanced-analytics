@@ -34,7 +34,12 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			'update_core',
 			'theme_roots',
 			'poptags_',
+			//'doing_cron',
 			'wp_theme_files_patterns-',
+			'wp_plugin_dependencies_plugin_data',
+			'wp_styles_for_blocks',
+			'wp_core_block_css_files',
+			'health-check-site-status-result',
 		);
 
 		/**
@@ -221,7 +226,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			$new_name = $_POST['name'] ?? '';
 
-			if ( ! empty( $new_name ) && $transient !== self::clear_transient_name( $new_name ) ) {
+			if ( ! empty( $new_name ) && self::clear_transient_name( $new_name ) !== $transient ) {
 				\delete_transient( $transient );
 				$transient = $new_name;
 			}
@@ -392,18 +397,41 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			// COUNT.
 			if ( ! empty( $parsed_args['count'] ) ) {
-				$sql[] = 'count(option_id)';
+				$sql[] = 'count(go.option_id)';
 			} else {
-				$sql[] = 'option_id, option_name, option_value, autoload';
+				$sql[] = 'go.option_id, go.option_name, go.option_value, go.autoload';
 			}
 
 			// FROM.
-			$sql[] = "FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name NOT LIKE %s";
+			$sql[] = "FROM {$wpdb->options} as go 
+			LEFT JOIN
+				{$wpdb->options} d
+				ON d.option_name LIKE concat('%_transient_timeout_', SUBSTRING_INDEX( go.option_name, '_transient_', -1 ), '%')
+			WHERE go.option_name LIKE %s AND go.option_name NOT LIKE %s";
+
+			if ( ! empty( $parsed_args['type'] ) ) {
+				if ( 'persistent' === $parsed_args['type'] ) {
+					$sql[] = ' AND d.option_value IS NULL';
+				}
+				if ( 'with_expiration' === $parsed_args['type'] ) {
+					$sql[] = ' AND d.option_value IS NOT NULL';
+				}
+				if ( 'core' === $parsed_args['type'] ) {
+					$sql[]  = ' AND (';
+					$in_sql = '';
+					foreach ( self::WP_CORE_TRANSIENTS as $transient_name ) {
+						$in_sql .= ' go.option_value LIKE \'%' . ( $transient_name ) . '%\' AND ';
+					}
+
+					$sql[] = \rtrim( $in_sql, ' AND ' );
+					$sql[] = ')';
+				}
+			}
 
 			// Search.
 			if ( ! empty( $parsed_args['search'] ) ) {
 				$search = '%' . $wpdb->esc_like( $parsed_args['search'] ) . '%';
-				$sql[]  = $wpdb->prepare( 'AND option_name LIKE %s', $search );
+				$sql[]  = $wpdb->prepare( 'AND go.option_name LIKE %s', $search );
 			}
 
 			// Limits.
@@ -413,20 +441,20 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 				// if ( ! empty( $parsed_args['orderby'] ) && \in_array( $parsed_args['orderby'], array( 'transient_name' ) ) ) {
 
-				// 	$orderby = 'option_name';
+				// $orderby = 'option_name';
 
-				// 	$order = 'DESC';
+				// $order = 'DESC';
 
-				// 	if ( ! empty( $parsed_args['order'] ) && \in_array( $parsed_args['order'], array( 'ASC', 'DESC', 'asc', 'desc' ) ) ) {
+				// if ( ! empty( $parsed_args['order'] ) && \in_array( $parsed_args['order'], array( 'ASC', 'DESC', 'asc', 'desc' ) ) ) {
 
-				// 		$order = $parsed_args['order'];
-				// 	}
+				// $order = $parsed_args['order'];
+				// }
 
-				// 	$sql[] = $wpdb->prepare(
-				// 		'ORDER BY ' . \esc_sql( $orderby ) . ' ' . \esc_sql( $order ) . ' LIMIT %d, %d',
-				// 		$offset,
-				// 		$number
-				// 	);
+				// $sql[] = $wpdb->prepare(
+				// 'ORDER BY ' . \esc_sql( $orderby ) . ' ' . \esc_sql( $order ) . ' LIMIT %d, %d',
+				// $offset,
+				// $number
+				// );
 				// } else {
 					$sql[] = $wpdb->prepare( 'ORDER BY option_id DESC LIMIT %d, %d', $offset, $number );
 				// }

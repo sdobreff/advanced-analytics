@@ -268,7 +268,8 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			$offset      = $per_page * ( $page - 1 );
 			$pages       = ceil( $this->count / $per_page );
 			$one_page    = ( 1 === $pages ) ? 'one-page' : '';
-			$this->count = self::get_total_transients( $search );
+			$type        = ! empty( $_GET['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['event_type'] ) ) : '';
+			$this->count = self::get_total_transients( $search, $type );
 
 			$this->handle_table_actions();
 
@@ -279,6 +280,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					'number'  => $per_page,
 					'orderby' => $orderby,
 					'order'   => $order,
+					'type'    => $type,
 				)
 			);
 
@@ -395,13 +397,14 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 *
 		 * @since 1.7.0
 		 */
-		private static function get_total_transients( $search = '' ) {
+		private static function get_total_transients( $search = '', string $type ) {
 
 			// Query.
 			$count = Transients_Helper::get_transient_items(
 				array(
 					'count'  => true,
 					'search' => $search,
+					'type'   => $type,
 				)
 			);
 
@@ -880,10 +883,10 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 				}
 			);
 
-			$filtered['custom'] = array_filter(
+			$filtered['with_expiration'] = array_filter(
 				$events,
 				function ( $event ) {
-					return ( ! in_array( $event['hook'], Crons_Helper::WP_CORE_CRONS ) );
+					return ( 0 !== $event['schedule'] );
 				}
 			);
 
