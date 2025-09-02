@@ -779,8 +779,8 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 			$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
 			$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
 
-					// If the offset of the date of the event is different from the offset of the site, add a marker.
-			if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+			// If the offset of the date of the event is different from the offset of the site, add a marker.
+			if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== \get_date_from_gmt( 'now', 'P' ) ) {
 				$time_format .= ' (P)';
 			}
 
@@ -864,6 +864,28 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Helper' ) ) {
 		public static function is_admin_page(): bool {
 
 			return \is_admin() && ! \wp_doing_ajax() && ( Settings::is_plugin_settings_page() );
+		}
+
+		/**
+		 * Converts currently selected timezone into string which can be passed to MySQL server.
+		 *
+		 * @since 3.3.1
+		 */
+		public static function get_mysql_time_zone(): string {
+			$timezone_string = \wp_timezone();
+
+			$date = new \DateTime( 'now', $timezone_string );
+
+			// create a new date offset by the timezone offset.
+			// gets the interval as hours & minutes.
+			$offset      = $timezone_string->getOffset( $date ) . ' seconds';
+			$date_offset = clone $date;
+			$date_offset->sub( \DateInterval::createFromDateString( $offset ) );
+
+			$interval = $date_offset->diff( $date );
+			$offset   = $interval->format( '%R%H:%I' );
+
+			return $offset;
 		}
 	}
 }

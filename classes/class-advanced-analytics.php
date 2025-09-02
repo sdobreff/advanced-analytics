@@ -233,8 +233,8 @@ if ( ! class_exists( '\ADVAN\Advanced_Analytics' ) ) {
 			if ( Context_Helper::is_front() ) {
 				printf(
 					/* Translators: Plugin link. */
-					esc_html__( 'Proudly powered by %s', '0-day-analytics' ),
-					'<a href="' . esc_url( __( 'https://wordpress.org/plugins/0-day-analytics/', '0-day-analytics' ) ) . '" rel="nofollow">' . esc_attr( ADVAN_NAME ) . '</a>'
+					\esc_html__( 'Proudly powered by %s', '0-day-analytics' ),
+					'<a href="' . \esc_url( __( 'https://wordpress.org/plugins/0-day-analytics/', '0-day-analytics' ) ) . '" rel="nofollow">' . \esc_attr( ADVAN_NAME ) . '</a>'
 				);
 			}
 		}

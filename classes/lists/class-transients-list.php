@@ -269,7 +269,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			$pages       = ceil( $this->count / $per_page );
 			$one_page    = ( 1 === $pages ) ? 'one-page' : '';
 			$type        = ! empty( $_GET['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['event_type'] ) ) : '';
-			$this->count = self::get_total_transients( $search, $type );
+			$this->count = self::get_total_transients( $type, $search );
 
 			$this->handle_table_actions();
 
@@ -392,12 +392,14 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 *
 		 * If a search is performed, it returns the number of found results
 		 *
+		 * @param string $type - The type of the transients to collect data for.
 		 * @param  string $search - Search string.
+		 *
 		 * @return int
 		 *
 		 * @since 1.7.0
 		 */
-		private static function get_total_transients( $search = '', string $type ) {
+		private static function get_total_transients( string $type, $search = '' ) {
 
 			// Query.
 			$count = Transients_Helper::get_transient_items(
@@ -596,7 +598,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		}
 
 		/**
-		 * Returns translatet text for per page option
+		 * Returns translated text for per page option
 		 *
 		 * @return string
 		 *
@@ -778,7 +780,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 *
 		 * @return array<string,string>
 		 *
-		 * @since latest
+		 * @since 3.3.1
 		 */
 		public function get_views() {
 
@@ -856,7 +858,7 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 		 * @param array<string,stdClass> $events The list of all events.
 		 * @return array<string,array<string,stdClass>> Array of filtered events keyed by filter name.
 		 *
-		 * @since latest
+		 * @since 3.3.1
 		 */
 		public static function get_filtered_transients( array $events ) {
 
@@ -883,19 +885,26 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 				}
 			);
 
+			$filtered['expired'] = array_filter(
+				$events,
+				function ( $event ) {
+					if ( isset( $event['schedule'] ) && $event['schedule'] ) {
+						$late = Crons_Helper::is_late( (array) $event );
+
+						if ( $late ) {
+							return true;
+						}
+					}
+					return false;
+				}
+			);
+
 			$filtered['with_expiration'] = array_filter(
 				$events,
 				function ( $event ) {
 					return ( 0 !== $event['schedule'] );
 				}
 			);
-
-			// $filtered['url'] = array_filter(
-			// $events,
-			// function ( $event ) {
-			// return ( 'crontrol_url_cron_job' === $event->hook );
-			// }
-			// );
 
 			return $filtered;
 		}

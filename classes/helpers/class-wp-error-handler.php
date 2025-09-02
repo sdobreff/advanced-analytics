@@ -686,5 +686,44 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 				);
 			}
 		}
+
+
+		/**
+		 * Action for _doing_it_wrong() calls.
+		 *
+		 * @param string $function_name The function that was called.
+		 * @param string $message       A message explaining what has been done incorrectly.
+		 * @param string $version       The version of WordPress where the message was added.
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.2.2
+		 */
+		public static function action_doing_it_wrong_run( $function_name, $message, $version ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+
+			/**
+			 * Shall we trigger that error or not - sending the error and message so others can check it.
+			 *
+			 * @param string $function_name - The name of the function that triggered the error (this is the WP function which is not called right, not the real function that actually called it).
+			 * @param string $message - The WP error string (message).
+			 * @param string $message - The WP eversion when that was originally added.
+			 *
+			 * @since 3.3.1
+			 */
+			$shall_trigger = \apply_filters( ADVAN_PREFIX . 'trigger_error_doing_it_wrong', true, $function_name, $message, $version );
+
+			if ( $shall_trigger ) {
+				$function_name = (string) $function_name;
+				$message       = (string) $message;
+
+				$out = sprintf(
+					'Doing it wrong run: %s: %s',
+					$function_name,
+					$message,
+				) . \PHP_EOL .
+				'As of version: ' . $version . PHP_EOL . 'Stack trace:' . PHP_EOL;
+				self::trace_log( $out );
+			}
+		}
 	}
 }

@@ -264,12 +264,11 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
 					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
 
-					echo '<div style="clear:both; float:right">';
 					$transients->search_box(
 						__( 'Search', '0-day-analytics' ),
 						strtolower( $transients::get_table_name() ) . '-find'
 					);
-					echo '</div>';
+
 					$transients->display();
 
 					?>

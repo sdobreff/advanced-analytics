@@ -12,7 +12,7 @@
  *
  * Plugin Name:     WP Control
  * Description:     Take full control of error log, crons, transients, plugins, requests and DB tables.
- * Version:         3.3.1
+ * Version:         3.4.0
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/
  * Text Domain:     0-day-analytics
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Constants.
 if ( ! defined( 'ADVAN_VERSION' ) ) {
-	define( 'ADVAN_VERSION', '3.3.1' );
+	define( 'ADVAN_VERSION', '3.4.0' );
 	define( 'ADVAN_TEXTDOMAIN', '0-day-analytics' );
 	define( 'ADVAN_NAME', 'WP Control' );
 	define( 'ADVAN_PLUGIN_ROOT', \plugin_dir_path( __FILE__ ) );
@@ -95,6 +95,9 @@ if ( ! defined( 'QM_DISABLE_ERROR_HANDLER' ) ) {
 \add_action( 'doing_it_wrong_trigger_error', array( WP_Error_Handler::class, 'trigger_error' ), 0, 4 );
 \add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 0, 3 );
 \add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 20, 3 );
+
+
+\add_action( 'doing_it_wrong_run', array( WP_Error_Handler::class, 'action_doing_it_wrong_run' ), 99, 3 );
 
 // All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.
 \add_action( 'deprecated_function_run', array( WP_Error_Handler::class, 'deprecated_error' ), 0, 3 );

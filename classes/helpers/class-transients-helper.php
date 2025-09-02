@@ -34,7 +34,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			'update_core',
 			'theme_roots',
 			'poptags_',
-			//'doing_cron',
+			'doing_cron',
 			'wp_theme_files_patterns-',
 			'wp_plugin_dependencies_plugin_data',
 			'wp_styles_for_blocks',
@@ -82,8 +82,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			// Transient type.
 			$retval = ( false !== self::is_site_wide( $transient ) )
-			? delete_site_transient( $transient_name )
-			: delete_transient( $transient_name );
+			? \delete_site_transient( $transient_name )
+			: \delete_transient( $transient_name );
 
 			if ( false === $retval ) {
 				return new \WP_Error(
@@ -289,26 +289,26 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 		private static function get_transient_value_type( $transient ): string {
 
 			// Default type.
-			$type = esc_html__( 'unknown', '0-day-analytics' );
+			$type = \esc_html__( 'unknown', '0-day-analytics' );
 
 			// Try to unserialize.
-			$value = maybe_unserialize( $transient );
+			$value = \maybe_unserialize( $transient );
 
 			// Array.
 			if ( is_array( $value ) ) {
-				$type = esc_html__( 'array', '0-day-analytics' );
+				$type = \esc_html__( 'array', '0-day-analytics' );
 
 				// Object.
 			} elseif ( is_object( $value ) ) {
-				$type = esc_html__( 'object', '0-day-analytics' );
+				$type = \esc_html__( 'object', '0-day-analytics' );
 
 				// Serialized array.
-			} elseif ( is_serialized( $value ) ) {
-				$type = esc_html__( 'serialized', '0-day-analytics' );
+			} elseif ( \is_serialized( $value ) ) {
+				$type = \esc_html__( 'serialized', '0-day-analytics' );
 
 				// HTML.
 			} elseif ( strip_tags( $value ) !== $value ) {
-				$type = esc_html__( 'html', '0-day-analytics' );
+				$type = \esc_html__( 'html', '0-day-analytics' );
 
 				// Scalar.
 			} elseif ( is_scalar( $value ) ) {
@@ -317,32 +317,32 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 					// Likely a timestamp.
 					if ( 10 === strlen( $value ) ) {
-						$type = esc_html__( 'timestamp?', '0-day-analytics' );
+						$type = \esc_html__( 'timestamp?', '0-day-analytics' );
 
 						// Likely a boolean.
 					} elseif ( in_array( $value, array( '0', '1' ), true ) ) {
-						$type = esc_html__( 'boolean?', '0-day-analytics' );
+						$type = \esc_html__( 'boolean?', '0-day-analytics' );
 
 						// Any number.
 					} else {
-						$type = esc_html__( 'numeric', '0-day-analytics' );
+						$type = \esc_html__( 'numeric', '0-day-analytics' );
 					}
 
 					// JSON.
 				} elseif ( is_string( $value ) && is_object( json_decode( $value ) ) ) {
 
-					$type = esc_html__( 'json', '0-day-analytics' );
+					$type = \esc_html__( 'json', '0-day-analytics' );
 				} elseif ( is_string( $value ) && in_array( $value, array( 'no', 'yes', 'false', 'true' ), true ) ) {
-						$type = esc_html__( 'boolean?', '0-day-analytics' );
+						$type = \esc_html__( 'boolean?', '0-day-analytics' );
 
 					// Scalar.
 				} else {
-					$type = esc_html__( 'scalar', '0-day-analytics' );
+					$type = \esc_html__( 'scalar', '0-day-analytics' );
 				}
 
 				// Empty.
 			} elseif ( empty( $value ) ) {
-				$type = esc_html__( 'empty', '0-day-analytics' );
+				$type = \esc_html__( 'empty', '0-day-analytics' );
 			}
 
 			// Return type.
@@ -385,11 +385,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 
 			global $wpdb;
 
+			$wpdb->query( 'SET time_zone = ' . "'" . WP_Helper::get_mysql_time_zone() . "';" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
 			// Parse arguments.
 			$parsed_args = Transients_List::parse_args( $args );
 
 			// Escape some LIKE parts.
-			$esc_name = '%' . $wpdb->esc_like( '_transient_' ) . '%';
+			$esc_name = '' . $wpdb->esc_like( '_transient_' ) . '%';
+			$esc_site_name = '' . $wpdb->esc_like( '_site_transient_' ) . '%';
 			$esc_time = '%' . $wpdb->esc_like( '_transient_timeout_' ) . '%';
 
 			// SELECT.
@@ -399,15 +402,19 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			if ( ! empty( $parsed_args['count'] ) ) {
 				$sql[] = 'count(go.option_id)';
 			} else {
-				$sql[] = 'go.option_id, go.option_name, go.option_value, go.autoload';
+				$sql[] = 'go.option_id, go.option_name, go.option_value, go.autoload, d.option_value AS time_to_run';
 			}
 
-			// FROM.
-			$sql[] = "FROM {$wpdb->options} as go 
-			LEFT JOIN
+			$sql[] = "FROM {$wpdb->options} as go ";
+
+			// if ( empty( $parsed_args['count'] ) ) {
+
+				// FROM.
+
+				$sql[] = "LEFT JOIN
 				{$wpdb->options} d
 				ON d.option_name LIKE concat('%_transient_timeout_', SUBSTRING_INDEX( go.option_name, '_transient_', -1 ), '%')
-			WHERE go.option_name LIKE %s AND go.option_name NOT LIKE %s";
+			WHERE ( go.option_name LIKE %s OR go.option_name LIKE %s ) AND go.option_name NOT LIKE %s";
 
 			if ( ! empty( $parsed_args['type'] ) ) {
 				if ( 'persistent' === $parsed_args['type'] ) {
@@ -416,17 +423,23 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 				if ( 'with_expiration' === $parsed_args['type'] ) {
 					$sql[] = ' AND d.option_value IS NOT NULL';
 				}
+				if ( 'expired' === $parsed_args['type'] ) {
+					$sql[] = ' AND ( d.option_value IS NOT NULL AND d.option_value < UNIX_TIMESTAMP( CURRENT_TIMESTAMP ) )';
+				}
 				if ( 'core' === $parsed_args['type'] ) {
 					$sql[]  = ' AND (';
 					$in_sql = '';
 					foreach ( self::WP_CORE_TRANSIENTS as $transient_name ) {
-						$in_sql .= ' go.option_value LIKE \'%' . ( $transient_name ) . '%\' AND ';
+						$search  = '%' . $wpdb->esc_like( $transient_name ) . '%';
+						$in_sql .= $wpdb->prepare( ' go.option_name LIKE %s OR', $search );
+						// $in_sql .= ' go.option_name LIKE \'%' . $wpdb->esc_like( $transient_name ) . '%\' OR ';
 					}
 
-					$sql[] = \rtrim( $in_sql, ' AND ' );
+					$sql[] = \rtrim( $in_sql, ' OR ' );
 					$sql[] = ')';
 				}
 			}
+			// }
 
 			// Search.
 			if ( ! empty( $parsed_args['search'] ) ) {
@@ -464,14 +477,14 @@ if ( ! class_exists( '\ADVAN\Helpers\Transients_Helper' ) ) {
 			$query = implode( ' ', $sql );
 
 			// Prepare.
-			$prepared = $wpdb->prepare( $query, $esc_name, $esc_time ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$prepared = $wpdb->prepare( $query, $esc_name, $esc_site_name, $esc_time ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 			// Query.
 			$transients = empty( $parsed_args['count'] )
 				? $wpdb->get_results( $prepared, \ARRAY_A ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 				: $wpdb->get_var( $prepared, 0 );    // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
-			if ( empty( $parsed_args['count'] ) ) {
+			if ( empty( $parsed_args['count'] ) && ! empty( $transients ) ) {
 				$normalized_data = array();
 				foreach ( $transients as $transient ) {
 					$normalized_data[] = array(

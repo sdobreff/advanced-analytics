@@ -1940,7 +1940,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.3.1
 		 */
 		public static function show_error_count() {
 			if ( 1 <= ( $count = Log_Line_Parser::get_lines_to_show_interface() ) ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
