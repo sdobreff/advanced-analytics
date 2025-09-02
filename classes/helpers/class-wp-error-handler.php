@@ -701,6 +701,12 @@ if ( ! class_exists( '\ADVAN\Helpers\WP_Error_Handler' ) ) {
 		 */
 		public static function action_doing_it_wrong_run( $function_name, $message, $version ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 
+			if ( Advanced_Analytics::is_just_in_time_for_0_day_domain( $function_name, $message ) ) {
+				// This error code is not included in error_reporting, so let it fall.
+				// through to the standard PHP error handler.
+				return;
+			}
+
 			/**
 			 * Shall we trigger that error or not - sending the error and message so others can check it.
 			 *
