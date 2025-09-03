@@ -1,0 +1,14 @@
+tasks:
+    command-0:
+        command: |
+            sudo rsyslogd
+            sudo service mysql start
+            sudo service php8.4-fpm start
+            sudo service nginx start
+            sudo mailhog </dev/null &>/dev/null & disown
+            /bin/bash .gitpod/.init.sh
+            history -c
+        description: init task migrated from .gitpod.yml
+        name: 'Some init: command'
+        triggeredBy:
+            - postDevcontainerStart

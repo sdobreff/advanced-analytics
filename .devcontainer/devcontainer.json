@@ -1,20 +1,66 @@
-// The Dev Container format allows you to configure your environment. At the heart of it
-// is a Docker image or Dockerfile which controls the tools available in your environment.
-//
-// See https://aka.ms/devcontainer.json for more information.
 {
-	"name": "Ona",
-	// Use "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
-	// instead of the build to use a pre-built image.
-	"build": {
+  "name": "advanced-analytics",
+ "build": {
         "context": ".",
         "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "gitpod",
+  "containerUser": "gitpod",
+  "workspaceFolder": "/var/www",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/advanced-analytics,type=bind",
+  "forwardPorts": [
+    8080,
+    3306,
+    8025,
+    1025,
+    9000
+  ],
+  "portsAttributes": {
+    "1025": {
+      "label": "Port 1025",
+      "onAutoForward": "ignore",
+      "elevateIfNeeded": true
+    },
+    "3306": {
+      "label": "Port 3306",
+      "onAutoForward": "ignore",
+      "elevateIfNeeded": true
+    },
+    "8025": {
+      "label": "Port 8025",
+      "onAutoForward": "ignore",
+      "elevateIfNeeded": true
+    },
+    "8080": {
+      "label": "Port 8080",
+      "onAutoForward": "openPreview",
+      "elevateIfNeeded": true
+    },
+    "9000": {
+      "label": "Port 9000",
+      "onAutoForward": "ignore",
+      "elevateIfNeeded": true
     }
-	// Features add additional features to your environment. See https://containers.dev/features
-	// Beware: features are not supported on all platforms and may have unintended side-effects.
-	// "features": {
-    //   "ghcr.io/devcontainers/features/docker-in-docker": {
-    //     "moby": false
-    //   }
-    // }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "usernamehw.errorlens",
+        "StoilDobreff.php-resolver",
+        "felixfbecker.php-debug",
+        "neilbrayfield.php-docblocker",
+        "streetsidesoftware.code-spell-checker",
+        "TabNine.tabnine-vscode",
+        "sleistner.vscode-fileutils",
+        "bmewburn.vscode-intelephense-client",
+        "sdras.night-owl",
+        "waderyan.gitblame",
+        "felixfbecker.php-pack",
+        "xdebug.php-debug",
+        "zaaack.markdown-editor",
+        "RobertOstermann.inline-parameters-extended",
+        "mrmlnc.vscode-duplicate"
+      ]
+    }
+  }
 }
