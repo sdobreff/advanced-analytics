@@ -327,7 +327,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Transients_View' ) ) {
 			\wp_safe_redirect(
 				\remove_query_arg(
 					array( 'deleted' ),
-					add_query_arg(
+					\add_query_arg(
 						array(
 							'page'                        => Transients_List::TRANSIENTS_MENU_SLUG,
 							Transients_List::SEARCH_INPUT => Transients_List::escaped_search_input(),

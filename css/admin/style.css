@@ -2366,6 +2366,14 @@ input:not(:checked) + span.switchery {
 }
 
 /* Dark Skin */
+html.aadvana-darkskin .quicktags-toolbar {
+  background: #1d456b !important;
+}
+
+html.aadvana-darkskin .wp-switch-editor {
+  background: #1d456b !important;
+  color: rgb(229, 229, 236);
+}
 
 html.aadvana-darkskin .subsubsub a .count, html.aadvana-darkskin .subsubsub a.current .count {
   color: #c9d2db;

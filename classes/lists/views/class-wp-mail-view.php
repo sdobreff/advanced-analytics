@@ -522,10 +522,21 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 			if ( isset( $_POST['message'] ) ) {
 				// message may be content of html tags.
 				$message = \wp_kses_post( $_POST['message'] );
+
+				if ( empty( $message ) ) {
+					$message = ' ';
+				}
+
+				\add_filter(
+					'wp_mail_content_type',
+					function () {
+						return 'text/html';
+					}
+				);
 			}
 
 			$arr_attachments = array();
-			if ( isset( $_POST['attachments'] ) ) {
+			if ( isset( $_POST['attachments'] ) && ! empty( $_POST['attachments'] ) ) {
 				$arr_attachments_url = explode( ',', $_POST['attachments'] );
 				$arr_attachments_url = array_map( 'sanitize_text_field', $arr_attachments_url );
 				$arr_attachments     = array();
