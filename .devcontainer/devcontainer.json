@@ -1,12 +1,12 @@
 {
   "name": "advanced-analytics",
- "build": {
+  "build": {
         "context": ".",
         "dockerfile": "Dockerfile"
   },
   "remoteUser": "gitpod",
   "containerUser": "gitpod",
-  "workspaceFolder": "/var/www",
+  "workspaceFolder": "/var/www/html",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/advanced-analytics,type=bind",
   "forwardPorts": [
     8080,

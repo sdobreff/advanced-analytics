@@ -260,14 +260,14 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			$this->_column_headers = array( $columns, $hidden, $sortable );
 
 			// Vars.
-			$search      = self::escaped_search_input();
-			$per_page    = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : self::get_screen_option_per_page();
-			$orderby     = ! empty( $_GET['orderby'] ) ? \sanitize_text_field( \wp_unslash( $_GET['orderby'] ) ) : '';
-			$order       = ! empty( $_GET['order'] ) ? \sanitize_text_field( \wp_unslash( $_GET['order'] ) ) : 'DESC';
-			$page        = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
-			$offset      = $per_page * ( $page - 1 );
-			$pages       = ceil( $this->count / $per_page );
-			$one_page    = ( 1 === $pages ) ? 'one-page' : '';
+			$search   = self::escaped_search_input();
+			$per_page = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : self::get_screen_option_per_page();
+			$orderby  = ! empty( $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : '';
+			$order    = ! empty( $_GET['order'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
+			$page     = $this->get_pagenum();
+			$offset   = $per_page * ( $page - 1 );
+			// $pages       = ceil( $this->count / $per_page );
+			// $one_page    = ( 1 === $pages ) ? 'one-page' : '';
 			$type        = ! empty( $_GET['event_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['event_type'] ) ) : '';
 			$this->count = self::get_total_transients( $type, $search );
 
@@ -798,9 +798,10 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 
 			$url = \add_query_arg(
 				array(
-					'page' => self::TRANSIENTS_MENU_SLUG,
+					'page'       => self::TRANSIENTS_MENU_SLUG,
 					// self::SEARCH_INPUT => self::escaped_search_input(),
 					// 'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+					'event_type' => 'all',
 				),
 				\admin_url( 'admin.php' )
 			);
@@ -808,8 +809,9 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 			$all_transients = Transients_Helper::get_transient_items( array( 'all' => true ) );
 
 			$views['all'] = sprintf(
-				'<a href="%1$s">%2$s <span class="count">(%3$s)</span></a>',
+				'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
 				\esc_url( $url ),
+				$hooks_type === 'all' ? ' class="current"' : '',
 				\esc_html__( 'All transients (no filters)', '0-day-analytics' ),
 				\esc_html( \number_format_i18n( count( $all_transients ) ) )
 			);
@@ -834,7 +836,6 @@ if ( ! class_exists( '\ADVAN\Lists\Transients_List' ) ) {
 					array(
 						'page'             => self::TRANSIENTS_MENU_SLUG,
 						self::SEARCH_INPUT => self::escaped_search_input(),
-						'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? \sanitize_text_field( \wp_unslash( $_REQUEST['schedules_filter'] ) ) : '',
 						'event_type'       => $key,
 					),
 					\admin_url( 'admin.php' )

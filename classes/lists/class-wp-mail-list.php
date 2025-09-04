@@ -53,6 +53,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 		public const WP_MAIL_MENU_SLUG = 'advan_wp_mail';
 
+		public const NEW_ACTION = 'advan_mail_new';
+
+		public const NONCE_NAME = 'advana_wp_mail_manager';
+
 		/**
 		 * The table to show
 		 *
@@ -132,7 +136,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 * @since 3.0.0
 		 */
 		public static function init() {
-			// \add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+			\add_action( 'admin_post_' . self::NEW_ACTION, array( WP_Mail_View::class, 'new_mail' ) );
 		}
 
 		/**
@@ -213,7 +217,27 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		public function prepare_items() {
 			$this->handle_table_actions();
 
-			$items = $this->fetch_table_data();
+			// Vars.
+			$search   = self::escaped_search_input();
+			$per_page = ! empty( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : self::get_screen_option_per_page();
+			$orderby  = ! empty( $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : '';
+			$order    = ! empty( $_GET['order'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
+			$page     = $this->get_pagenum();
+			$offset   = $per_page * ( $page - 1 );
+			// $pages    = ceil( $this->count / $per_page );
+			// $one_page = ( 1 === $pages ) ? 'one-page' : '';
+			$type = ! empty( $_GET['mail_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['mail_type'] ) ) : '';
+
+			$items = $this->fetch_table_data(
+				array(
+					'search'  => $search,
+					'offset'  => $offset,
+					'number'  => $per_page,
+					'orderby' => $orderby,
+					'order'   => $order,
+					'type'    => $type,
+				)
+			);
 
 			$columns = self::manage_columns( array() );
 			$hidden  = \get_user_option( 'manage' . WP_Helper::get_wp_screen()->id . 'columnshidden', false );
@@ -288,24 +312,40 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		/**
 		 * Fetch table data from the WordPress database.
 		 *
+		 * @param array $args - The arguments collected / passed.
+		 *
 		 * @since 1.0.0
 		 *
 		 * @return  Array
 		 */
-		public function fetch_table_data() {
+		public function fetch_table_data( array $args = array() ) {
 
 			global $wpdb;
 
-			$per_page = self::get_screen_option_per_page();
+			// Parse.
+			$parsed_args = \wp_parse_args(
+				$args,
+				array(
+					'offset'  => 0,
+					'number'  => self::get_screen_option_per_page(),
+					'search'  => '',
+					'orderby' => 'id',
+					'order'   => 'DESC',
+					'count'   => false,
+				)
+			);
 
-			$current_page = $this->get_pagenum();
-			if ( 1 < $current_page ) {
-				$offset = $per_page * ( $current_page - 1 );
-			} else {
-				$offset = 0;
-			}
+			$per_page = $parsed_args['number'];
+			$offset   = $parsed_args['offset'];
 
-			$search_string = self::escaped_search_input();
+			// $current_page = $this->get_pagenum();
+			// if ( 1 < $current_page ) {
+			// $offset = $per_page * ( $current_page - 1 );
+			// } else {
+			// $offset = 0;
+			// }
+
+			$search_string = $parsed_args['search'];
 
 			$search_sql = '';
 
@@ -317,15 +357,39 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				$search_sql .= ') ';
 			}
 
+			if ( ! empty( $parsed_args['type'] ) ) {
+				if ( 'successful' === $parsed_args['type'] ) {
+					$search_sql .= ' AND status = 1';
+				}
+				if ( 'unsuccessful' === $parsed_args['type'] ) {
+					$search_sql .= ' AND status = 0';
+				}
+				if ( 'html' === $parsed_args['type'] ) {
+					$search_sql .= ' AND is_html = 1';
+				}
+				if ( 'text' === $parsed_args['type'] ) {
+					$search_sql .= ' AND is_html != 1';
+				}
+				if ( 'attachments' === $parsed_args['type'] ) {
+					$search_sql .= ' AND attachments != "[]"';
+				}
+			}
+
+			$orderby = $parsed_args['orderby'];
+			if ( empty( $orderby ) ) {
+				$orderby = 'id';
+			}
+			$order = $parsed_args['order'];
+
 			$wpdb_table = $this->get_table_name();
 
-			$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['orderby'] ) ) : 'id';
-			$order   = ( isset( $_GET['order'] ) && '' != $_GET['orderby'] ) ? \esc_sql( \wp_unslash( $_GET['order'] ) ) : 'DESC';
-			$query   = 'SELECT
+			$query = 'SELECT
 				' . implode( ', ', \array_keys( WP_Mail_Entity::get_fields() ) ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 
-			$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
+			if ( ! isset( $parsed_args['all'] ) ) {
+				$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
+			}
 
 			// query output_type will be an associative array with ARRAY_A.
 			$query_results = WP_Mail_Entity::get_results( $query );
@@ -686,45 +750,45 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 					$item['date_added'] = (int) $item['time'];
 
-					$event_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['date_added'] );
+					$mail_datetime_utc = \gmdate( 'Y-m-d H:i:s', $item['date_added'] );
 
 					$timezone_local  = \wp_timezone();
-					$event_local     = \get_date_from_gmt( $event_datetime_utc, 'Y-m-d' );
+					$mail_local      = \get_date_from_gmt( $mail_datetime_utc, 'Y-m-d' );
 					$today_local     = ( new \DateTimeImmutable( 'now', $timezone_local ) )->format( 'Y-m-d' );
 					$tomorrow_local  = ( new \DateTimeImmutable( 'tomorrow', $timezone_local ) )->format( 'Y-m-d' );
 					$yesterday_local = ( new \DateTimeImmutable( 'yesterday', $timezone_local ) )->format( 'Y-m-d' );
 
 					// If the offset of the date of the event is different from the offset of the site, add a marker.
-					if ( \get_date_from_gmt( $event_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
+					if ( \get_date_from_gmt( $mail_datetime_utc, 'P' ) !== get_date_from_gmt( 'now', 'P' ) ) {
 						$time_format .= ' (P)';
 					}
 
-					$event_time_local = \get_date_from_gmt( $event_datetime_utc, $time_format );
+					$mail_time_local = \get_date_from_gmt( $mail_datetime_utc, $time_format );
 
-					if ( $event_local === $today_local ) {
+					if ( $mail_local === $today_local ) {
 						$date = sprintf(
 						/* translators: %s: Time */
 							__( 'Today at %s', '0-day-analytics' ),
-							$event_time_local,
+							$mail_time_local,
 						);
-					} elseif ( $event_local === $tomorrow_local ) {
+					} elseif ( $mail_local === $tomorrow_local ) {
 						$date = sprintf(
 						/* translators: %s: Time */
 							__( 'Tomorrow at %s', '0-day-analytics' ),
-							$event_time_local,
+							$mail_time_local,
 						);
-					} elseif ( $event_local === $yesterday_local ) {
+					} elseif ( $mail_local === $yesterday_local ) {
 						$date = sprintf(
 						/* translators: %s: Time */
 							__( 'Yesterday at %s', '0-day-analytics' ),
-							$event_time_local,
+							$mail_time_local,
 						);
 					} else {
 						$date = sprintf(
 						/* translators: 1: Date, 2: Time */
 							__( '%1$s at %2$s', '0-day-analytics' ),
-							\get_date_from_gmt( $event_datetime_utc, 'F jS' ),
-							$event_time_local,
+							\get_date_from_gmt( $mail_datetime_utc, 'F jS' ),
+							$mail_time_local,
 						);
 					}
 
@@ -1123,7 +1187,8 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				if ( isset( $record['is_html'] ) && (bool) $record['is_html'] ) {
 					$message .= WP_Mail_Log::filter_html( $record['message'] );
 				} else {
-					$message .= \nl2br( $record['message'] );;
+					$message .= \nl2br( $record['message'] );
+
 				}
 
 				$attachments = '';
@@ -1170,9 +1235,9 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 									if ( isset( $attachment['note'] ) ) {
 										echo $attachment['note']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 										?>
-										<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+										<a href="<?php echo \esc_url_raw( $attachment['url'] ); ?>" alt="<?php echo \esc_html( $attachment['alt'] ); ?>" title="<?php echo \esc_html( $attachment['alt'] ); ?>" target="_blank"
 											class="attachment-item"
-											style=" display:block; width:35px; height: 35px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											style=" display:block; width:35px; height: 35px; background: url(<?php echo \esc_url_raw( $attachment['src'] ); ?>) no-repeat; background-size: contain;"></a>
 											<?php
 											continue;
 									}
@@ -1180,16 +1245,16 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 									if ( \wp_attachment_is_image( $attachment['id'] ) ) {
 										?>
 
-											<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"><img src="<?php echo $attachment['url']; ?>" alt="<?php echo \esc_attr( $attachment['alt'] ); ?>" title="<?php echo \esc_attr( $attachment['alt'] ); ?>" 
+										<a href="<?php echo \esc_url_raw( $attachment['url'] ); ?>" alt="<?php echo \esc_html( $attachment['alt'] ); ?>" title="<?php echo \esc_html( $attachment['alt'] ); ?>" target="_blank"><img src="<?php echo \esc_url_raw( $attachment['url'] ); ?>" alt="<?php echo \esc_attr( $attachment['alt'] ); ?>" title="<?php echo \esc_attr( $attachment['alt'] ); ?>" 
 											class="attachment-item"
 											style=" display:block; width:50px; height: 50px;"/></a>
 											<?php
 									} else {
 										?>
 
-										<a href="<?php echo $attachment['url']; ?>" alt="<?php echo $attachment['alt']; ?>" title="<?php echo $attachment['alt']; ?>" target="_blank"
+										<a href="<?php echo \esc_url_raw( $attachment['url'] ); ?>" alt="<?php echo \esc_html( $attachment['alt'] ); ?>" title="<?php echo \esc_html( $attachment['alt'] ); ?>" target="_blank"
 											class="attachment-item"
-											style=" display:block; width:50px; height: 50px; background: url(<?php echo $attachment['src']; ?>) no-repeat; background-size: contain;"></a>
+											style=" display:block; width:50px; height: 50px; background: url(<?php echo \esc_url_raw( $attachment['src'] ); ?>) no-repeat; background-size: contain;"></a>
 											<?php } ?>
 							</li>
 								<?php } ?>
@@ -1219,6 +1284,137 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					array( 'status' => 400 )
 				);
 			}
+		}
+
+
+		/**
+		 * Display the list of hook types.
+		 *
+		 * @return array<string,string>
+		 *
+		 * @since latest
+		 */
+		public function get_views() {
+
+			$views      = array();
+			$hooks_type = ( $_REQUEST['mail_type'] ) ?? '';
+
+			$types = array(
+				// 'all'      => __( 'All events', '0-day-analytics' ),
+				'successful'   => __( 'Successful', '0-day-analytics' ),
+				'unsuccessful' => __( 'Unsuccessful', '0-day-analytics' ),
+				'html'         => __( 'HTNL', '0-day-analytics' ),
+				'text'         => __( 'Text', '0-day-analytics' ),
+				'attachments'  => __( 'With attachments', '0-day-analytics' ),
+			// 'url'      => __( 'URL events', '0-day-analytics' ),
+			);
+
+			$url = \add_query_arg(
+				array(
+					'page'      => self::WP_MAIL_MENU_SLUG,
+					// self::SEARCH_INPUT => self::escaped_search_input(),
+					// 'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+					'mail_type' => 'all',
+				),
+				\admin_url( 'admin.php' )
+			);
+
+			$all_mails = $this->fetch_table_data( array( 'all' => true ) );
+
+			$views['all'] = sprintf(
+				'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
+				\esc_url( $url ),
+				$hooks_type === 'all' ? ' class="current"' : '',
+				\esc_html__( 'All mails (no filters)', '0-day-analytics' ),
+				\esc_html( \number_format_i18n( count( $all_mails ) ) )
+			);
+
+			$filtered = self::get_filtered_mails( $all_mails );
+
+			/**
+			 * @var array<string,string> $types
+			 */
+			foreach ( $types as $key => $type ) {
+				if ( ! isset( $filtered[ $key ] ) ) {
+					continue;
+				}
+
+				$count = count( $filtered[ $key ] );
+
+				if ( ! $count ) {
+					continue;
+				}
+
+				$url = \add_query_arg(
+					array(
+						'page'             => self::WP_MAIL_MENU_SLUG,
+						self::SEARCH_INPUT => self::escaped_search_input(),
+						'mail_type'        => $key,
+					),
+					\admin_url( 'admin.php' )
+				);
+
+				$views[ $key ] = sprintf(
+					'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
+					\esc_url( $url ),
+					$hooks_type === $key ? ' class="current"' : '',
+					\esc_html( $type ),
+					\esc_html( \number_format_i18n( $count ) )
+				);
+			}
+
+			return $views;
+		}
+
+		/**
+		 * Returns mails filtered by various parameters
+		 *
+		 * @param array<string,stdClass> $mails The list of all events.
+		 * @return array<string,array<string,stdClass>> Array of filtered events keyed by filter name.
+		 *
+		 * @since 3.3.1
+		 */
+		public static function get_filtered_mails( array $mails ) {
+
+			$filtered['successful'] = array_filter(
+				$mails,
+				function ( $mail ) {
+					return ( 1 === (int) $mail['status'] );
+				}
+			);
+
+			$filtered['unsuccessful'] = array_filter(
+				$mails,
+				function ( $mail ) {
+					return ( 0 === (int) $mail['status'] );
+				}
+			);
+
+			$filtered['html'] = array_filter(
+				$mails,
+				function ( $mail ) {
+					return ( 1 === (int) $mail['is_html'] );
+				}
+			);
+
+			$filtered['text'] = array_filter(
+				$mails,
+				function ( $mail ) {
+					return ( 0 === (int) $mail['is_html'] );
+				}
+			);
+
+			$filtered['attachments'] = array_filter(
+				$mails,
+				function ( $mail ) {
+					return ( '[]' !== $mail['attachments'] );
+					// $mail['attachments'] = json_decode( $mail['attachments'], true );
+					// return (
+					// ( isset( $mail['attachments'] ) && ! empty( $mail['attachments'] ) && is_array( $mail['attachments'] ) ) );
+				}
+			);
+
+			return $filtered;
 		}
 	}
 }

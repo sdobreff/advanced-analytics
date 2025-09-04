@@ -43,6 +43,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 			\add_thickbox();
 			\wp_enqueue_style( 'media-views' );
 			\wp_enqueue_script( 'wp-api-fetch' );
+			\wp_enqueue_media();
 			?>
 			<script>
 				if( 'undefined' != typeof localStorage ){
@@ -53,6 +54,62 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 						element.classList.add("aadvana-darkskin");
 					}
 				}
+				jQuery(document).ready(function($){
+
+					var mediaUploader;
+
+					$('#upload-button').click(function(e) {
+						e.preventDefault();
+						// If the uploader object has already been created, reopen the dialog
+						if (mediaUploader) {
+						mediaUploader.open();
+						return;
+						}
+						// Extend the wp.media object
+						mediaUploader =  wp.media({
+						title: 'Add Attachments',
+						button: {
+						text: 'Choose Files'
+						}, multiple: true });
+
+						// When a file is selected, grab the URL and set it as the text field's value
+						mediaUploader.on('select', function() {
+							//media_uploader.on("insert", function(){
+
+							
+							var length = mediaUploader.state().get("selection").length;
+							var files = mediaUploader.state().get("selection").models
+
+							var arr_file_url = []
+							for(var iii = 0; iii < length; iii++)
+							{
+								//var image_url = files[iii].changed.url;
+								arr_file_url.push( files[iii].changed.url ); 
+								$('#attachment-container').append( '<a href="' + files[iii].changed.url + '" target="_blank">' + files[iii].changed.title + ' (' + files[iii].changed.url + ')' + '</a><br/>' )
+								//var image_caption = files[iii].changed.caption;
+								//var image_title = files[iii].changed.title;
+							}
+							//console.log( arr_file_url );
+							var prev_attachments = $("#attachments").val();
+							if(jQuery.trim(prev_attachments).length > 0) {
+								$('#attachments').val( prev_attachments + ',' + arr_file_url.join() );
+							}
+							else {
+								$('#attachments').val( arr_file_url.join() );
+							}
+							
+						//});
+							/*
+							console.log(mediaUploader.state().get('selection'));
+							attachment = mediaUploader.state().get('selection').first().toJSON();
+							$('#attachments').val(attachment.url);
+							*/
+						});
+						// Open the uploader dialog
+						mediaUploader.open();
+					});
+
+				});
 			</script>
 			<?php
 
@@ -60,111 +117,90 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 			? \sanitize_key( $_REQUEST['action'] )
 			: '';
 
-			if ( ! empty( $action ) && ( 'edit_transient' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
+			if ( ! empty( $action ) && ( 'new_mail' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
 			) {
-				$transient_id = ! empty( $_REQUEST['trans_id'] )
-				? absint( $_REQUEST['trans_id'] )
-				: 0;
-				$transient    = Transients_Helper::get_transient_by_id( $transient_id );
-				$name         = Transients_Helper::get_transient_name( $transient['option_name'] );
-				$expiration   = Transients_Helper::get_transient_expiration_time( $transient['option_name'] );
-
-				if ( 0 !== $expiration ) {
-
-					$next_run_gmt        = gmdate( 'Y-m-d H:i:s', $expiration );
-					$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-					$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
-				}
-
+				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', time() );
+				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
+				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
 				?>
 				<div class="wrap">
-					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Edit Transient', '0-day-analytics' ); ?></h1>
+					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Compose mail', '0-day-analytics' ); ?></h1>
 					<hr class="wp-header-end">
+
 					<form method="post" action="<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>">
-						<input type="hidden" name="transient" value="<?php echo esc_attr( $name ); ?>" />
 						<input type="hidden" name="<?php echo \esc_attr( WP_Mail_List::SEARCH_INPUT ); ?>" value="<?php echo esc_attr( WP_Mail_List::escaped_search_input() ); ?>" />
-						<input type="hidden" name="action" value="<?php echo \esc_attr( WP_Mail_List::UPDATE_ACTION ); ?>" />
+						<input type="hidden" name="action" value="<?php echo \esc_attr( WP_Mail_List::NEW_ACTION ); ?>" />
 						<?php \wp_nonce_field( WP_Mail_List::NONCE_NAME ); ?>
 
-						<?php
-						if ( in_array( $name, Requests_Helper::WP_CORE_TRANSIENTS ) ) {
-							?>
-							<div id="advaa-status-notice" class="notice notice-warning">
-								<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
-							</div>
-							<?php
-						} else {
-							foreach ( Requests_Helper::WP_CORE_TRANSIENTS as $trans_name ) {
-								if ( \str_starts_with( $name, $trans_name ) ) {
+						<table  class="form-table">
+							<!--<tr>
+								<th scope="row">
+									<label for="from"><?php /*esc_html_e( 'From (Optional)', '0-day-analytics' ); */ ?></label>
+								</th>
+
+								<td> 
+									<input type="text" id="from" name="from" value="" placeholder="<?php /*esc_attr_e( 'name@yourdomain.com (Optional)', '0-day-analytics' ); */ ?>" tabindex="1" class="regular-text">
+									<p class="description"><strong>
+									<?php
+									/*
+															esc_html_e(
+										'Make sure you are setting a from address is hosted in your domain; otherwise, Your Composed email may be considered spam. For example, You should write the from email address like john@yourdomain.com.
+									',
+										'0-day-analytics'
+									);
+									*/
 									?>
-									<div id="advaa-status-notice" class="notice notice-warning">
-										<p><?php esc_html_e( 'This is a WP core transient, even if you update it, the new value will be overridden by the core!', '0-day-analytics' ); ?></p>
+																	</strong></p>
+								</td>  
+							</tr>-->
+							<tr> 
+								<th scope="row">  
+									<label for="to"><?php \esc_html_e( 'To', '0-day-analytics' ); ?></label> 
+								</th>
+								<td> 
+									<input type="email" id="to" name="to" value="" placeholder="<?php \esc_attr_e( 'To', '0-day-analytics' ); ?>" tabindex="2" class="regular-text" required pattern="([a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,20}[,]{0,}){0,}">
+								</td>  
+							</tr>
+							<tr> 
+								<th scope="row">  
+									<label for="subject"><?php \esc_html_e( 'Subject', '0-day-analytics' ); ?></label> 
+								</th>
+								<td>
+									<input type="text" id="subject" name="subject" value="" placeholder="<?php \esc_attr_e( 'Subject', '0-day-analytics' ); ?>" tabindex="3"  class="regular-text"  required>
+								</td>
+							</tr>     
+							<tr> 
+								<th scope="row">  
+									<label for="upload-button"><?php \esc_html_e( 'Attachments', '0-day-analytics' ); ?></label> 
+								</th>
+								<td>
+								
+									<input type="hidden" name="attachments" id="attachments" value="" class="regular-text" >
+									<input id="upload-button" type="button" class="button" value="<?php esc_attr_e( 'Attach Files', '0-day-analytics' ); ?>" tabindex="4" />
+									<div id="attachment-container">
 									</div>
+								</td>
+							</tr>     
+							<tr> 
+								<th scope="row">  
+									<label for="message"><?php \esc_html_e( 'Message', '0-day-analytics' ); ?></label> 
+								</th>
+								<td>
 									<?php
-									break;
-								}
-							}
-						}
-						?>
-
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th><?php esc_html_e( 'Option ID', '0-day-analytics' ); ?></th>
-									<td><input type="text" disabled class="large-text code" name="name" value="<?php echo esc_attr( $transient['option_id'] ); ?>" /></td>
-								</tr>
-								<tr>
-									<th><?php \esc_html_e( 'Name', '0-day-analytics' ); ?></th>
-									<td><input type="text" class="large-text code" name="name" value="<?php echo \esc_attr( Requests_Helper::clear_transient_name( $transient['option_name'] ) ); ?>" /></td>
-								</tr>
-								<?php
-								if ( 0 !== $expiration ) {
+									$args = array(
+										'textarea_name' => 'message',
+										'wpautop'       => false, /*'textarea_rows' => '22',*/
+										'media_buttons' => true,
+										'tabindex'      => 4,
+									);
+									\wp_editor( '', 'message', $args );
 									?>
-								<tr>
-									<th><?php \esc_html_e( 'Expiration', '0-day-analytics' ); ?></th>
-									<td>
-									<?php
-										printf(
-											'<input type="date" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s" placeholder="yyyy-mm-dd" pattern="\d{4}-\d{2}-\d{2}" />
-											<input type="time" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s" step="1" placeholder="hh:mm:ss" pattern="\d{2}:\d{2}:\d{2}" />',
-											\esc_attr( $next_run_date_local ),
-											\esc_attr( $next_run_time_local )
-										);
-									?>
-									</td>
-								</tr>
-									<?php
-								} else {
-
-										printf(
-											'<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_date" id="cron_next_run_custom_date" value="%1$s"" />
-											<input type="hidden" autocorrect="off" autocapitalize="off" spellcheck="false" name="cron_next_run_custom_time" id="cron_next_run_custom_time" value="%2$s"  />',
-											'',
-											''
-										);
-								}
-
-								?>
-								<tr>
-									<th><?php esc_html_e( 'Value', '0-day-analytics' ); ?></th>
-									<td>
-										<textarea class="large-text code" name="value" id="transient-editor" style="height: 302px; padding-left: 35px; max-witdh:100%;"><?php echo \esc_textarea( $transient['option_value'] ); ?></textarea>
-										<?php
-										printf(
-										/* translators: 1, 2, and 3: Example values for an input field. */
-											esc_html__( 'Because of the nature of the transients, if you want to use data structures here they must be in serialized format, e.g. %1$s, %2$s, or %3$s', 'wp-crontrol' ),
-											'<code>O:8:"stdClass":100:{s:11:"commerce";...</code>',
-											'<code>a:2:{s:7:"version";s:3:"1.2";...</code>',
-											'<code>a:0:{}</code>'
-										);
-										?>
-									</td>
-								</tr>
-							</tbody>
+								</td>
+							</tr>
 						</table>
 
 						<p class="submit">
-							<?php \submit_button( '', 'primary', '', false ); ?>
+							<?php \submit_button( 'Send mail', 'primary', '', false ); ?>
 						</p>
 					</form>
 				</div>
@@ -175,8 +211,12 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Mail Logs', '0-day-analytics' ); ?></h1>
-
+				<?php echo '<a href="' . \esc_url( \admin_url( 'admin.php?page=' . WP_Mail_List::WP_MAIL_MENU_SLUG . '&action=new_mail&_wpnonce=' . \wp_create_nonce( 'bulk-custom-delete' ) ) ) . '" class="page-title-action">' . \esc_html__( 'Compose mail', '0-day-analytics' ) . '</a>'; ?>
 					<hr class="wp-header-end">
+
+					<h2 class='screen-reader-text'><?php \esc_html_e( 'Filter mail list', '0-day-analytics' ); ?></h2>
+					<?php $wp_mail->views(); ?>
+
 					<form id="wp-mail-filter" method="get">
 					<?php
 
@@ -186,12 +226,10 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 					printf( '<input type="hidden" name="page" value="%s" />', \esc_attr( $page ) );
 					printf( '<input type="hidden" name="paged" value="%d" />', \esc_attr( $paged ) );
 
-					echo '<div style="clear:both; float:right">';
 					$wp_mail->search_box(
 						__( 'Search', '0-day-analytics' ),
 						strtolower( $wp_mail::get_table_name() ) . '-find'
 					);
-					echo '</div>';
 					$wp_mail->display();
 
 					?>
@@ -399,7 +437,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 					});
 
 					jQuery(document).on('click', '.media-modal-close', function () {
-						jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' );?>');
+						jQuery('.media-modal .http-request-args').html('<?php \esc_html_e( 'Loading please wait...', '0-day-analytics' ); ?>');
 						jQuery('.media-modal .http-mail-to').html('');
 						jQuery('.media-modal .http-mail-from').html('');
 						jQuery('.media-modal .http-mail-subject').html('');
@@ -459,6 +497,64 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 				</script>
 				<?php
 			}
+		}
+
+		/**
+		 * Collects all the data from the form and creates new transient.
+		 *
+		 * @return void
+		 *
+		 * @since 1.9.2
+		 */
+		public static function new_mail() {
+
+			// Bail if nonce fails.
+			if ( empty( $_REQUEST['_wpnonce'] ) || ! WP_Helper::verify_admin_nonce( WP_Mail_List::NONCE_NAME ) ) {
+				return;
+			}
+
+			if ( isset( $_POST['to'] ) ) {
+				$to = \sanitize_text_field( $_POST['to'] );
+			}
+			if ( isset( $_POST['subject'] ) ) {
+				$subject = \sanitize_text_field( $_POST['subject'] );
+			}
+			if ( isset( $_POST['message'] ) ) {
+				// message may be content of html tags.
+				$message = \wp_kses_post( $_POST['message'] );
+			}
+
+			$arr_attachments = array();
+			if ( isset( $_POST['attachments'] ) ) {
+				$arr_attachments_url = explode( ',', $_POST['attachments'] );
+				$arr_attachments_url = array_map( 'sanitize_text_field', $arr_attachments_url );
+				$arr_attachments     = array();
+				foreach ( $arr_attachments_url as $attach_url ) {
+					$arr_attachments[] = str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $attach_url );
+				}
+			}
+
+			$header = '';
+			/*
+			if ( ! empty( $_POST['from'] ) && filter_var( $_POST['from'], FILTER_VALIDATE_EMAIL ) ) {
+			$header = 'From:' . sanitize_text_field( $_POST['from'] ) . "\r\n";
+			}*/
+			$ret_mail = \wp_mail( $to, $subject, $message, $header, $arr_attachments );
+
+			\wp_safe_redirect(
+				\remove_query_arg(
+					array( 'deleted' ),
+					\add_query_arg(
+						array(
+							'page'                     => WP_Mail_List::WP_MAIL_MENU_SLUG,
+							WP_Mail_List::SEARCH_INPUT => WP_Mail_List::escaped_search_input(),
+							'updated'                  => true,
+						),
+						\admin_url( 'admin.php' )
+					)
+				)
+			);
+			exit;
 		}
 
 		/**

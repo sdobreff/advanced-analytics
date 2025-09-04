@@ -1270,16 +1270,18 @@ if ( ! class_exists( '\ADVAN\Lists\Crons_List' ) ) {
 
 			$url = \add_query_arg(
 				array(
-					'page' => self::CRON_MENU_SLUG,
+					'page'       => self::CRON_MENU_SLUG,
 					// self::SEARCH_INPUT => self::escaped_search_input(),
 					// 'schedules_filter' => isset( $_REQUEST['schedules_filter'] ) && ! empty( $_REQUEST['schedules_filter'] ) ? $_REQUEST['schedules_filter'] : '',
+					'event_type' => 'all',
 				),
 				\admin_url( 'admin.php' )
 			);
 
 			$views['all'] = sprintf(
-				'<a href="%1$s">%2$s <span class="count">(%3$s)</span></a>',
+				'<a href="%1$s"%2$s>%3$s <span class="count">(%4$s)</span></a>',
 				\esc_url( $url ),
+				$hooks_type === 'all' ? ' class="current"' : '',
 				\esc_html__( 'All events (no filters)', '0-day-analytics' ),
 				\esc_html( \number_format_i18n( count( Crons_Helper::get_events() ) ) )
 			);
