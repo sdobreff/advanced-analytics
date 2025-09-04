@@ -1292,7 +1292,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 *
 		 * @return array<string,string>
 		 *
-		 * @since latest
+		 * @since 3.5.0
 		 */
 		public function get_views() {
 

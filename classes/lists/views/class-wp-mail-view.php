@@ -119,9 +119,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\WP_Mail_View' ) ) {
 
 			if ( ! empty( $action ) && ( 'new_mail' === $action ) && WP_Helper::verify_admin_nonce( 'bulk-custom-delete' )
 			) {
-				$next_run_gmt        = gmdate( 'Y-m-d H:i:s', time() );
-				$next_run_date_local = get_date_from_gmt( $next_run_gmt, 'Y-m-d' );
-				$next_run_time_local = get_date_from_gmt( $next_run_gmt, 'H:i:s' );
+				
 				?>
 				<div class="wrap">
 					<h1 class="wp-heading-inline"><?php \esc_html_e( 'Compose mail', '0-day-analytics' ); ?></h1>

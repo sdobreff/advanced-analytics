@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.4.1
+Stable tag: 3.5.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -102,6 +102,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.5.0 =
+Added filtering to the mail log. Added option to send mail directly from the plugin.
 
 = 3.4.1 =
 Small fix for doing_it_wrong from this plugin.

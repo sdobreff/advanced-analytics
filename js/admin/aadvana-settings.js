@@ -434,6 +434,17 @@ $doc.ready(function () {
             return;
         }
 
+        let pattern = jQuery('#test_mail_address').attr( 'pattern' );
+
+        let re = new RegExp( /^([a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,20}[,]{0,}){0,}$/ );
+
+        if ( ! re.test(emailAddress) ) {
+            jQuery('#test_mail_address').focus();
+            alert( __('Please provide valid email address to send mail to!', '0-day-analytics') );
+
+            return;
+        }
+
         $figaroBody.addClass('has-overlay');
 
         jQuery.ajax({
