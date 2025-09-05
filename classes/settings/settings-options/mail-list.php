@@ -129,8 +129,6 @@ use ADVAN\Controllers\Mail_SMTP_Settings;
 			'id'       => 'test_mail_address',
 			'type'     => 'text',
 			'validate' => 'email',
-			'required' => true,
-			'pattern'  => '([a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,20}[,]{0,}){0,}',
 		)
 	);
 
