@@ -468,6 +468,8 @@ $doc.ready(function () {
                     alert(__('Something went wrong', '0-day-analytics'));
                 }
             },
+        }).always(function (dataOrjqXHR, textStatus, jqXHRorErrorThrown) { 
+            setTimeout(function () { $figaroBody.removeClass('has-overlay'); }, 1200);
         });
     });
     

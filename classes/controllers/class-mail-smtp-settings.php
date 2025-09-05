@@ -63,8 +63,8 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			// return;
 			// }
 			// Maybe override FROM email and/or name if the sender is "WordPress <wordpress@sitedomain.com>", the default from WordPress core and not yet overridden by another plugin.
-			$from_name            = $phpmailer->FromName;
-			$from_email_beginning = substr( $phpmailer->From, 0, 9 );
+			// $from_name            = $phpmailer->FromName;
+			// $from_email_beginning = substr( $phpmailer->From, 0, 9 );
 			// Get the first 9 characters of the current FROM email.
 			// if ( $smtp_force_from ) {
 			// $phpmailer->FromName = $smtp_default_from_name;
@@ -77,6 +77,11 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			// $phpmailer->From = $smtp_default_from_email;
 			// }
 			// }
+
+			$from_email = Settings::get_option( 'from_email' );
+			if ( ! empty( trim( $from_email ) ) ) {
+				$phpmailer->From = $from_email;
+			}
 			// Only attempt to send via SMTP if all the required info is present. Otherwise, use default PHP Mailer settings as set by wp_mail().
 			if ( ! empty( $smtp_host ) && ! empty( $smtp_port ) && ! empty( $smtp_security ) ) {
 				// Send using SMTP.
@@ -120,9 +125,9 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			// If debug mode is enabled, send debug info (SMTP::DEBUG_CONNECTION) to WordPress debug.log file set in wp-config.php.
 			// Reference: https://github.com/PHPMailer/PHPMailer/wiki/SMTP-Debugging
 			// if ( $smtp_debug ) {
-			// 	$phpmailer->SMTPDebug = 4;
+			// $phpmailer->SMTPDebug = 4;
 
-			// 	$phpmailer->Debugoutput = 'error_log';
+			// $phpmailer->Debugoutput = 'error_log';
 
 			// }
 		}

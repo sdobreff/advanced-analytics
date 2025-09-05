@@ -58,6 +58,17 @@ use ADVAN\Controllers\Mail_SMTP_Settings;
 
 	Settings::build_option(
 		array(
+			'name'    => \esc_html__( 'From: ', '0-day-analytics' ),
+			'id'      => 'from_email',
+			'type'    => 'text',
+			'validate' => 'email',
+			'hint'    => \esc_html__( 'Provide "From email address" if the email provider you are using is from different domain.', '0-day-analytics' ),
+			'default' => Settings::get_option( 'from_email' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
 			'name'    => \esc_html__( 'Port', '0-day-analytics' ),
 			'id'      => 'smtp_port',
 			'type'    => 'number',
