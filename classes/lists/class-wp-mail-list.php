@@ -647,6 +647,9 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					return '<span><span class="dashicons dashicons-' . $icon . '" aria-hidden="true"></span></span>';
 
 				case 'attachments':
+					if ( ! \is_string( $item['attachments'] ) ) {
+						return _e( 'No', '0-day-analytics' );
+					}
 					$item['attachments'] = json_decode( $item['attachments'], true );
 					if ( isset( $item['attachments'] ) && ! empty( $item['attachments'] ) && is_array( $item['attachments'] ) ) {
 						$item['attachments'] = array_map(
@@ -682,7 +685,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						$item['attachments'] = null;
 					}
 					if ( empty( $item['attachments'] ) ) {
-							return _e( 'No', '0-day-analytics' );
+						return _e( 'No', '0-day-analytics' );
 					} else {
 						\ob_start();
 						?>

@@ -82,6 +82,10 @@ if ( ! class_exists( '\ADVAN\Controllers\Mail_SMTP_Settings' ) ) {
 			if ( ! empty( trim( $from_email ) ) ) {
 				$phpmailer->From = $from_email;
 			}
+			$from_email_name = Settings::get_option( 'from_email_name' );
+			if ( ! empty( trim( $from_email_name ) ) ) {
+				$phpmailer->FromName = $from_email_name;
+			}
 			// Only attempt to send via SMTP if all the required info is present. Otherwise, use default PHP Mailer settings as set by wp_mail().
 			if ( ! empty( $smtp_host ) && ! empty( $smtp_port ) && ! empty( $smtp_security ) ) {
 				// Send using SMTP.
