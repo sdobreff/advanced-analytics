@@ -6,10 +6,20 @@ sudo useradd -m gitpod
 sudo usermod -aG sudo gitpod
 sudo usermod -aG www-data gitpod
 
-sudo service mysql stop
+# sudo service mysql stop
 sudo mv /var/lib/mysql/ /workspace/
 sudo cp .gitpod/mysqld.cnf /etc/mysql/mysql.conf.d/mysql.cnf
+sudo mkdir /var/lib/mysql
+sudo mkdir /var/log/mysql
+sudo chown mysql:mysql /var/log/mysql
+sudo usermod -d /var/lib/mysql/ mysql
+
 sudo service mysql start
+sudo rsyslogd
+
+sudo service php8.4-fpm start
+sudo service nginx start
+sudo mailhog </dev/null &>/dev/null & disown
 
 sudo ln -s $GITPOD_REPO_ROOT /var/www/html/wp-content/plugins
 sudo chown gitpod:gitpod /var/www/html/wp-content/plugins/$REPO_NAME
