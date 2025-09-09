@@ -8,7 +8,8 @@ sudo usermod -aG www-data gitpod
 
 sudo service mysql start
 sudo service mysql stop
-sudo mv /var/lib/mysql/ /workspace/
+sudo mkdir /workspace/
+sudo mv /var/lib/mysql/ /workspace/mysql/
 sudo cp .gitpod/mysqld.cnf /etc/mysql/mysql.conf.d/mysql.cnf
 # sudo mkdir /var/lib/mysql
 sudo mkdir /var/log/mysql
