@@ -2,6 +2,10 @@
 
 export REPO_NAME=$(basename $GITPOD_REPO_ROOT)
 
+sudo useradd -m gitpod
+sudo usermod -aG sudo gitpod
+sudo usermod -aG www-data gitpod
+
 sudo service mysql stop
 sudo mv /var/lib/mysql/ /workspace/
 sudo cp .gitpod/mysqld.cnf /etc/mysql/mysql.conf.d/mysql.cnf
@@ -42,7 +46,6 @@ sudo chmod 777 /workspace/uploads-multi/ -R
 
 cp .pre-commit $GITPOD_REPO_ROOT/.git/hooks/pre-commit
 chmod +x $GITPOD_REPO_ROOT/.git/hooks/pre-commit
-cp -a .gdrive $HOME/.gdrive
 
 FLAG="$GITPOD_REPO_ROOT/bin/install-dependencies.sh"
 
@@ -58,7 +61,7 @@ if [ -f $FLAG ]; then
  /bin/bash $FLAG
 fi
 
-sudo adduser gitpod www-data
+# sudo adduser gitpod www-data
 sudo chown gitpod:www-data /var/www -R
 sudo chmod g+rw /var/www -R
 
