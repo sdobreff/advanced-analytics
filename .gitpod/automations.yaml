@@ -2,7 +2,8 @@ tasks:
     buildAll:
         name: Build All
         description: builds all code
-        command: /bin/bash .gitpod/.init.sh; history -c
+        command: ls -la
+        # /bin/bash .gitpod/.init.sh; history -c
         triggeredBy:
         # - manual
         - postEnvironmentStart
