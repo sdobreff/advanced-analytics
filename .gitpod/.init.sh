@@ -6,17 +6,18 @@ sudo useradd -m gitpod
 sudo usermod -aG sudo gitpod
 sudo usermod -aG www-data gitpod
 
-# sudo service mysql stop
+sudo service mysql start
+sudo service mysql stop
 sudo mv /var/lib/mysql/ /workspace/
 sudo cp .gitpod/mysqld.cnf /etc/mysql/mysql.conf.d/mysql.cnf
-sudo mkdir /var/lib/mysql
+# sudo mkdir /var/lib/mysql
 sudo mkdir /var/log/mysql
 sudo chown mysql:mysql /var/log/mysql
-sudo usermod -d /var/lib/mysql/ mysql
+#sudo usermod -d /var/lib/mysql/ mysql
 
 sudo service mysql start
-sudo rsyslogd
 
+sudo rsyslogd
 sudo service php8.4-fpm start
 sudo service nginx start
 sudo mailhog </dev/null &>/dev/null & disown
