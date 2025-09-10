@@ -137,6 +137,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 */
 		public static function init() {
 			\add_action( 'admin_post_' . self::NEW_ACTION, array( WP_Mail_View::class, 'new_mail' ) );
+			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
 		}
 
 		/**
@@ -149,10 +150,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 * @since 3.0.0
 		 */
 		public static function add_cron_job( $crons ) {
-			if ( -1 !== (int) Settings::get_option( 'advana_rest_requests_clear' ) ) {
-				$crons[ ADVAN_PREFIX . 'request_table_clear' ] = array(
-					'time' => Settings::get_option( 'advana_rest_requests_clear' ),
-					'hook' => array( __CLASS__, 'truncate_requests_table' ),
+			if ( -1 !== (int) Settings::get_option( 'advana_mail_logging_clear' ) ) {
+				$crons[ ADVAN_PREFIX . 'mail_logging_clear' ] = array(
+					'time' => Settings::get_option( 'advana_mail_logging_clear' ),
+					'hook' => array( __CLASS__, 'truncate_wp_mail_table' ),
 					'args' => array(),
 				);
 			}

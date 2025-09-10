@@ -96,7 +96,6 @@ if ( ! defined( 'QM_DISABLE_ERROR_HANDLER' ) ) {
 \add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 0, 3 );
 \add_action( 'doing_it_wrong_run', array( Advanced_Analytics::class, 'action_doing_it_wrong_run' ), 20, 3 );
 
-
 \add_action( 'doing_it_wrong_run', array( WP_Error_Handler::class, 'action_doing_it_wrong_run' ), 99, 3 );
 
 // All deprecated error following their own idea of what to pass and how to pass it. That list covers the most common ones.

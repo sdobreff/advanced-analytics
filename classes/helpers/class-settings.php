@@ -476,6 +476,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'transients_module_enabled'       => true,
 					'tables_module_enabled'           => true,
 					'advana_rest_requests_clear'      => 'weekly',
+					'advana_mail_logging_clear'       => 'weekly',
 					'advana_error_log_clear'          => '-1',
 					'browser_notifications_seconds'   => 10,
 					'browser_notifications_not_send'  => false,
@@ -1655,12 +1656,21 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 			// Crons.
 			$advanced_options['advana_rest_requests_clear'] = ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) ? ( in_array( $post_array['advana_rest_requests_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_rest_requests_clear'] : self::get_option( 'advana_rest_requests_clear' ) ) : self::get_option( 'advana_rest_requests_clear' );
 
+			$advanced_options['advana_mail_logging_clear'] = ( array_key_exists( 'advana_mail_logging_clear', $post_array ) ) ? ( in_array( $post_array['advana_mail_logging_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_mail_logging_clear'] : self::get_option( 'advana_mail_logging_clear' ) ) : self::get_option( 'advana_mail_logging_clear' );
+
 			$advanced_options['advana_error_log_clear'] = ( array_key_exists( 'advana_error_log_clear', $post_array ) ) ? ( in_array( $post_array['advana_error_log_clear'], \array_keys( \wp_get_schedules(), true ) ) ? $post_array['advana_error_log_clear'] : self::get_option( 'advana_error_log_clear' ) ) : self::get_option( 'advana_error_log_clear' );
 
 			if ( array_key_exists( 'advana_rest_requests_clear', $post_array ) ) {
 				if ( -1 === (int) $post_array['advana_rest_requests_clear'] ) {
 					Crons_Helper::clear_events( ADVAN_PREFIX . 'request_table_clear' );
 					$advanced_options['advana_rest_requests_clear'] = '-1';
+				}
+			}
+
+			if ( array_key_exists( 'advana_mail_logging_clear', $post_array ) ) {
+				if ( -1 === (int) $post_array['advana_mail_logging_clear'] ) {
+					Crons_Helper::clear_events( ADVAN_PREFIX . 'mail_logging_clear' );
+					$advanced_options['advana_mail_logging_clear'] = '-1';
 				}
 			}
 

@@ -60,7 +60,7 @@ Settings::set_current_options( $settings );
 
 	Settings::build_option(
 		array(
-			'name'    => \esc_html__( 'Disable HTTP Rrequests logging', '0-day-analytics' ),
+			'name'    => \esc_html__( 'Disable HTTP Requests logging', '0-day-analytics' ),
 			'id'      => 'advana_http_requests_disable',
 			'type'    => 'checkbox',
 
@@ -70,7 +70,7 @@ Settings::set_current_options( $settings );
 
 	Settings::build_option(
 		array(
-			'name'    => \esc_html__( 'Disable REST API Rrequests logging', '0-day-analytics' ),
+			'name'    => \esc_html__( 'Disable REST API Requests logging', '0-day-analytics' ),
 			'id'      => 'advana_rest_requests_disable',
 			'type'    => 'checkbox',
 

@@ -34,9 +34,33 @@ use ADVAN\Controllers\Mail_SMTP_Settings;
 			'type'    => 'checkbox',
 			'hint'    => \esc_html__( 'If you disable this, the entire plugin mails module will be disabled. This applies only for the plugin module (if you are not using it and don\'t want it to take unnecessarily resources, your WP will continue working as before.', '0-day-analytics' ),
 			'default' => Settings::get_option( 'wp_mail_module_enabled' ),
+			'toggle'  => '#advana_maillist_settings-item',
 		)
 	);
+?>
+<div id="advana_maillist_settings-item">
+	<?php
 
+	$schedules = \wp_get_schedules();
+	$options   = array(
+		'-1' => esc_html__( 'Never', 'wp-security-audit-log' ),
+	);
+	foreach ( $schedules as $schedule => $text ) {
+		$options[ $schedule ] = $text['display'];
+	}
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Clear mails log table every', '0-day-analytics' ),
+			'id'      => 'advana_mail_logging_clear',
+			'type'    => 'select',
+			'options' => $options,
+			'default' => Settings::get_option( 'advana_mail_logging_clear' ),
+		)
+	);
+	?>
+</div>
+<?php
 	// Mail SMTP options.
 	Settings::build_option(
 		array(
