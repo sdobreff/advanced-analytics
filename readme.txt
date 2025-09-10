@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.5.0
+Stable tag: 3.5.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -102,6 +102,12 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.5.2 =
+Adds option to set from email address and option to set from name (for mail SMTP options). Fixes problem with mail list when attachments are set to null.
+
+= 3.5.1 =
+Fixes problem with settings can not be saved because of required field.
 
 = 3.5.0 =
 Added filtering to the mail log. Added option to send mail directly from the plugin.

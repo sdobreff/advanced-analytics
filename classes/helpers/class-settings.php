@@ -480,6 +480,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'advana_error_log_clear'          => '-1',
 					'browser_notifications_seconds'   => 10,
 					'browser_notifications_not_send'  => false,
+					'from_email'                      => '',
+					'from_email_name'                 => '',
 					'smtp_host'                       => '',
 					'smtp_port'                       => '',
 					'smtp_username'                   => '',
@@ -1526,6 +1528,10 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 
 			// Email SMTP settings start.
 			$advanced_options['smtp_host'] = ( array_key_exists( 'smtp_host', $post_array ) && ! empty( $post_array['smtp_host'] ) ) ? \sanitize_text_field( $post_array['smtp_host'] ) : '';
+
+			$advanced_options['from_email'] = ( array_key_exists( 'from_email', $post_array ) && ! empty( $post_array['from_email'] ) ) ? \sanitize_text_field( $post_array['from_email'] ) : '';
+
+			$advanced_options['from_email_name'] = ( array_key_exists( 'from_email_name', $post_array ) && ! empty( $post_array['from_email_name'] ) ) ? \sanitize_text_field( $post_array['from_email_name'] ) : '';
 
 			$advanced_options['smtp_port'] = ( array_key_exists( 'smtp_port', $post_array ) && ! empty( $post_array['smtp_port'] ) ) ? filter_var(
 				$post_array['smtp_port'],

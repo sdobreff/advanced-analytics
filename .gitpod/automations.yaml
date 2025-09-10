@@ -1,14 +1,39 @@
 tasks:
-    command-0:
-        command: |
-            sudo rsyslogd
-            sudo service mysql start
-            sudo service php8.4-fpm start
-            sudo service nginx start
-            sudo mailhog </dev/null &>/dev/null & disown
-            /bin/bash .gitpod/.init.sh
-            history -c
-        description: init task migrated from .gitpod.yml
-        name: 'Some init: command'
+    buildAll:
+        name: Build All
+        description: builds all code
+        command: ls -la
+        # /bin/bash .gitpod/.init.sh; history -c
         triggeredBy:
-            - postDevcontainerStart
+        # - manual
+        - postEnvironmentStart
+        # - postDevcontainerStart
+
+# services:
+#     backend:
+#         name: Backend Service
+#         description: Example service simulating a backend
+#         commands:
+#             start: |
+#                 echo "Starting backend service..."
+#                 touch /tmp/backend.started
+#                 while true; do
+#                     sleep 1
+#                     date
+#                 done
+#             ready: |
+#                 if [ -f /tmp/backend.started ]; then
+#                     echo "Backend service is ready"
+#                     exit 0
+#                 else
+#                     echo "Backend service is not ready"
+#                     exit 1
+#                 fi
+#             # stop: |
+#             # 	echo "Stopping backend service..."
+#             # 	rm /tmp/backend.started
+#             # 	pkill backend
+#         triggeredBy:
+#             - postEnvironmentStart
+#             # - postDevcontainerStart
+

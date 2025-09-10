@@ -82,6 +82,27 @@ use ADVAN\Controllers\Mail_SMTP_Settings;
 
 	Settings::build_option(
 		array(
+			'name'    => \esc_html__( 'From: ', '0-day-analytics' ),
+			'id'      => 'from_email',
+			'type'    => 'text',
+			'validate' => 'email',
+			'hint'    => \esc_html__( 'Provide "From email address" if the email provider you are using is from different domain.', '0-day-analytics' ),
+			'default' => Settings::get_option( 'from_email' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'From name: ', '0-day-analytics' ),
+			'id'      => 'from_email_name',
+			'type'    => 'text',
+			'hint'    => \esc_html__( 'Provide "From email name". The default From name WP is using is "WordPress", set value here if you want to change that, or leave it empty for default.', '0-day-analytics' ),
+			'default' => Settings::get_option( 'from_email_name' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
 			'name'    => \esc_html__( 'Port', '0-day-analytics' ),
 			'id'      => 'smtp_port',
 			'type'    => 'number',
@@ -153,8 +174,7 @@ use ADVAN\Controllers\Mail_SMTP_Settings;
 			'id'       => 'test_mail_address',
 			'type'     => 'text',
 			'validate' => 'email',
-			'required' => true,
-			'pattern'  => '([a-zA-Z0-9\._\%\+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,20}[,]{0,}){0,}',
+			'hint' => \esc_html__( 'When press this, the plugin will use the settings which are already saved, meaning that if you made any changes, save them first before trying to send test email.', '0-day-analytics' ),
 		)
 	);
 
