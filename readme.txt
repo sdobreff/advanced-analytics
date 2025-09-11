@@ -3,33 +3,35 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.6.0
+Stable tag: 3.6.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
-**WP Control** is a WordPress plugin which purpose is to manage all kinds on error logs. 
+**WP Control** will give you control over your WP like never before. 
 
 == Description ==
 
-**WP Control** is a powerful plugin designed for WordPress sites with extensive error logs. It allows administrators to:
-- Read and analyze error logs even if the error log is gigabytes of size. (Only up to last 100 records are shown) Filtering by type is supported. The limitation is necessary for two reasons - first if there are more errors they are either not relevant or repeating ones, and second - that way your server will continue operate without any interruptions even if your log is few gigs of data.
+**WP Control** is a powerful plugin designed for WordPress sites with extensive error logs. But it is not limited to that, it will also provide you with:
+- Read and analyze error logs even if the error log is gigabytes of size. (Only up to last 999 records are shown).  The limitation is necessary for two reasons - first if there are more errors they are either not relevant or repeating ones, and second - that way your server will continue operate without any interruptions even if your log is few gigs of data.Filtering by type is supported. You can also filter by plugin name - **WP Control** is the first and only with such functionality. There is also a search by string option.
 - Enable or disable error logging directly from the WordPress dashboard.
-- Manage large log files without performance degradation.
+- Manage large log files without performance irruptions.
+- Easily see where exactly error is thrown (built-in code viewer)
 - **Cron manager** at the tip of your fingers (edit / delete / run).
 - **Transient manager** - all (stored in the DB) transients (edit / delete).
 - **Requests manager** - all requests which your WP install is making (edit / delete).
-- **Mail logger** - all mails which your WP sends are recorder and accessible from here (edit / delete).
+- **Mail logger** - all mails which your WP sends are recorded and accessible from here (edit / delete).
+- You can even compose your emails directly from the plugin.
+- **SMTP** mail settings are built-in - you can setup you provider now.
 - **SQL tables manager** - From here you can see and delete records from all the tables currently present in the Database.
 - **Environment type** - There is the notification in the admin bar which tells you what is the selected type of the current environment you are on (can change it (the env type) from the settings or completely disable it)
 - **Plugin version switcher** - Now you can change the plugin version directly from the admin Plugins page of your WordPress. Shows the path where main plugin file is located.
-- Easily see where exactly error is thrown (where detected)
 
-**Important:** Description below does not apply for multisites, as this feature is not implemented by the WordPress core team for multisites!
-Recovery Mode link in the notification channels (if set) is added along with the fatal error. Wp core not always kicks in on fatality errors and this makes sure that you still have access to your website.
+**Important:** Description below does not apply for multisites, as this feature is not implemented by the WordPress core team for multisites yet!
+**Recovery Mode** link in the notification channels (Slack and Telegram if set) is added along with the fatal error message. WP core not always kicks in on fatality errors and this makes sure that you still have access to your website.
 
 **How this feature works:**
 If fatal error is detected from the plugin, it sends notifications to Slack or Telegram channels (if set), and provides recovery link along with the error message. When used, that link allows admin to login and suppresses all the plugins and active theme (except the **WP Control** plugin). You can observe the error log using the plugin screen and see where, when and what caused the error and take measures. You can completely disable the errored plugin or theme, switch to another version or just fix the error (if possible). Once done - just exit recovery mode and everything should continue working normally.
-Note: Every time fatal is thrown, for security reasons new link is generated, every single one of them should work, but on busy sites that could lead to 10s of generated links.
+Note: Every time fatal is thrown, for security reasons new link is generated, every single one of them should work, but on busy sites that could lead to tens of generated links.
 
 This plugin is ideal for developers and administrators who need robust tools for troubleshooting and maintenance.
 
@@ -47,6 +49,8 @@ You can see it in action [here](https://wordpress.org/plugins/0-day-analytics/?p
 - Built-in Table manager.
 - Built-in Requests viewer.
 - Built-in Mail logger.
+- Built-in SMTP.
+- Built-in mail composer.
 - Built-in badge that shows you current environment type.
 - Option to randomize the name of the error log file (security).
 - Easily plugin version switch (the ones from official WP marketplace).
@@ -68,8 +72,8 @@ Voila! It's ready to go.
 
 == Frequently Asked Questions ==
 
-= Why only last 100 error logs? =
-Plugin is designed to be as fast as possible and work with enormously large log files, consuming as less resources as possible, no other plugin could provide something even close to that, thats why it comes with this limitation. And one single error could contain more than 30K sub-rows. But 100 is more than enough - errors before that are either too old, no longer related or repeating ones, in fact is best to regularly truncate your log file and check for only the last error. And last but not least - this are 100 errors not 100 lines of the error log. You can increase that up-to 999 using screen options menu but do that on your wn risk.
+= Why only last 999 error logs? =
+Plugin is designed to be as fast as possible and work with enormously large log files, consuming as less resources as possible, no other plugin could provide something even close to that, thats why it comes with this limitation. And one single error could contain more than 30K sub-rows. But 999 is more than enough - errors before that are either too old, no longer related or repeating ones, in fact is best to regularly truncate your log file and check for only the last error. And last but not least - this are 999 errors not 999 lines of the error log. You can increase that up-to 999 using screen options menu but do that on your wn risk.
 
 = Why there is no pagination for error logs? =
 That is once again related to the nature of the error log - one single reload could generate tens of new errors, so paginating this would probably never come handy, and in order to paginate, the entire log must be read every time - which is extremely bad idea resource-wise.
@@ -102,6 +106,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.6.1 =
+Text search introduced in Error Log viewer.
 
 = 3.6.0 =
 Various small issues fixes. Added option to show the active plugins first in plugins page. Added cron job for auto truncating the mail log table (clears the entire table) - default to 1 week.

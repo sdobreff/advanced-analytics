@@ -46,6 +46,15 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		private static $last_id = 0;
 
 		/**
+		 * Class cache for the BB mail.
+		 *
+		 * @var array
+		 *
+		 * @since latest
+		 */
+		private static $bp_mail = null;
+
+		/**
 		 * Inits the class.
 		 *
 		 * @return void
@@ -59,6 +68,62 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 				\add_filter( 'wp_mail_content_type', array( __CLASS__, 'save_is_html' ), PHP_INT_MAX );
 
 				\add_filter( 'phpmailer_init', array( __CLASS__, 'extract_more_mail_info' ), \PHP_INT_MAX );
+
+				\add_action( 'bp_send_email', array( __CLASS__, 'bp_record_mail' ), PHP_INT_MAX );
+
+				\add_filter( 'bp_email_use_wp_mail', array( __CLASS__, 'should_use_wp_mail' ), PHP_INT_MAX );
+
+				add_action( 'bp_send_email_failure', array( __CLASS__, 'record_error' ), PHP_INT_MAX, 2 );
+			}
+		}
+
+		/**
+		 * Filter that check if the default wp_mail should be used and not the BuddyPress one - if the default is in use, just clear the vars and this will cover the rest using the core filters, if not - do the initial message store
+		 *
+		 * @param bool $default - True if the default must be used, false otherwise.
+		 *
+		 * @return bool
+		 *
+		 * @since latest
+		 */
+		public static function should_use_wp_mail( $default ) {
+			if ( $default ) {
+				self::$bp_mail = null;
+				self::$is_html = 0;
+			} else {
+				self::$last_id = WP_Mail_Entity::insert( self::$bp_mail );
+			}
+
+			return $default;
+		}
+
+		public static function bp_record_mail( $args ) {
+			if ( isset( $args ) && \is_object( $args ) && ! empty( $args ) ) {
+				$to = $args->get( 'to' );
+				$to = array_shift( $to )->get_address();
+
+				$message = '';
+
+				if ( 'html' === $args->get( 'content_type' ) ) {
+					self::$is_html = 1;
+
+					$message = $args->get( 'content_html', 'replace-tokens' );
+				} else {
+					self::$is_html = 0;
+
+					$message = $args->get( 'content_plaintext', 'replace-tokens' );
+				}
+				self::$bp_mail = array(
+					'time'               => time(),
+					'email_to'           => $to,
+					'subject'            => self::filter_html( $args->get( 'subject', 'replace-tokens' ) ),
+					'message'            => self::filter_html( $message ),
+					'backtrace_segment'  => \wp_json_encode( self::get_backtrace() ),
+					'status'             => 1,
+					'attachments'        => \wp_json_encode( self::get_attachment_locations( array() ) ),
+					'additional_headers' => \wp_json_encode( $args->get( 'headers' ) ),
+					'is_html'            => (int) self::$is_html,
+				);
 			}
 		}
 
