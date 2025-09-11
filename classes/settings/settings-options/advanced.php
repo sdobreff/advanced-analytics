@@ -80,7 +80,16 @@ Settings::build_option(
 			'min'     => 1,
 			'max'     => 10,
 			'hint'    => \esc_html__( 'Set how many version to show in the drop down to choose from when Plugin version switching. Maximum allowed number is 10, minimum is 1.', '0-day-analytics' ),
-			'default' => Settings::get_current_options()['plugin_version_switch_count'],
+			'default' => Settings::get_option( 'plugin_version_switch_count' ),
+		)
+	);
+
+	Settings::build_option(
+		array(
+			'name'    => \esc_html__( 'Show active plugins first on plugins page', '0-day-analytics' ),
+			'id'      => 'show_active_plugins_first',
+			'type'    => 'checkbox',
+			'default' => Settings::get_option( 'show_active_plugins_first' ),
 		)
 	);
 

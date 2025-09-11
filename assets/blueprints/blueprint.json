@@ -13,12 +13,9 @@
     "steps": [
         {
             "step": "installPlugin",
-            "pluginZipFile": {
-                "resource": "url",
-                "url": "https:\/\/downloads.wordpress.org\/plugin\/0-day-analytics.zip"
-            },
-            "options": {
-                "activate": true
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "0-day-analytics"
             }
         },
         {

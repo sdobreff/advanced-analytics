@@ -49,6 +49,11 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 
 				if ( \current_user_can( 'activate_plugins' ) || \current_user_can( 'delete_plugins' ) ) {
 					\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
+					if ( true === Settings::get_option( 'show_active_plugins_first' ) ) {
+
+						\add_action( 'admin_head-plugins.php', array( __CLASS__, 'show_active_plugins_first' ) );
+
+					}
 				}
 			}
 		}
@@ -441,6 +446,55 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 				</script>
 
 			<?php
+		}
+
+		/**
+		 * Responsible for displaying the active plugins first in plugins.php
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function show_active_plugins_first() {
+			global $wp_list_table, $status;
+			if ( ! in_array(
+				$status,
+				array(
+					'active',
+					'inactive',
+					'recently_activated',
+					'mustuse',
+				),
+				true
+			) ) {
+				if ( is_array( $wp_list_table->items ) ) {
+					uksort( $wp_list_table->items, array( __CLASS__, 'plugins_order_callback' ) );
+				}
+			}
+		}
+
+		/**
+		 * Sorts plugins based on their active status
+		 *
+		 * @param string $a - First plugin.
+		 * @param string $b - Second plugin.
+		 *
+		 * @return int|bool
+		 *
+		 * @since latest
+		 */
+		public static function plugins_order_callback( $a, $b ) {
+			global $wp_list_table;
+			$items    = $wp_list_table->items;
+			$a_active = \is_plugin_active( $a );
+			$b_active = \is_plugin_active( $b );
+			if ( $a_active && ! $b_active ) {
+				return -1;
+			} elseif ( ! $a_active && $b_active ) {
+				return 1;
+			} elseif ( isset( $items[ $a ] ) && isset( $items[ $b ] ) ) {
+				return strcasecmp( $items[ $a ]['Name'], $items[ $b ]['Name'] );
+			}
 		}
 	}
 }

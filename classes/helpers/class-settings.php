@@ -471,6 +471,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 					'keep_error_log_records_truncate' => 10,
 					'plugin_version_switch_count'     => 3,
 					'cron_module_enabled'             => true,
+					'show_active_plugins_first'       => true,
 					'requests_module_enabled'         => true,
 					'wp_mail_module_enabled'          => true,
 					'transients_module_enabled'       => true,
@@ -1687,6 +1688,8 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				}
 			}
 			// Crons end.
+
+			$advanced_options['show_active_plugins_first']       = ( array_key_exists( 'show_active_plugins_first', $post_array ) ) ? filter_var( $post_array['show_active_plugins_first'], \FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $import && ! is_a( Config_Transformer::init(), '\WP_Error' ) ) {
 

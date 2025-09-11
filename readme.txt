@@ -3,7 +3,7 @@ Tags: error log, debug, cron, transients, requests, mail log
 Requires at least: 6.0
 Tested up to: 6.8.2
 Requires PHP: 7.4
-Stable tag: 3.5.2
+Stable tag: 3.6.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -102,6 +102,9 @@ Because of its extremely poor implementation and interfering with the proper Wor
 9. **Requests operations** - All the request made from the given WP install.
 
 == Changelog ==
+
+= 3.6.0 =
+Various small issues fixes. Added option to show the active plugins first in plugins page. Added cron job for auto truncating the mail log table (clears the entire table) - default to 1 week.
 
 = 3.5.2 =
 Adds option to set from email address and option to set from name (for mail SMTP options). Fixes problem with mail list when attachments are set to null.
