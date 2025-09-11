@@ -267,13 +267,13 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			$this->_column_headers = array( self::$columns, $hidden, $sortable );
 
 			// Set the pagination.
-			$this->set_pagination_args(
-				array(
-					'total_items' => $this->count,
-					'per_page'    => self::get_screen_option_per_page(),
-					'total_pages' => ceil( $this->count / self::get_screen_option_per_page() ),
-				)
-			);
+			// $this->set_pagination_args(
+			// array(
+			// 'total_items' => $this->count,
+			// 'per_page'    => self::get_screen_option_per_page(),
+			// 'total_pages' => ceil( $this->count / self::get_screen_option_per_page() ),
+			// )
+			// );
 		}
 
 		/**
@@ -521,6 +521,20 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 						} else {
 							return false;
 						}
+					}
+				);
+			}
+
+			if ( ! empty( $_REQUEST[ self::SEARCH_INPUT ] ) && is_string( $_REQUEST[ self::SEARCH_INPUT ] ) ) {
+				$s = \sanitize_text_field( \wp_unslash( $_REQUEST[ self::SEARCH_INPUT ] ) );
+
+				$errors = array_filter(
+					$errors,
+					function ( $event ) use ( $s ) {
+
+						$ar_as_string = ( isset( $event['sub_items'] ) && is_array($event['sub_items']) )?\wp_json_encode($event['sub_items']):'';
+
+						return ( false !== ( strpos( $event['message'], $s ) || strpos($ar_as_string ,$s)) );
 					}
 				);
 			}
@@ -1558,7 +1572,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 				</style>
 					<?php
-					if ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) {
+					if ( ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) || '' !== self::escaped_search_input() ) {
 					} else {
 						?>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>

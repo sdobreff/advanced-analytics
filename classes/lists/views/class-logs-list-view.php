@@ -65,10 +65,15 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Logs_List_View' ) ) {
 			?>
 			<div class="wrap">
 				<h1 class="wp-heading-inline"><?php \esc_html_e( 'Error logs', '0-day-analytics' ); ?></h1>
+				<hr class="wp-header-end">
 				<form id="error-logs-filter" method="get">
 					<input type="hidden" name="page" value="<?php echo \esc_attr( Logs_List::MENU_SLUG ); ?>" />
 					<input type="hidden" name="action" value="" />
 					<?php
+					$events_list->search_box(
+						__( 'Search', '0-day-analytics' ),
+						strtolower( $events_list::get_table_name() ) . '-find'
+					);
 					$events_list->display();
 					?>
 				</form>
