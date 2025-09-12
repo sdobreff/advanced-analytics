@@ -50,7 +50,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @var array
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		private static $bp_mail = null;
 
@@ -84,7 +84,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return bool
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		public static function should_use_wp_mail( $default ) {
 			if ( $default ) {
@@ -104,7 +104,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		public static function bp_record_mail( $email_class ) {
 			if ( isset( $email_class ) && \is_object( $email_class ) && ! empty( $email_class ) ) {
@@ -205,13 +205,13 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 						'time'               => time(),
 						'email_to'           => self::filter_html( self::to_mail_get( $to ) ),
 						'email_from'         => self::array_to_string( $from ),
-						'subject'            => self::filter_html( $phpmailer->Subject ),
-						'message'            => self::filter_html( $phpmailer->Body ),
+						'subject'            => self::filter_html( $phpmailer->Subject ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+						'message'            => self::filter_html( $phpmailer->Body ), // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 						'backtrace_segment'  => \wp_json_encode( self::get_backtrace() ),
 						'status'             => 1,
 						'attachments'        => \wp_json_encode( self::get_attachment_locations( $attachment ) ),
 						'additional_headers' => \wp_json_encode( $mail_header ),
-						'is_html'            => ( 'text/html' === $phpmailer->ContentType ) ? 1 : 0,
+						'is_html'            => ( 'text/html' === $phpmailer->ContentType ) ? 1 : 0, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 					);
 
 					self::$last_id = WP_Mail_Entity::insert( $log_entry );
@@ -496,7 +496,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		public static function to_mail_get( $to_array ): string {
 
