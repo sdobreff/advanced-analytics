@@ -1197,7 +1197,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 				$attachments = '';
 
-				$record['attachments'] = json_decode( $record['attachments'], true );
+				$record['attachments'] = json_decode( (string) $record['attachments'], true );
 				if ( isset( $record['attachments'] ) && ! empty( $record['attachments'] ) && is_array( $record['attachments'] ) ) {
 					$record['attachments'] = array_map(
 						function ( $attachment ) {

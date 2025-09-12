@@ -73,7 +73,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 
 				\add_filter( 'bp_email_use_wp_mail', array( __CLASS__, 'should_use_wp_mail' ), PHP_INT_MAX );
 
-				add_action( 'bp_send_email_failure', array( __CLASS__, 'record_error' ), PHP_INT_MAX, 2 );
+				\add_action( 'bp_send_email_failure', array( __CLASS__, 'record_error' ), PHP_INT_MAX, 2 );
 			}
 		}
 
@@ -97,31 +97,40 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			return $default;
 		}
 
-		public static function bp_record_mail( $args ) {
-			if ( isset( $args ) && \is_object( $args ) && ! empty( $args ) ) {
-				$to = $args->get( 'to' );
+		/**
+		 * Records the mail from BuddyPress in the class cache var for later check. If the mail from BP falls back to the core WP method, that get cleared, if not - stored in the DB
+		 *
+		 * @param \stdClass $email_class - The mail class from the BuddyPress plugin.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function bp_record_mail( $email_class ) {
+			if ( isset( $email_class ) && \is_object( $email_class ) && ! empty( $email_class ) ) {
+				$to = $email_class->get( 'to' );
 				$to = array_shift( $to )->get_address();
 
 				$message = '';
 
-				if ( 'html' === $args->get( 'content_type' ) ) {
+				if ( 'html' === $email_class->get( 'content_type' ) ) {
 					self::$is_html = 1;
 
-					$message = $args->get( 'content_html', 'replace-tokens' );
+					$message = $email_class->get( 'content_html', 'replace-tokens' );
 				} else {
 					self::$is_html = 0;
 
-					$message = $args->get( 'content_plaintext', 'replace-tokens' );
+					$message = $email_class->get( 'content_plaintext', 'replace-tokens' );
 				}
 				self::$bp_mail = array(
 					'time'               => time(),
 					'email_to'           => $to,
-					'subject'            => self::filter_html( $args->get( 'subject', 'replace-tokens' ) ),
+					'subject'            => self::filter_html( $email_class->get( 'subject', 'replace-tokens' ) ),
 					'message'            => self::filter_html( $message ),
 					'backtrace_segment'  => \wp_json_encode( self::get_backtrace() ),
 					'status'             => 1,
 					'attachments'        => \wp_json_encode( self::get_attachment_locations( array() ) ),
-					'additional_headers' => \wp_json_encode( $args->get( 'headers' ) ),
+					'additional_headers' => \wp_json_encode( $email_class->get( 'headers' ) ),
 					'is_html'            => (int) self::$is_html,
 				);
 			}
@@ -167,17 +176,60 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		public static function extract_more_mail_info( $phpmailer ) {
 
 			if ( \property_exists( $phpmailer, 'From' ) && ! empty( $phpmailer->From ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-				$log_entry = WP_Mail_Entity::load( 'id=%d', array( self::$last_id ) );
 
-				$from          = array();
-				$from['email'] = $phpmailer->From; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-				if ( \property_exists( $phpmailer, 'FromName' ) && ! empty( $phpmailer->FromName ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-					$from['name'] = $phpmailer->FromName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				if ( 0 === self::$last_id ) {
+					// Someone is doing nasty things and killed all of the params passed to wp_mail hook - lets intercept directly then.
+					$rc = new \ReflectionClass( $phpmailer );
+
+					$from          = array();
+					$from['email'] = $phpmailer->From; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					if ( \property_exists( $phpmailer, 'FromName' ) && ! empty( $phpmailer->FromName ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+						$from['name'] = $phpmailer->FromName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					}
+
+					$log_entry['email_from'] = self::array_to_string( $from );
+
+					$prop = $rc->getProperty( 'to' );
+					$prop->setAccessible( true );
+					$to = $prop->getValue( $phpmailer );
+
+					$prop = $rc->getProperty( 'attachment' );
+					$prop->setAccessible( true );
+					$attachment = $prop->getValue( $phpmailer );
+
+					$prop = $rc->getProperty( 'mailHeader' );
+					$prop->setAccessible( true );
+					$mail_header = $prop->getValue( $phpmailer );
+
+					$log_entry = array(
+						'time'               => time(),
+						'email_to'           => self::filter_html( self::to_mail_get( $to ) ),
+						'email_from'         => self::array_to_string( $from ),
+						'subject'            => self::filter_html( $phpmailer->Subject ),
+						'message'            => self::filter_html( $phpmailer->Body ),
+						'backtrace_segment'  => \wp_json_encode( self::get_backtrace() ),
+						'status'             => 1,
+						'attachments'        => \wp_json_encode( self::get_attachment_locations( $attachment ) ),
+						'additional_headers' => \wp_json_encode( $mail_header ),
+						'is_html'            => ( 'text/html' === $phpmailer->ContentType ) ? 1 : 0,
+					);
+
+					self::$last_id = WP_Mail_Entity::insert( $log_entry );
+
+				} else {
+
+					$log_entry = WP_Mail_Entity::load( 'id=%d', array( self::$last_id ) );
+
+					$from          = array();
+					$from['email'] = $phpmailer->From; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					if ( \property_exists( $phpmailer, 'FromName' ) && ! empty( $phpmailer->FromName ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+						$from['name'] = $phpmailer->FromName; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					}
+
+					$log_entry['email_from'] = self::array_to_string( $from );
+
+					WP_Mail_Entity::insert( $log_entry );
 				}
-
-				$log_entry['email_from'] = self::array_to_string( $from );
-
-				WP_Mail_Entity::insert( $log_entry );
 			}
 		}
 
@@ -225,7 +277,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 		 */
 		public static function filter_html( $value ): string {
 
-			$value = preg_replace( '~<!--(?!<!)[^\[>].*?-->~s', '', $value );
+			$value = preg_replace( '~<!--(?!<!)[^\[>].*?-->~s', '', (string) $value );
 
 			$value = htmlspecialchars_decode( (string) $value );
 
@@ -288,7 +340,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 
 			// Rewrite keys.
 			foreach ( $array_to_process as $key => $value ) {
-				if ( $parent_key ) {
+				if ( null !== $parent_key ) {
 					$key = $parent_key . $separator . $key;
 				}
 				$_flattened[ $key ] = self::flatten( $value, $separator, $key );
@@ -435,6 +487,28 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 			unset( $url );
 
 			return $attachment_ids;
+		}
+
+		/**
+		 * Builds to string from what is stored in the PHPMailer object.
+		 *
+		 * @param array $to_array - The array to convert to string.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function to_mail_get( $to_array ): string {
+
+			$to_string = '';
+
+			foreach ( $to_array as $recipient ) {
+				$to_string .= trim( \implode( ' ', $recipient ) ) . ', ';
+			}
+
+			$to_string = \rtrim( $to_string, ', ' );
+
+			return $to_string;
 		}
 	}
 }
