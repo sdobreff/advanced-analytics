@@ -453,7 +453,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return void
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		public static function show_active_plugins_first() {
 			global $wp_list_table, $status;
@@ -481,7 +481,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Upgrade_Notice' ) ) {
 		 *
 		 * @return int|bool
 		 *
-		 * @since latest
+		 * @since 3.6.1
 		 */
 		public static function plugins_order_callback( $a, $b ) {
 			global $wp_list_table;

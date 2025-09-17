@@ -11,7 +11,7 @@
  * @link      https://wordpress.org/plugins/0-day-analytics/
  *
  * Plugin Name:     WP Control
- * Description:     Take full control of error log, crons, transients, plugins, requests and DB tables.
+ * Description:     Take full control of error log, crons, transients, plugins, requests, mails and DB tables.
  * Version:         3.6.1
  * Author:          Stoil Dobrev
  * Author URI:      https://github.com/sdobreff/

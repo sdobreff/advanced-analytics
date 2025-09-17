@@ -108,7 +108,7 @@ Because of its extremely poor implementation and interfering with the proper Wor
 == Changelog ==
 
 = 3.6.1 =
-Text search introduced in Error Log viewer.
+Text search introduced in Error Log viewer. BuddyPress mailing is supported (they are using their own solution for sending email by default). Added logic to capture and log emails, even when some tries to wipe params from the WP core hooks.
 
 = 3.6.0 =
 Various small issues fixes. Added option to show the active plugins first in plugins page. Added cron job for auto truncating the mail log table (clears the entire table) - default to 1 week.
