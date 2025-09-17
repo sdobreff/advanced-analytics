@@ -198,9 +198,7 @@ if ( ! class_exists( '\ADVAN\Helpers\Settings' ) ) {
 				\add_action( 'network_admin_menu', array( __CLASS__, 'add_options_page' ) ); // Insert the Admin on multisite install panel.
 			}
 
-			if ( self::get_option( 'keep_reading_error_log' ) || ( defined( 'WP_DEBUG' ) && \WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && \WP_DEBUG_LOG ) ) {
-				\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
-			}
+			\add_action( 'admin_enqueue_scripts', array( __CLASS__, 'load_custom_wp_admin_style' ) );
 
 			/* Crons start */
 			if ( self::get_option( 'cron_module_enabled' ) ) {

@@ -69,6 +69,7 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Logs_List_View' ) ) {
 				<form id="error-logs-filter" method="get">
 					<input type="hidden" name="page" value="<?php echo \esc_attr( Logs_List::MENU_SLUG ); ?>" />
 					<input type="hidden" name="action" value="" />
+					
 					<?php
 					$events_list->search_box(
 						__( 'Search', '0-day-analytics' ),

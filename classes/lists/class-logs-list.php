@@ -532,9 +532,9 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					$errors,
 					function ( $event ) use ( $s ) {
 
-						$ar_as_string = ( isset( $event['sub_items'] ) && is_array($event['sub_items']) )?\wp_json_encode($event['sub_items']):'';
+						$ar_as_string = ( isset( $event['sub_items'] ) && is_array( $event['sub_items'] ) ) ? \wp_json_encode( $event['sub_items'] ) : '';
 
-						return ( false !== ( strpos( $event['message'], $s ) || strpos($ar_as_string ,$s)) );
+						return ( false !== ( strpos( $event['message'], $s ) || strpos( $ar_as_string, $s ) ) );
 					}
 				);
 			}
@@ -945,9 +945,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 		 * @return array
 		 */
 		public function get_bulk_actions() {
-			$actions = array();
-
-			return $actions;
+			return array();
 		}
 
 		/**
@@ -1167,6 +1165,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 				<style>
 					.flex {
 						display:flex;
+						clear: both;
 					}
 					.flex-row {
 						flex-direction:row;
@@ -1457,23 +1456,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 			if ( 'top' === $which ) {
 				\wp_nonce_field( 'advan-plugin-data', 'advanced-analytics-security', false );
 			}
-			?>
-			<div class="tablenav <?php echo esc_attr( $which ); ?>">
 
-				<?php if ( $this->has_items() ) { ?>
-				<div class="alignleft actions bulkactions">
-						<?php $this->bulk_actions( $which ); ?>
-				</div>
-						<?php
-				}
-				?>
-
-				<br class="clear" />
-			</div>
-				<?php
 				$this->extra_tablenav( $which );
-				if ( 'top' !== $which && ! empty( self::$items_collected ) ) {
-					?>
+			if ( 'top' !== $which && ! empty( self::$items_collected ) ) {
+				?>
 				<style>
 					.toplevel_page_advan_logs #debug-log {
 						max-width: 100%;
@@ -1489,17 +1475,17 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					.generated-logs #severity { width: 7%; }
 					.generated-logs #message { width: 60%; }
 
-					<?php
-					foreach ( Settings::get_option( 'severities' ) as $class => $properties ) {
+				<?php
+				foreach ( Settings::get_option( 'severities' ) as $class => $properties ) {
 
-						$color = '#252630';
+					$color = '#252630';
 
-						$color = ( \in_array( $class, array( 'warning' ), true ) ) ? '#6C6262' : $color;
-						$color = ( \in_array( $class, array( 'parse', 'fatal' ), true ) ) ? '#fff' : $color;
+					$color = ( \in_array( $class, array( 'warning' ), true ) ) ? '#6C6262' : $color;
+					$color = ( \in_array( $class, array( 'parse', 'fatal' ), true ) ) ? '#fff' : $color;
 
-						echo '.generated-logs .' . \esc_attr( $class ) . ' td:nth-child(1) { border-left: 7px solid ' . \esc_attr( $properties['color'] ) . ' !important;}';
-					}
-					?>
+					echo '.generated-logs .' . \esc_attr( $class ) . ' td:nth-child(1) { border-left: 7px solid ' . \esc_attr( $properties['color'] ) . ' !important;}';
+				}
+				?>
 					
 					.container {
 						display: flex;
@@ -1571,10 +1557,10 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 
 				</style>
-					<?php
-					if ( ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) || '' !== self::escaped_search_input() ) {
-					} else {
-						?>
+				<?php
+				if ( ( isset( $_REQUEST['plugin_filter'] ) && ! empty( $_REQUEST['plugin_filter'] ) && -1 !== (int) $_REQUEST['plugin_filter'] ) || '' !== self::escaped_search_input() ) {
+				} else {
+					?>
 				<pre id="debug-log"><?php Reverse_Line_Reader::read_temp_file(); ?></pre>
 					<?php } ?>
 				
@@ -1607,7 +1593,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 					}
 				</script>
 					<?php
-				}
+			}
 		}
 
 		/**
