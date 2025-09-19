@@ -3,8 +3,13 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "runArgs": ["--network=host"],
+  "runArgs": [
+    "--network=host",
+    "--privileged",
+	  "--security-opt=seccomp=unconfined"
+  ],
   "remoteUser": "root",
+  "network_mode": "host",
   "containerUser": "root",
   "forwardPorts": [
     8080,
