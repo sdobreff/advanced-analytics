@@ -132,6 +132,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 					'attachments'        => \wp_json_encode( self::get_attachment_locations( array() ) ),
 					'additional_headers' => \wp_json_encode( $email_class->get( 'headers' ) ),
 					'is_html'            => (int) self::$is_html,
+					'blog_id'            => (int) \get_current_blog_id(),
 				);
 			}
 		}
@@ -158,6 +159,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 					'attachments'        => \wp_json_encode( self::get_attachment_locations( $args['attachments'] ) ),
 					'additional_headers' => \wp_json_encode( $args['headers'] ),
 					'is_html'            => (int) self::$is_html,
+					'blog_id'            => (int) \get_current_blog_id(),
 				);
 
 				self::$last_id = WP_Mail_Entity::insert( $log_entry );
@@ -212,6 +214,7 @@ if ( ! class_exists( '\ADVAN\Controllers\WP_Mail_Log' ) ) {
 						'attachments'        => \wp_json_encode( self::get_attachment_locations( $attachment ) ),
 						'additional_headers' => \wp_json_encode( $mail_header ),
 						'is_html'            => ( 'text/html' === $phpmailer->ContentType ) ? 1 : 0, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+						'blog_id'            => (int) \get_current_blog_id(),
 					);
 
 					self::$last_id = WP_Mail_Entity::insert( $log_entry );

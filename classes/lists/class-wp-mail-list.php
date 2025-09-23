@@ -831,6 +831,25 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						\esc_html( $in ),
 						$time,
 					) . $this->row_actions( $actions ) . $data;
+
+				case 'blog_id':
+					if ( WP_Helper::is_multisite() && 1 !== (int) $item['blog_id'] ) {
+						$site = \get_site( (int) $item['blog_id'] );
+						if ( $site ) {
+							$details = \sprintf(
+								/* translators: 1: Site ID, 2: Site domain, 3: Site path */
+								__( 'Site ID: %1$s, Domain: %2$s, Path: %3$s', '0-day-analytics' ),
+								(int) $site->blog_id,
+								$site->domain,
+								$site->path
+							);
+							return '<a href="' . \esc_url( \get_admin_url( (int) $item['blog_id'] ) ) . '" title="' . \esc_attr( $details ) . '">' . \esc_html( $site->domain ) . '</a>';
+						} else {
+							return \esc_html__( 'Unknown or deleted site', '0-day-analytics' );
+						}
+					} elseif ( WP_Helper::is_multisite() && 1 === (int) $item['blog_id'] ) {
+						return \esc_html__( 'Main Site', '0-day-analytics' );
+					}
 			}
 		}
 

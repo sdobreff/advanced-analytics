@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Entities;
 
+use ADVAN\Helpers\WP_Helper;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,6 +41,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 */
 		protected static $fields = array(
 			'id'                 => 'int',
+			'blog_id'            => 'int',
 			'time'               => 'string',
 			'email_to'           => 'string',
 			'email_from'         => 'string',
@@ -61,6 +64,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 */
 		protected static $fields_values = array(
 			'id'                 => 0,
+			'blog_id'            => 0,
 			'time'               => '',
 			'email_to'           => '',
 			'email_from'         => '',
@@ -94,6 +98,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			$wp_entity_sql = '
 				CREATE TABLE `' . $table_name . '` (
 					id BIGINT unsigned not null auto_increment,
+					blog_id int NOT NULL,
 					time DOUBLE NOT NULL DEFAULT 0,
 					email_to TEXT DEFAULT NULL,
 					email_from TEXT DEFAULT NULL,
@@ -126,6 +131,21 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		}
 
 		/**
+		 * Alters the table to add the blog_id for more precise logging in multisite setups.
+		 *
+		 * @return array|bool
+		 *
+		 * @since latest
+		 */
+		public static function alter_table_370() {
+			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `blog_id` INT NOT NULL AFTER `id`';
+
+			// Extend our logging logic to capture get_current_blog_id() / get_site_url() and store it in a new column in the log table.
+
+			return Common_Table::execute_query( $sql );
+		}
+
+		/**
 		 * Returns the table CMS admin fields
 		 *
 		 * @return array
@@ -133,7 +153,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 * @since 3.0.0
 		 */
 		public static function get_column_names_admin(): array {
-			return array(
+			$columns = array(
 				'time'              => __( 'Date', '0-day-analytics' ),
 				'email_to'          => __( 'To', '0-day-analytics' ),
 				'email_from'        => __( 'From', '0-day-analytics' ),
@@ -142,6 +162,12 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 				'attachments'       => __( 'Attachments', '0-day-analytics' ),
 				'backtrace_segment' => __( 'Source', '0-day-analytics' ),
 			);
+
+			if ( WP_Helper::is_multisite() ) {
+				$columns['blog_id'] = __( 'From Blog', '0-day-analytics' );
+			}
+
+			return $columns;
 		}
 	}
 }

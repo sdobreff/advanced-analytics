@@ -145,25 +145,6 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 		}
 
 		/**
-		 * Migrates the plugin up-to version 2.8.0
-		 *
-		 * @return void
-		 *
-		 * @since 2.8.0
-		 */
-		public static function migrate_up_to_280() {
-			$settings = Settings::get_current_options();
-
-			$defaults = Settings::get_default_options()['severities'];
-
-			foreach ( $defaults as $name => $default ) {
-			}
-
-			Settings::store_options( $settings );
-			Settings::set_current_options( $settings );
-		}
-
-		/**
 		 * Migrates the plugin up-to version 2.8.1
 		 *
 		 * @return void
@@ -197,6 +178,21 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			if ( \class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 				if ( Common_Table::check_table_exists( WP_Mail_Entity::get_table_name() ) && ! Common_Table::check_column( 'email_from', 'text', WP_Mail_Entity::get_table_name() ) ) {
 					WP_Mail_Entity::alter_table_301();
+				}
+			}
+		}
+
+		/**
+		 * Migrates the plugin up-to version 3.7.0
+		 *
+		 * @return void
+		 *
+		 * @since 3.7.0
+		 */
+		public static function migrate_up_to_370() {
+			if ( \class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
+				if ( Common_Table::check_table_exists( WP_Mail_Entity::get_table_name() ) && ! Common_Table::check_column( 'blog_id', 'int', WP_Mail_Entity::get_table_name() ) ) {
+					WP_Mail_Entity::alter_table_370();
 				}
 			}
 		}
