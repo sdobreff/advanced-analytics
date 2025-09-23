@@ -169,5 +169,51 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 
 			return $columns;
 		}
+
+		/**
+		 * Generates drop down with all the subsites that have mail logs.
+		 *
+		 * @param string $selected - The selected (if any) site ID.
+		 * @param string $which - Indicates postion of the dropdown (top or bottom).
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		public static function get_all_sites_dropdown( $selected = '', $which = '' ): string {
+			$sql = 'SELECT blog_id FROM ' . self::get_table_name() . ' GROUP BY blog_id ORDER BY blog_id DESC';
+
+			$results = self::get_results( $sql );
+			$sites   = array();
+			$output  = '';
+
+			if ( $results ) {
+				foreach ( $results as $result ) {
+					$details = \get_blog_details( array( 'blog_id' => $result['blog_id'] ) );
+					$sites[] = array(
+						'id'   => $result['blog_id'],
+						'name' => $details->blogname,
+					);
+				}
+			}
+
+			if ( ! empty( $sites ) ) {
+
+				$output  = '<select class="site_id_filter" name="site_id_' . \esc_attr( $which ) . '" id="site_id_' . \esc_attr( $which ) . '">';
+				$output .= '<option value="">' . __( 'All sites', '0-day-analytics' ) . '</option>';
+				foreach ( $sites as $site_info ) {
+					if ( isset( $selected ) && ! empty( trim( (string) $selected ) ) && (int) $selected === (int) $site_info['id'] ) {
+						$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '" selected>' . \esc_html( $site_info['name'] ) . '</option>';
+
+						continue;
+					}
+					$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '">' . \esc_html( $site_info['name'] ) . '</option>';
+				}
+
+				$output .= '</select>';
+			}
+
+			return $output;
+		}
 	}
 }

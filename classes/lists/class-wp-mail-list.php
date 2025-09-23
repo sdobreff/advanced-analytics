@@ -57,6 +57,8 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 		public const NONCE_NAME = 'advana_wp_mail_manager';
 
+		public const SITE_ID_FILTER_ACTION = 'filter_site_id';
+
 		/**
 		 * The table to show
 		 *
@@ -137,6 +139,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 */
 		public static function init() {
 			\add_action( 'admin_post_' . self::NEW_ACTION, array( WP_Mail_View::class, 'new_mail' ) );
+			\add_action( 'admin_post_' . self::SITE_ID_FILTER_ACTION, array( WP_Mail_View::class, 'site_id_filter_action' ) );
 			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
 		}
 
@@ -229,6 +232,12 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 			// $one_page = ( 1 === $pages ) ? 'one-page' : '';
 			$type = ! empty( $_GET['mail_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['mail_type'] ) ) : '';
 
+			if ( isset( $_REQUEST['site_id'] ) && ! empty( $_REQUEST['site_id'] ) ) {
+					$site_id = \absint( $_REQUEST['site_id'] );
+			} else {
+				$site_id = '';
+			}
+
 			$items = $this->fetch_table_data(
 				array(
 					'search'  => $search,
@@ -237,6 +246,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					'orderby' => $orderby,
 					'order'   => $order,
 					'type'    => $type,
+					'site_id' => $site_id,
 				)
 			);
 
@@ -333,6 +343,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					'orderby' => 'id',
 					'order'   => 'DESC',
 					'count'   => false,
+					'site_id' => 0,
 				)
 			);
 
@@ -347,6 +358,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 			// }
 
 			$search_string = $parsed_args['search'];
+			$site_id = $parsed_args['site_id'];
 
 			$search_sql = '';
 
@@ -356,6 +368,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
 				}
 				$search_sql .= ') ';
+			}
+
+			if  ( '' !== $site_id ) {
+				$search_sql .= ' AND blog_id = ' . (int) $site_id . ' ';
 			}
 
 			if ( ! empty( $parsed_args['type'] ) ) {
@@ -1032,6 +1048,27 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public function extra_tablenav( $which ) {
+
+			if ( WP_Helper::is_multisite() ) {
+				if ( isset( $_REQUEST['site_id'] ) && ! empty( $_REQUEST['site_id'] ) ) {
+					$site_id = \absint( $_REQUEST['site_id'] );
+				} else {
+					$site_id = 0;
+				}
+				?>
+				<div class="alignleft actions bulkactions">
+					
+					<?php echo WP_Mail_Entity::get_all_sites_dropdown( $site_id, $which ); ?>
+					
+				</div>
+				<script>
+					jQuery('form .site_id_filter').on('change', function(e) {
+						jQuery('form .site_id_filter').val(jQuery(this).val());
+						jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::SITE_ID_FILTER_ACTION ); ?>">').append('<?php \wp_nonce_field( self::SITE_ID_FILTER_ACTION, self::SITE_ID_FILTER_ACTION . 'nonce' ); ?>').submit();
+					});
+				</script>
+				<?php
+			}
 			if ( 'top' === $which ) {
 				?>
 				<style>
