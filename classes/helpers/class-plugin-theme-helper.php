@@ -78,6 +78,9 @@ if ( ! class_exists( '\ADVAN\Helpers\Plugin_Theme_Helper' ) ) {
 		 */
 		public static function get_plugins(): array {
 			if ( empty( self::$plugins ) ) {
+				if ( ! \function_exists( 'get_plugins' ) ) {
+					include_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
 				self::$plugins = \get_plugins();
 			}
 

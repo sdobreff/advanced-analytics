@@ -139,7 +139,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'date_added'     => time(),
 				'requests'       => self::$requests,
 				'trace'          => self::get_trace(),
-				'plugin'         => self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ),
+				'plugin'         => ( isset( \json_decode( self::$trace, true )[7] ) && isset( \json_decode( self::$trace, true )[7]['file'] ) ) ? self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ) : '',
 			);
 
 			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
@@ -327,7 +327,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'date_added'     => time(),
 				'requests'       => self::$requests,
 				'trace'          => self::get_trace(),
-				'plugin'         => self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ),
+				'plugin'         => ( isset( \json_decode( self::$trace, true )[7] ) && isset( \json_decode( self::$trace, true )[7]['file'] ) ) ? self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ) : '',
 			);
 
 			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
