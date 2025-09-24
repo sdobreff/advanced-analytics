@@ -233,7 +233,11 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 			$type = ! empty( $_GET['mail_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['mail_type'] ) ) : '';
 
 			if ( isset( $_REQUEST['site_id'] ) && ! empty( $_REQUEST['site_id'] ) ) {
+				if ( -1 === (int) $_REQUEST['site_id'] ) {
+					$site_id = -1;
+				} else {
 					$site_id = \absint( $_REQUEST['site_id'] );
+				}
 			} else {
 				$site_id = '';
 			}
@@ -358,7 +362,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 			// }
 
 			$search_string = $parsed_args['search'];
-			$site_id = $parsed_args['site_id'];
+			$site_id       = $parsed_args['site_id'];
 
 			$search_sql = '';
 
@@ -370,8 +374,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				$search_sql .= ') ';
 			}
 
-			if  ( '' !== $site_id ) {
+			if ( '' !== $site_id && -1 !== (int) $site_id ) {
 				$search_sql .= ' AND blog_id = ' . (int) $site_id . ' ';
+			} elseif ( ( '' === $site_id && -1 !== (int) $site_id ) && WP_Helper::is_multisite() && ! \is_main_site() ) {
+				$search_sql .= ' AND blog_id = ' . (int) \get_current_blog_id() . ' ';
 			}
 
 			if ( ! empty( $parsed_args['type'] ) ) {
@@ -852,14 +858,15 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					if ( WP_Helper::is_multisite() && 1 !== (int) $item['blog_id'] ) {
 						$site = \get_site( (int) $item['blog_id'] );
 						if ( $site ) {
-							$details = \sprintf(
+							$blog_details = \get_blog_details( array( 'blog_id' => $item['blog_id'] ) );
+							$details      = \sprintf(
 								/* translators: 1: Site ID, 2: Site domain, 3: Site path */
 								__( 'Site ID: %1$s, Domain: %2$s, Path: %3$s', '0-day-analytics' ),
 								(int) $site->blog_id,
 								$site->domain,
 								$site->path
 							);
-							return '<a href="' . \esc_url( \get_admin_url( (int) $item['blog_id'] ) ) . '" title="' . \esc_attr( $details ) . '">' . \esc_html( $site->domain ) . '</a>';
+							return '<a href="' . \esc_url( \get_admin_url( (int) $item['blog_id'] ) ) . '" title="' . \esc_attr( $details ) . '">' . \esc_html( $blog_details->blogname ) . '</a>';
 						} else {
 							return \esc_html__( 'Unknown or deleted site', '0-day-analytics' );
 						}
@@ -1051,9 +1058,17 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 			if ( WP_Helper::is_multisite() ) {
 				if ( isset( $_REQUEST['site_id'] ) && ! empty( $_REQUEST['site_id'] ) ) {
-					$site_id = \absint( $_REQUEST['site_id'] );
+					if ( -1 === (int) $_REQUEST['site_id'] ) {
+						$site_id = -1;
+					} else {
+						$site_id = \absint( $_REQUEST['site_id'] );
+					}
 				} else {
 					$site_id = 0;
+
+					if ( ! \is_main_site() ) {
+						$site_id = \get_current_blog_id();
+					}
 				}
 				?>
 				<div class="alignleft actions bulkactions">

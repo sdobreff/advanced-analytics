@@ -135,9 +135,9 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @return array|bool
 		 *
-		 * @since latest
+		 * @since 3.6.3
 		 */
-		public static function alter_table_370() {
+		public static function alter_table_363() {
 			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `blog_id` INT NOT NULL AFTER `id`';
 
 			// Extend our logging logic to capture get_current_blog_id() / get_site_url() and store it in a new column in the log table.
@@ -178,7 +178,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 *
 		 * @return string
 		 *
-		 * @since latest
+		 * @since 3.6.3
 		 */
 		public static function get_all_sites_dropdown( $selected = '', $which = '' ): string {
 			$sql = 'SELECT blog_id FROM ' . self::get_table_name() . ' GROUP BY blog_id ORDER BY blog_id DESC';
@@ -200,7 +200,7 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			if ( ! empty( $sites ) ) {
 
 				$output  = '<select class="site_id_filter" name="site_id_' . \esc_attr( $which ) . '" id="site_id_' . \esc_attr( $which ) . '">';
-				$output .= '<option value="">' . __( 'All sites', '0-day-analytics' ) . '</option>';
+				$output .= '<option value="-1">' . __( 'All sites', '0-day-analytics' ) . '</option>';
 				foreach ( $sites as $site_info ) {
 					if ( isset( $selected ) && ! empty( trim( (string) $selected ) ) && (int) $selected === (int) $site_info['id'] ) {
 						$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '" selected>' . \esc_html( $site_info['name'] ) . '</option>';

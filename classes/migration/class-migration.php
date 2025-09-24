@@ -183,16 +183,16 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 		}
 
 		/**
-		 * Migrates the plugin up-to version 3.7.0
+		 * Migrates the plugin up-to version 3.6.3
 		 *
 		 * @return void
 		 *
-		 * @since 3.7.0
+		 * @since 3.6.3
 		 */
-		public static function migrate_up_to_370() {
+		public static function migrate_up_to_363() {
 			if ( \class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 				if ( Common_Table::check_table_exists( WP_Mail_Entity::get_table_name() ) && ! Common_Table::check_column( 'blog_id', 'int', WP_Mail_Entity::get_table_name() ) ) {
-					WP_Mail_Entity::alter_table_370();
+					WP_Mail_Entity::alter_table_363();
 				}
 			}
 		}
