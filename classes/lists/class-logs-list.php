@@ -1897,7 +1897,7 @@ if ( ! class_exists( '\ADVAN\Lists\Logs_List' ) ) {
 
 					$base .= 'code';
 
-					$data['body']  = $event['severity'] . ' ' . $event['message'];
+					$data['body']  = \esc_html( $event['severity'] ) . ' ' . \html_entity_decode( $event['message'] );
 					$data['title'] = $in;
 					$data['icon']  = 'data:image/svg+xml;base64,' . $base( file_get_contents( \ADVAN_PLUGIN_ROOT . 'assets/icon.svg' ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 					$data['url']   = Settings::get_error_log_page_link();

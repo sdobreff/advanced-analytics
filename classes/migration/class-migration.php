@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace ADVAN\Migration;
 
-use ADVAN\Entities\Common_Table;
 use ADVAN\Helpers\Settings;
+use ADVAN\Entities\Common_Table;
 use ADVAN\Entities\WP_Mail_Entity;
+use ADVAN\Entities\Requests_Log_Entity;
 use ADVAN\Migration\Abstract_Migration;
 
 
@@ -193,6 +194,20 @@ if ( ! class_exists( '\ADVAN\Migration\Migration' ) ) {
 			if ( \class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 				if ( Common_Table::check_table_exists( WP_Mail_Entity::get_table_name() ) && ! Common_Table::check_column( 'blog_id', 'int', WP_Mail_Entity::get_table_name() ) ) {
 					WP_Mail_Entity::alter_table_363();
+				}
+			}
+		}
+		/**
+		 * Migrates the plugin up-to version 3.7.0
+		 *
+		 * @return void
+		 *
+		 * @since 3.7.0
+		 */
+		public static function migrate_up_to_370() {
+			if ( \class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
+				if ( Common_Table::check_table_exists( Requests_Log_Entity::get_table_name() ) && ! Common_Table::check_column( 'plugin', 'text', Requests_Log_Entity::get_table_name() ) ) {
+					Requests_Log_Entity::alter_table_370();
 				}
 			}
 		}

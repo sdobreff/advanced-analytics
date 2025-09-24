@@ -13,6 +13,7 @@ namespace ADVAN\Controllers;
 
 use ADVAN\Helpers\Settings;
 use ADVAN\Helpers\Context_Helper;
+use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Entities\Requests_Log_Entity;
 
 // Exit if accessed directly.
@@ -138,6 +139,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'date_added'     => time(),
 				'requests'       => self::$requests,
 				'trace'          => self::get_trace(),
+				'plugin'         => self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ),
 			);
 
 			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
@@ -325,6 +327,7 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 				'date_added'     => time(),
 				'requests'       => self::$requests,
 				'trace'          => self::get_trace(),
+				'plugin'         => self::add_plugin_info_to_collected_item( \json_decode( self::$trace, true )[7]['file'] ),
 			);
 
 			if ( isset( self::$last_id ) && self::$last_id > 0 ) {
@@ -335,6 +338,45 @@ if ( ! class_exists( '\ADVAN\Controllers\Requests_Log' ) ) {
 			self::$last_id = Requests_Log_Entity::insert( $log_entry );
 
 			return $response;
+		}
+
+		/**
+		 * Adds plugin info to the database using the file path collected from the trace.
+		 *
+		 * @param string $message - File path from the trace.
+		 *
+		 * @return string
+		 *
+		 * @since latest
+		 */
+		private static function add_plugin_info_to_collected_item( string $message ) {
+
+			$plugins_dir_basename = basename( \WP_PLUGIN_DIR );
+
+			if ( false !== \mb_strpos( $message, $plugins_dir_basename . \DIRECTORY_SEPARATOR ) ) {
+
+				$split_plugin = explode( \DIRECTORY_SEPARATOR, $message );
+
+				$next        = false;
+				$plugin_base = '';
+				foreach ( $split_plugin as $part ) {
+					if ( $next ) {
+						$plugin_base = $part;
+						break;
+					}
+					if ( $plugins_dir_basename === $part ) {
+						$next = true;
+					}
+				}
+
+				$plugin = Plugin_Theme_Helper::get_plugin_from_path( $plugin_base );
+				if ( ! empty( $plugin ) ) {
+
+					return $plugin_base;
+				}
+			}
+
+			return '';
 		}
 	}
 }

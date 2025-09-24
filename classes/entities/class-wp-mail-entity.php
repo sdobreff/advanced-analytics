@@ -33,6 +33,15 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		protected static $table = ADVAN_PREFIX . 'wp_mail_log';
 
 		/**
+		 * Inner class cache for rendered dorp down with of of the collected data from sites.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $drop_down_sites_rendered = false;
+
+		/**
 		 * Keeps the info about the columns of the table - name, type.
 		 *
 		 * @var array
@@ -181,40 +190,44 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 		 * @since 3.6.3
 		 */
 		public static function get_all_sites_dropdown( $selected = '', $which = '' ): string {
-			$sql = 'SELECT blog_id FROM ' . self::get_table_name() . ' GROUP BY blog_id ORDER BY blog_id DESC';
 
-			$results = self::get_results( $sql );
-			$sites   = array();
-			$output  = '';
+			if ( false === self::$drop_down_sites_rendered ) {
+				$sql = 'SELECT blog_id FROM ' . self::get_table_name() . ' GROUP BY blog_id ORDER BY blog_id DESC';
 
-			if ( $results ) {
-				foreach ( $results as $result ) {
-					$details = \get_blog_details( array( 'blog_id' => $result['blog_id'] ) );
-					$name    = ( $details ) ? $details->blogname : \sprintf( /* translators: %s: Site ID */ __( 'Site %s', '0-day-analytics' ), (int) $result['blog_id'] );
-					$sites[] = array(
-						'id'   => $result['blog_id'],
-						'name' => $name,
-					);
-				}
-			}
+				$results = self::get_results( $sql );
+				$sites   = array();
+				$output  = '';
 
-			if ( ! empty( $sites ) ) {
-
-				$output  = '<select class="site_id_filter" name="site_id_' . \esc_attr( $which ) . '" id="site_id_' . \esc_attr( $which ) . '">';
-				$output .= '<option value="-1">' . __( 'All sites', '0-day-analytics' ) . '</option>';
-				foreach ( $sites as $site_info ) {
-					if ( isset( $selected ) && ! empty( trim( (string) $selected ) ) && (int) $selected === (int) $site_info['id'] ) {
-						$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '" selected>' . \esc_html( $site_info['name'] ) . '</option>';
-
-						continue;
+				if ( $results ) {
+					foreach ( $results as $result ) {
+						$details = \get_blog_details( array( 'blog_id' => $result['blog_id'] ) );
+						$name    = ( $details ) ? $details->blogname : \sprintf( /* translators: %s: Site ID */ __( 'Site %s', '0-day-analytics' ), (int) $result['blog_id'] );
+						$sites[] = array(
+							'id'   => $result['blog_id'],
+							'name' => $name,
+						);
 					}
-					$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '">' . \esc_html( $site_info['name'] ) . '</option>';
 				}
 
-				$output .= '</select>';
+				if ( ! empty( $sites ) ) {
+
+					$output  = '<select class="site_id_filter" name="site_id_' . \esc_attr( $which ) . '" id="site_id_' . \esc_attr( $which ) . '">';
+					$output .= '<option value="-1">' . __( 'All sites', '0-day-analytics' ) . '</option>';
+					foreach ( $sites as $site_info ) {
+						if ( isset( $selected ) && ! empty( trim( (string) $selected ) ) && (int) $selected === (int) $site_info['id'] ) {
+							$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '" selected>' . \esc_html( $site_info['name'] ) . '</option>';
+
+							continue;
+						}
+						$output .= '<option value="' . \esc_attr( $site_info['id'] ) . '">' . \esc_html( $site_info['name'] ) . '</option>';
+					}
+
+					$output .= '</select>';
+				}
+				self::$drop_down_sites_rendered = $output;
 			}
 
-			return $output;
+			return self::$drop_down_sites_rendered;
 		}
 	}
 }

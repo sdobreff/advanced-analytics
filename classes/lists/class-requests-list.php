@@ -21,6 +21,7 @@ use ADVAN\Entities\Common_Table;
 use ADVAN\Lists\Traits\List_Trait;
 use ADVAN\ControllersApi\Endpoints;
 use ADVAN\Lists\Views\Requests_View;
+use ADVAN\Helpers\Plugin_Theme_Helper;
 use ADVAN\Entities\Requests_Log_Entity;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -51,6 +52,8 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		public const SEARCH_INPUT = 's';
 
 		public const REQUESTS_MENU_SLUG = 'advan_requests';
+
+		public const PLUGIN_FILTER_ACTION = 'filter_plugin';
 
 		/**
 		 * The table to show
@@ -122,6 +125,7 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 */
 		public static function init() {
 			\add_filter( 'advan_cron_hooks', array( __CLASS__, 'add_cron_job' ) );
+			\add_action( 'admin_post_' . self::PLUGIN_FILTER_ACTION, array( Requests_View::class, 'plugin_filter_action' ) );
 		}
 
 		/**
@@ -296,6 +300,16 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 
 			$search_string = self::escaped_search_input();
 
+			if ( isset( $_REQUEST['plugin'] ) && ! empty( $_REQUEST['plugin'] ) ) {
+				if ( -1 === (int) $_REQUEST['plugin'] ) {
+					$plugin = -1;
+				} else {
+					$plugin = \sanitize_text_field( \wp_unslash( $_REQUEST['plugin'] ) );
+				}
+			} else {
+				$plugin = '';
+			}
+
 			$search_sql = '';
 
 			if ( '' !== $search_string ) {
@@ -304,6 +318,10 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
 				}
 				$search_sql .= ') ';
+			}
+
+			if ( '' !== $plugin && -1 !== (int) $plugin ) {
+				$search_sql .= ' AND plugin = "' . (string) $plugin . '" ';
 			}
 
 			$wpdb_table = $this->get_table_name();
@@ -523,6 +541,15 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 						\esc_html( $in ),
 						$time,
 					) . $this->row_actions( $actions ) . $data;
+
+				case 'plugin':
+					if ( ! empty( $item['plugin'] ) ) {
+						$plugin = Plugin_Theme_Helper::get_plugin_from_path( $item['plugin'] );
+						if ( ! empty( $plugin ) ) {
+
+							return __( 'Plugin: ', '0-day-analytics' ) . '<b>' . \esc_html( $plugin['Name'] ) . '</b><br>' . \__( 'Current version: ' ) . \esc_html( $plugin['Version'] );
+						}
+					}
 			}
 		}
 
@@ -705,9 +732,31 @@ if ( ! class_exists( '\ADVAN\Lists\Requests_List' ) ) {
 		 * @since 1.1.0
 		 */
 		public function extra_tablenav( $which ) {
+			if ( isset( $_REQUEST['plugin'] ) && ! empty( $_REQUEST['plugin'] ) ) {
+				if ( -1 === (int) $_REQUEST['plugin'] ) {
+					$plugin = -1;
+				} else {
+					$plugin = \sanitize_text_field( \wp_unslash( $_REQUEST['plugin'] ) );
+				}
+			} else {
+				$plugin = 0;
+			}
+			?>
+				<div class="alignleft actions bulkactions">
+					
+					<?php echo Requests_Log_Entity::get_all_plugins_dropdown( $plugin, $which ); ?>
+					
+				</div>
+				<script>
+					jQuery('form .plugin_filter').on('change', function(e) {
+						jQuery('form .plugin_filter').val(jQuery(this).val());
+						jQuery( this ).closest( 'form' ).attr( 'action', '<?php echo \esc_url( \admin_url( 'admin-post.php' ) ); ?>').append('<input type="hidden" name="action" value="<?php echo \esc_attr( self::PLUGIN_FILTER_ACTION ); ?>">').append('<?php \wp_nonce_field( self::PLUGIN_FILTER_ACTION, self::PLUGIN_FILTER_ACTION . 'nonce' ); ?>').submit();
+					});
+				</script>
+				<?php
 
-			if ( 'top' === $which ) {
-				?>
+				if ( 'top' === $which ) {
+					?>
 				<style>
 					.flex {
 						display:flex;

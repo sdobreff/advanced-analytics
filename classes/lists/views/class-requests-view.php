@@ -652,5 +652,37 @@ if ( ! class_exists( '\ADVAN\Lists\Views\Requests_View' ) ) {
 				exit;
 			}
 		}
+
+		/**
+		 * Responsible for filtering table by plugin.
+		 *
+		 * @return void
+		 *
+		 * @since latest
+		 */
+		public static function plugin_filter_action() {
+
+			if ( isset( $_REQUEST['plugin_top'] ) || isset( $_REQUEST['plugin_filter_bottom'] ) ) {
+
+				if ( \check_admin_referer( Requests_List::PLUGIN_FILTER_ACTION, Requests_List::PLUGIN_FILTER_ACTION . 'nonce' ) ) {
+					$id = $_REQUEST['plugin_top']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+
+					\wp_safe_redirect(
+						\remove_query_arg(
+							array( 'deleted' ),
+							\add_query_arg(
+								array(
+									'page'       => Requests_List::REQUESTS_MENU_SLUG,
+									Requests_List::SEARCH_INPUT => Requests_List::escaped_search_input(),
+									'plugin' => rawurlencode( $id ),
+								),
+								\admin_url( 'admin.php' )
+							)
+						)
+					);
+					exit;
+				}
+			}
+		}
 	}
 }

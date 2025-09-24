@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace ADVAN\Entities;
 
+use ADVAN\Helpers\Plugin_Theme_Helper;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,6 +33,15 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		protected static $table = ADVAN_PREFIX . 'requests_log';
 
 		/**
+		 * Inner class cache for rendered dorp down with of of the collected data from sites.
+		 *
+		 * @var string
+		 *
+		 * @since latest
+		 */
+		private static $drop_down_sites_rendered = false;
+
+		/**
 		 * Keeps the info about the columns of the table - name, type.
 		 *
 		 * @var array
@@ -40,6 +51,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		protected static $fields = array(
 			'id'             => 'int',
 			'type'           => 'string',
+			'plugin'         => 'string',
 			'url'            => 'string',
 			'page_url'       => 'string',
 			'domain'         => 'string',
@@ -65,6 +77,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		protected static $fields_values = array(
 			'id'             => 0,
 			'type'           => '',
+			'plugin'         => '',
 			'url'            => '',
 			'page_url'       => '',
 			'domain'         => '',
@@ -101,6 +114,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 				CREATE TABLE `' . $table_name . '` (
 					id BIGINT unsigned not null auto_increment,
 					type VARCHAR(20) NOT NULL DEFAULT "",
+					plugin VARCHAR(200) NOT NULL DEFAULT "",
 					url TEXT(2048),
 					page_url TEXT(2048),
 					user_id BIGINT unsigned NOT NULL DEFAULT 0,
@@ -123,6 +137,19 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 		}
 
 		/**
+		 * Responsible for adding the plugin column to the table (version 3.7.0).
+		 *
+		 * @return array|bool
+		 *
+		 * @since 3.7.0
+		 */
+		public static function alter_table_370() {
+			$sql = 'ALTER TABLE `' . self::get_table_name() . '` ADD `plugin` TEXT DEFAULT "" AFTER `type`;';
+
+			return Common_Table::execute_query( $sql );
+		}
+
+		/**
 		 * Returns the table CMS admin fields
 		 *
 		 * @return array
@@ -133,6 +160,7 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 			return array(
 				'date_added'     => __( 'Date', '0-day-analytics' ),
 				'type'           => __( 'Type', '0-day-analytics' ),
+				'plugin'         => __( 'Plugin Name', '0-day-analytics' ),
 				'request_status' => __( 'Status', '0-day-analytics' ),
 				'url'            => __( 'URL', '0-day-analytics' ),
 				'page_url'       => __( 'Page', '0-day-analytics' ),
@@ -140,6 +168,60 @@ if ( ! class_exists( '\ADVAN\Entities\Requests_Log_Entity' ) ) {
 				'user_id'        => __( 'User', '0-day-analytics' ),
 				'runtime'        => __( 'Runtime', '0-day-analytics' ),
 			);
+		}
+
+		/**
+		 * Generates drop down with all the subsites that have mail logs.
+		 *
+		 * @param string $selected - The selected (if any) site ID.
+		 * @param string $which - Indicates position of the dropdown (top or bottom).
+		 *
+		 * @return string
+		 *
+		 * @since 3.6.3
+		 */
+		public static function get_all_plugins_dropdown( $selected = '', $which = '' ): string {
+
+			if ( false === self::$drop_down_sites_rendered ) {
+				$sql = 'SELECT plugin FROM ' . self::get_table_name() . ' GROUP BY plugin ORDER BY plugin DESC';
+
+				$results = self::get_results( $sql );
+				$plugins   = array();
+				$output  = '';
+
+				if ( $results ) {
+					foreach ( $results as $result ) {
+						if ( ! isset( $result['plugin'] ) || empty( trim( (string) $result['plugin'] ) ) ) {
+							continue;
+						}
+						$details = Plugin_Theme_Helper::get_plugin_from_path( $result['plugin'] );
+						$name    = ( $details ) ? $details['Name'] : \sprintf( /* translators: %s: Site ID */ __( '%s', '0-day-analytics' ), (int) $result['plugin'] );
+						$plugins[] = array(
+							'id'   => $result['plugin'],
+							'name' => $name,
+						);
+					}
+				}
+
+				if ( ! empty( $plugins ) ) {
+
+					$output  = '<select class="plugin_filter" name="plugin_' . \esc_attr( $which ) . '" id="plugin_' . \esc_attr( $which ) . '">';
+					$output .= '<option value="-1">' . __( 'All plugins', '0-day-analytics' ) . '</option>';
+					foreach ( $plugins as $plugin_info ) {
+						if ( isset( $selected ) && ! empty( trim( (string) $selected ) ) && (string) $selected === (string) $plugin_info['id'] ) {
+							$output .= '<option value="' . \esc_attr( $plugin_info['id'] ) . '" selected>' . \esc_html( $plugin_info['name'] ) . '</option>';
+
+							continue;
+						}
+						$output .= '<option value="' . \esc_attr( $plugin_info['id'] ) . '">' . \esc_html( $plugin_info['name'] ) . '</option>';
+					}
+
+					$output .= '</select>';
+				}
+				self::$drop_down_sites_rendered = $output;
+			}
+
+			return self::$drop_down_sites_rendered;
 		}
 	}
 }

@@ -242,6 +242,10 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				$site_id = '';
 			}
 
+			if ( isset( $type ) && ! empty( $type ) ) {
+				$site_id = -1;
+			}
+
 			$items = $this->fetch_table_data(
 				array(
 					'search'  => $search,
@@ -351,52 +355,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 				)
 			);
 
-			$per_page = $parsed_args['number'];
-			$offset   = $parsed_args['offset'];
-
-			// $current_page = $this->get_pagenum();
-			// if ( 1 < $current_page ) {
-			// $offset = $per_page * ( $current_page - 1 );
-			// } else {
-			// $offset = 0;
-			// }
-
-			$search_string = $parsed_args['search'];
-			$site_id       = $parsed_args['site_id'];
-
 			$search_sql = '';
-
-			if ( '' !== $search_string ) {
-				$search_sql = 'AND (id LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
-				foreach ( array_keys( WP_Mail_Entity::get_column_names_admin() ) as $value ) {
-					$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
-				}
-				$search_sql .= ') ';
-			}
-
-			if ( '' !== $site_id && -1 !== (int) $site_id ) {
-				$search_sql .= ' AND blog_id = ' . (int) $site_id . ' ';
-			} elseif ( ( '' === $site_id && -1 !== (int) $site_id ) && WP_Helper::is_multisite() && ! \is_main_site() ) {
-				$search_sql .= ' AND blog_id = ' . (int) \get_current_blog_id() . ' ';
-			}
-
-			if ( ! empty( $parsed_args['type'] ) ) {
-				if ( 'successful' === $parsed_args['type'] ) {
-					$search_sql .= ' AND status = 1';
-				}
-				if ( 'unsuccessful' === $parsed_args['type'] ) {
-					$search_sql .= ' AND status = 0';
-				}
-				if ( 'html' === $parsed_args['type'] ) {
-					$search_sql .= ' AND is_html = 1';
-				}
-				if ( 'text' === $parsed_args['type'] ) {
-					$search_sql .= ' AND is_html != 1';
-				}
-				if ( 'attachments' === $parsed_args['type'] ) {
-					$search_sql .= ' AND attachments != "[]"';
-				}
-			}
 
 			$orderby = $parsed_args['orderby'];
 			if ( empty( $orderby ) ) {
@@ -406,12 +365,65 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 
 			$wpdb_table = $this->get_table_name();
 
-			$query = 'SELECT
+			if ( ! isset( $parsed_args['all'] ) ) {
+
+				$per_page = $parsed_args['number'];
+				$offset   = $parsed_args['offset'];
+
+				// $current_page = $this->get_pagenum();
+				// if ( 1 < $current_page ) {
+				// $offset = $per_page * ( $current_page - 1 );
+				// } else {
+				// $offset = 0;
+				// }
+
+				$search_string = $parsed_args['search'];
+				$site_id       = $parsed_args['site_id'];
+
+				if ( '' !== $search_string ) {
+					$search_sql = 'AND (id LIKE "%' . $wpdb->esc_like( $search_string ) . '%"';
+					foreach ( array_keys( WP_Mail_Entity::get_column_names_admin() ) as $value ) {
+						$search_sql .= ' OR ' . $value . ' LIKE "%' . esc_sql( $wpdb->esc_like( $search_string ) ) . '%" ';
+					}
+					$search_sql .= ') ';
+				}
+
+				if ( '' !== $site_id && -1 !== (int) $site_id ) {
+					$search_sql .= ' AND blog_id = ' . (int) $site_id . ' ';
+				} elseif ( ( '' === $site_id && -1 !== (int) $site_id ) && WP_Helper::is_multisite() && ! \is_main_site() ) {
+					$search_sql .= ' AND blog_id = ' . (int) \get_current_blog_id() . ' ';
+				}
+
+				if ( ! empty( $parsed_args['type'] ) ) {
+					if ( 'successful' === $parsed_args['type'] ) {
+						$search_sql .= ' AND status = 1';
+					}
+					if ( 'unsuccessful' === $parsed_args['type'] ) {
+						$search_sql .= ' AND status = 0';
+					}
+					if ( 'html' === $parsed_args['type'] ) {
+						$search_sql .= ' AND is_html = 1';
+					}
+					if ( 'text' === $parsed_args['type'] ) {
+						$search_sql .= ' AND is_html != 1';
+					}
+					if ( 'attachments' === $parsed_args['type'] ) {
+						$search_sql .= ' AND attachments != "[]"';
+					}
+				}
+
+				$query = 'SELECT
 				' . implode( ', ', \array_keys( WP_Mail_Entity::get_fields() ) ) . '
 			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 
-			if ( ! isset( $parsed_args['all'] ) ) {
-				$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
+				if ( ! isset( $parsed_args['all'] ) ) {
+					$query .= $wpdb->prepare( ' LIMIT %d OFFSET %d;', $per_page, $offset );
+				}
+			} else {
+
+				$query = 'SELECT
+				' . implode( ', ', \array_keys( WP_Mail_Entity::get_fields() ) ) . '
+			  FROM ' . $wpdb_table . '  WHERE 1=1 ' . $search_sql . ' ORDER BY ' . $orderby . ' ' . $order;
 			}
 
 			// query output_type will be an associative array with ARRAY_A.
@@ -1070,6 +1082,12 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 					if ( ! \is_main_site() ) {
 						$site_id = \get_current_blog_id();
 					}
+				}
+
+				$type = ! empty( $_GET['mail_type'] ) ? \sanitize_text_field( \wp_unslash( $_GET['mail_type'] ) ) : '';
+
+				if ( isset( $type ) && ! empty( $type ) ) {
+					$site_id = -1;
 				}
 				?>
 				<div class="alignleft actions bulkactions">
