@@ -859,6 +859,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 						$site = \get_site( (int) $item['blog_id'] );
 						if ( $site ) {
 							$blog_details = \get_blog_details( array( 'blog_id' => $item['blog_id'] ) );
+							$name         = ( $blog_details ) ? $blog_details->blogname : \sprintf( /* translators: %s: Site ID */ __( 'Site %s', '0-day-analytics' ), (int) $item['blog_id'] );
 							$details      = \sprintf(
 								/* translators: 1: Site ID, 2: Site domain, 3: Site path */
 								__( 'Site ID: %1$s, Domain: %2$s, Path: %3$s', '0-day-analytics' ),
@@ -866,7 +867,7 @@ if ( ! class_exists( '\ADVAN\Lists\WP_Mail_List' ) ) {
 								$site->domain,
 								$site->path
 							);
-							return '<a href="' . \esc_url( \get_admin_url( (int) $item['blog_id'] ) ) . '" title="' . \esc_attr( $details ) . '">' . \esc_html( $blog_details->blogname ) . '</a>';
+							return '<a href="' . \esc_url( \get_admin_url( (int) $item['blog_id'] ) ) . '" title="' . \esc_attr( $details ) . '">' . \esc_html( $name ) . '</a>';
 						} else {
 							return \esc_html__( 'Unknown or deleted site', '0-day-analytics' );
 						}

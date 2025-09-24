@@ -190,9 +190,10 @@ if ( ! class_exists( '\ADVAN\Entities\WP_Mail_Entity' ) ) {
 			if ( $results ) {
 				foreach ( $results as $result ) {
 					$details = \get_blog_details( array( 'blog_id' => $result['blog_id'] ) );
+					$name    = ( $details ) ? $details->blogname : \sprintf( /* translators: %s: Site ID */ __( 'Site %s', '0-day-analytics' ), (int) $result['blog_id'] );
 					$sites[] = array(
 						'id'   => $result['blog_id'],
-						'name' => $details->blogname,
+						'name' => $name,
 					);
 				}
 			}
